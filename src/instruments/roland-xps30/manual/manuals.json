@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "instrument": {
+    "manufacturer": "Roland",
+    "model": "XPS-30"
+  },
+  "generated_at": "2026-07-27",
+  "storage": {
+    "scope": "internal_study",
+    "status": "downloaded",
+    "root": "manual/source",
+    "redistribution": "Do not distribute the original PDFs outside the internal study scope."
+  },
+  "documents": [
+    {
+      "id": "xps30-version-2-supplementary-manual",
+      "title": "XPS-30 Version 2 Supplementary Manual",
+      "kind": "supplementary_manual",
+      "version": "2",
+      "support_page": "https://www.roland.com/global/support/by_product/xps-30/owners_manuals/97b7aa70-ff16-4cc2-baef-94b68320c1de/",
+      "direct_pdf": "https://static.roland.com/assets/media/pdf/XPS-30_v200_eng01_W.pdf",
+      "local_file": "source/XPS-30_v200_eng01_W.pdf",
+      "download_status": "downloaded",
+      "downloaded_at": "2026-07-27",
+      "page_count": 2,
+      "file_size_bytes": 263604,
+      "sha256": "3d5f9a8f41382b014e1ba2b647f1a4401c54f5d8ba2b49e20a35bd9e35aaedc8",
+      "purpose": "Version 2 feature additions and changes."
+    },
+    {
+      "id": "xps30-owners-manual",
+      "title": "XPS-30 Owner\u0027s Manual",
+      "kind": "owners_manual",
+      "version": null,
+      "support_page": "https://www.roland.com/global/support/by_product/xps-30/owners_manuals/123885cb-a317-4f84-95e4-158cc993dadb/",
+      "direct_pdf": "https://static.roland.com/assets/media/pdf/XPS-30_e02_W.pdf",
+      "local_file": "source/XPS-30_e02_W.pdf",
+      "download_status": "downloaded",
+      "downloaded_at": "2026-07-27",
+      "page_count": 24,
+      "file_size_bytes": 2473892,
+      "sha256": "c38aa39ddf88daffe0ec1f747bb6d87f19b245207e7d0363a3ee0201b5d2c28b",
+      "purpose": "Core operation, connections, modes, and general workflow."
+    },
+    {
+      "id": "xps30-parameter-guide",
+      "title": "XPS-30 Parameter Guide",
+      "kind": "parameter_guide",
+      "version": null,
+      "support_page": "https://www.roland.com/global/support/by_product/xps-30/owners_manuals/76ddc62f-8d9f-4ca4-8e13-43ec4b5c3675/",
+      "direct_pdf": "https://static.roland.com/assets/media/pdf/XPS-30_ParamGuide_eng02_W.pdf",
+      "local_file": "source/XPS-30_ParamGuide_eng02_W.pdf",
+      "download_status": "downloaded",
+      "downloaded_at": "2026-07-27",
+      "page_count": 89,
+      "file_size_bytes": 7506615,
+      "sha256": "bccceb1554b312679ee91d73d77b4fc4e521847756adffc6f90fe742337896e8",
+      "purpose": "Detailed menu and parameter definitions."
+    },
+    {
+      "id": "xps30-midi-implementation",
+      "title": "XPS-30 MIDI Implementation",
+      "kind": "midi_implementation",
+      "version": null,
+      "support_page": "https://www.roland.com/global/support/by_product/xps-30/owners_manuals/f411c299-e981-4226-a341-156020e22baf/",
+      "direct_pdf": "https://static.roland.com/assets/media/pdf/XPS-30_MIDI_Imple_eng02_W.pdf",
+      "local_file": "source/XPS-30_MIDI_Imple_eng02_W.pdf",
+      "download_status": "downloaded",
+      "downloaded_at": "2026-07-27",
+      "page_count": 67,
+      "file_size_bytes": 435466,
+      "sha256": "b119c90192e8646371801ad73e0ac6c9e9f230afcb54d12a88bbd5e9c6710196",
+      "purpose": "MIDI messages, SysEx, and integration details."
+    },
+    {
+      "id": "xps30-version-1-04-supplementary-manual",
+      "title": "XPS-30 Version 1.04 Supplementary Manual",
+      "kind": "supplementary_manual",
+      "version": "1.04",
+      "support_page": "https://www.roland.com/global/support/by_product/xps-30/owners_manuals/bba94790-4b95-4f27-8176-b28eff6c6572/",
+      "direct_pdf": "https://static.roland.com/assets/media/pdf/XPS-30_v104_e01_W.pdf",
+      "local_file": "source/XPS-30_v104_e01_W.pdf",
+      "download_status": "downloaded",
+      "downloaded_at": "2026-07-27",
+      "page_count": 4,
+      "file_size_bytes": 100099,
+      "sha256": "38d3fbd2df682b107e4d57ca28b9aa2657f11546517def27c994d7f87ac29bd0",
+      "purpose": "Historical documentation for Version 1.04 additions."
+    },
+    {
+      "id": "juno-ds-tone-manager-guide",
+      "title": "Using JUNO-DS Tone Manager",
+      "kind": "software_guide",
+      "version": null,
+      "support_page": "https://www.roland.com/global/support/by_product/xps-30/owners_manuals/8de9a4d7-443b-4e18-b8f1-004200b366f2/",
+      "direct_pdf": "https://static.roland.com/assets/media/pdf/JUNO-DS_TM_eng02_W.pdf",
+      "local_file": "source/JUNO-DS_TM_eng02_W.pdf",
+      "download_status": "downloaded",
+      "downloaded_at": "2026-07-27",
+      "page_count": 18,
+      "file_size_bytes": 6300939,
+      "sha256": "23b8a02da50bee495bfc43afae181c2ae1d86365c2d0cb9e78e3a6b8557bb450",
+      "purpose": "Official guide for Tone Manager workflows, including Version 2 multisample work."
+    }
+  ]
+}

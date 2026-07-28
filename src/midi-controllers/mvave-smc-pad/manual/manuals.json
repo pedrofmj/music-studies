@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "device": "M-VAVE SMC-PAD",
+  "stored_for": "internal_study",
+  "manual": {
+    "official_product_page": "https://www.m-vave.com/product?id=smc-pad",
+    "official_manual_url": "https://manualf.oss-cn-hongkong.aliyuncs.com/manual/MIDI-KEYBOARD/SMC-PAD_ZE.pdf",
+    "local_file": "source/SMC-PAD_ZE.pdf",
+    "downloaded_at": "2026-07-27",
+    "page_count": 17,
+    "file_size_bytes": 1789762,
+    "sha256": "552f53ad4f77e4a42d900cda86fff0257e6421f2ca3a0cfa402e854ca7bc48db"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "device": "M-VAVE FM-1",
+  "stored_for": "internal_study",
+  "manual": {
+    "official_product_page": "https://www.m-vave.com/product?id=fm-1",
+    "official_manual_url": "https://manualf.oss-cn-hongkong.aliyuncs.com/manual/MIDI-KEYBOARD/FM-1-manual.pdf",
+    "local_file": "source/FM-1-manual.pdf",
+    "downloaded_at": "2026-07-27",
+    "page_count": 27,
+    "file_size_bytes": 825397,
+    "sha256": "d6e6f28c2ff3c37b01b19d4bed2bf2c10aaf06bbe664076d3cef3a38697e28e7"
+  }
+}

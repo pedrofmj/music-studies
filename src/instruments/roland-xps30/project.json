@@ -1,0 +1,58 @@
+{
+  "project": {
+    "name": "Roland XPS-30 Study and Setup Plan",
+    "objective": "Create a complete knowledge base, configuration guide, and optimized setup for a Roland XPS-30 focused on Christian worship, live performance, and long-term mastery."
+  },
+  "user_profile": {
+    "experience": {
+      "keyboard": "Intermediate",
+      "software": "Advanced software engineer",
+      "linux": true
+    },
+    "goals": [
+      "Master every feature of the Roland XPS-30.",
+      "Build a professional worship/live setup.",
+      "Understand the synthesis architecture instead of only memorizing buttons.",
+      "Organize sounds and performances efficiently.",
+      "Keep all documentation under version control.",
+      "Avoid dependence on Windows whenever possible."
+    ],
+    "environment": {
+      "os": "Ubuntu Linux",
+      "pedals": [
+        "Roland DP-10"
+      ],
+      "instrument": "Roland XPS-30"
+    }
+  },
+  "constraints": {
+    "prefer_linux_only": true,
+    "avoid_windows_when_possible": true,
+    "prefer_official_resources": true,
+    "document_everything": true
+  },
+  "deliverables": [
+    {
+      "name": "Knowledge Base",
+      "description": "Complete documentation explaining the XPS-30 architecture, features, terminology, and workflow."
+    },
+    {
+      "name": "Study Plan",
+      "description": "Progressive study roadmap from beginner to advanced."
+    },
+    {
+      "name": "Live Setup",
+      "description": "Optimized setup for church worship."
+    },
+    {
+      "name": "Sound Library",
+      "description": "Catalog of useful sounds, favorites, performances, and expansion recommendations."
+    },
+    {
+      "name": "Linux Guide",
+      "description": "How to manage expansions, backups, and samples using Ubuntu where possible."
+    }
+  ],
+  "documentation_root": "src/instruments/roland-xps30",
+  "status": "starter"
+}

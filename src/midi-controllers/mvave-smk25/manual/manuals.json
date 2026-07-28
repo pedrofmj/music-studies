@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "device": "M-VAVE SMK25",
+  "stored_for": "internal_study",
+  "manual": {
+    "official_product_page": "https://www.m-vave.com/product?id=smk25",
+    "official_manual_url": "https://manualf.oss-cn-hongkong.aliyuncs.com/manual/MIDI-KEYBOARD/SMK-25-MIDI.pdf",
+    "local_file": "source/SMK-25-MIDI.pdf",
+    "downloaded_at": "2026-07-27",
+    "page_count": 22,
+    "file_size_bytes": 1883375,
+    "sha256": "36ff04096011931e735a7bcab086fecb62ce2ce8b4fc631eb461f7aece57728b"
+  }
+}

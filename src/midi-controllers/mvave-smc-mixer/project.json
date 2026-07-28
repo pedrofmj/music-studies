@@ -1,0 +1,19 @@
+{
+  "project": {
+    "name": "M-VAVE SMC-Mixer Study and Setup Plan",
+    "objective": "Create a reproducible knowledge base and operating setup for the M-VAVE SMC-Mixer."
+  },
+  "device": {
+    "manufacturer": "M-VAVE",
+    "model": "SMC-Mixer",
+    "category": "eight-channel wireless DAW control surface"
+  },
+  "goals": [
+    "Understand every physical control and operating mode.",
+    "Build reliable wired USB workflows before BLE MIDI.",
+    "Document host endpoints, mappings, presets, and firmware state.",
+    "Prefer Linux-native configuration and preserve editor-dependent settings."
+  ],
+  "documentation_root": "src/midi-controllers/mvave-smc-mixer",
+  "status": "starter"
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "device": "M-VAVE SMC-Mixer",
+  "stored_for": "internal_study",
+  "manual": {
+    "official_product_page": "https://www.m-vave.com/product?id=smc-mixer",
+    "official_manual_url": "https://manualf.oss-cn-hongkong.aliyuncs.com/manual/MIDI-KEYBOARD/SMC-MIXER_ZE.pdf",
+    "local_file": "source/SMC-MIXER_ZE.pdf",
+    "downloaded_at": "2026-07-27",
+    "page_count": 15,
+    "file_size_bytes": 824073,
+    "sha256": "b396005e4a3973cc216ba4151bf3f765d9f2b10af5656b599e807eced7dcb289"
+  }
+}

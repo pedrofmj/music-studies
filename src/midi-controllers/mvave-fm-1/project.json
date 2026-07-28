@@ -1,0 +1,19 @@
+{
+  "project": {
+    "name": "M-VAVE FM-1 Study and Setup Plan",
+    "objective": "Create a reproducible knowledge base and operating setup for the M-VAVE FM-1 FM synthesizer and MIDI controller."
+  },
+  "device": {
+    "manufacturer": "M-VAVE",
+    "model": "FM-1",
+    "category": "six-operator FM synthesizer and MIDI controller"
+  },
+  "goals": [
+    "Understand the six-operator FM architecture, algorithms, envelopes, LFO, effects, arpeggiator, and sequencer.",
+    "Build reliable audio and wired USB MIDI workflows before BLE MIDI.",
+    "Document presets, global MIDI channels, SysEx imports, sequences, and firmware state.",
+    "Prefer Linux-native routing and retain evidence for editor or firmware-dependent work."
+  ],
+  "documentation_root": "src/midi-controllers/mvave-fm-1",
+  "status": "starter"
+}
