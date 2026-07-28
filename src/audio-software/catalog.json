@@ -195,7 +195,7 @@
         "evidence_url": "https://pipewire.org/"
       },
       "official_resources": ["https://pipewire.org/", "https://docs.pipewire.org/"],
-      "manual": {"documentation_url": "https://docs.pipewire.org/", "local_status": "not_retained", "documentation_root": null}
+      "manual": {"documentation_url": "https://docs.pipewire.org/", "local_status": "not_retained", "documentation_root": "pipewire"}
     },
     {
       "id": "easyeffects",
@@ -216,7 +216,7 @@
         "evidence_url": "https://github.com/wwmm/easyeffects"
       },
       "official_resources": ["https://github.com/wwmm/easyeffects", "https://wwmm.github.io/easyeffects/"],
-      "manual": {"documentation_url": "https://wwmm.github.io/easyeffects/", "local_status": "not_retained", "documentation_root": null}
+      "manual": {"documentation_url": "https://wwmm.github.io/easyeffects/", "local_status": "not_retained", "documentation_root": "easyeffects"}
     },
     {
       "id": "equalizer-apo",

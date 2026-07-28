@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalog_id": "easyeffects",
+  "software": {
+    "name": "EasyEffects",
+    "publisher": "EasyEffects project",
+    "license": "GPL-3.0-or-later"
+  },
+  "study_scope": "Build and document safe PipeWire input and output effect chains on Linux, then verify device selection, presets, monitoring, and recovery.",
+  "platforms_in_scope": {
+    "linux": "active_study",
+    "windows": "not_offered"
+  },
+  "primary_functions": [
+    "output effects chains",
+    "input effects chains",
+    "equalization and dynamics processing",
+    "PipeWire device integration"
+  ],
+  "local_test_status": {
+    "linux": "not_tested",
+    "windows": "not_applicable"
+  },
+  "manual_status": "official_web_documentation_only",
+  "documentation_root": "src/audio-software/easyeffects"
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "catalog_id": "pipewire",
+  "stored_for": "internal_study",
+  "documents": [
+    {
+      "id": "pipewire-project-page",
+      "title": "PipeWire Project Page",
+      "authority": "official_project_documentation",
+      "url": "https://pipewire.org/",
+      "local_file": null,
+      "extracted_text": null,
+      "download_status": "web_documentation_only",
+      "reviewed_at": "2026-07-28",
+      "use": "Official Linux project scope, graph-engine capabilities, client compatibility paths, and documentation entry point. No authorized local PDF has been retained."
+    }
+  ]
+}

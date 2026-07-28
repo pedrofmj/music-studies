@@ -1,0 +1,8 @@
+# Retained PipeWire Source PDFs
+
+No PDF is retained yet. The current official sources are
+https://pipewire.org/ and https://docs.pipewire.org/.
+
+Store an authorized official PDF here only after recording its exact URL,
+revision, retrieval date, page count, byte size, and SHA-256 in
+../manuals.json.

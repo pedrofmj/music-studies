@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "catalog_id": "pipewire",
+  "software": {
+    "name": "PipeWire",
+    "publisher": "PipeWire project",
+    "source_status": "open_source"
+  },
+  "study_scope": "Build and document a Linux audio and MIDI routing baseline, then verify device routing and client compatibility for LMMS and Carla.",
+  "platforms_in_scope": {
+    "linux": "active_study",
+    "windows": "not_offered"
+  },
+  "primary_functions": [
+    "low-latency multimedia graph processing",
+    "audio and MIDI device routing",
+    "client compatibility"
+  ],
+  "local_test_status": {
+    "linux": "not_tested",
+    "windows": "not_applicable"
+  },
+  "manual_status": "official_web_documentation_only",
+  "documentation_root": "src/audio-software/pipewire"
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "catalog_id": "easyeffects",
+  "stored_for": "internal_study",
+  "documents": [
+    {
+      "id": "easyeffects-project-repository",
+      "title": "EasyEffects Project Repository",
+      "authority": "official_project_documentation",
+      "url": "https://github.com/wwmm/easyeffects",
+      "local_file": null,
+      "extracted_text": null,
+      "download_status": "web_documentation_only",
+      "reviewed_at": "2026-07-28",
+      "use": "Official PipeWire application role, effects list, installation paths, safety warning, and help links. No authorized local PDF has been retained."
+    }
+  ]
+}
