@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "catalog_id": "carla",
+  "software": {
+    "name": "Carla",
+    "publisher": "KXStudio / Carla project",
+    "license": "GPL-2.0"
+  },
+  "study_scope": "Build and document reproducible plugin rack, patchbay, audio output, MIDI input, and controller workflows on Linux and Windows.",
+  "platforms_in_scope": ["linux", "windows"],
+  "primary_functions": [
+    "plugin hosting",
+    "rack processing",
+    "audio and MIDI patching",
+    "transport and parameter control"
+  ],
+  "local_test_status": {
+    "linux": "not_tested",
+    "windows": "not_tested"
+  },
+  "manual_status": "official_web_documentation_only",
+  "documentation_root": "src/audio-software/carla"
+}

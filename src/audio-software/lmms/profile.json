@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "catalog_id": "lmms",
+  "software": {
+    "name": "LMMS",
+    "publisher": "LMMS community",
+    "license": "GPL-2.0-or-later"
+  },
+  "study_scope": "Build and document a reproducible pattern-based MIDI production workflow on Linux and Windows, then verify controllers, audio output, project exchange, and export.",
+  "platforms_in_scope": ["linux", "windows"],
+  "primary_functions": [
+    "pattern-based MIDI composition",
+    "instrument and effect sequencing",
+    "automation",
+    "audio export"
+  ],
+  "local_test_status": {
+    "linux": "not_tested",
+    "windows": "not_tested"
+  },
+  "manual_status": "official_web_documentation_only",
+  "documentation_root": "src/audio-software/lmms"
+}

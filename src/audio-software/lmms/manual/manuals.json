@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "catalog_id": "lmms",
+  "stored_for": "internal_study",
+  "documents": [
+    {
+      "id": "lmms-user-manual",
+      "title": "LMMS User Manual",
+      "authority": "official_project",
+      "url": "https://docs.lmms.io/user-manual/",
+      "local_file": null,
+      "extracted_text": null,
+      "download_status": "web_documentation_only",
+      "reviewed_at": "2026-07-28",
+      "use": "Official installation, workflow, and feature documentation. No authorized local PDF has been retained."
+    }
+  ]
+}

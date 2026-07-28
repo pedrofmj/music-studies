@@ -90,7 +90,7 @@
         "evidence_url": "https://lmms.io/"
       },
       "official_resources": ["https://lmms.io/download", "https://docs.lmms.io/user-manual/"],
-      "manual": {"documentation_url": "https://docs.lmms.io/user-manual/", "local_status": "not_retained", "documentation_root": null}
+      "manual": {"documentation_url": "https://docs.lmms.io/user-manual/", "local_status": "not_retained", "documentation_root": "lmms"}
     },
     {
       "id": "qtractor",
@@ -153,7 +153,7 @@
         "evidence_url": "https://kx.studio/Applications:Carla"
       },
       "official_resources": ["https://kx.studio/Applications:Carla", "https://github.com/falkTX/Carla"],
-      "manual": {"documentation_url": "https://kx.studio/Applications:Carla", "local_status": "not_retained", "documentation_root": null}
+      "manual": {"documentation_url": "https://kx.studio/Applications:Carla", "local_status": "not_retained", "documentation_root": "carla"}
     },
     {
       "id": "vcv-rack",

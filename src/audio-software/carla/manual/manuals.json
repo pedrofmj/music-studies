@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "catalog_id": "carla",
+  "stored_for": "internal_study",
+  "documents": [
+    {
+      "id": "kxstudio-carla-application-page",
+      "title": "KXStudio: Applications: Carla",
+      "authority": "official_project_documentation",
+      "url": "https://kx.studio/Applications:Carla",
+      "local_file": null,
+      "extracted_text": null,
+      "download_status": "web_documentation_only",
+      "reviewed_at": "2026-07-28",
+      "use": "Official host purpose, routing modes, driver paths, plugin format, and download documentation. No authorized local PDF has been retained."
+    }
+  ]
+}
