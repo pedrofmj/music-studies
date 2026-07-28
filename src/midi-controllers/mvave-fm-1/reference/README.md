@@ -1,5 +1,7 @@
 # FM-1 Reference
 
+[Structured capabilities](capabilities.json) records source-linked ports, signal directions, connection constraints, and supported roles.
+
 The FM-1 is a self-contained sound source and a MIDI device. It should be
 documented as both an instrument and a controller.
 

@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "device": "F998 Live Sound Card",
+  "stored_for": "internal_study",
+  "identity": {
+    "fcc_id": "2A6NU-F998",
+    "fcc_applicant_manufacturer": "Shenzhen Furuijie Electronic Technology Co., Ltd.",
+    "retail_brand": "unknown; verify physical label"
+  },
+  "documents": [
+    {
+      "id": "f998-podcast-bundle-manual",
+      "title": "F998 Podcast Equipment Bundle Product Manual",
+      "authority": "retail_bundle_document",
+      "url": "https://ae-pic-a1.aliexpress-media.com/kf/S03b355e3dfa348dbb3809cfa801e2f6e6.pdf",
+      "local_file": "source/F998-podcast-bundle-manual.pdf",
+      "extracted_text": "extracted/F998-podcast-bundle-manual.txt",
+      "download_status": "downloaded",
+      "downloaded_at": "2026-07-27",
+      "page_count": 1,
+      "file_size_bytes": 68907,
+      "sha256": "e81e1972415db2cabc484fab89430b61830ce92d5b354ee03a9f9fb92680be28",
+      "use": "product class and control claims; not a revision-specific port map"
+    },
+    {
+      "id": "fcc-filed-user-manual",
+      "title": "F998 Live Sound Card User Manual",
+      "authority": "regulatory_filing",
+      "url": "https://fccid.io/2A6NU-F998/User-Manual/User-manual-5858583",
+      "direct_attachment": "https://apps.fcc.gov/eas/GetApplicationAttachment.html?id=5858583",
+      "local_file": null,
+      "download_status": "not_retrieved_http_403",
+      "retrieval_attempted_at": "2026-07-27",
+      "page_count": 2,
+      "file_size_bytes": 4301207,
+      "sha256": "f82db622a525d70038295228f18564779f88e258084fd5eea328161f1394f186",
+      "use": "manufacturer and product-code evidence; visual document remains to be retained when accessible"
+    },
+    {
+      "id": "third-party-port-guide",
+      "title": "F998 Live Sound Card Audio Mixer User Manual",
+      "authority": "third_party",
+      "url": "https://manuals.plus/asin/B0DQ8ZFVCB",
+      "local_file": null,
+      "download_status": "web_source_only",
+      "use": "provisional port-label and streaming behavior cross-check"
+    }
+  ]
+}

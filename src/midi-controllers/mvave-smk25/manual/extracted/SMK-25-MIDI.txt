@@ -1,0 +1,637 @@
+   SMK-25
+ User Manual
+
+
+
+
+CubeSuite for Android/iOS：scan the QR code
+Ⅰ. Packing List                                                    EN
+
+
+■SMK-25 Midi Keyboard；
+■USB connection cable；
+■User manual；
+
+
+Ⅱ. Making The Connection                                           EN
+
+■USB Connection: Plug the cable through the USB port to the
+Windows/Mac it will automatic be recognized, When plug into
+Windows/Mac the SMK-25 will be charging at the same time；
+(Red light: charging, Green light: charging complete)
+■Wireless Connection: Press and hold the BT button, when the
+light flashing the wireless function is activated, when the light stay
+on was connection successfully；
+■Wireless Adapter: Plug Wireless Adapter B into Windows/Mac,
+connection was successfully when both lights stay on；
+■Direct Wireless: Activated BT function of Windows/Mac/ios/
+Android, Select SMK-25 on the list (Windows users need BT 5.0
+and extra BLE Midi Driver)；
+■MIDI OUT Connection:
+Cable Connection: Change the Pedal mode setting in software
+form Pedal to MIDI OUT, When it’s done, the Port in back of the
+keyboard can use as a MIDI OUT port to connecting to device such
+as hardware synthesizer;
+Wireless connection: Use Five-Pin wireless MIDI adapter A
+connecting to device such as synthesizer or other device that
+support MIDI IN;
+
+
+
+
+                                  1
+W i rel ess ad ap ter A                              W i rel ess ad ap ter B
+
+
+
+
+Note: Wireless Adapter A and B are not within the package need
+to buy additionally；
+Low battery notification: The digital segment display will flash
+when there is insufficient power supply for keyboard;
+
+
+Ⅲ. Functions                                                           EN
+
+
+
+
+                                 2
+①Back of keyboard                              ①
+Power: Switch to turn on/off the midi
+keyboard;
+USB: USB-B Connection port;
+Sustain: 1/4 inch sustain pedal
+connection port;
+
+②Pitch Stripe and Modulation Stripe
+                                               ②
+Pitch Stripe: Slide the pitch stripe up and
+down to control the pitch bend, the
+center position is the original pitch of the
+sound, lift the finger up will release the
+sound to the original pitch;
+Modulation Stripe: Slide the modulation
+stripe send continuous Midi CC message;
+Note: (You can assign the Modulation
+stripe use the Midi Learn function of
+Daw)
+
+③Display area
+
+
+
+
+                                  3
+④Button area
+PLAY: Control the Play function of the Daw;
+STOP: Control the Stop function of the Daw;
+RECORD: Control the Record function of the Daw;
+Note: To use Transport control needs to Select the presets
+within the keyboard and set up inside Daw correctly;
+BT: Press and hold the BT button to connect the midi keyboard
+with the receiver or your phone, when the light flashing still the
+keyboard was connected to the receiver or your phone
+successfully;
+ARP: Press the Arp button to enable arpeggiator mode, press and
+hold the Arp button and press the key to adjust the settings of
+arpeggiator;
+(Go through more details in Arp instructions)
+SC/CH: Press the button to enable smart scale/chord mode, Smart
+scale allows you to constrain the notes you playing on the
+keyboard to a specified scale. Smart chord make every single note
+you playing become a chord which root note is the key you
+pressed;
+(Go through more details in Smart Scale/Chord instructions)
+KNOB-B: Press the button to switch from Knob 1-8 to Knob 9-16;
+PAD-B: Press the button to switch from Pad 1-8 to Pad 9-16;
+KNOB-B + PAD-B: Hold this two button together to edit the
+velocity curve of the key and the pad;
+BT + PAD-B: Select presets inside the keyboard;
+
+                                ④
+
+                                               P RE
+
+
+
+
+                                        VEL
+
+
+
+
+                                 4
+⑤Oct+,Oct-
+This two buttons adjust the pitch range of the keyboard,
+Hold OCT+/OCT- and rotate the Transpose Knob to Shift the Pitch
+by one note per step;
+Higher the octave range of keyboard, faster the light of the OCT+
+button will flashing;
+Lower the octave range of keyboard, faster the light of the OCT-
+button will flashing;
+Press the oct+, oct- simultaneously to reset the octave range to
+the original position;
+
+                                        ⑤
+
+
+                               Transpose
+
+
+
+⑥Knobs
+Eight assignable 360-degrees rotary encoders; These eight knobs
+can also send Aftertouch, Midi CC, Pitch information through
+setting inside software;
+Hold Arp button and rotate the knob to change settings of Arp, for
+more details check the Arpeggiator instructions;
+Note: You can only change settings inside software;
+
+                                        ⑥
+
+
+                      M OD E    OCT         L ATC H        G ATE
+
+
+
+
+                      SWIN G   TEM PO       R ATE     t r an s po s e
+
+
+
+
+                                        5
+⑦Pads
+Eight RGB back-lit pads with velocity-sensitive & aftertouch;
+Include Note, Midi CC, Program Change;
+Note: You can only change settings inside software;
+
+
+
+
+⑧Keys
+Twenty-five velocity-sensitive keys, hold the ARP, SC/ CH button
+and press the key to change different settings of corresponding
+mode;
+
+
+
+
+                                 6
+Ⅳ. Arpeggiator Instructions                                     EN
+
+Arpeggiator Types (Up,Down,Incl,Excl,Random,Order,Repeat)
+     Press and hold the Arp button or Press the button and
+rotate the knob to change the way arpeggiator work based on
+BPM/Tempo;
+Up: The pressing notes will play from the lowest to highest;
+Down: The pressing notes will play from the highest to lowest;
+Incl: The pressing notes will play from the lowest to highest, and
+then back down, The lowest and highest notes will sound twice;
+Excl: The pressing notes will play from the lowest to highest, and
+then back down, The lowest and highest notes will sound just
+once；
+Random: The pressing notes will play randomly as they were
+pressed;
+Order: The pressing notes will play in order as they were pressed;
+Repeat: The pressing notes and the pads will play repeatedly;
+Oct+: Shift the octave range of arpeggiator, press the key four
+time will back to init octave range;
+Latch: The arpeggiator will still arpeggiated even when you lift
+your fingers;
+Gate+, Gate -: Set the length of each note has been arpeggiated;
+Tap: Tap the key to adjust the tempo of arpeggiator (Display area
+show the BPM);
+Swing+, Swing: Set the deviation of notes, longer the Swing
+amount, the playing sounds will be more groovy;
+Tempo+, Tempo-: Set the tempo of the arpeggiator. you can hold
+the tempo+/tempo- to continuously increase the amount;
+Sync: Synchronized the tempo to the DAW, To activated SYNC you
+need to enable external Midi Controller sync function inside DAW;
+Note: When Sync is activated, Tempo+, Tempo-, Tap, function
+are invalid;
+Time division: Set the rate of arpeggiator based on the tempo,
+(1/4, 1/4T, 1/8, 1/8T, 1/16, 1/16T, 1/32, 1/32T);
+                                7
+Ⅴ. Smart Scale/Chord Instructions                                 EN
+
+
+Smart Scale Mode:
+Select the scale: Hold the button and press the notes C-B to
+select the scale;
+Major/Minor: When set to the selected scale, hold the button and
+press the major/minor to determined weather it is a major scale or
+minor scale;
+For example: If you want to select C minor scale, hold the button
+and press the C on the left side of keybed and Minor on the right
+side of keybed, After setting correctly all the keys that been played
+will be fit in the C minor Scale;
+To exit out of the smart scales mode press the off on the left
+side of keybed;
+Note: If Smart Chord mode was activated, Then it will just exit
+out of Smart Scale mode preserve the Smart Chord mode;
+
+Smart Chord Mode:
+Chord Types: Press the notes on the keybed (Triad, 7th, 9th,
+Random) to select the type of chord;
+Major/Minor: Press the notes (Major, Minor) to select weather it’s
+a major/minor chord;
+Scale: Press the notes on the keybed (C-B) to select the scale of
+chord;
+To exit out of the smart chord mode press the off on the right
+side of keybed;
+Note: If Smart Scale mode was activated, Then it will just exit
+out of Smart Chord mode preserve the Smart Scale mode;
+For example: If you want to play the chords all fits in C minor
+scale, hold the button and press the note on the right side of
+keybed, then select the types and tonality of chord;
+
+
+
+                                 8
+Ⅵ. Technology Parameters                                    EN
+
+
+
+Product Dimensions 321mm(L) x 178mm (W)x 46mm(H)
+Product Weight     750g
+Keys               Twenty-five velocity-sensitive keys
+                   8 RGB Back-Lit Pads with velocity-sensitive
+Pads               and after touch
+Knobs              8 assignable endless 360 degree encoders
+                   Capacitive touch-stripes pitch bend &
+Touch Stripes      Modulation control
+                   1/4 inch Sustain pedal connection port
+                   USB-B port
+Output             Wireless connection with
+                   Windows/Mac/ios/Android
+                   Wireless Midi Out Function
+                   （Need extra wireless midi device）
+Power              Battery supplied or USB-bus-powered
+Battery Model/Type 704060
+Battery Nominal
+Voltage            3.7V
+Battery capacity    2000mAh
+
+
+
+
+                              9
+ Ⅶ. Connection Method                                            EN
+
+
+
+
+      MAC
+                  Audio MIDI Studio
+
+Mac: Connect directly via BT inside Audio MIDI Studio Setup
+
+
+
+ Windows     Ble MIDI Driver
+
+
+Windows: You need to download a driver, please contact us to
+send you a link
+
+
+iOS
+
+
+
+iPhone: You need to open the software that supports Ble MIDI,
+such as GarageBand, search for a MiDl keyboard in your MIDI
+device and connect it
+
+
+
+
+Android: You need to open the software that supports Ble MIDI,
+such as FL studio. search for a MiDl keyboard in your MIDI
+device and connect it
+
+
+                                10
+Ⅷ. FCC Warning Statement                                           EN
+
+
+★Changes or modifications not expressly approved by the party
+responsible for compliance could void the user’s authority to
+operate the equipment. This equipment has been tested and
+found to comply with the limits for a Class B digital device,
+pursuant to Part 15 of the FCC Rules. These limits are designed to
+provide reasonable protection against harmful interference in a
+residential installation. This equipment generates uses and can
+radiate radio frequency energy and, if not installed and used in
+accordance with the instructions, may cause harmful interference
+to radio communications. However, there is no guarantee that
+interference will not occur in a particular installation. If this
+equipment does cause harmful interference to radio or television
+reception, which can be determined by turning the equipment off
+and on, the user is encouraged to try to correct the interference by
+one or more of the following measures:
+‐‐ Reorient or relocate the receiving antenna.
+‐‐ Increase the separation between the equipment and receiver.
+‐‐ Connect the equipment into an outlet on a circuit different from
+that to which the receiver is connected.
+‐‐ Consult the dealer or an experienced radio/TV technician for
+help.
+
+FCC Radiation Exposure Statement
+The device has been evaluated to meet general RF exposure
+requirement. The device can be used in portable exposure
+condition without restriction.
+
+This device complies with Part 15 of the FCC Rules. Operation is
+subject to the following two conditions:
+(1)This device may not cause harmful interference.
+(2)This device must accept any interference received, including
+interference that may cause undesired operation.
+
+
+
+
+                                11
+ SMK-25
+    用户指南
+
+
+
+
+手机端Android/iOS下载APP：扫描二维码下载
+一. 包装清单                                 CN
+
+
+■SMK-25 MIDI键盘；
+■USB连接线；
+■用户指南；
+
+
+二. 设备连接                                 CN
+
+■有线连接：通过USB接口连接移动设备或电脑终端（Windows/
+Mac），设备无需安装驱动可自动识别，同时设备将会自动充电；
+（背部指示灯为红色为正在充电；指示灯为绿色为已经充满）；
+
+■无线连接：长按设备区域4中的BT按键开启无线功能（按键灯光闪
+烁为待连接，常亮为连接成功）；
+
+■无线适配器连接：将适配器B端接入Windows/Mac，当键盘与无线
+适配器连接指示灯同时为常亮状态为连接成功；
+
+■无线直连：开启Windows/Mac/ios/Android的BT功能，菜单中选择
+SMK-25，配对成功后BT按键灯光常亮（Windows用户需BT5.0及安
+装BLE MIDI驱动）；
+
+■MIDI OUT连接:
+有线连接: 在设置软件中将踏板接口模式从Pedal改为MIDI OUT, 此时
+接口可做为MIDI OUT接口有线连接合成器等支持MIDI IN的设备;
+无线连接: 使用键盘的无线功能配对五针MIDI口无线适配器A端用来控
+制合成器等支持MIDI IN的设备;
+
+
+
+
+                    1
+注：无线适配器A端与B端需另外购买；
+低电量提示：键盘电量不足情况下数码管将会闪烁。
+
+
+
+三. 功能介绍                   CN
+
+
+
+
+               2
+区域 ①                           ①
+Power：拨动开关以开启或关闭MIDI键盘；
+USB：USB-B型连接接口；
+Sustain：6.5mm延音踏板输出接口；
+                               ②
+区域 ② 触控区域
+●弯音滑条：用手指上下滑动该区域来调整
+弹奏声音的音高，中间区域为原点，松开手
+指后声音回到原始音高；
+●Modulation滑条：手指滑动该区域发送
+连续的Midi Cc码；
+注：可以使用宿主软件中的Midi Learn功能
+来配置该区域；
+
+区域 ③ 数码管显示区域；
+
+
+
+
+                           ④
+
+
+区域 ④ 按键区域
+                                         P RE
+
+
+
+
+PLAY：控制宿主软件中的播放按键；                 VEL
+
+
+STOP：控制宿主软件中的停止按键；
+RECORD：控制宿主软件中的录制按键；
+注：控制播放录制暂停需选择对应的软件预设并在宿主软件中进行正
+确配置；
+
+                   3
+Bt：长按开启无线功能，当灯闪烁时为未连接状态，灯常亮时为已成
+功连接至手机或无线接收端（接收端灯也为常亮）；
+ARP：开启琶音功能，长按ARP功能按键加琴键来调整琶音的模式；
+ (具体功能介绍查看琶音编辑说明) ；
+SC/CH：开启Smart Scale/Chord（智能音阶、和弦）功能，长按SC/
+CH功能键加琴键调整模式（具体功能介绍查看智能音阶/和弦编辑说
+明）；
+KNOB-B：按下按键切换Knob1-8至Knob9-16；
+PAD-B：按下按键切换Pad1-8至Pad9-16；
+KNOB + PAD-B：同时按进入力度选择模式，此时打击垫区域Pad1-
+4，Pad4-8为绿色，分别为打击垫的4种力度曲线与琴键的4种力度曲
+线，选择力度曲线后再同时按下按键退出力度选择模式；
+BT + PAD-B：预设选择模式；
+
+区域 ⑤ OCT+ , OCT-
+调整键盘琴键区域的音高；                                     ⑤
+按一次提升或降低一个八度（Octave）
+（12个半音【semitone】）；按住
+OCT+/OCT- 同时旋转Transpose旋钮移调,
+可逐个音符调节;
+                                        Tr a n s p o s e
+
+
+
+音高范围越高OCT+键灯光闪烁速度越快；
+音高范围越低OCT-键灯光闪烁速度越快；
+注：同时按下OCT+和OCT-重置音高；
+
+区域 ⑥ 旋钮
+八组可分配的无极旋钮，通过软件设置可                               ⑥
+调整不同的信息发送类型，包含
+AfterTouch，Midi CC；
+按住Arp功能键同时旋转旋钮可调节琶音功           M OD E    OCT          L ATC H        G ATE
+
+
+
+
+能，具体功能介绍查看琶音编辑说明；
+注：信息发送类型只可以通过软件调整；
+                               SWIN G   TEM PO        R ATE     t r an s po s e
+
+
+
+
+                      4
+区域 ⑦ 打击垫
+八组拥有力度感应和触后功能的打击垫（可在软件中调节背光颜
+色），通过软件设置可调整发送不同的信息类型，包含Note，Midi
+CC，Program Change；
+注：信息发送类型只可以通过软件调整；
+
+
+
+
+区域 ⑧
+琴键区域，琴键上方丝印内容为智能音阶，和弦模式下的功能选择按
+键，下方为琶音模式下对应按键；
+
+
+
+
+                5
+四. 琶音【Arpeggiator】编辑说明                             CN
+
+琶音类型（Up, Down, Incl, Excl, Random, Order, Repeat）
+    按住琶音Arp功能键加琴键区域的琶音类型琴键或旋转旋钮来选择
+琶音演奏的模式，不同的演奏模式下琶音会根据已设置的基于BPM
+（每分钟节拍数）的时间间隔播放；
+Up：按下的音符会按照音高从最低点爬升至最高点，不重复首尾音；
+Down：按下的音符的音高从最高点降低至最低点，不重复首尾音；
+Incl：按下的音符会重复从最低点爬升至最高点再降低至最低点，首音
+和尾音重复两次；
+Excl：按下音符会重复从最低点爬升至最高点再降低至最低点，不重
+复首尾音；
+Rand：按下的音符会按照随机的顺序播放；
+Order：按下的音符会按照音符按下的顺序来播放；
+Repeat：按下的音符会重复播放，此模式下打击垫区域也会重复播
+放；
+Oct+：调整琶音的八度，最高可提升三个八度，按三次后返回原始音
+高；
+Latch：松开琴键后琶音器仍会运行，可在此模式下改变琶音的速率与
+不同的琶音类型；
+Gate+，Gate-：调整琶音音符的长短（Length） ；
+Tap：通过敲击琴键调整琶音的BPM，（数码管显示BPM数值）；
+Swing+, Swing- ：调整琶音音符的律动；
+Tempo+, Tempo-：调整琶音的速率（Rate），长按时可加速调整；
+Sync：将琶音器的BPM与宿主同步；
+注：同步时TAP Tempo，以及Tempo+和Tempo-无效，开启此功能需
+在使用的软件中开启外部设备同步功能；
+
+时间间隔：
+按下琶音功能按键加琴键处的（1/4, 1/4T, 1/8, 1/8T, 1/16, 1/16T, 1/32,
+1/32T）调整琶音的速率（Rate）；
+注：默认情况下琶音的Rate与键盘设置的Tempo/BPM（每分钟节拍
+数）同步，按下Sync则将速率调整与宿主软件BPM同步；
+
+                          6
+五. 智能音阶/和弦模式                                 CN
+
+
+智能音阶模式（Smart Scale）：
+音阶选择：按住功能键加琴键丝印为C-B的琴键选择音阶；
+调性选择：按住功能键加琴键丝印为Major/Minor的琴键选择大调或小
+调音阶；
+注：未选择默认为大调音阶；
+例如：按住按键按C，松开C琴键再按下Major，此时弹奏的所有音符
+都会自动调整为C大调（C Major Scale）音阶内的音符；
+按住SC/CH加琴键上的OFF关闭SCALE模式；
+注：如果在智能和弦模式，则会保留智能和弦模式，如果未开启则功
+能键灯光熄灭。
+
+智能和弦模式（Smart Chord）：
+和弦种类：按住功能加键加琴键丝印为（Triad, 7th, 9th, Rand）的琴
+键选择和弦种类；
+和弦调性：按住功能加键加琴键丝印为（Major, Minor）的琴键选择大
+调或小调和弦；
+和弦音阶：按住功能加键加琴键丝印为（C-B）的琴键使弹奏的所有和
+弦都在选择的音阶中；
+例如：按住功能按键选择琴键Triad，再按下Major，此时弹奏的所有
+单音琴键变为三音大调和弦，按下C音符弹奏的则为C大调和弦；
+默认情况下弹奏的每个琴键都为大调的和弦（选择和弦模式+Minor为
+小调）；
+按住SC/CH加琴键上的OFF，退出和弦模式；
+注：如果在智能音阶模式，则会保留智能音阶模式，如果未开启则功
+能键灯光熄灭；
+注（Triad为和弦的1.3.5音，例如Cmaj，为C大调7个音中的1.3.5，
+7TH为1.3.5.7，9TH为1.3.5.7.9，Random为Major或Minor中的随机
+3音和弦或3音以上和弦）。
+
+
+
+
+                       7
+六. 技术参数                                   CN
+
+
+
+产品尺寸      321mm(L) x 178mm (W)x 46mm(H)
+产品重量      750g
+琴键        25键力度感应琴键
+鼓垫        8个RGB背光支持力度感应和触后的打击垫
+旋钮        8个可分配的360度旋转旋钮
+滑条触摸      电容式触摸弯音滑条和Modulation滑条
+          6.35mm延音\表情踏板接口
+输出        USB-B型接口
+          无线连接Windows/Mac/ios/Android
+          无线MIDI OUT功能（需要额外的无线接收器）
+电源        电池供电或USB供电
+电池型号规格    704060
+电池标称电压    3.7V
+电池额定容量    2000mAh
+修订        20240815
+
+
+
+
+                   8
+七. 连接指南                                          CN
+
+
+
+
+      MAC
+                   音频MIDI设置
+
+Mac：通过音频MIDI工作室进行无线连接；
+
+
+ Windows    Ble MIDI Driver
+
+
+Windows：与Windows连接需要安装Ble Midi驱动，需网上搜索
+下载；
+
+iOS
+
+
+
+iPhone：需要软件支持Ble MIDI （例如库乐队），在软件MIDI设
+备中搜索并连接设备；
+
+
+
+
+Android：需要软件支持Ble MIDI （例如Fl Studio Mobile），在软
+件MIDI设备中搜索并连接设备；
+
+
+
+
+                              9
+

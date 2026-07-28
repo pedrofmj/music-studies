@@ -1,0 +1,807 @@
+   Using JUNO-DS Tone Manager
+  © 2018 Roland Corporation
+  * Roland is a registered trademark or trademark of Roland Corporation in the United States and/or other countries.
+  * Company names and product names appearing in this document are registered trademarks or trademarks of their respective owners.
+
+
+1. Introduction
+  JUNO-DS Tone Manager is an application that lets you use your computer to manage JUNO-DS patches, drum kits, performances, and samples
+  in a library, and to edit their parameters. Using your computer, you’ll be able to efficiently manage and edit large numbers of tones.
+  * JUNO-DS Tone Manager can also be used with the XPS-30. In this manual, simply read references to “JUNO-DS” as “XPS-30.”
+
+
+2. Connections and Settings
+  As described in the JUNO-DS owner’s manual, connect the JUNO-DS to your computer.
+  If it’s not connected correctly, JUNO-DS Tone Manager might not work correctly.
+
+
+2-1. About the JUNO-DS’s Screen Indications
+  While using JUNO-DS Tone Manager, press the [Exit] button so that the left screen and right screen of the JUNO-DS both show the top page.
+  If a screen other than the top screen is shown, the system might not work correctly.
+
+
+
+
+                            Patch screen top page                                 Performance screen top page (using Split)
+
+  While data is being read or written, the JUNO-DS’s display indicates “PC Mode,” and it no longer accepts operations.
+  When reading or writing is completed, the JUNO-DS automatically returns to its normal state.
+  If a problem occurs during reading or writing, and the JUNO-DS does not return from PC Mode, press the [Exit] button to return to the normal
+  state.
+
+
+2-2. Connecting via USB Cable
+  If the JUNO-DS is connected to your computer by a USB cable, you must power up the JUNO-DS before you start up JUNO-DS Tone Manager.
+  If connecting via a USB cable, and the JUNO-DS’s screen shows the message “Go to DAW Control menu?,” press the [EXIT] button to exit the
+  screen.
+  When using the software for the first time, you must set up MIDI devices using the procedure below.
+
+1. On the JUNO-DS itself, set the USB driver setting to “VENDOR.”
+  [MENU] button 0 “SYSTEM” 0 “MIDI” tab 0 “USB Driver”
+  * For details on switching the USB driver, refer to the JUNO-DS Parameter Guide.
+2. Download the USB driver from the Roland website, and install it on your computer.
+3. Start JUNO-DS Tone Manager.
+4. Use the menu’s [System] button to open the System screen, and select “JUNO-DS” for both the INPUT and the
+  OUTPUT DEVICE.
+      NOTE
+       Do not disconnect the USB cable connected to the JUNO-DS while JUNO-DS Tone Manager is running.
+
+
+2-3. Connecting via MIDI Cables
+  If you want to connect JUNO-DS Tone Manager via MIDI cables, you’ll also need a MIDI interface.
+  Using MIDI cables, connect both the MIDI IN and MIDI OUT connectors on the MIDI interface connected to your computer to the MIDI
+  connectors on the JUNO-DS.
+  When using this for the first time, be sure to use the menu's [System] button to open the System screen, and for both the INPUT and the
+  OUTPUT DEVICE, select the port to which the JUNO-DS is connected.
+
+
+                                                                       1                                                                      02
+                                                                                                             Using JUNO-DS Tone Manager
+
+3. Overview of the JUNO-DS Tone Manager
+ Broadly speaking, JUNO-DS Tone Manager provides the following three modes.
+ Librarian
+ You can copy, add, delete, or re-order patches, drum kits, and performances, and to edit the names or memos.
+ In addition, you can load or save library files and backup data for the JUNO-DS.
+ Editor
+ You can edit the parameters of patches, drum kits, and performances.
+ In addition, you can edit user samples and multisample parameters.
+ Sample Creator
+ You can import audio files, and create WAV data that can be imported by the JUNO-DS as user samples.
+ In addition to editing the parameter settings, you can delete unwanted portions of a sample, and process the sample so that loops are
+ smoothly connected.
+
+    Audio files that can be imported
+      WAV/AIFF/SF2 formats (on Mac OS, CoreAudio compatible files are also included)
+
+
+ There’s also a System mode that lets you make settings for JUNO-DS Tone Manager.
+ To switch between these modes, use the mode buttons located in the upper part of the screen.
+
+
+
+
+                                                                     2
+                                                                                                                                                                      Using JUNO-DS Tone Manager
+
+3-1. Librarian Mode
+[Select All]              [Clear] button                          [Load] button                     [Save] button                              [New] button             [Duplicate]              [Close] button
+button                    Clears all selections in                Loads library files or backup     Saves data from the list as a              Adds a new list.         button                   Closes the list.
+Selects all items in      the list.                               data. The loaded file is added    library file (.DSL) or as backup
+                                                                                                                                                                        Duplicates a list,
+the list.                                                         at the far right as a new list.   data (.SVD).
+                                                                                                                                                                        adding it as a new
+                                                                                                                                                                        list.
+
+
+
+
+MODE select                                          [Copy] button                   [Replace] button                 [Insert] button                      [Initialize] button           [Delete] button
+Switches between lists of patches, drum              Copies the selected item        Overwrites the copied item       Inserts the copied item              Initializes all parameters    Deletes the selected item.
+kits, or performances.                               ([Ctrl] key + [C] key does      onto the selected item           below the selected item              of the selected item.
+                                                     the same). If you execute       ([Ctrl] key + [R] key does       ([Ctrl] key + [V] key does
+Finder                                               this on the left-most list,     the same). If you execute        the same). If you execute
+In the currently selected list, searches             only the parameters are         this on the left-most list,      this on the left-most list,
+the specified category for matching                  copied; the sample file is      only the parameters are          only the parameters are
+text in the NO., NAME, or MEMO fields.               not copied.                     copied; the sample file is       copied; the sample files are
+                                                                                     not copied.                      not copied.
+
+
+
+
+View in editor                                                                                             [Read] button                               [Write] button
+By holding down the [Ctrl] key + [Shift] key and clicking an item in the list,                             Reads the selected data from the            Writes the data of the selected number
+you can switch to editor mode with the parameters of that item shown.                                      connected JUNO-DS. However, the             to the connected JUNO-DS. However,
+                                                                                                           sample itself is not read.                  the sample itself is not written.
+
+
+
+
+                                                                                                                                       List NAME input
+                                                                                                                                       Enter a name for the list
+                                                                                                                                       (maximum 32 characters).
+
+
+
+
+ JUNO-DS list
+ Shows a list of patches,
+ drum kits, and performances
+ that are in the JUNO-
+ DS synthesizer that is
+ connected. If the XPS-30
+ is connected, this area
+ indicates “XPS-30.“
+
+
+                                                                                                                                                             Add Item button
+                                                                                                                                                             Adds a new item to the end
+                                                                                                                                                             of the list.
+
+
+
+
+                          Number                              NAME input                        S symbol                          MEMO input                       [PREVIEW] button
+                          Click here to select an item.       Enter a name (maximum 12          This is shown if the patch or     Enter a memo (maximum            Plays a preview phrase
+                          To select consecutive items,        characters).                      drum kit uses user samples        32 characters).                  for the selected patch or
+                          click while you hold down                                             or multisamples.                                                   drum kit on the JUNO-DS.
+                          the [Shift] key. To select                                                                                                               (However, if a user sample
+                          multiple non-consecutive                                                                                                                 is used, it must first be
+                          items, click while you hold                                                                                                              correctly imported into the
+                          down the [Ctrl] key.                                                                                                                     JUNO-DS.)
+
+
+
+
+                                                                                                           3
+                                                                                                                                                             Using JUNO-DS Tone Manager
+
+3-2. Editor Mode
+  Editor mode has four groups, and each group lets you edit the following content.
+
+   Performance group              Patch group                 Sample group                        Multisample group                     [Read] button                   [Sync] button
+   Edits the parameters of a      Edits the parameters of a   Edits the parameters of a           Creates a multisample or              Reads all of the parameters     Applies the edited
+   performance.                   patch or drum kit.          user sample.                        edits its parameters.                 of a patch or performance       parameters to the panel of
+                                                                                                                                        group.                          the JUNO-DS.
+
+
+
+
+                                                                                          [Keyboard] button                                [Manual] button
+                                                                                          Opens the keyboard popup; click a note to     Opens the PDF manual.
+                                                                                          hear it from the JUNO-DS. You can also change
+                                                                                          the MIDI channel on which notes are played.
+
+                                                                                                                         Default MIDI
+                                                                                           Part
+                                                                                                                         Ch
+
+                                                                                           Patch
+                                                                                                                         1
+                                                                                           Performance (UPPER)
+
+                                                                                           Performance (LOWER)           2
+
+                                                                                           Part 3 – 16                   3 – 16
+
+
+
+
+Performance group (Performance screen)
+
+
+
+                                                                                                                                                        [List] button
+               Parameter group                                                                                                                          Selects a performance.
+               Selects the parameter group
+               to edit.
+
+
+                                                                                                                                                        Performance Name
+                                                                                                                                                        Enters the performance
+               Effect group                                                                                                                             name (maximum 12
+               Selects the effect group to edit.                                                                                                        characters).
+
+
+
+
+               [Initialize] button
+               Initializes the entire selected
+               performance, or the
+               parameters of a performance
+               patch.
+
+               [Write] button
+               Writes the current performance
+               to the user performance of the
+               connected JUNO-DS.
+
+
+
+
+                                                                                                     4
+                                                                                                        Using JUNO-DS Tone Manager
+
+Patches group (Patch screen)
+                                         Patch Name                        [LIST] button
+                                         Shows the patch name.             Lets you select a patch or
+                                                                           drum kit from a category
+                                                                           or bank.
+
+
+
+
+  Parameter Group
+  Select the parameter group
+  that you want to edit.
+
+
+
+
+  [Initialize] button
+  Initializes the parameters of
+  the entire selected patch or
+  of the selected tone.
+
+  [Copy Tone] button
+  Copies the parameters of the
+  specified source tone to the
+  specified destination tone.             [MFX/CTRL] button
+                                          Edits MFX or MFX control
+  [Write] button                          settings.
+  Writes the current patch
+  to the user patch of the                [CHO/REV] button
+  connected JUNO-DS.                      Edits chorus or reverb
+                                          settings.
+
+
+
+
+Patches group (Drum Kit screen)
+                                              Note
+                                              Select the drum note.
+
+                                              Note name
+                                              Enter the drum note name (up to 12 characters).
+
+
+
+
+  Parameter Group
+  Select the parameter group
+  that you want to edit.
+
+
+
+
+                                  Drum Kit Name
+                                  Shows the drum kit name.
+  [Initialize] button
+  Initializes the parameters of   [LIST] button
+  the entire selected drum kit    Lets you select a patch or drum kit from a category or bank.
+  or of a note.
+
+  [Copy Note] button
+  Copies the parameters of the
+  specified source note to the
+  specified destination note.
+
+  [Write] button
+  Writes the current drum kit
+  to the user drum kit of the
+  connected JUNO-DS.
+
+
+
+
+                                             5
+                                                                                                                                                              Using JUNO-DS Tone Manager
+
+Samples group (Sample screen)
+                                            Channel indication                                                               SAMPLE NAME                                      [Edit Preview] button
+                                            "L" and "R" symbols are shown for             [Preview] button                   The sample name.                                 Auditions the sample that
+                                            a stereo sample; an "M" symbol is             Auditions each sample              Click this to enter the                          you're editing. The sound
+                                            shown for a mono sample.                      as it is.                          name (maximum 12                                 reflects the edited state of
+                                                                                                                             characters).                                     the parameters.
+
+
+
+
+                                                                                                                                                                              [Select] button
+                                                                                                                                                                              Applies the selected sample
+                                                                                                                                                                              to the parameter area at
+                                                                                                                                                                              the right.
+
+
+
+
+                                           Sample list
+                                           Shows information for all user                                                                                                     [Write] button
+                                           samples.
+                                                                                                                                                                              Writes the edited sample
+                                                                                                                                                                              into the user sample area of
+                                                                                                                                                                              the JUNO-DS.
+
+                                                                                                                                                                              [Delete] button
+                                                                                                                                                                              Deletes the selected sample.
+
+
+
+
+                                 [Reload] button                            Sample capacity
+                                 Obtains the latest user sample             Shows the proportion of free space in
+                                 information from the JUNO-DS.              the JUNO-DS's user memory.
+
+
+
+
+Samples group (Multisample screen)
+             MULTISAMPLE NAME               [LIST] button                          Channel indication                                                          [Preview] button
+             Enter the multisample name     Shows a list from which you            "L" and "R" symbols are shown for a stereo sample; an "M"                   Auditions a sample in its original state.
+             (up to 12 characters).         can select a multisample.              symbol is shown for a mono sample.
+
+
+
+
+  [Write] button
+  Writes an edited multisample
+  to the multisample area of                                                                                                                                   Keyboard and zone display
+  the JUNO-DS.                                                                                                                                                 Specifies the keys to which the sample
+                                                                                                                                                               is assigned.
+  [Reload] button                                                                                                                                              You can select a consecutive range of
+  Obtains the latest                                                                                                                                           keys by holding down the [Shift] key
+  multisample information                                                                                                                                      and clicking.
+  from the JUNO-DS.
+
+
+
+
+                                                                                                            Zone list
+                                                      Sample list
+                                                                                                            Shows information for the samples/zones that are
+                                                      Shows information for all
+                                                                                                            assigned to the current multisample.
+                                                      user samples.
+                                                                                                            Click to see a keyboard diagram of the zones to
+                                                                                                            which the samples are assigned.
+
+
+
+
+                                                                  [Select] button                      [Erase] button                    [Erase All] button
+                                                                  Assigns the selected sample          Erases the selected zone.         Erases all zones that are
+                                                                  to the specified zone.                                                 in use.
+
+
+
+
+                                                                                                   6
+                                                                                                                                                        Using JUNO-DS Tone Manager
+
+3-3. Sample Creator Mode
+ [Load] button                                 [Save] button                                   [Export] button
+ Loads the audio file that you want to edit.   Saves the edited sample.                        Exports the edited sample to a USB flash drive
+                                                                                               so that it can be imported by the JUNO-DS.
+
+
+
+
+                                                                                                                                 Waveform display area
+                                                                                                                                 Here you can move the Start/Loop/End/Fade point display
+                                                                                                                                 bars.
+
+
+
+
+                                                                                                                                 [FADE] switch
+                                                                                                                                 Start Point: 	The waveform is processed so that it starts
+                                                                                                                                                smoothly when it is truncated. Use the SF bar
+                                                                                                                                                to specify the end point of the processing.
+                                                                                                                                 Loop Start: 	Use the LF bar to specify the start point of the
+                                                                                                                                               processing that applies smoothing to make the
+                                                                                                                                               sample loop smoothly.
+                                                                                                                                 End Point: 	Processes the waveform so that it ends
+                                                                                                                                              smoothly when it is truncated. Use the EF bar
+                                                                                                                                              to specify the start point of the processing.
+
+                                                                                                                                 [Truncate] button
+                                                                                                                                 Deletes the portions of the waveform that are before the start
+                                                                                                                                 point or after the end point; this reduces the size of the sample.
+ Specifies the sample's start
+ point, loop start point, end                                                                                                    [Smoothing] button
+ point, loop on/off, and                                                                                                         Processes the waveform so that the loop is connected
+ original key settings.                                                                                                          smoothly.
+                                                                                                                                 You’ll need to turn on the Loop Start [FADE] switch.
+
+
+
+
+                                                     [ZERO-X] switch                     [Undo] button                          [Preview] button
+                                                     When setting the Start/             Lets you undo up to three              Auditions the currently-
+                                                     Loop/End points, this switch        Truncate or Smoothing                  edited sample. The sound
+                                                     makes the value jump to             operations.                            reflects the parameters as
+                                                     “zero-crossing” points where                                               you’ve edited them.
+                                                     the waveform level is zero.
+
+
+
+
+3-4. System Mode
+  Lets you select, connect, or disconnect MIDI devices, and shows the software version number of JUNO-DS Tone Manager.
+
+
+
+ [MIDI Devices] button
+ Shows the MIDI devices
+ (Input/Output) that are
+ recognized by the computer.
+
+ [Version] button
+ Shows the software version
+ number of JUNO-DS Tone
+                                                                      Selects a MIDI device (Input/
+ Manager.
+                                                                      Output) recognized by the
+                                                                      computer.
+
+
+
+
+                                                                                               7
+                                                                                                                  Using JUNO-DS Tone Manager
+
+4. Usage Examples (Specific Workflows)
+
+4-1. Reading/Writing Patches, Drum Kits, or Performances from the JUNO-DS
+1 Select Librarian mode.
+   %
+
+2 In the left-most list, select user patch, drum kit or performance locations.
+   If you want to select more than one location, click while holding down the [Ctrl] key; if you want to select a contiguous range, click while
+   holding down the [Shift] key.
+   %
+
+3 To read from the JUNO-DS, click the [Read] button.
+   The patches, drum kits, and performances that are read are shown in the list.
+   %
+
+4 To write to the JUNO-DS, click the [Write] button.
+         1
+
+
+
+
+     2       3      4
+
+
+
+
+                                                                         8
+                                                                                                                  Using JUNO-DS Tone Manager
+
+4-2. Loading/Saving JUNO-DS Sound Files
+   JUNO-DS Tone Manager can load or save the following files.
+
+   Load
+        55 JUNO-DS library files (.DSL)
+        55 Backup data created by the JUNO-DS’s Backup function (.SVD)
+        55 JUNO-DS librarian files (.jxl)
+        55 Sound data files of the Roland E-A7 (.EAL / .UST / .UDK)
+        * For sound data files of the Roland E-A7, only the parameters are loaded; the sample data is not loaded. You’ll need to separately import
+          and assign the sample data according to the Sample Log that is shown when loading.
+   Save
+        55 JUNO-DS library files (.DSL)
+        55 Backup data that can be read by the JUNO-DS’s RESTORE function (.SVD)
+
+Loading files
+1 Select Librarian mode.
+   %
+
+2 Click the [Load] button, and select the file that you want to load.
+   A list of the loaded files 3 is added at the far right.
+
+
+       1
+
+
+
+
+    2
+                                                                                3
+
+
+
+
+                                                                          9
+                                                                                                                  Using JUNO-DS Tone Manager
+
+Saving files
+1 Select Librarian mode.
+   %
+
+2 Select the list that you want to save.
+   %
+
+3 Click the [Save] button, specify the file name and save-location, and save the sound library file.
+       About the difference in the save format (.DSL and .SVD)
+           .DSL: This is a JUNO-DS library file. It does not include system settings or pattern sequencer data.
+           .SVD: This is a backup file. It contains all the data of the JUNO-DS and can be loaded using the RESTORE function of the JUNO-DS.
+
+
+       1
+
+
+
+
+                     3
+                                              2
+
+
+
+
+                                                                           10
+                                                                                               Using JUNO-DS Tone Manager
+
+4-3. Copying, Replacing, Inserting, Deleting, or Reordering Patches, Drum Kits, or Performances
+   You can copy, replace, insert, initialize, or delete patches, drum kits, or performances.
+
+1 Select Librarian mode.
+   %
+
+2 In the list, select the patch, drum kit, or performance that you want to manage.
+   %
+
+3 Click the desired item to edit the list.
+   You can also copy by dragging and dropping a patch, drum kit, or performance number.
+       1
+
+
+
+
+     2                   3
+
+
+
+
+                                                                          11
+                                                                                                    Using JUNO-DS Tone Manager
+
+4-4. Renaming or Entering a Memo for a Patch, Drum kit, or Performance
+1 Select Librarian mode.
+   %
+
+2 Select the NAME or MEMO field of patch, drum kit, or performance, and enter the desired name or memo.
+   %
+
+3 Press the [Save] button, enter the file name and save-location, and save the file.
+       1
+
+
+
+
+                 3
+
+                  2
+
+
+
+
+                                                                   12
+                                                                                                              Using JUNO-DS Tone Manager
+
+4-5. Adding Data from Another Library to the JUNO-DS
+   Here’s how you can add patches, drum kits, or performances from another library file (or backup data) to your JUNO-DS.
+
+1 Create backup data on your JUNO-DS.
+   %
+
+2 In JUNO-DS Tone Manager, select Librarian mode.
+   %
+
+3 Load the created backup data into JUNO-DS Tone Manager (P.9)
+   %
+
+4 Also load into JUNO-DS Tone Manager the library file containing the data that you want to add (P.9).
+   %
+
+5 In the library file list, select the data that you want to add, and copy it to the backup data list (P.3)
+   %
+
+6 When you have finished copying, click the [Save] button, select .SVD, and save it as new backup data (.SVD and .BIN files) (P.10).
+   %
+
+7 Use the JUNO-DS’s RESTORE function to load the backup data that you saved.
+
+
+                                                 2                                  6
+                                                 3
+ 1 Create backup data                            4
+                                                                                                              5
+
+
+
+
+ 7 Restore backup data
+
+
+
+
+                                                                       13
+                                                                                                   Using JUNO-DS Tone Manager
+
+4-6. Editing Sample Parameters
+1 Select Editor mode.
+   %
+
+2 Click the [Sample] button.
+   %
+
+3 In the sample list, select the sample that you want to edit, and then click the select button.
+   %
+
+4 Edit the parameters.
+   %
+
+5 When you finish editing, click the [Write] button to write the sample into the JUNO-DS.
+
+
+                            1
+
+
+
+
+                           2
+                                                              3
+
+                                                                                                                   4
+
+
+
+
+                                                                                                               5
+
+
+
+
+                                                                    14
+                                                                                                        Using JUNO-DS Tone Manager
+
+4-7. Editing a Multisample
+1 Select Editor mode.
+   %
+
+2 Click the [Multisample] button.
+   %
+
+3 From the [LIST] button, select the multisample that you want to edit.
+   %
+
+4 Specify the keyboard region, and select the sample that you want to assign.
+   %
+
+5 Click the select button to assign the sample to the multisample.
+   %
+
+6 When you finish editing, click the [Write] button, specify the multisample name and the save location, and write the multisample to
+   the JUNO-DS.
+
+                            1
+                                                                2
+
+
+                                                     3
+            6
+
+
+
+
+                                                                          5
+                4
+
+
+
+
+                                                                     15
+                                                                                                          Using JUNO-DS Tone Manager
+
+4-8. Editing a Patch / Drum Kit
+1 Select Editor mode.
+   %
+
+2 Click the [Patch] button.
+   %
+
+3 From the [LIST] button, select the patch / drum kit that you want to edit.
+   %
+
+4 Select the desired group and item, and edit the parameters.
+   %
+
+5 When you finish editing, click the [Write] button, specify the patch or drum kit name and the save location, and write the patch or
+   drum kit to the JUNO-DS.
+
+                               1
+                        2
+
+
+            4
+
+                                                                                          3
+
+
+
+
+                        5
+
+
+
+
+                                                                   16
+                                                                                                       Using JUNO-DS Tone Manager
+
+4-9. Editing a Performance
+1 Select Editor mode.
+   %
+
+2 Click the [Performance] button.
+   %
+
+3 From the [LIST] button, select the performance that you want to edit.
+   %
+
+4 Select the desired group and item, and edit the parameters.
+   %
+
+5 When you finish editing, click the [Write] button, specify the performance name and the save location, and write the performance to
+   the JUNO-DS.
+
+                              1
+           2
+
+
+
+            4
+
+                                                                                     3
+
+
+
+
+                        5
+
+
+
+
+                                                                 17
+                                                                                                                 Using JUNO-DS Tone Manager
+
+4-10. Creating Samples to Import into the JUNO-DS
+1 Select Sample Creator mode.
+   %
+
+2 Click the [Load] button and specify the audio file that you want to load.
+   %
+
+3 Edit the sample’s waveform and parameters.
+   %
+
+4 When you’ve finished editing, click the [Save] button, specify the name and the save location, and save the sample as a WAV file.
+   %
+
+5 If you want to import the sample into the JUNO-DS, connect your USB flash drive to the computer, and click the [Export] button to
+   export the sample.
+   You can connect this USB flash drive to the JUNO-DS and directly select the sample that you want to import.
+
+
+                                                          1
+
+         2               4                 5
+
+
+              3
+
+
+
+
+                                                                      18
+

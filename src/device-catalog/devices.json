@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "catalog_date": "2026-07-27",
+  "purpose": "Machine-searchable device capabilities and evidence-backed connection planning.",
+  "devices": [
+    {
+      "id": "roland-xps30",
+      "manufacturer": "Roland",
+      "model": "XPS-30",
+      "category": "performance synthesizer",
+      "generates_audio": true,
+      "root": "../instruments/roland-xps30",
+      "capabilities_file": "../instruments/roland-xps30/reference/capabilities.json"
+    },
+    {
+      "id": "teyun-a8",
+      "manufacturer": "TEYUN",
+      "model": "A8",
+      "category": "analog mixer with USB audio-interface capability",
+      "generates_audio": false,
+      "root": "../audio-interfaces/teyun-a8",
+      "capabilities_file": "../audio-interfaces/teyun-a8/reference/capabilities.json",
+      "source_status": "provisional_third_party"
+    },
+    {
+      "id": "f998-live-sound-card",
+      "manufacturer": "Shenzhen Furuijie Electronic Technology Co., Ltd. (FCC applicant)",
+      "model": "F998",
+      "category": "portable live sound card and streaming audio interface",
+      "generates_audio": false,
+      "root": "../audio-interfaces/f998",
+      "capabilities_file": "../audio-interfaces/f998/reference/capabilities.json",
+      "source_status": "fcc_identified_manufacturer; retail_brand_unknown"
+    },
+    {
+      "id": "mvave-smk25",
+      "manufacturer": "M-VAVE",
+      "model": "SMK25",
+      "category": "MIDI keyboard controller",
+      "generates_audio": false,
+      "root": "../midi-controllers/mvave-smk25",
+      "capabilities_file": "../midi-controllers/mvave-smk25/reference/capabilities.json"
+    },
+    {
+      "id": "mvave-smc-mixer",
+      "manufacturer": "M-VAVE",
+      "model": "SMC-Mixer",
+      "category": "DAW control surface",
+      "generates_audio": false,
+      "root": "../midi-controllers/mvave-smc-mixer",
+      "capabilities_file": "../midi-controllers/mvave-smc-mixer/reference/capabilities.json"
+    },
+    {
+      "id": "mvave-smc-pad-pocket",
+      "manufacturer": "M-VAVE",
+      "model": "SMC-PAD Pocket",
+      "category": "MIDI pad controller",
+      "generates_audio": false,
+      "root": "../midi-controllers/mvave-smc-pad-pocket",
+      "capabilities_file": "../midi-controllers/mvave-smc-pad-pocket/reference/capabilities.json"
+    },
+    {
+      "id": "mvave-smc-pad",
+      "manufacturer": "M-VAVE",
+      "model": "SMC-PAD",
+      "category": "MIDI pad controller",
+      "generates_audio": false,
+      "root": "../midi-controllers/mvave-smc-pad",
+      "capabilities_file": "../midi-controllers/mvave-smc-pad/reference/capabilities.json"
+    },
+    {
+      "id": "mvave-fm-1",
+      "manufacturer": "M-VAVE",
+      "model": "FM-1",
+      "category": "FM synthesizer and MIDI controller",
+      "generates_audio": true,
+      "root": "../midi-controllers/mvave-fm-1",
+      "capabilities_file": "../midi-controllers/mvave-fm-1/reference/capabilities.json"
+    }
+  ]
+}

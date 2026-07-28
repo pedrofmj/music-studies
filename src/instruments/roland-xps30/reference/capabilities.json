@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "device": {
+    "id": "roland-xps30",
+    "manufacturer": "Roland",
+    "model": "XPS-30",
+    "category": "performance synthesizer",
+    "repository_root": "src/instruments/roland-xps30"
+  },
+  "manual_sources": [
+    {
+      "id": "owners-manual",
+      "local_pdf": "../manual/source/XPS-30_e02_W.pdf",
+      "extracted_text": "../manual/extracted/XPS-30_e02_W.txt"
+    },
+    {
+      "id": "midi-implementation",
+      "local_pdf": "../manual/source/XPS-30_MIDI_Imple_eng02_W.pdf",
+      "extracted_text": "../manual/extracted/XPS-30_MIDI_Imple_eng02_W.txt"
+    },
+    {
+      "id": "version-2-supplement",
+      "local_pdf": "../manual/source/XPS-30_v200_eng01_W.pdf",
+      "extracted_text": "../manual/extracted/XPS-30_v200_eng01_W.txt"
+    }
+  ],
+  "capabilities": {
+    "audio": {
+      "source_refs": [
+        { "source_id": "owners-manual", "pdf_pages": [3, 5, 8] }
+      ],
+      "generates_audio": true,
+      "audio_inputs": [
+        {
+          "name": "MIC INPUT",
+          "connector": "unbalanced 1/4-inch phone jack",
+          "direction": "in",
+          "purpose": "microphone input with rear-panel MIC LEVEL control"
+        },
+        {
+          "name": "EXT INPUT",
+          "connector": "external audio input jack",
+          "direction": "in",
+          "purpose": "external audio player or audio device input"
+        }
+      ],
+      "audio_outputs": [
+        {
+          "name": "OUTPUT R, L/MONO",
+          "connector": "two output jacks",
+          "direction": "out",
+          "signal": "stereo; use L/MONO alone for mono",
+          "purpose": "amplifier or mixer connection"
+        },
+        {
+          "name": "PHONES",
+          "connector": "headphone jack",
+          "direction": "out",
+          "purpose": "headphone monitoring"
+        }
+      ],
+      "usb_audio": {
+        "available": true,
+        "direction": "out",
+        "purpose": "record XPS-30 sound into a DAW through USB COMPUTER"
+      }
+    },
+    "midi": {
+      "source_refs": [
+        { "source_id": "owners-manual", "pdf_pages": [3, 17] },
+        { "source_id": "midi-implementation", "pdf_pages": [1, 2] },
+        { "source_id": "version-2-supplement", "pdf_pages": [2] }
+      ],
+      "ports": [
+        {
+          "name": "MIDI IN",
+          "connector": "MIDI IN connector",
+          "direction": "in",
+          "protocol": "MIDI",
+          "host_required": false
+        },
+        {
+          "name": "MIDI OUT",
+          "connector": "MIDI OUT connector",
+          "direction": "out",
+          "protocol": "MIDI",
+          "host_required": false
+        },
+        {
+          "name": "USB COMPUTER",
+          "connector": "USB 2.0 computer connection",
+          "direction": "in_out",
+          "protocol": "USB MIDI",
+          "host_required": true,
+          "purpose": "DAW synchronization and MIDI communication with a computer"
+        }
+      ],
+      "routing_features": [
+        "Local Switch can disconnect the controller section from the internal sound generator for DAW control.",
+        "Soft Through can retransmit MIDI received at MIDI IN from MIDI OUT.",
+        "Clock Source can be MIDI IN or USB COMPUTER when Sync Mode is SLAVE.",
+        "Version 2 Favorites can transmit bank select and program change when recalled.",
+        "Version 2 Phrase Pads can transmit individually configured MIDI note messages."
+      ]
+    },
+    "controllers_and_pedals": {
+      "source_refs": [
+        { "source_id": "owners-manual", "pdf_pages": [3, 16] }
+      ],
+      "internal_controllers": [
+        "61-note keyboard",
+        "pitch bend/modulation lever",
+        "panel knobs and buttons",
+        "eight phrase pads"
+      ],
+      "external_controllers": [
+        {
+          "name": "PEDAL HOLD",
+          "accepted_devices": "Roland DP-series pedal switch",
+          "documented_use": "hold pedal; Continuous Hold Pedal enables half-pedaling"
+        },
+        {
+          "name": "PEDAL CONTROL",
+          "accepted_devices": "Roland EV-5 expression pedal or DP-series pedal switch",
+          "documented_use": "assignable control",
+          "warning": "Use only the specified expression pedal type."
+        }
+      ]
+    },
+    "storage_and_maintenance": {
+      "source_refs": [
+        { "source_id": "owners-manual", "pdf_pages": [3, 17] },
+        { "source_id": "version-2-supplement", "pdf_pages": [1] }
+      ],
+      "usb_memory": {
+        "connector": "USB MEMORY",
+        "purpose": "USB flash-drive audio playback, backup, restore, and update media",
+        "manual_requirement": "format the USB flash drive on the XPS-30 where the documented procedure requires it"
+      },
+      "update_media": "system updater file is copied to the root of a XPS-30-formatted USB flash drive"
+    }
+  },
+  "connection_rules": [
+    {
+      "id": "xps30-audio-is-separate-from-midi",
+      "rule": "MIDI IN, MIDI OUT, and USB MIDI carry performance/control data; route sound separately through OUTPUT, PHONES, or documented USB audio.",
+      "source_refs": [
+        { "source_id": "owners-manual", "pdf_pages": [3] }
+      ]
+    },
+    {
+      "id": "xps30-usb-computer-needs-host",
+      "rule": "USB COMPUTER is for a computer connection. Do not plan a direct USB-device-to-USB-device cable between the XPS-30 and another controller.",
+      "source_refs": [
+        { "source_id": "owners-manual", "pdf_pages": [3] }
+      ]
+    },
+    {
+      "id": "xps30-mono-output",
+      "rule": "For a mono PA or mixer input, connect only OUTPUT L/MONO; use both R and L/MONO for stereo.",
+      "source_refs": [
+        { "source_id": "owners-manual", "pdf_pages": [3] }
+      ]
+    },
+    {
+      "id": "xps30-pedal-polarity",
+      "rule": "If sustain behaves inversely, check Hold Pedal Polarity before changing cables or hardware.",
+      "source_refs": [
+        { "source_id": "owners-manual", "pdf_pages": [16] }
+      ]
+    }
+  ],
+  "roles": [
+    "standalone keyboard synthesizer",
+    "stereo or mono live sound source",
+    "DAW MIDI and USB-audio instrument",
+    "external MIDI sound module controlled through MIDI IN",
+    "MIDI controller for external hardware or a DAW"
+  ],
+  "unknowns": [
+    "Record actual Linux ALSA endpoint names and USB-audio channel behavior after testing; manuals do not establish Ubuntu support.",
+    "Record the exact cable or adapter used for each external controller MIDI OUT connection before relying on it live."
+  ]
+}

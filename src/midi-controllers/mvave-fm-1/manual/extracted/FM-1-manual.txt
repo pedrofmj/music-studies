@@ -1,0 +1,1174 @@
+Detailed User Manual
+    FM-1 Synthesizer
+1. Left Panel — Master Controls                                                       EN
+
+■ ➀ MASTER (Potentiometer)                                           ➀           ➁
+Controls the main audio output volume.
+• Turn clockwise to increase volume, counter-clockwise to
+decrease.
+
+
+■ ➁ SELECT (Encoder)
+Switches between pages within the current mode. Many
+modes have 2 pages of parameters.
+• Turn clockwise → go to Page 2
+• Turn counter-clockwise → go back to Page 1
+• The bottom bar of the display shows the current page, for
+example: 1/2 Arpeggio or 2/2 Arpeggio
+                                                                     ➂           ➃
+• In FX mode, SELECT scrolls through the 6 effect slots
+(positions 1–6 in the chain)
+
+
+■ ➂ PRESETS (Encoder)
+Scrolls through the 128 presets presets (numbered 001–128).
+• Turn clockwise to go to the next presets, counter-clockwise for the previous presets
+• The selection wraps around: scrolling past 128 goes back to 001, and vice versa
+• Each turn immediately loads the selected presets — you will hear the change right away
+• While scrolling, a presets list popup appears on screen showing:
+• The presets number (e.g. 001)
+• The presets name (e.g. PIANO 3)
+• A highlight on the currently selected presets
+• The popup disappears after about 1 second of inactivity
+• The top bar of the display always shows the currently loaded presets number and name
+
+■ ➃ ALGORITHM (Encoder)
+This encoder has two functions depending on whether OCT−/OCT+ is held:
+
+
+Normal (no buttons held) — Algorithm Select:
+• Turn to select the FM synthesis algorithm (01–32)
+• The FM-1 has 32 algorithms that deﬁne how the 6 operators are connected
+• When changed, the screen shows the algorithm diagram — a visual representation of how
+operators are routed (which ones are carriers, which are modulators, and the feedback path)
+• The diagram popup disappears after about 1 second
+
+
+While holding OCT− or OCT+ — Transpose:
+• Hold OCT− and turn ALGORITHM → adjust transpose downward (0 to −12 semitones)
+• Hold OCT+ and turn ALGORITHM → adjust transpose upward (0 to +12 semitones)
+• The screen shows:
+  Transpose
+  XX
+                                            -01-
+Where XX is the current transpose value (e.g. −3 or +5)
+• Transpose shifts all notes by the set number of semitones without changing octave
+• Transpose is saved to global settings automatically
+
+
+■ ➄ OCT− / OCT+ (Buttons)
+Shift the entire keyboard up or down by one octave per press.
+• Press OCT− → shift down one octave (range: down to −3)
+• Press OCT+ → shift up one octave (range: up to +3)
+• Each press shows a popup:                                                             ➄
+  Octave
+  XX
+
+
+Where XX is the current octave offset (e.g. −2 or +1 or 0)
+Octave LED indicator (the LED next to OCT− or OCT+):
+
+ Octave Value                                     LED Behavior
+ 0 (default)                                      Both LEDs off
+ ±1                                               Slow blinking
+ ±2                                               Fast blinking
+ ±3                                               Solid on
+
+The LED is on the OCT− side if octave is negative, on the OCT+ side if positive.
+
+
+Combo — Reset Octave & Transpose:
+Press OCT− and OCT+ simultaneously to reset both Octave to 0 and Transpose to 0.
+
+
+
+
+ 2. Center — 1.54" TFT Display                                                        EN
+
+The display is divided into three areas:
+
+ Area               Content
+ Top bar            Current voice number + voice name (e.g. `032 BRASS 1`)
+ Center area        Mode-speciﬁc content — parameters, oscilloscope waveform, effect chain
+                    grid, algorithm diagram, etc.
+ Bottom bar         Current mode name and page indicator (e.g. `1/2 LFO`)
+
+Battery icon appears in the top-right corner with a visual level indicator.
+Temporary popups appear in the center area (overlaying the current mode) when you:
+• Change preset → shows voice list
+• Change algorithm → shows algorithm diagram
+• Change octave → shows Octave X
+
+
+
+                                             -02-
+• Change transpose → shows Transpose X
+• Adjust volume → shows Volume X
+• Save preset → shows Preset Saved
+• Battery critically low → shows LOW BATTERY (stays until
+battery recovers)
+
+
+All popups disappear automatically after about 1 second
+unless noted otherwise.
+
+
+
+
+                                                                          TFT Display
+
+
+
+
+ 3. Right Panel — Parameter Knobs & Function Buttons                                    EN
+
+
+
+
+■ 3.1 KNOB 1 – KNOB 4 (Encoders)
+Four parameter encoders whose function changes depending on the current mode. The
+bottom bar on the display always indicates what each knob controls. Speciﬁc mappings per
+mode:
+
+
+■ In FX (Effect Chain) Mode
+The knobs control the currently selected effect (highlighted with a blinking dot):
+
+
+For Filter and Reverb (effects with sub-types):
+
+ Knob 1                              Type — select sub-type
+ Knob 2                              Parameter 1 — ﬁrst audio parameter
+ Knob 3                              Parameter 2 — second audio parameter
+ Knob 4                              Effect On/Off
+
+
+                                            -03-
+For Delay, Distortion, Chorus, Phaser:
+ Knob 1                               Parameter 1
+ Knob 2                               Parameter 2
+ Knob 3                               Parameter 3
+ Knob 4                               Effect On/Off
+
+Detailed effect parameters:
+
+Effect     Knob 1                    Knob 2                       Knob 3
+Filter     Type: Low Pass / Band CutOff: 100 Hz – 20,000 Hz       Q (resonance): 0 – 100
+           Pass / High Pass          (100 steps, logarithmic)
+Reverb     Type: Room / Hall / Plate Decay: 0% – 100% (10% steps) Mix: 0% – 100% (10% steps)
+Delay      Decay: 0% – 100%          Rate: 0% – 100%              Mix: 0% – 100%
+Distortion Gain: 0% – 100%           Tone: 0% – 100%              Level: 0% – 100%
+Chorus     Freq: 0% – 100%           Depth: 0% – 100%             Mix: 0% – 100%
+Phaser     Freq: 0% – 100%           Depth: 0% – 100%             Mix: 0% – 100%
+
+The bottom bar shows the exact parameter value, for example: CutOff: 1004Hz or Mix: 70%.
+
+
+■ In ENV Mode
+
+ Knob 1                 Knob 2                 Knob 3                Knob 4
+ Attack (0–8)           Decay (0–8)            Sustain (0–8)         Release (0–8)
+
+Each value is shown as a bar graph on screen (more blocks = higher value).
+
+
+■ In LFO Mode
+Page 1:
+
+ Knob 1                 Knob 2                 Knob 3                Knob 4
+ Wave                   Speed (0–99)           PMD (0–99)            AMD (0–99)
+
+Page 2:
+
+ Knob 1                 Knob 2                 Knob 3                Knob 4
+ Delay (0–99)           Pitch Sens (0–7)       Lfo Sync (0–1)        Osc Sync (0–1)
+Wave types: Triangle, Saw Down, Saw Up, Square, Sine, Sample & Hold
+
+
+■ In Edit Mode (varies by selected operator/section)
+OP1–6, Page 1 (Envelope): Rate 1–4 (0–99)
+OP1–6, Page 2 (Envelope): Level 1–4 (0–99)
+OP1–6, Page 3 (Tuning): Detune (0–14), FreqCoarse (0–31), FreqFine (0–99), OscMode
+(Ratio/Fixed)
+OP1–6, Page 4 (Sens & Level): A ModSens (0–3), KeyVelocity (0–7), Out Level (0–99)
+OP1–6, Page 5 (Scaling): L Depth (0–99), R Depth (0–99), BreakPoint (A-1 - C7)
+OP1–6, Page 6 (Scaling): L Curve (−LN/−EX/+LN/+EX), R Curve (−LN/−EX/+LN/+EX), RateScale
+(0–7)
+Pitch Envelope, Page 1: Rate 1–4 (0–99)
+Pitch Envelope, Page 2: Level 1–4 (0–99)
+Globe: Algorithm (0–31), Feedback (0–7), Osc Sync (On/Off), Transpose (0–48)
+                                            -04-
+■ In Globe Mode
+Page 1:
+Knob 1              Knob 2                Knob 3               Knob 4
+Note Channel (1–16) Effect Channel (1–16) Pitch Bend Up (1–24) Pitch Bend Down (1–24)
+
+Page 2:
+Knob 1                Knob 2                 Knob 3                Knob 4
+Reset Patches         Globe Save             -                     -
+
+
+■ In ARP Mode
+Page 1:
+Knob 1                Knob 2                 Knob 3                Knob 4
+Mode                  Octave (1–4)           Rate                  Tempo (30–300 BPM)
+
+Page 2:
+Knob 1                Knob 2                 Knob 3                Knob 4
+Gate (20–100%)        Swing (50–75%)         Latch (On/Off)        -
+
+
+■ In SEQ Mode
+Page 1:
+
+Knob 1               Knob 2                        Knob 3            Knob 4
+Pattern (1–16)       Clear                         Rate              Tempo (30–300 BPM)
+
+Page 2:
+Knob 1               Knob 2                        Knob 3            Knob 4
+Gate (20–100%)       Swing (50–75%)                -                 -
+
+
+
+■ 3.2 Function Buttons — Top Row
+
+■ FX (Effect Chain)
+Press to enter Effect Chain mode. The screen shows a 3×2 grid of the 6 effect slots, each
+displaying:
+• Effect name (Filter, Reverb, Delay, Distortion, Chorus, Phaser)
+• A blinking dot under the currently selected slot
+• Bright box = effect is ON, dim box = effect is OFF
+
+
+How to use FX mode:
+• Turn SELECT to move the blinking dot between the 6 effect slots
+• Turn Knobs 1–4 to adjust the selected effect's parameters (displayed in the bottom bar)
+• Press FX again to return to Home screen
+
+
+■ SEL (Effect Select / Reorder)
+Works only inside FX mode. Used to lock an effect for reordering:
+
+
+                                            -05-
+• Press SEL → the currently highlighted effect becomes "grabbed" (dot stops blinking,
+becomes solid; SEL LED turns on)
+• Turn SELECT → the grabbed effect swaps positions with adjacent effects in the chain
+• Press SEL again → release the effect into its new position (SEL LED turns off)
+This lets you rearrange the order effects are applied (e.g. put Distortion before Reverb, or
+Delay before Chorus).
+
+
+On/Off toggle: Turn the rightmost knob (Encoder 4) clockwise to turn the selected effect ON,
+counter-clockwise to turn it OFF. The effect box changes brightness accordingly.
+
+
+■ ENV (Envelope)
+Press to enter ADSR Envelope editing mode. The screen shows 4 parameter boxes:
+• Attack — How quickly the sound reaches full volume after a key is pressed. Range: 0–8.
+Value 0 = instant attack (immediate full volume). Value 8 = very slow fade in.
+• Decay — How quickly the sound drops from peak to the sustain level. Range: 0–8.
+• Sustain — The volume level maintained while a key is held. Range: 0–8. Higher = louder
+sustained note.
+• Release — How long the sound takes to fade out after the key is released. Range: 0–8.
+Value 0 = abrupt cutoff. Value 8 = long fade out.
+Adjust each with Knobs 1–4. Values are shown as block bar graphs. Press ENV again to
+return to Home.
+
+
+■ LFO (Low Frequency Oscillator)
+Press to enter LFO editing mode. The LFO adds periodic modulation to the sound.
+
+
+Page 1 (use SELECT to navigate):
+• Wave (Knob 1): LFO waveform shape. Options: Triangle, Saw Down, Saw Up, Square, Sine,
+Sample & Hold.
+• Speed (Knob 2): LFO oscillation speed. Range: 0–99. Higher = faster modulation.
+• PMD (Knob 3): Pitch Modulation Depth. Range: 0–99. Higher = wider pitch wobble.
+• AMD (Knob 4): Amplitude Modulation Depth. Range: 0–99. Higher = more tremolo.
+
+
+Page 2:
+• Delay (Knob 1): Time before LFO kicks in after note-on. Range: 0–99.
+• Pitch Sens (Knob 2): How much the LFO affects pitch. Range: 0-7.
+• Lfo Sync (Knob 3): Whether LFO resets on each new note. 0 = Free, 1 = Sync.
+• Osc Sync (Knob 4): Whether the oscillator phase resets on each new note. 0 = free-running,
+1 = sync.
+Press LFO again to return to Home.
+
+
+■ EDIT (Operator Editing)
+Press to enter deep FM synthesis editing. This is where you shape the fundamental tone of
+each FM-1 voice.
+The FM-1 synth has 6 Operators (OP1–OP6). Each operator is a sine wave oscillator that can
+
+
+                                              -06-
+either produce sound (carrier) or modulate another operator (modulator). The Algorithm
+setting (changed via the ALGORITHM encoder) determines how operators connect.
+
+
+How to use Edit mode:
+• Press EDIT to enter. The bottom keyboard keys now act as section selectors.
+• Press a combo key on the keyboard to select what to edit:
+
+
+• OP1 – OP6: Select individual operator parameters
+• PIT: Pitch Envelope (how pitch changes over time)
+• GLO: Global synthesis parameters (Algorithm, Feedback, Osc Sync)
+• MONO: Switch to monophonic mode (one note at a time, last-note priority)
+• POLY: Switch to polyphonic mode (up to 12 simultaneous notes)
+
+
+• The LED for the currently selected operator/section lights up solid.
+• Turn SELECT to page through that section's parameters (up to 6 pages per operator).
+• Adjust parameters with Knobs 1–4.
+• Press EDIT again to return to Home.
+
+
+■ GLO (Globe — Global Settings)
+Press to enter global device settings.
+
+
+Page 1 — MIDI & Pitch:
+• Note Channel (Knob 1): Which MIDI channel the keyboard sends/receives notes. Range:
+1–16.
+• Effect Channel (Knob 2): Which MIDI channel controls effect parameters. Range: 1–16.
+• Pitch Bend Up (Knob 3): Maximum upward pitch bend range in semitones. Range: 1–24.
+• Pitch Bend Down (Knob 4): Maximum downward pitch bend range in semitones. Range:
+1–24.
+
+
+Page 2 — System:
+• Reset Patches (Knob 1): Turn clockwise to initiate factory reset. A conﬁrmation screen
+appears:
+• Turn Knob 4 to conﬁrm reset (restores all 128 voices to factory defaults)
+• Turn Knob 1 again to cancel
+• After successful reset, shows "Reset Success"
+• Globe Save (Knob 2): Turn to save all global settings (MIDI channels, pitch bend, speaker,
+etc.) to ﬂash memory. Shows "Globe Saved" brieﬂy.
+
+
+Press GLO again to return to Home.
+
+
+
+
+                                             -07-
+■ 3.3 Function Buttons — Bottom Row
+
+■ HOME (BT / Home Screen)
+Long-press to toggle BT. HOME LED blinking = BT on but not connected; HOME LED solid = BT
+connected; HOME LED off = BT off.
+Press at any time to return to the Home / Oscilloscope screen. The oscilloscope shows the
+synthesizer output as a real-time waveform — a yellow line on a gray background that moves
+with the sound you play.
+
+
+■ SAVE
+Press and hold to save the current preset to ﬂash memory.
+• When pressed, the device saves any pending changes (voice parameters, effect settings,
+sequencer patterns, global settings)
+• The SAVE LED lights up while saving
+• The screen shows Preset Saved brieﬂy
+• After releasing the button, the LED turns off
+
+
+FM-1 SysEx Bank Save (via MIDI):
+When the device receives a FM-1 voice bank via MIDI SysEx, a bank selection screen appears.
+Turn Knob 1–4 to choose which bank (A/B/C/D) to save the received voices into. Saved
+successfully after a brief delay.
+
+
+■ ARP (Arpeggiator)
+The arpeggiator automatically plays notes in a pattern when keys are held.
+
+
+To activate:
+• Press ARP → the ARP LED lights up, arpeggiator becomes active
+• The display enters ARP settings mode
+
+
+To use:
+• Hold one or more keys on the keyboard
+• The arpeggiator plays them automatically in the selected pattern
+• Key LEDs light up as notes are triggered
+• Adjust settings with Knobs 1–4 (see parameter table)
+
+
+Arpeggiator Modes:
+
+Mode                Pattern
+Up                  Low note → High note, repeat
+Down                High note → Low note, repeat
+Inclusive           Low → High → Low (bouncing, including endpoints)
+Exclusive           Low → High → Low (bouncing, excluding endpoints)
+Random              Random order
+Order               In the order keys were pressed
+Repeat              Repeat each note before moving to the next
+
+
+                                            -08-
+Latch mode: When Latch is ON, notes continue playing even after you release the keys.
+Press new keys to change the pattern. Turn Latch OFF to stop.
+
+
+To deactivate:
+Press ARP while in ARP mode → the arpeggiator stops, ARP LED turns off, returns to Home.
+
+
+     Important: If the sequencer (SEQ) is currently active, pressing ARP will show "Disable
+     SEQ to enter" on screen. You must turn off SEQ ﬁrst.
+
+
+■ SEQ (Sequencer)
+A 16-step pattern sequencer for creating and playing back note sequences.
+
+
+To activate:
+• Press SEQ → SEQ LED lights up, STOP LED lights up, sequencer becomes active
+• The display enters SEQ settings mode
+• The keyboard keys now function as 16 step indicators (LEDs show ﬁlled/empty steps)
+
+
+Recording a sequence:
+• Press REC → REC LED and PLAY LED light up, recording starts
+• Play notes on the keyboard — each note is recorded into the next step
+• Filled steps have their LEDs lit
+• Press REC again to stop recording (switches to playback mode)
+
+
+Playing back:
+• Press PLAY/STOP → PLAY LED lights up, STOP LED turns off
+• The sequence plays through the ﬁlled steps
+• The current step's LED blinks as it plays
+• Press PLAY/STOP again to stop (STOP LED lights up, PLAY LED turns off)
+
+
+Step LED indicators during playback:
+• Solid LED = step has notes
+• No LED = step is empty
+• Blinking LED = current playback step
+
+
+Pattern management:
+• 16 independent patterns (1-16) available
+• Select pattern with Knob 1 in SEQ mode
+• Patterns are stored in ﬂash memory
+
+
+To deactivate:
+Press SEQ while in SEQ mode → sequencer stops, all transport LEDs turn off, returns to Home.
+      Important: If the arpeggiator (ARP) is currently active, pressing SEQ will show "Disable
+      ARP to enter" on screen. You must turn off ARP ﬁrst.
+
+
+
+                                             -09-
+■ PLAY/STOP
+Transport control for the sequencer (only works when SEQ is active):
+• Press while stopped → starts playback (PLAY LED on, STOP LED off)
+• Press while playing or recording → stops (STOP LED on, PLAY and REC LEDs off)
+• If SEQ is not active, shows "Enable SEQ ﬁrst" on screen
+
+
+■ REC
+Recording control for the sequencer (only works when SEQ is active):
+• Press while stopped or playing → enters record mode (REC + PLAY LEDs on)
+• Press while recording → exits record mode, continues playback (REC LED off, PLAY stays on)
+• If SEQ is not active, shows "Enable SEQ ﬁrst" on screen
+
+
+
+
+ 4. Bottom — Keyboard & Combo Keys                                                        EN
+
+
+
+
+4.1 Piano Keys (27 Keys)
+Standard piano-style keys for playing notes.
+• Each key has an LED that lights up when pressed
+• The actual MIDI note number is calculated as: key position + 53 + (octave × 12) + transpose
+• The default range (octave 0, transpose 0) covers roughly F3 – G5
+• In normal mode: keys play notes directly (polyphonic or monophonic depending on setting)
+• In ARP mode: keys are fed into the arpeggiator
+• In SEQ mode: keys input notes into sequencer steps
+
+
+4.2 Combo Function Keys
+Certain keys are labeled with secondary functions. These labels are active only in Edit mode:
+
+ Key Label           Function
+ OP1-OP6             Select Operator 1-6 for editing. LED solid when selected.
+ PIT                 Select Pitch Envelope for editing
+ GLO                 Select Globe parameters (Algorithm, Feedback, Osc Sync, Transpose)
+ MONO                Switch to Mono mode — only one note plays at a time
+ POLY                Switch to Poly mode — up to 12 notes can play simultaneously
+When in Edit mode, all 8 OP/PIT/GLO keys have LEDs that blink to indicate they are
+selectable. The currently active selection has a solid LED. The MONO/POLY LEDs indicate the
+current mode: the active mode has a solid LED, the inactive mode blinks.
+                                             -10-
+ 5. MIDI Connectivity                                                                     EN
+
+Three MIDI interfaces are active simultaneously — you can use all three at once:
+
+ Interface        Connection
+ USB MIDI         Connect via USB cable to a computer or DAW. Appears as a standard
+                  USB MIDI device.
+ BLE MIDI         Wireless MIDI to iOS/Android/Mac/Windows devices that support BLE MIDI
+ 3.5 MIDI IN      Traditional MIDI cable (31250 baud). Connect to hardware synths,
+                  controllers, etc.
+What the FM-1 receives via MIDI:
+• Note On/Off with velocity → triggers the internal synth engine
+• Pitch Bend → bends pitch within the conﬁgured range (see Globe settings)
+• Control Change → various parameter control
+• FM-1 SysEx voice dumps → import standard Yamaha DX7 voice banks (32 voices per
+bank). After receiving, you choose which bank slot (A/B/C/D) to save to.
+
+
+What the FM-1 sends via MIDI:
+• Note On/Off with velocity from keyboard, arpeggiator, or sequencer
+• Notes are sent on the conﬁgured Note Channel (1–16, set in Globe mode)
+
+
+
+
+ 6. Battery & Power                                                                       EN
+
+• Battery level is shown as an icon in the top-right corner of the display
+• When battery is critically low, a full-screen LOW BATTERY warning appears and stays
+visible until the battery is recharged or the device is powered off
+• The warning takes priority over all other screen content — you need to recharge to clear it
+
+
+■ Speaker
+• The FM-1 has a built-in speaker for monitoring without headphones; plugging in
+headphones automatically mutes the speaker.
+
+
+
+
+                                             -11-
+ 7. Rear Panel Interface                                                            EN
+
+
+
+
+     ①      ②      ③      ④
+
+① 3.5mm Audio Output: It is recommended to use headphones with a standard
+TRS connector. Using other types of connectors may cause audio output noise     TRS Audio
+and prevent the built-in speakers from being muted.                           Headphones
+② MIDI input Port: Use a 3.5 mm-to-MIDI adapter to connect to external
+devices that support MIDI OUT.
+③ USB: USB connection port.
+④ Power: Used to turn the FM-1 synthesizer on/off.
+
+
+
+
+ 8. Technical Speciﬁcations                                                         EN
+
+ Product Dimensions                161.5 (L) x 96.5 (W) x 28.6 (H) mm
+ Product Weight                    251 g
+ Keys                              27-key silicone keybed
+ Knobs                             1 x 300° Volume Knob, 7 x 360° Control Knobs
+ Battery Life                      12 hours
+ Output                            USB Type-C port
+                                   Wireless MIDI (Windows/Mac/iOS/Android)
+                                   3.5mm Audio Out Jack
+ Input                             3.5mm MIDI IN Jack
+ Power                             Battery or USB Bus Power
+ Battery Model                     DTP704060
+ Nominal Voltage                   3.7V
+ Rated Capacity                    2000mAh
+ Operating Frequency Band          2403~2478MHz
+ Maximum RF Power                  9dBm
+
+
+
+
+                                              -12-
+ 9. FCC Warning Statement                                                                 EN
+
+★Changes or modiﬁcations not expressly approved by the party responsible for compliance
+could void the user’s authority to operate the equipment. This equipment has been tested and
+found to comply with the limits for a Class B digital device, pursuant to Part 15 of the FCC
+Rules. These limits are designed to provide reasonable protection against harmful interference
+in a residential installation. This equipment generates uses and can radiate radio frequency
+energy and, if not installed and used in accordance with the instructions, may cause harmful
+interference to radio communications. However, there is no guarantee that interference will
+not occur in a particular installation. If this equipment does cause harmful interference to
+radio or television reception, which can be determined by turning the equipment off and on,
+the user is encouraged to try to correct the interference by one or more of the following
+measures:
+‐‐ Reorient or relocate the receiving antenna.
+‐‐ Increase the separation between the equipment and receiver.
+‐‐ Connect the equipment into an outlet on a circuit different from that to which the
+receiver is connected.
+‐‐ Consult the dealer or an experienced radio/TV technician for help.
+
+
+FCC Radiation Exposure Statement
+The device has been evaluated to meet general RF exposure requirement. The device can be
+used in portable exposure condition without restriction.
+
+
+This device complies with Part 15 of the FCC Rules. Operation is subject to the following two
+conditions:
+(1)This device may not cause harmful interference.
+(2)This device must accept any interference received, including interference that may cause
+undesired operation.
+
+
+
+
+                                             -13-
+详细用户手册
+FM-1 合成器
+1. 左侧面板 — 主要控制区                                           CN
+
+■ ➀ MASTER（主音量旋钮）
+控制主音频输出音量。                                    ➀       ➁
+• 顺时针旋转增大音量，逆时针旋转减小音量。
+
+
+■ ➁ SELECT（页面选择编码器）
+切换当前模式下的不同参数页面。大多数模式有 2 个页面。
+• 顺时针旋转 → 切换到第 2 页
+• 逆时针旋转 → 切回第 1 页
+• 屏幕底栏显示当前页码，例如：1/2 Arpeggio 或 2/2 Arpeggio
+• 在 FX 模式中，SELECT 用于在 6 个效果槽位之间滚动选择
+
+■ ➂ PRESETS（音色预设编码器）
+浏览 128 个音色预设（编号 001–128）。
+                                              ➂       ➃
+• 顺时针旋转切换到下一个音色，逆时针切换到上一个音色
+• 选择会循环：超过 128 自动回到 001，反之亦然
+• 每次旋转立即加载所选音色 — 即时听到变化
+• 滚动时，屏幕显示音色列表弹窗，包含：
+• 音色编号（例如 001）
+• 音色名称（例如 PIANO 3）
+• 当前选中音色的高亮显示
+• 弹窗在停止操作约 1 秒后自动消失
+• 屏幕顶栏始终显示当前加载的音色编号和名称
+
+
+■ ➃ ALGORITHM（算法编码器）
+该编码器根据 OCT−/OCT+ 是否被按住，具有两种功能：
+
+
+正常使用（未按住任何按键）— 算法选择：
+• 旋转选择 FM 合成算法（01–32）
+• FM-1 有 32 种算法，定义了 6 个算子的连接方式
+• 改变时，屏幕显示算法图 — 直观展示算子之间的连接路由（载波/调制/反馈路径）
+• 图示弹窗约 1 秒后自动消失
+
+
+按住 OCT−/OCT+ 时 — 移调功能：
+• 按住 OCT− 并旋转 ALGORITHM → 向下移调（0 到 −12 半音）
+• 按住 OCT+ 并旋转 ALGORITHM → 向上移调（0 到 +12 半音）
+• 屏幕显示：Transpose XX（例如 −3 或 +5）
+• 移调功能在不改变八度的情况下，将所有音符偏移指定的半音数
+• 移调设置会自动保存到全局设置中
+
+■ ➄ OCT− / OCT+（八度按键）
+                                                  ➄
+将整个键盘上移或下移一个八度。
+
+
+                               -01-
+• 按 OCT− → 下移一个八度（最低至 −3）
+• 按 OCT+ → 上移一个八度（最高至 +3）
+• 每次按下显示弹窗：Octave XX（例如 −2、+1 或 0）
+
+
+八度 LED 指示灯：
+
+ 八度值                            LED 状态
+ 0（默认）                          两个 LED 均熄灭
+ ±1                             慢闪
+ ±2                             快闪
+ ±3                             常亮
+
+八度为负值时 LED 在 OCT− 侧，正值时在 OCT+ 侧。
+
+
+组合键 — 重置八度和移调：
+同时按下 OCT− 和 OCT+ 可将八度和移调同时重置为 0。
+
+
+
+
+2. 中央 — 1.54 英寸 TFT 显示屏                             CN
+
+
+显示屏分为三个区域：
+ 区域           内容
+ 顶栏           当前音色编号 + 音色名称（例如 032 BRASS 1）
+ 中央区域         模式相关内容 — 参数、示波器波形、效果链网格、算法图等
+ 底栏           当前模式名称和页码指示（例如 1/2 LFO）
+
+电池图标显示在右上角，带有电量指示。
+临时弹窗在以下操作时出现（覆盖当前模式内容）：
+• 切换音色 → 显示音色列表
+• 改变算法 → 显示算法图
+• 改变八度 → 显示 Octave X
+• 改变移调 → 显示 Transpose X
+• 调节音量 → 显示 Volume X
+• 保存预设 → 显示 Preset Saved
+• 电池电量极低 → 显示 LOW BATTERY（电池恢复前持续显示）
+
+
+除特别说明外，所有弹窗约 1 秒后自动消失。
+
+
+
+                                              显示屏
+
+
+
+
+                             -02-
+3. 右侧面板 — 参数旋钮与功能按键                                                       CN
+
+
+
+
+■ 3.1 KNOB 1 – KNOB 4（参数编码器）
+四个参数编码器的功能随当前模式而变化。底栏始终显示每个旋钮对应的参数名称。
+
+
+■ FX（效果链）模式下的参数
+旋钮控制当前选中的效果（闪烁圆点标识）：
+
+
+滤波器和混响（带子类型的效果）：
+
+ 旋钮 1                         类型 — 选择子类型
+ 旋钮 2                         参数 1 — 第一个音频参数
+ 旋钮 3                         参数 2 — 第二个音频参数
+ 旋钮 4                         效果开关
+
+延迟、失真、合唱、移相器（无子类型的效果）：
+ 旋钮 1                         参数 1
+ 旋钮 2                         参数 2
+ 旋钮 3                         参数 3
+ 旋钮 4                         效果开关
+
+各效果详细参数：
+效果            旋钮 1                   旋钮 2                   旋钮 3
+滤波器 Filter    类型：Low Pass / Band     截止频率：100 Hz – 20,000   Q 值（共振）：0 – 100
+              Pass / High Pass       Hz（100 级，对数分布）
+混响 Reverb     类型：Room / Hall / Plate 衰减 Decay：0% – 100%     混合 Mix：0% – 100%
+                                     （10% 步进）               （10% 步进）
+延迟 Delay      衰减 Decay：0% – 100% 速率 Rate：0% – 100%          混合 Mix：0% – 100%
+失真 Distortion 增益 Gain：0% – 100%      音色 Tone：0% – 100%      电平 Level：0% – 100%
+合唱 Chorus     频率 Freq：0% – 100%      深度 Depth：0% – 100%     混合 Mix：0% – 100%
+移相器 Phaser 频率 Freq：0% – 100%         深度 Depth：0% – 100%     混合 Mix：0% – 100%
+
+底栏显示精确参数值，例如：CutOff: 1004Hz 或 Mix: 70%。
+
+
+                                    -03-
+■ ENV（包络）模式
+
+ 旋钮 1             旋钮 2               旋钮 3               旋钮 4
+ Attack 起音（0–8）   Decay 衰减（0–8）      Sustain 延音（0–8）    Release 释放（0–8）
+
+每个值以方块条形图显示（方块越多 = 值越大）。
+
+
+■ LFO（低频振荡器）模式
+第 1 页：
+
+旋钮 1                   旋钮 2          旋钮 3               旋钮 4
+Wave 波形                Speed 速度      PMD 音高调制深度         AMD 振幅调制深度
+                       （0–99）        （0–99）             （0–99）
+
+第 2 页：
+
+旋钮 1                 旋钮 2                  旋钮 3                 旋钮 4
+Delay 延迟（0–99）       Pitch Sens 高音灵敏度      Lfo Sync 同步（0–1）     Osc Sync
+                     （0–7）                                      （0–1）
+
+波形类型：Triangle（三角波）、Saw Down（下锯齿）、Saw Up（上锯齿）、Square（方波）、
+Sine（正弦波）、Sample & Hold（采样保持）
+
+
+■ Edit（编辑）模式
+OP1–6（每个算子 6 页参数）：
+页码                    参数（旋钮 1–4）
+第 1 页 — 包络            Rate 1, Rate 2, Rate 3, Rate 4（0–99）
+第 2 页 — 包络            Level 1, Level 2, Level 3, Level 4（0–99）
+第 3 页 — 调音            Detune（0–14）、FreqCoarse（0–31）、FreqFine（0–99）、
+                      OscMode（比率/固定）
+第 4 页 — 灵敏度与电平        A ModSens（0–3）、KeyVelocity（0–7）、Out Level（0–99）
+第 5 页 — 键盘缩放          L Depth（0–99）、R Depth（0–99）、BreakPoint（A-1 - C7）
+第 6 页 — 键盘缩放          L Curve（−LN/−EX/+LN/+EX）、R Curve（−LN/−EX/+LN/+EX）、
+                      RateScale（0–7）
+
+■ Globe（全局设置）模式
+第 1 页 — MIDI 与弯音：
+
+旋钮 1              旋钮 2              旋钮 3               旋钮 4
+音符通道 Note Ch      效果通道 Effect Ch    弯音上 Pitch Up       弯音下 Pitch Dn
+（1–16）            （1–16）            （1–24 半音）          （1–24 半音）
+
+第 2 页 — 系统：
+旋钮 1                   旋钮 2                    旋钮 3              旋钮 4
+重置音色 Reset Patches     保存全局 Globe Save         -                 -
+
+■ ARP（琶音器）模式
+第 1 页：
+旋钮 1          旋钮 2                   旋钮 3          旋钮 4
+模式 Mode       八度范围 Octave（1–4）       速率 Rate       速度 Tempo（30–300 BPM）
+
+                                   -04-
+第 2 页：
+旋钮 1                    旋钮 2                      旋钮 3               旋钮 4
+门限 Gate （20–100%）       摇摆 Swing（50–75%）          锁定 Latch （开/关）     -
+
+
+
+■ SEQ（音序器）模式
+第 1 页：
+
+旋钮 1                旋钮 2                旋钮 3                   旋钮 4
+模式编号 Pattern        Clear               速率 Rate                速度 Tempo
+(1-16)                                                         (30-300BPM)
+
+第 2 页：
+旋钮 1                    旋钮 2                            旋钮 3         旋钮 4
+门限 Gate （20–100%）       摇摆 Swing（50–75%）                -            -
+
+
+■ 3.2 功能按键 — 上排
+
+■ FX（效果链）
+按下进入效果链模式。屏幕显示 3×2 网格的 6 个效果槽位，每个显示：
+• 效果名称（Filter, Reverb, Delay, Distortion, Chorus, Phaser）
+• 当前选中的槽位下方有一个闪烁圆点
+• 亮色方块 = 效果已开启，暗色方块 = 效果已关闭
+
+
+
+操作方法：
+• 旋转 SELECT 在 6 个效果槽位之间移动闪烁圆点
+• 旋转 KNOB 1–4 调节选中效果的参数（参数名称显示在底栏）
+• 再次按 FX 返回主屏幕
+
+
+■ SEL（效果选择 / 排序）
+仅在 FX 模式中有效。用于锁定效果并重新排序
+• 按 SEL → 当前高亮效果被"抓取"（圆点由闪烁变为常亮；SEL LED 亮起）
+• 旋转 SELECT → 被抓取的效果与相邻效果交换位置
+• 再次按 SEL → 将效果放置到新位置（SEL LED 熄灭）
+这允许您重新排列效果的处理顺序（例如将失真放在混响前面，或将延迟放在合唱前面）。
+
+
+开/关切换： 旋转最右侧旋钮（编码器 4）顺时针开启选中效果，逆时针关闭。效果方块亮度相应变
+化。
+
+
+■ ENV（包络）
+按下进入 ADSR 包络编辑模式。屏幕显示 4 个参数框：
+• Attack（起音） — 按键后声音达到最大音量的速度。范围：0–8。0 = 瞬时起音（立即最大音
+量），8 = 极慢渐入。
+
+
+                                      -05-
+• Decay（衰减） — 声音从峰值降到延音电平的速度。范围：0–8。
+• Sustain（延音） — 按住琴键时保持的音量电平。范围：0–8。值越高 = 延音越响。
+• Release（释放） — 松开琴键后声音消失的时间。范围：0–8。0 = 立即静音，8 = 长时间渐弱。
+使用 KNOB 1–4 调节各参数。数值以方块条形图显示。再次按 ENV 返回主屏幕。
+
+
+■ LFO（低频振荡器）
+按下进入 LFO 编辑模式。LFO 为声音添加周期性调制效果。
+
+
+第 1 页（使用 SELECT 切换页面）：
+• Wave（KNOB 1）：LFO 波形。选项：三角波、下锯齿、上锯齿、方波、正弦波、采样保持。
+• Speed（KNOB 2）：LFO 振荡速度。范围：0–99。值越高 = 调制越快。
+• PMD（KNOB 3）：音高调制深度。范围：0–99。值越高 = 音高颤动越大。
+• AMD（KNOB 4）：振幅调制深度。范围：0–99。值越高 = 颤音效果越强。
+
+
+第 2 页：
+• Delay（KNOB 1）：LFO 在音符触发后延迟启动的时间。范围：0–99。
+• Pitch Sens（KNOB 2）：LFO 对音高的影响量。范围：0–7。
+• Lfo Sync（KNOB 3）：是否在每个新音符时重置 LFO。0 = 自由运行，1 = 同步。
+• Osc Sync（KNOB 4）：是否在每个新音符时重置音头。0 = 自由运行，1 = 同步。
+
+
+■ EDIT（算子编辑）
+按下进入深度 FM 合成编辑。在此塑造每个 FM-1 音色的基本音色特征。
+FM-1 合成器有 6 个算子（OP1–OP6）。每个算子是一个正弦波振荡器，可以作为载波（直接产生声
+音）或调制器（改变其他算子的声音）。算法设置（通过 ALGORITHM 编码器更改）决定了算子的连
+接方式。
+
+
+操作方法：
+• 按 EDIT 进入。底部键盘按键此时作为功能选择器使用。
+• 按键盘上的组合功能键选择编辑内容：
+
+
+• OP1 – OP6: 选择单个算子的参数进行编辑
+• PIT：音高包络（音高随时间的变化）
+• GLO：全局合成参数（算法、反馈、振荡器同步）
+• MONO：切换到单音模式（一次只发一个音，后触优先）
+• POLY：切换到复音模式（最多同时发 12 个音）
+
+
+• 当前选中的算子/功能的 LED 常亮。
+• 旋转 SELECT 翻页浏览该部分的参数（每个算子最多 6 页）。
+• 使用 KNOB 1–4 调节参数。
+• 再次按 EDIT 返回主屏幕。
+
+
+■ GLO（Globe — 全局设置）
+按下进入全局设备设置。
+
+
+
+                             -06-
+第 1 页 — MIDI 与弯音：
+• 音符通道 Note Channel（KNOB 1）：键盘发送/接收音符的 MIDI 通道。范围：1–16。
+• 效果通道 Effect Channel（KNOB 2）：控制效果参数的 MIDI 通道。范围：1–16。
+• 弯音上 Pitch Bend Up（KNOB 3）：向上弯音最大范围（半音数）。范围：1–24。
+• 弯音下 Pitch Bend Down（KNOB 4）：向下弯音最大范围（半音数）。范围：1–24。
+
+
+第 2 页 — 系统：
+• 重置音色 Reset Patches（KNOB 1）：顺时针旋转发起恢复出厂设置。出现确认界面：
+• 旋转 KNOB 4 确认重置（将所有 128 个音色恢复为出厂默认）
+• 再次旋转 KNOB 1 取消
+• 重置成功后显示 "Reset Success"
+• 保存全局 Globe Save（KNOB 2）：旋转保存所有全局设置到闪存。短暂显示 "Globe Saved"。再
+次按 GLO 返回主屏幕。
+
+■ 3.3 功能按键 — 下排
+
+■ HOME（BT/主屏幕）
+长按开关BT，HOME LED 闪烁 BT 打开未连接，HOME LED 常亮 BT 连接，HOME LED 不亮 BT 关
+闭。
+随时按下可返回主屏幕 / 示波器画面。示波器以实时波形显示合成器输出 — 灰色背景上的黄色线条随
+您演奏的声音运动。
+
+
+■ SAVE（保存）
+按住以将当前预设保存到闪存。
+• 按住时，设备保存所有待处理的更改（音色参数、效果设置、音序器模式、全局设置）
+• 保存期间 SAVE LED 亮起
+• 屏幕短暂显示 Preset Saved
+• 松开按键后 LED 熄灭
+
+
+FM-1 SysEx 音色库保存（通过 MIDI）：
+当设备通过 MIDI SysEx 接收到 FM-1 音色库时，出现音色库选择界面。旋转 KNOB 1–4 选择存入哪个
+库（A/B/C/D）。短暂延迟后保存完成。
+
+
+■ ARP（琶音器）
+琶音器在按住琴键时自动按模式播放音符。
+
+
+激活方法：
+• 按 ARP → ARP LED 亮起，琶音器激活
+• 显示屏进入 ARP 设置模式
+
+
+使用方法：
+• 按住键盘上一个或多个琴键
+• 琶音器按选定模式自动播放
+• 触发音符时对应琴键 LED 亮起
+• 使用 KNOB 1–4 调节设置（参见上方参数表）
+                              -07-
+琶音器模式：
+
+ 模式                      演奏方式
+ Up（上行）                  从低音到高音，重复
+ Down（下行）                从高音到低音，重复
+ Inclusive（包含）           低→高→低（含端点来回跳动）
+ Exclusive（排除）           低→高→低（不含端点来回跳动）
+ Random（随机）              随机顺序
+ Order（按键顺序）             按照按键按下的顺序
+ Repeat（重复）              每个音符重复后再移到下一个
+Latch（锁定）模式：锁定开启时，即使松开琴键，音符仍继续播放。按新键可改变模式。关闭锁定以
+停止。
+关闭方法： 在 ARP 模式中再次按 ARP → 琶音器停止，ARP LED 熄灭，返回主屏幕。
+     重要提示：如果音序器（SEQ）正在运行，按 ARP 将显示 "Disable SEQ to enter"。您必须先关
+     闭 SEQ。
+
+
+■ SEQ（音序器）
+16 步模式音序器，支持录制和回放。
+
+
+激活方法：
+• 按 SEQ → SEQ LED 亮起，STOP LED 亮起，音序器激活
+• 显示屏进入 SEQ 设置模式
+• 键盘按键此时作为 16 步指示器（LED 显示已填充/空步）
+
+
+录制序列：
+• 按 REC → REC LED 和 PLAY LED 亮起，开始录制
+• 在键盘上弹奏音符 — 每个音符录入下一步
+• 已填充步的 LED 亮起
+• 再次按 REC 停止录制（切换到播放模式）
+
+
+回放：
+• 按 PLAY/STOP → PLAY LED 亮起，STOP LED 熄灭
+• 序列播放已填充的步
+• 当前播放步的 LED 闪烁
+• 再次按 PLAY/STOP 停止（STOP LED 亮起，PLAY LED 熄灭）
+
+
+步 LED 指示灯说明：
+
+ LED 状态                  含义
+ 常亮                      该步包含音符
+ 熄灭                      该步为空
+ 闪烁                      当前播放到该步
+模式管理： 有 16 个独立模式（1–16）可用。在 SEQ 模式下使用 KNOB 1 选择模式。模式存储在闪存
+中。
+关闭方法： 在 SEQ 模式中再次按 SEQ → 音序器停止，所有传输 LED 熄灭，返回主屏幕。
+
+
+                                 -08-
+   重要提示：如果琶音器（ARP）正在运行，按 SEQ 将显示 "Disable ARP to enter"。您必须先关
+   闭 ARP。
+
+
+■ PLAY/STOP（播放/停止）
+音序器的传输控制（仅在 SEQ 激活时有效）：
+• 在停止状态下按 → 开始播放（PLAY LED 亮，STOP LED 灭）
+• 在播放或录制状态下按 → 停止（STOP LED 亮，PLAY 和 REC LED 灭）
+• 如 SEQ 未激活，显示 "Enable SEQ ﬁrst"
+
+
+■ REC（录制）
+音序器的录制控制（仅在 SEQ 激活时有效）：
+• 在停止或播放状态下按 → 进入录制模式（REC + PLAY LED 亮）
+• 在录制状态下按 → 退出录制，继续播放（REC LED 灭，PLAY 保持亮）
+• 如 SEQ 未激活，显示 "Enable SEQ ﬁrst"
+
+
+
+4. 底部 — 键盘与组合功能键                                          CN
+
+
+
+
+4.1 钢琴键（27 键）
+标准钢琴式按键用于弹奏音符。
+• 每个按键都有 LED，按下时亮起
+• 实际 MIDI 音符编号计算方式：按键位置 + 53 +（八度 × 12）+ 移调
+• 默认范围（八度 0，移调 0）大约覆盖 F3 – G5
+• 在普通模式下：直接弹奏音符（复音或单音取决于设置）
+• 在琶音模式下：按键输入给琶音器处理
+• 在音序模式下：按键将音符录入音序器步
+
+
+4.2 组合功能键
+部分琴键标注有第二功能。这些标签仅在 Edit（编辑）模式下有效：
+按键标签          功能
+OP1 – OP6     选择算子 1–6 进行编辑。选中时 LED 常亮。
+PIT           选择音高包络进行编辑
+GLO           选择全局参数（算法、反馈、振荡器同步、移调）
+MONO          切换到单音模式 — 一次只发一个音
+POLY          切换到复音模式 — 最多同时发 12 个音
+
+在 Edit 模式下，所有 8 个 OP/PIT/GLO 按键的 LED 闪烁表示可选择。当前激活的选择 LED 常亮。
+MONO/POLY LED 指示当前模式：当前模式的 LED 常亮，另一个闪烁。
+
+                              -09-
+5. MIDI 连接                                                         CN
+
+三种 MIDI 接口同时工作 — 可以同时使用所有三种：
+
+接口            连接方式
+USB MIDI      通过 USB 线缆连接电脑或 DAW。作为标准 USB MIDI 设备识别。
+BLE MIDI      无线 MIDI 连接 iOS/Android/Mac/Windows 支持 BLE MIDI 的设备
+3.5 MIDI IN   传统 MIDI 线缆连接（31250 波特率）。连接硬件合成器、控制器等。
+FM-1 通过 MIDI 接收的内容：
+
+
+• Note On/Off（音符开关） 带力度 → 触发内部合成引擎
+• Pitch Bend（弯音） → 在设定范围内弯曲音高（参见 Globe 设置）
+• Control Change（控制变化） → 各种参数控制
+• FM-1 SysEx 音色转储 → 导入标准 Yamaha DX7 音色库（每库 32 个音色）。接收后选择保存到哪
+个库槽位（A/B/C/D）。
+
+
+FM-1 通过 MIDI 发送的内容：
+• 来自键盘、琶音器或音序器的 Note On/Off 带力度
+• 音符通过设定的音符通道发送（1–16，在 Globe 模式中设置）
+
+
+
+
+6. 电池与电源                                                           CN
+
+• 电池电量以图标形式显示在屏幕右上角
+• 电池电量极低时，出现全屏 LOW BATTERY 警告并持续显示，直到充电或关机
+• 该警告优先于所有其他屏幕内容 — 需要充电才能清除
+
+
+■ 扬声器
+• FM-1 内置扬声器，可在无耳机时监听，插入耳机后扬声器自动静音。
+
+
+
+
+                                -10-
+7. 背面接口说明                                                   CN
+
+
+
+
+     ①   ②   ③   ④
+
+① 3.5音频输出插孔：建议使用TRS图示耳机，否则可能导致音频输出噪音以及扬
+声器无法关闭。
+                                                      TRS图示耳机
+② MIDI 输入端口：使用3.5mm转MIDI适配器连接到支持 MIDI OUT 的外部设备。
+③ USB：USB连接端口。
+④ 电源：用于打开/关闭FM-1合成器
+
+
+
+
+8. 技术规格                                                    CN
+
+产品尺寸             161.5 (L) x 96.5 (W) x 28.6 (H) mm
+产品重量             251 g
+琴键               27键硅胶琴键
+旋钮               1个300° 音量旋钮，7个360° 控制旋钮
+续航时间             12小时
+输出               USB-C型接口
+                 无线MIDI连接Windows/Mac/ios/Android
+                 3.5mm音频输出接口
+输入               3.5mm MIDI IN 接口
+电源               电池供电或USB供电
+电池型号规格           DTP704060
+电池标称电压           3.7V
+电池额定容量           2000mAh
+工作频段             2403~2478MHz
+最大射频功率           9dBm
+修订               2026-4-30
+
+
+
+
+                                 -11-
+◆ In the interest of product improvement, the speciﬁcations and/or the content of products
+(induding but not limited to appearances, packaging design, manual content, accessories,
+size, paramieters and display screen), are subject to change without prior notice. Please
+check with local suplier for exact offers. Speciﬁcations and features (including but not
+limited to appearances, colors and size) may vary by model owing to environmental factors,
+and all images are llustrative.
+

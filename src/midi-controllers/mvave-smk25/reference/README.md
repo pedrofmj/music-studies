@@ -1,5 +1,7 @@
 # SMK25 Reference
 
+[Structured capabilities](capabilities.json) records source-linked ports, signal directions, connection constraints, and supported roles.
+
 This reference explains the original SMK25. It is a MIDI controller: keys,
 pads, strips, and encoders create MIDI data for a host or configured MIDI
 destination; they do not contain instrument sounds.

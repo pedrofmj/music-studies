@@ -1,0 +1,356 @@
+        XPS-30 Version 1.04 Supplementary Manual
+XPS-30 Program Update
+     This explains how to update the XPS-30’s system program.
+
+
+
+Checking the Version                                                                        Update Procedure
+     Before you download the system program, check the version of your XPS-30.                Follow the procedure below to install the program “xps30_up.bin” in your XPS-30.
+
+1. Press the [MENU] button.                                                                    NOTE
+2. Move the cursor to “SYSTEM,” and press the [ENTER] button.                                   Never turn off the XPS-30’s power while the update is in progress.
+3. Move the cursor to “INFORMATION” tab.                                                        Doing so may make the XPS-30’s system unable to start up correctly.
+
+                                                                                            1. Copy the update-use file (xps30_up.bin ) to the root directory of the USB
+                                                                                              flash drive.
+What You’ll Need for the Update
+     In order to update your XPS-30, you’ll need the following items.
+     55 XPS-30 itself                                                                                                      xps30_up.bin
+
+     55 PC to write the updater to the USB flash drive
+     55 USB flash drive (the USB flash drive needs to be formatted on a XPS-30)
+                                                                                                                           EXPORT
+
+
+
+
+Download the System Program and Uncompress the Compressed File                                                             IMPORT
+
+     Download the file named “xps30_sys_v104.zip.”
+     It is an archive file in zip format, please double click on the file to expand.
+     After expanding the file, the folder “xps30_sys_v104” holding the file “xps30_                                        SONG LIST
+     up.bin” will be appeared.
+
+
+                                                                                                                           ROLAND
+
+Note When Updating
+55 We recommend that you save your data to a USB flash drive before you perform
+   the update. If a problem occurs and your data is lost, you will be able to restore the
+   original state by reloading the data you saved.                                          2. Make sure the XPS-30’s power is switched off, then connect the USB flash
+   For details on the procedure, refer to the following sections of the “Saving XPS-30’s      drive to the USB MEMORY port.
+   Data to USB Flash Drive (BACKUP)” of the Owner’s Manual p. 18.                           3. Hold down the [TAP] button and switch on the power.
+55 Never apply this update data to any product other than the XPS-30. This update           4. When the message “start update.” appears, release the [TAP] button.
+   data may destroy the data or system program of other products.                             The update starts.
+                                                                                              ** The update process takes several minutes to finish. Be sure never to switch off
+                                                                                                 the power before the operation finishes.
+55 Never power-off your XPS-30 while the update is in progress!
+   If a power failure or similar accident occurs during the update process, the XPS-30        When the message “===update finished.===” is displayed, the operation has
+   won’t be able to start up in normal operating mode. This will require servicing, so        finished. (It will take about 1 minute to update.)
+   you will need to contact Roland service center near you if this occurs.
+
+55 We regret that we are unable to answer questions regarding the update procedure          5. Switch off the power.
+   using this system program. Please perform the update responsibly, following the          6. Detach the USB flash drive, then switch on the power to the unit and verify
+   directions given in this document.                                                         that the version has been updated.
+
+
+
+
+© 2015 ROLAND CORPORATION
+
+01
+                                                                                                                                                                                   1
+XPS-30 Version 1.04 Supplementary Manual
+
+
+
+Functions Added in XPS-30 Ver.1.04
+
+PATCH LIST (CAT) Screen                                                                           Sample Cleanup (SAMPLE CLEANUP)
+    Move the cursor to the category number of the patch and press the [ENTER] button                Cleanup is a function that deletes unused sample waveform data. For example, if
+    to access the PATCH LIST (CAT) screen.                                                          a patch number containing a sample created by sample import is overwritten by a
+                                                                                                    different patch, the sample’s waveform data remains by itself.
+    (Example 1) Patch mode                                                                          The cleanup function deletes this type of unused sample waveform data in a single
+                                                                                                    operation. This makes it a useful way to obtain the free memory that is needed
+                                                                                                    when importing new samples.
+
+                                                                                                  1. Press the [SAMPLE IMPORT] button to make it light.
+                                                                                                    The SAMPLE MENU screen appears.
+                                                                                                  2. Move the cursor to “SAMPLE CLEANUP,” and press the [ENTER] button.
+                             [ENTER]                                                                The SAMPLE CLEANUP screen appears.
+
+
+
+
+                                                                                                         USED BLOCK           Waveform data of samples that are being used
+
+    (Example 2) Performance mode
+                                                                                                         UNUSED BLOCK         Waveform data of samples that are not being used
+
+
+                                                                                                         EMPTY BLOCK          Free memory
+
+
+
+                                                                                                  3. Press the [ENTER] button.
+                             [ENTER]                                                                A confirmation message appears.
+                                                                                                    If you decide to cancel, press the [EXIT] button.
+                                                                                                  4. Move the cursor to “OK,” and press the [ENTER] button.
+                                                                                                    Cleanup is complete when the screen indicates “Completed!”
+
+
+
+                                                                                                  Arpeggio
+                                                                                                    By long-pressing the [ARPEGGIO] button, you can move to the ARPEGGIO screen
+    You can also use the category buttons ([A. PIANO/E. PIANO]–[SAMPLE]) to switch                  from any screen without changing the arpeggio status.
+    tabs.
+
+
+    Function in Ver.1.03 and earlier: Access the PATCH LIST screen                                Vocoder/Auto Pitch
+    Patch mode                Move the cursor to the bank number, and press the [ENTER] button.   55 The “Part Level” parameter has been added to the VOCODER/AUTO-PITCH screen.
+                                                                                                    ** Part Level is memorized when you save vocoder / auto pitch settings.
+                              In the PERFORM EDIT screen, move the cursor to “Number,” and
+    Performance mode
+                              press the [ENTER] button.                                              Parameter          Value/Explanation
+                                                                                                     Mode: Vocoder
+                                                                                                                        Adjusts the level at which the selected Carrier sound is input to the
+                                                                                                     Part Level         vocoder.
+                                                                                                                        0–127
+Favorite                                                                                             Mode: Auto-Pitch
+    Now you can use favorites even when the AUDIO PLAYER screen is displayed.                                           Adjusts the volume of the sound played on the keyboard when using
+                                                                                                     Part Level         auto-pitch.
+                                                                                                                        0–127
+
+
+                                                                                                  55 In the VOCODER/AUTO-PITCH screen, moving the [UPPER] slider adjusts the Part
+                                                                                                     Level.
+                                                                                                    ** This is a change from Ver.1.03 and earlier, in which this slider adjusted “Patch
+                                                                                                       Level.”
+
+                                                                                                  55 In the VOCODER/AUTO-PITCH screen, moving the [LOWER] slider adjusts the
+                                                                                                     vocoder/auto pitch’s Level.
+
+
+
+
+2
+                                                                                                                                     XPS-30 Version 1.04 Supplementary Manual
+
+
+
+Pattern Sequencer                                                                                Sample Edit
+ In the PATTERN SEQUENCER screen you can now edit the patch that is used to play                 55 When you press the [MENU] button in the SAMPLE EDIT screen, the INIT MENU
+ or record the track.                                                                               window appears. Choose “SAMPLE” and press the [ENTER] button to initialize the
+ In the PATTERN SEQUENCER screen, press the [SAMPLE IMPORT] and [DAW CONTROL]                       parameters other than that of the “SAMPLE” tab.
+ buttons simultaneously, and then choose “PATCH EDIT.”
+                                                                                                 55 The “COMMON” tab and “SAMPLE WAVE” tab have been added to the SAMPLE EDIT
+                                                                                                    screen.
+System Settings
+                                                                                                  COMMON
+ The “Patch Remain” parameter has been added to the “SOUND” tab of the SYSTEM
+ screen.                                                                                           Parameter           Value/Explanation
+                                                                                                                     Specifies the volume of the patch.
+  Parameter          Value/Explanation                                                             Patch Level
+                                                                                                                     0–127
+                     Specifies whether currently sounding notes will continue sounding when
+                                                                                                                     Specifies the pan of the patch.
+                     another patch or drum kit is selected (ON), or not (OFF).
+                                                                                                   Patch Pan         “L64” is far left, “0” is center, and “63R” is far right.
+                     When this is “ON,” changes produced by incoming MIDI messages such
+                     as Volume or Pan (CC 5, 7, 10, 65, 68, 71–74, RPN 0, 1, 2, MONO ON, POLY                        L64–0–63R
+                     ON), as well as tonal quality and volume changes produced by the various                        This determines how notes will be managed when the maximum
+                     controllers will be inherited.                                                                  polyphony is exceeded (128 voices).
+  Patch Remain       ** Effects settings change as soon as you switch to a new patch or drum                                        The last-played voices will be given priority, and currently
+                        kit, without being influenced by the Patch Remain setting. Because                           LAST           sounding notes will be turned off in order, beginning with the
+                        of this, certain effects settings can cause notes that were until then     Patch Priority
+                                                                                                                                    first-played note.
+                        sounding to no longer be heard, even though Patch Remain has been
+                        set to “ON.”                                                                                                The voices with the loudest volume will be given priority, and
+                     ** When using the pattern sequencer, Patch Remain is always OFF.                                LOUDEST currently sounding notes will be turned off, beginning with
+                     OFF, ON                                                                                                        the lowest-volume voice.
+                                                                                                                     Adjusts the pitch of the patch’s sound up or down in units of an octave (±3
+                                                                                                   Octave Shift      octaves).
+                                                                                                                     -3–3
+Shortcut                                                                                                             Adjusts the pitch of the patch’s sound up or down in semitone steps (±4
+                                                                                                   Patch Coarse Tune octaves).
+ The following shortcuts have been added.                                                                            -48–48
+                                                                                                                     Adjusts the pitch of the patch’s sound up or down in 1-cent steps (±50
+  Shortcut                           Explanation
+                                                                                                   Patch Fine Tune   cents).
+  Common section
+                                                                                                                     -50–50
+                                     Displays the “KNOB” tab of the SYSTEM screen; the setting
+  [SHIFT] + each control knob                                                                                        Stretched tuning (a system by which acoustic pianos are normally tuned,
+                                     of the control knob you operated is selected.
+                                                                                                                     causing the lower range to be lower and the higher range to be higher
+  [SHIFT] + [4]                      Turns the MFX (MFX1) on (lit)/off (unlit)                                       than the mathematical tuning ratios would otherwise dictate)
+                                     Turns the MFX2 on (lit)/off (unlit)                                             OFF            Equal temperament
+  [SHIFT] + [5]
+                                     ** Only in Performance mode.                                                                   Higher settings will produce the greater difference in the
+                                     Turns the MFX3 on (lit)/off (unlit)                                             1–3
+                                                                                                                                    pitch of the low and high ranges.
+  [SHIFT] + [6]
+                                     ** Only in Performance mode.
+                                                                                                                                  Pitch difference from
+  [SHIFT] + [7]                      Turns the chorus on (lit)/off (unlit)                                                        equal temperament                       Parameter value
+  [SHIFT] + [8]                      Turns the reverb on (lit)/off (unlit)
+
+                                                                                                   Stretch Tune
+ Operations using [SHIFT] + ([0]–[3], [9])                                                         Depth
+ In Ver.1.04, the button lit/blink status when the [SHIFT] button is pressed has been
+ changed as follows.
+  Shortcut           Explanation
+                     PATCH EDIT screen
+  [SHIFT] + [0]      or                      When the shortcut is available:
+                     DRUM KIT EDIT screen    Button blinks when the [SHIFT] button is held
+                                             down
+  [SHIFT] + [1]      MFX (MFX1) screen
+  [SHIFT] + [2]      CHORUS screen           When the shortcut is unavailable:
+                                                                                                                               Low note range                             High note range
+  [SHIFT] + [3]      REVERB screen           Button is unlit when the [SHIFT] button is held
+                                             down                                                                     Specifies the depth of 1/f modulation that is to be applied to the patch.
+  [SHIFT] + [9]      SAMPLE EDIT screen                                                                               By adding this “1/f modulation,” you can simulate the natural instability
+                                                                                                   Analog Feel        characteristic of an analog synthesizer.
+                                                                                                                      0–127
+                                                                                                                      Offsets the Cutoff Frequency value.
+                                                                                                   Cutoff Offset
+                                                                                                                      -63–+63
+                                                                                                                      Offsets the Resonance value.
+                                                                                                   Resonance Offset
+                                                                                                                      -63–+63
+                                                                                                                      Offsets the TVA-Env Time 1 and TVF-Env Time 1 values.
+                                                                                                   Attack Time Offset
+                                                                                                                      -63–+63
+                                                                                                   Release Time       Offsets the TVA-Env Time 4 and TVF-Env Time 4 values.
+                                                                                                   Offset             -63–+63
+                                                                                                   Velocity Sens      Offsets the Cutoff V-Sens and Level V-Sens values.
+                                                                                                   Offset             -63–+63
+                                                                                                                      Specifies whether the patch will play polyphonically (POLY) or
+                                                                                                                      monophonically (MONO).
+                                                                                                                      The “MONO” setting is effective when playing a solo instrument patch such
+                                                                                                   Mono/Poly          as sax or flute.
+                                                                                                                      MONO          Only the last-played note will sound.
+                                                                                                                      POLY          Two or more notes can be played simultaneously.
+                                                                                                                      Specifies whether the Legato Switch will be used (ON) or not (OFF).
+                                                                                                                      With the Legato Switch parameter “ON,” pressing a key while continuing
+                                                                                                                      to press a previous key causes the note to change pitch to the pitch of the
+                                                                                                                      most recently pressed key, sounding all the while. This creates a smooth
+                                                                                                   Legato Switch      transition between notes, which is effective when you wish to simulate the
+                                                                                                                      hammering-on and pulling-off techniques used by a guitarist.
+                                                                                                                      ** Legato Switch is valid when the Mono/Poly is set to “MONO.”
+                                                                                                                      OFF, ON
+
+
+
+
+                                                                                                                                                                                                3
+XPS-30 Version 1.04 Supplementary Manual
+
+
+    Parameter            Value/Explanation                                                              Parameter            Value/Explanation
+                         Specifies whether sounds are replayed (ON) or not (OFF) when performing                             Selects the type of tone delay.
+                         legato. Normally you will leave this parameter “ON.”                                                NORM       The tone begins to play after the time specified in the Tone
+                         When “OFF,” when one key is held down and another key is then pressed,                                         Delay Time has elapsed.
+                         only the pitch changes, without the attack of the latter key being played.
+    Legato Retrigger     Set this to “OFF” when performing wind and string phrases or when
+                         simulating the mono synth keyboard sound.
+                                                                                                                                                                                  No Tone Delay
+                         ** Legato Retrigger is valid when the Mono/Poly is set to “MONO” and the
+                            Legato Switch is set to “ON.”
+                         OFF, ON
+
+      MEMO
+    Let’s say you have the Legato Switch set to “ON,” and the Legato Retrigger set to “OFF.” When
+    you try to sound a legato (by pressing a higher key while a lower key is held down), the pitch                                                Delay time
+    may sometimes not be able to rise all the way to the intended pitch (stopping instead at an
+    intermediate pitch). This can occur because the limit of pitch rise, as determined at the wave
+    level, has been exceeded. Additionally, if differing upper pitch limits are used for the waves of
+    a Patch that uses multiple tones, it may stop being heard in MONO. When making large pitch
+    changes, set the Legato Retrigger to “ON.”
+                                                                                                                                              Note on              Note off
+    Portamento      Specifies whether the portamento effect will be applied (ON) or not (OFF).
+                                                                                                                             HOLD       Although the tone begins to play after the time specified in the
+    Switch          OFF, ON                                                                                                             Tone Delay Time has elapsed, if the key is released before the
+                    Specifies the performance conditions for which portamento will be applied.                                          time specified in the Tone Delay Time has elapsed, the tone is
+                    NORMAL Portamento will always be applied.                                                                           not played.
+    Portamento Mode               Portamento will be applied only when you play legato (i.e.,
+                    LEGATO        when you press the next key before releasing the previous
+                                  key).
+                    Specifies the type of portamento effect.
+                                  The time it takes will depend on the distance between the
+                    RATE
+    Portamento Type               two pitches.
+                                  The time it takes will be constant, regardless of how far apart
+                    TIME                                                                                                                                                             No sound played
+                                  in pitch the notes are.
+                    When another key is pressed during a pitch change produced by
+                    portamento, a new pitch change will begin. This setting specifies the pitch
+                    at which the change will begin.                                                     Tone Delay Mode
+                    PITCH         Starts a new portamento when another key is pressed while
+                                       the pitch is changing.
+                                                                                                                                             Note on               Note off
+                                         Pitch
+                                                                                                                             OFF-N      Rather than being played while the key is pressed, the tone
+                                                                                                                                        begins to play once the period of time specified in the Tone
+                                                                                                                                        Delay Time has elapsed after release of the key. This is effective
+                                                                                                                                        in situations such as when simulating noises from guitars and
+                                                                                                                                        other instruments.
+
+
+
+
+                                                                                             Time
+                                                                          press D4 key
+                                                                press C5 key
+    Portamento Start                                                                                                                                                   Delay time
+                                                 press C4 key
+
+                         NOTE          Portamento will begin anew from the pitch where the current
+                                                                                                                                               Note on              Note off
+                                       change would end.
+                                         Pitch                                                                               OFF-D      Rather than being played while the key is pressed, the tone
+                                                                                                                                        begins to play once the period of time specified in the Tone
+                                                                                                                                        Delay Time has elapsed after release of the key. Here, however,
+                                                                                                                                        changes in the TVA Envelope begin while the key is pressed,
+                                                                                                                                        which in many cases means that only the sound from the
+                                                                                                                                        release portion of the envelope is heard.
+
+                                                                                                                                                                                   Delay time
+
+
+
+                                                                                             Time
+                                                                          press D4 key
+                                                                press C5 key
+                                                                                                                                                      Note on                  Note off
+                                                 press C4 key
+                         When portamento is used, this specifies the time over which the pitch will        MEMO
+                         change. Higher settings will cause the pitch change to the next note to        If you have selected a waveform that is a decay-type sound (i.e., a sound that fades away
+    Portamento Time      take more time.                                                                naturally even if the key is not released), selecting “OFF-N” or “OFF-D” may result in no sound
+                         0–127                                                                          being heard.
+                                                                                                                             Specifies the time from when the key is pressed (or if the Delay Mode is set
+                                                                                                                             to “OFF-N” or “OFF-D,” the time from when the key is released) until when
+    SAMPLE WAVE                                                                                         Tone Delay Time      the tone will sound.
+    Parameter            Value/Explanation                                                                                   0–127, note
+                         Sets the gain (amplification) of the waveform. The value changes in 6 dB
+    Wave Gain            (decibel) steps—an increase of 6 dB doubles the waveform’s gain.
+                         -6, 0, +6, +12
+                         Sets whether FXM will be used (ON) or not (OFF).
+                         OFF, ON
+                           MEMO
+    Wave FXM Switch
+                         FXM (Frequency Cross Modulation) uses a specified waveform to apply
+                         frequency modulation to the currently selected waveform, creating
+                         complex overtones. This is useful for creating dramatic sounds or sound
+                         effects.
+                         Specifies how FXM will perform frequency modulation. Higher settings
+                         result in a grainier sound, while lower settings result in a more metallic
+    Wave FXM Color       sound.
+                         1–4
+                         Specifies the depth of the modulation produced by FXM.
+    Wave FXM Depth
+                         0–16
+
+
+4
+

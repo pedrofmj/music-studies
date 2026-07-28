@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "device": {
+    "id": "mvave-fm-1",
+    "manufacturer": "M-VAVE",
+    "model": "FM-1",
+    "category": "six-operator FM synthesizer and MIDI controller",
+    "repository_root": "src/midi-controllers/mvave-fm-1"
+  },
+  "manual_sources": [
+    {
+      "id": "fm1-manual",
+      "local_pdf": "../manual/source/FM-1-manual.pdf",
+      "extracted_text": "../manual/extracted/FM-1-manual.txt"
+    }
+  ],
+  "capabilities": {
+    "audio": {
+      "source_refs": [
+        { "source_id": "fm1-manual", "pdf_pages": [1, 20, 21] }
+      ],
+      "generates_audio": true,
+      "sound_engine": "six-operator FM synthesis",
+      "audio_outputs": [
+        {
+          "name": "headphone output",
+          "connector": "3.5 mm stereo audio jack",
+          "direction": "out",
+          "purpose": "headphones or connection to a mixer or audio interface",
+          "speaker_behavior": "connecting headphones mutes the internal speaker"
+        },
+        {
+          "name": "internal speaker",
+          "connector": "built-in",
+          "direction": "out",
+          "purpose": "local monitoring"
+        }
+      ],
+      "usb_audio": {
+        "documented": false,
+        "status": "unknown",
+        "note": "The manual documents USB as MIDI; do not plan on USB audio without an observed test."
+      }
+    },
+    "midi": {
+      "source_refs": [
+        { "source_id": "fm1-manual", "pdf_pages": [4, 20, 21, 24] }
+      ],
+      "ports": [
+        {
+          "name": "USB-C MIDI",
+          "connector": "USB-C",
+          "direction": "in_out",
+          "protocol": "USB MIDI",
+          "host_required": true
+        },
+        {
+          "name": "BLE MIDI",
+          "connector": "Bluetooth",
+          "direction": "in_out",
+          "protocol": "BLE MIDI",
+          "host_required": true
+        },
+        {
+          "name": "MIDI IN",
+          "connector": "3.5 mm MIDI input",
+          "direction": "in",
+          "protocol": "MIDI",
+          "host_required": false
+        }
+      ],
+      "documented_behavior": [
+        "USB-C MIDI, BLE MIDI, and 3.5 mm MIDI input are documented as simultaneously active.",
+        "The FM-1 receives notes with velocity, pitch bend, CC, and supported FM SysEx.",
+        "Keyboard, arpeggiator, and sequencer notes transmit over USB MIDI and BLE MIDI on the configured note channel.",
+        "The 3.5 mm MIDI connector is input only."
+      ]
+    },
+    "performance_and_control": {
+      "source_refs": [
+        { "source_id": "fm1-manual", "pdf_pages": [1, 4, 6, 17, 18] }
+      ],
+      "keyboard": "27-key silicone keyboard",
+      "polyphony": "Mono or Poly mode; up to 12 voices in Poly mode",
+      "preset_memory": "128 factory presets; edited presets can be saved to flash",
+      "clocked_features": [
+        "seven-mode arpeggiator",
+        "16-step sequencer with 16 patterns",
+        "arpeggiator and sequencer cannot be active together"
+      ],
+      "global_midi_settings": [
+        "note channel 1-16",
+        "effect channel 1-16",
+        "pitch-bend ranges"
+      ]
+    },
+    "power": {
+      "source_refs": [
+        { "source_id": "fm1-manual", "pdf_pages": [20, 21] }
+      ],
+      "battery": "internal 2000 mAh battery; vendor product data states approximately 12 hours",
+      "charging_connection": "USB-C"
+    }
+  },
+  "connection_rules": [
+    {
+      "id": "fm1-midi-does-not-carry-audio",
+      "rule": "To hear FM-1 in a PA, mixer, or audio interface, use its 3.5 mm stereo audio output. USB-C MIDI, BLE MIDI, and 3.5 mm MIDI IN do not replace the audio connection.",
+      "source_refs": [
+        { "source_id": "fm1-manual", "pdf_pages": [20, 21, 24] }
+      ]
+    },
+    {
+      "id": "fm1-no-physical-midi-out",
+      "rule": "The manual documents its 3.5 mm MIDI connector as MIDI IN. Do not plan a direct physical MIDI-out cable from FM-1 to an XPS-30 or other hardware synthesizer.",
+      "source_refs": [
+        { "source_id": "fm1-manual", "pdf_pages": [20, 21] }
+      ]
+    },
+    {
+      "id": "fm1-usb-needs-host",
+      "rule": "For USB or BLE control of another hardware synthesizer, use a computer, mobile host, or documented MIDI-host interface that can receive FM-1 MIDI and send it to the target's MIDI IN.",
+      "source_refs": [
+        { "source_id": "fm1-manual", "pdf_pages": [20, 21, 24] }
+      ]
+    }
+  ],
+  "roles": [
+    "compact standalone FM sound source",
+    "USB or BLE MIDI keyboard/controller for a host",
+    "hardware FM module controlled through 3.5 mm MIDI IN",
+    "sequenced or arpeggiated auxiliary sound source with separate audio routing"
+  ],
+  "unknowns": [
+    "The stored manual does not document a USB-audio interface. Verify actual Linux endpoints before claiming USB audio support.",
+    "Record the required 3.5 mm MIDI adapter wiring before connecting an external MIDI source."
+  ]
+}

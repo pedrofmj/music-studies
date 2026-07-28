@@ -1,5 +1,7 @@
 # SMC-PAD Pocket Reference
 
+[Structured capabilities](capabilities.json) records source-linked ports, signal directions, connection constraints, and supported roles.
+
 The SMC-PAD Pocket is a compact 16-pad MIDI controller. It sends MIDI over
 USB-C or BLE and does not make sound itself.
 

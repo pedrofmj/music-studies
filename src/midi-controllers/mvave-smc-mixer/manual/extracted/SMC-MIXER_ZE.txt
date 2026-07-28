@@ -1,0 +1,430 @@
+SMC-MIXER
+  User Manual
+
+
+
+
+ CubeSuite for Android/iOS：scan the QR code
+Ⅰ. PACKING LIST                                                     EN
+
+■ SMC-Mixer Midi Controller
+■ USB-C connection Cable
+■ User Manual
+
+Ⅱ. CONNECTION                                                       EN
+
+■ USB Connection: Plug the cable through the USB port to the
+Windows/Mac it will automatic be recognized, When plug into
+Windows/Mac, SMC-Mixer will be charging at the same time;
+(Red light: charging, Green light: charging complete)
+
+■ Wireless Connection: Press and hold the BT button to turn
+on/off wireless function, when the light flashing the wireless
+function is activated, when the light stay on device was connected
+successfully;
+
+■ Wireless Adapter: Plug Wireless Adapter B into Windows/Mac,
+connection was successfully when both lights stay on;
+
+■ Direct Wireless: Activated BT function of Windows/Mac/ios/
+Android, Select SMC-Mixer on the list (Windows users need BT 5.0
+and extra BLE Midi Driver);
+
+■ Low battery notification: When the battery level is low, the
+shift button will flash to indicate it is time to charge.
+Note: Wireless Adapter A and B are not within the package
+need to buy additionally;
+
+
+
+
+       Wireless adapter A                      Wireless adapter B
+
+
+
+
+                                1
+    MAC
+                    Audio MIDI Studio
+
+Mac: Connect directly via BT inside MIDI Studio Setup
+
+
+  Windows     Ble MIDI Driver
+
+
+Windows: You need to download a driver, scan the QR code in
+the back of device
+
+
+
+
+Android: You need the software that supports Ble MIDI, such as FL
+studio. Search for a MiDl keyboard in your MIDI device and connect it
+
+
+
+
+                                   2
+ Ⅲ. DAW SET UP                                                      EN
+
+■ Ableton Live:
+Open the preferences menu in Ableton Live, set the Control Surface
+to "MackieControl", and select "SMC-Mixer" for both input and
+output.
+
+■ FL studio:
+Access the MIDI settings in FL Studio, enable "SMC-Mixer", set the
+Controller Type to "Mackie Control Universal", and ensure SMC-Mixer
+input and output are on the same port.
+
+■ Cubase:
+In Cubase, navigate to Studio Setup, add the "Mackie Control" device,
+and choose "SMC-Mixer" for both MIDI input and output.
+
+■ Logic Pro:
+In Logic Pro, go to Control Surfaces > New > Install, add "Mackie
+Control", and set both the Output Port and Input Port to
+"SMC-Mixer".
+
+■ Studio One:
+In Studio One, visit Options > External Devices, add "Mackie Control",
+and set both "Receive From" and "Send to" to "SMC-Mixer".
+
+■ BitWig:
+In BitWig's Settings > Controllers, add the "Mackie Control" controller,
+and designate "SMC-Mixer" for both MIDI input and output.
+
+■ Reaper:
+In Reaper, navigate to Preferences > Control/OSC/web, add "Mackie
+Control Universal", and select "SMC-Mixer" for both MIDI input and
+output.
+
+■ CakeWalk:
+In CakeWalk, enter Preferences > Control Surfaces, incorporate
+"Mackie Control", and choose "SMC-Mixer" for both input and output.
+
+                                   3
+Ⅳ. MODE SELECTION                                                    EN
+
+
+
+
+                         Channel Left Channel Right   Left   Right
+
+Mode selection :
+Hold down the shift button and toggle between the left and right
+buttons to switch between DAW mode and User mode ;
+
+
+
+Ⅴ. KNOBS                                                             EN
+
+
+
+
+Knobs:
+Manipulate the pan settings individually for tracks one through
+eight (Use Channel left & Channel Right Button to Switch Tracks) .
+
+
+
+
+                                 4
+Ⅵ. LED INDICATOR/FADER/TRACK CONTROL BUTTONS EN
+
+
+
+
+     Fader                                      Track control buttons
+
+     LED Indicator
+
+
+
+LED Indicator:
+The LED will flash when the position of the faders doesn't align
+with the track volume.
+
+
+Fader:
+Manipulate the volume levels individually for tracks one through
+eight(Use Channel left & Channel Right Button to Switch Tracks) .
+
+
+Track control buttons:
+Each group of four track buttons controls the mute, solo, record,
+and select functions for their respective track.
+
+
+
+
+                                 5
+Ⅶ. GLOBE CONTROL BUTTONS                                          EN
+
+
+
+
+Globe control buttons :
+These buttons respectively control play, stop, record, rewind, fast
+forward, switching to the previous 8-track group, switching to the
+next 8-track group, and directional navigation (up, down, left,
+right).
+(The knobs, faders, track control buttons, and global control
+buttons can be configured using software on PC, Mac, iOS, and
+Android. Scan the QR code located on the back of the product
+to download software.)
+
+Ⅷ. TECHNOLOGY PARAMETERS                                          EN
+
+Product Dimensions      256mm (L) x 122mm (W) x 40mm (H)
+Product Weight          445g
+Faders                  Eight groups of fader to control track volume;
+Buttons                 43 assignable control buttons;
+Knobs                   8 assignable endless 360 degree encoders;
+                        USB-C port;
+                        Wireless connection with
+                        Windows/Mac/ios/Android;
+Output
+                        Wireless Midi Out Function
+                        (Extra wireless midi device needed for
+                        wireless Midi Out)
+Power                   Battery supplied or USB-bus-powered
+Battery Model/Type      603040
+Battery Nominal Voltage 3.7V
+Battery capacity        780mAh
+
+                                  6
+Ⅸ. FCC WARNING                                                     EN
+
+★Changes or modifications not expressly approved by the party
+responsible for compliance could void the user’s authority to
+operate the equipment. This equipment has been tested and found
+to comply with the limits for a Class B digital device, pursuant to
+Part 15 of the FCC Rules. These limits are designed to provide
+reasonable protection against harmful interference in a residential
+installation. This equipment generates uses and can radiate radio
+frequency energy and, if not installed and used in accordance with
+the instructions, may cause harmful interference to radio
+communications. However, there is no guarantee that interference
+will not occur in a particular installation. If this equipment does
+cause harmful interference to radio or television reception, which
+can be determined by turning the equipment off and on, the user
+is encouraged to try to correct the interference by one or more of
+the following measures:
+‐‐ Reorient or relocate the receiving antenna.
+‐‐ Increase the separation between the equipment and receiver.
+‐‐ Connect the equipment into an outlet on a circuit different from
+that to which the receiver is connected.
+‐‐ Consult the dealer or an experienced radio/TV technician for
+help.
+
+FCC Radiation Exposure Statement
+The device has been evaluated to meet general RF exposure
+requirement. The device can be used in portable exposure
+condition without restriction.
+
+This device complies with Part 15 of the FCC Rules. Operation is
+subject to the following two conditions:
+(1)This device may not cause harmful interference.
+(2)This device must accept any interference received, including
+interference that may cause undesired operation.
+
+
+
+                                 7
+SMC-MIXER
+     用户指南
+
+
+
+
+ 手机端Android/iOS下载APP：扫描二维码下载
+一. 包装清单                                      CN
+
+■ SMC-Mixer MIDI控制器；
+■ USB连接线；
+■ 用户指南；
+
+
+
+二、设备连接                                       CN
+
+■ USB 连接：通过 USB 端口将线缆插入 Windows/Mac，系统会自
+动识别。当插入 Windows/Mac 时，SMC-Mixer 会同时充电；（红
+灯：充电中，绿灯：充电完成）
+
+■ 无线连接：长按 BT 按钮以开启/关闭无线功能，当灯闪烁时，无线
+功能已激活，当灯常亮时，设备已成功连接；
+
+■ 无线适配器：将无线适配器 B 插入 Windows/Mac，当两个设备的
+无线指示灯都常亮时，连接成功；
+
+■ 无线直连：激活 Windows/Mac/ios/Android 的 BT 功能，在列表中
+选择 SMC-Mixer（Windows 需支持 BT 5.0 及额外的 BLE Midi 驱动
+程序）;
+
+■ 低电量提示：当电池电量较低时，shift 按钮会闪烁，表示需要充
+电。
+
+注：包装内不包括无线适配器 A 和 B，需要另外购买；
+
+
+
+
+     无线适配器 A                       无线适配器 B
+
+
+
+
+                       1
+   MAC
+                    音频MIDI设置
+
+Mac : 通过音频MIDI工作室进行无线连接；
+
+
+ Windows   Ble MIDI Driver
+
+
+Windows: 与Windows连接需要安装Ble Midi驱动，请扫描设备背
+面二维码下载
+
+
+
+
+Android: 需要软件支持Ble MIDI （例如Fl Studio Mobile），在软件
+MIDI设备中搜索并连接设备
+
+
+
+
+                               2
+三、宿主设置                                            CN
+
+
+■ Ableton Live：
+在 Ableton Live 中打开偏好设置菜单，将控制面板设置为
+"MackieControl"，并将输入和输出都选择 "SMC-Mixer"。
+
+■ FL studio：
+在 FL Studio 中，进入 MIDI 设置，启用 "SMC-Mixer"，将控制器类型
+设置为 "Mackie Control Universal"，并确保 SMC-Mixer 的输入和输
+出使用相同的端口。
+
+■ Cubase：
+在 Cubase 中，进入 Studio 设置，添加 "Mackie Control" 设备，并将
+MIDI 输入和输出都选择 "SMC-Mixer"。
+
+■ Logic Pro：
+在 Logic Pro 中，前往 控制面板 > 新建 > 安装，添加 "Mackie
+Control"，并将输出端口和输入端口都设置为 "SMC-Mixer"。
+
+■ Studio One：
+在 Studio One 中，访问 选项 > 外部设备，添加 "Mackie Control"，
+并将 "接收自" 和 "发送至" 都设置为 "SMC-Mixer"。
+
+■ BitWig：
+在 BitWig 的 设置 > 控制器 中，添加 "Mackie Control" 控制器，并将
+MIDI 输入和输出都指定 "SMC-Mixer"。
+
+■ Reaper：
+在 Reaper 中，进入 偏好设置 > 控制/OSC/网络，添加 "Mackie
+Control Universal"，并将MIDI 输入和输出都选择 "SMC-Mixer"。
+
+■ CakeWalk：
+在 CakeWalk 中，进入 偏好设置 > 控制面板，加入 "Mackie
+Control"，并将输入和输出都选择 "SMC-Mixer"。
+
+
+
+
+                        3
+四、模式选择                                CN
+
+
+
+
+                轨道左   轨道右     左   右
+
+
+模式选择：
+按住 shift 按键并使用左，右按键进行切换，以在 DAW 模式和用户模
+式之间进行切换。
+
+
+
+五、旋钮                                  CN
+
+
+
+
+旋钮:
+调整一至八轨道的声像设置（可通过全局控制按钮轨道左，右按键切
+换轨道）
+
+
+
+                  4
+六、LED指示灯/推钮/轨道控制按键               CN
+
+
+
+
+ 推钮
+                            轨道控制按键
+ LED 指示灯
+
+
+LED指示灯：
+当滑动推杆的位置与轨道音量不一致时，LED会闪烁。
+
+
+推钮：
+调整一至八轨道的音量（可通过全局控制按钮轨道左，右按键切换轨
+道）
+
+
+轨道控制按键：
+每组四个按键分别控制各自轨道的静音，独奏，录音和选择功能。
+
+
+
+
+                5
+七、全局控制按键                                      CN
+
+
+
+
+全局控制按键：
+这些按键分别控制播放，停止，录音，倒带，快进，切换到前一个8组
+轨道，切换到下一个8组轨道和方向导航（上，下，左，右）。
+（旋钮、推钮、轨道控制按键和全局控制按键都可以通过PC、Mac、
+iOS和Android的软件进行配置,请扫描产品背面的二维码下载软
+件。）
+
+
+
+八、技术参数                                        CN
+
+
+产品尺寸       256mm (L) x 122mm (W) x 40mm (H)
+产品重量       445g
+推钮         8个可分配的推钮;
+按键         43个可分配的控制按键；
+旋钮         8个可分配的无级360度编码器;
+           USB-C端口;
+           无线连接Windows/Mac/ios/Android;
+输出         无线Midi输出功能
+           (无线Midi输出功能需要额外的无线midi设备)
+电源         电池供电或USB总线供电
+电池型号规格     603040
+电池标称电压     3.7V
+电池额定容量     780mAh
+
+
+
+
+                    6
+

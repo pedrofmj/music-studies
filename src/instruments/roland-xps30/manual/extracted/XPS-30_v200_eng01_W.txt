@@ -1,0 +1,157 @@
+        XPS-30 Version 2 Supplementary Manual
+XPS-30 Program Update
+     This explains how to update the XPS-30’s system program.
+
+
+
+Checking the Version                                                                            Update Procedure
+     Before you download the system program, check the version of your XPS-30.                    Follow the procedure below to install the program “xps30_up.bin” in your XPS-30.
+
+1. Press the [MENU] button.                                                                        NOTE
+2. Move the cursor to “SYSTEM,” and press the [ENTER] button.                                       Never turn off the XPS-30’s power while the update is in progress.
+3. Move the cursor to “INFORMATION” tab.                                                            Doing so may make the XPS-30’s system unable to start up correctly.
+
+                                                                                                1. Copy the update-use file (xps30_up.bin) to the root directory of the USB
+                                                                                                  flash drive.
+What You’ll Need for the Update
+     In order to update your XPS-30, you’ll need the following items.
+     55 XPS-30 itself                                                                                                          xps30_up.bin
+
+     55 Computer to write the updater to the USB flash drive
+     55 USB flash drive (the USB flash drive needs to be formatted on a XPS-30)
+                                                                                                                               EXPORT
+
+
+
+
+Download the System Program and Uncompress the Compressed File                                                                 IMPORT
+
+     Download the file named “xps30_sys_v200.zip.”
+     It is an archive file in zip format, please double click on the file to expand.
+     After expanding the file, the folder “xps30_sys_v200” holding the file “xps30_                                            SONG LIST
+     up.bin” will be appeared.
+
+
+                                                                                                                               ROLAND
+
+Note When Updating
+55 We recommend that you save your data to a USB flash drive before you perform
+   the update. If a problem occurs and your data is lost, you will be able to restore the
+   original state by reloading the data you saved.                                              2. Make sure the XPS-30’s power is switched off, then connect the USB flash
+   For details on the procedure, refer to the following sections of the “Saving XPS-30’s          drive to the USB MEMORY port.
+   Data to USB Flash Drive (BACKUP)” of the Owner’s Manual.                                     3. Hold down the [TAP] button and switch on the power.
+55 Never apply this update data to any product other than the XPS-30. This update               4. When the message “start update.” appears, release the [TAP] button.
+   data may destroy the data or system program of other products.                                 The update starts.
+                                                                                                  When the message “===update finished.===” is displayed, the operation has
+                                                                                                  finished. (It will take about 1 minute to update.)
+55 Never power-off your XPS-30 while the update is in progress!
+   If a power failure or similar accident occurs during the update process, the XPS-30            ** The update process takes several minutes to finish. Be sure never to switch off
+   won’t be able to start up in normal operating mode. This will require servicing, so               the power before the operation finishes.
+   you will need to contact Roland service center near you if this occurs.
+
+55 We regret that we are unable to answer questions regarding the update procedure              5. Switch off the power.
+   using this system program. Please perform the update responsibly, following the              6. Detach the USB flash drive, then switch on the power to the unit and verify
+   directions given in this document.                                                             that the version has been updated.
+
+
+
+
+© 2018 Roland Corporation
+
+01
+                                                                                            1
+XPS-30 Version 2 Supplementary Manual
+
+
+
+Functions Added in XPS-30 Ver.2
+
+Favorite                                                                                       Patch Edit / Drum Kit Edit
+  Program change and bank select MIDI messages can now be transmitted when you                  For the Wave Group parameter, you can now select SAMP (user sample) or MSAM
+  recall a favorite, as described below. This is a convenient way to select sounds or           (user multisample).
+  switch programs on a MIDI-connected external sound module.
+   Content registered in a favorite     MSB                LSB                 PC
+                      PRST/GM/EXP       Values for each sound
+                      Bank              (refer to the parameter guide and sound list)
+                      USER Bank:
+   Patch                                                   0
+                      0501–0628
+                                        87                                     1–128
+                      USER Bank:                                                                           Select a wave (user sample) that you imported via sample import. The name of the
+                                                           1                                     SAMP
+                      0629–0756                                                                            file that was imported is shown as the wave name.
+                      PRST/GM/EXP       Values for each sound
+                      Bank              (refer to the parameter guide and sound list)                      Select a user multisample that you created by combining multiple user samples.
+   Drum Kit                                                                                      MSAM
+                      USER Bank:                                                                           User multisamples can be created using the “JUNO-DS Tone Manager” PC software.
+                                        86                 0                   1–8
+                      R501–R508
+                      PRST Bank                            64                  1–64
+   Performance                          85
+                      USER Bank                            0                   1–128           DAW Control
+                                                                                                In DAW control mode, octave shift (OCTAVE [DOWN] / [UP] buttons) is now available.
+Phrase Pads                                                                                     You can change the octave of the note messages that are transmitted via MIDI.
+  MIDI note messages can now be transmitted when you press a pad. This lets you
+  use the pads to play drums or phrases. The messages to be transmitted can be
+  individually specified for each pad.                                                         Level Meter
+                                                                                                The display conditions have changed for the level meter shown by the pad
+1. Press the [MENU] button.                                                                     illumination.
+
+2. Move the cursor to “SYSTEM,” and press the [ENTER] button.                                   (Before change): In patch mode, the meter indicates the level of the sound played
+                                                                                                                 by the keyboard.
+3. Move the cursor to the tab, and use the [C] [A] buttons to select the “PAD                   (After change):  The meter indicates the level of the sound played in the mode for
+  NOTE” tab.
+                                                                                                                 which Pad Note Switch is available.
+
+
+                                                                                               Support for JUNO-DS Tone Manager
+                                                                                                Now it supports for “JUNO-DS Tone Manager” which is a Computer software to
+                                                                                                manage and edit the patches/performances/samples. It lets you efficiently handle
+                                                                                                large numbers of contents on your computer.
+4. Move the cursor to the parameter that you want to edit, and use the value
+  dial to edit the value.
+5. Press the [EXIT] button to exit the screen.
+   MEMO
+  MIDI note messages are transmitted only if you’ve selected the patch or
+  performance top screen, or in the SYSTEM screen when the PAD NOTE tab is
+  selected.
+   Parameter           Values/Explanation
+                       Specifies the mode in which MIDI note messages are transmitted.
+                       OFF                  Messages are not transmitted.
+   Pad Note Switch     PATCH                Only in patch mode.
+                       PERFORM              Only in performance mode.
+                                                                                               Sample Import
+                       BOTH                 In patch mode and in performance mode.              The Original Key and Loop Switch values of a WAV file that you create using the
+   Pad 1–8             Specifies the note that is transmitted.                                  “JUNO-DS Tone Manager” software are automatically applied when importing the
+   Note Number         C-–G9                                                                    sample.
+                       Specifies the velocity of the note that is transmitted.
+   Pad 1–8 Velocity
+                       OFF, 1–127
+                                                                                               Sample Edit
+                       Specifies the MIDI channel of the note that is transmitted.
+   Pad 1–8 Channel                                                                              The Start/Loop/End Point of a WAV file that you create using the “JUNO-DS Tone
+                       1–16
+                                                                                                Manager” software are automatically applied as the default values when you edit
+                                                                                                each sample.
+Holding MIDI Note Messages (Hold)
+  You can specify that the MIDI note message is held even after you release your hand          Restore
+  from the pad (Hold). This is convenient when you want to play a sustained note or a
+  phrase.                                                                                       XPS-10 Backup files can now be restored.
+
+1. Press the [LOOP] button while pressing the pad.
+  Note is held even after you release your hand from the pad.
+
+   MEMO
+     55 If you’re pressing more than one pad, all of them are held.
+     55 Notes are also held if you first hold down the [LOOP] button and then press
+        each pad.
+2. If you press a pad while a note is being held, the hold function is cancelled
+  for that pad.
+  If you press the [LOOP] button by itself while notes are being held, the hold function
+  is cancelled for all pads.
+
+
+
+
+                                                                                           2
+

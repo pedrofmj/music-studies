@@ -1,5 +1,7 @@
 # SMC-PAD Reference
 
+[Structured capabilities](capabilities.json) records source-linked ports, signal directions, connection constraints, and supported roles.
+
 The SMC-PAD is a pad-first MIDI controller with encoder, transport, and MIDI
 out capability. It has no internal sound engine.
 

@@ -1,0 +1,21 @@
+{
+  "project": {
+    "name": "TEYUN A8 Study And Integration Plan",
+    "objective": "Create a source-linked, reproducible audio-routing knowledge base for the TEYUN A8 mixer and USB audio-interface capability."
+  },
+  "device": {
+    "manufacturer": "TEYUN",
+    "model": "A8",
+    "category": "analog mixer with USB audio-interface capability",
+    "midi_device": false
+  },
+  "goals": [
+    "Document actual connectors, channel layout, phantom-power scope, and USB endpoint behavior from the physical unit.",
+    "Build safe gain-staged routing for Roland XPS-30 and M-VAVE FM-1 audio.",
+    "Use the USB interface on Ubuntu only after recording its real ALSA capture and playback behavior.",
+    "Keep live, recording, and streaming routing separately documented and reproducible."
+  ],
+  "documentation_root": "src/audio-interfaces/teyun-a8",
+  "source_status": "provisional_third_party_sources_pending_physical_manual",
+  "status": "starter"
+}

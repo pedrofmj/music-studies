@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "device": {
+    "id": "mvave-smk25",
+    "manufacturer": "M-VAVE",
+    "model": "SMK25",
+    "category": "25-key MIDI keyboard controller",
+    "repository_root": "src/midi-controllers/mvave-smk25"
+  },
+  "manual_sources": [
+    {
+      "id": "smk25-manual",
+      "local_pdf": "../manual/source/SMK-25-MIDI.pdf",
+      "extracted_text": "../manual/extracted/SMK-25-MIDI.txt"
+    }
+  ],
+  "capabilities": {
+    "audio": {
+      "source_refs": [
+        { "source_id": "smk25-manual", "pdf_pages": [9, 10] }
+      ],
+      "generates_audio": false,
+      "audio_inputs": [],
+      "audio_outputs": [],
+      "note": "The SMK25 sends MIDI control data. It has no documented internal sound engine or audio output."
+    },
+    "midi": {
+      "source_refs": [
+        { "source_id": "smk25-manual", "pdf_pages": [2, 9, 10, 11] }
+      ],
+      "ports": [
+        {
+          "name": "USB-B MIDI",
+          "connector": "USB-B",
+          "direction": "out",
+          "protocol": "USB MIDI",
+          "host_required": true,
+          "purpose": "computer or mobile-host MIDI controller connection and charging"
+        },
+        {
+          "name": "BLE MIDI",
+          "connector": "Bluetooth",
+          "direction": "out",
+          "protocol": "BLE MIDI",
+          "host_required": true
+        },
+        {
+          "name": "pedal-port MIDI OUT",
+          "connector": "1/4-inch rear pedal port after software reconfiguration",
+          "direction": "out",
+          "protocol": "MIDI",
+          "host_required": false,
+          "constraint": "replaces the pedal role of that port"
+        },
+        {
+          "name": "optional wireless MIDI OUT",
+          "connector": "optional five-pin wireless MIDI adapter",
+          "direction": "out",
+          "protocol": "wireless MIDI",
+          "host_required": false,
+          "constraint": "optional adapter is required"
+        }
+      ],
+      "messages": [
+        "keyboard notes and velocity",
+        "pad note, CC, or program-change assignments",
+        "encoder-assigned MIDI CC, aftertouch, or pitch information",
+        "pitch and modulation touch-strip data",
+        "arpeggiator, Smart Scale, and Smart Chord note output"
+      ]
+    },
+    "controls": {
+      "source_refs": [
+        { "source_id": "smk25-manual", "pdf_pages": [4, 5, 6, 7] }
+      ],
+      "surface": [
+        "25 velocity-sensitive keys",
+        "8 RGB pads with Pad Bank",
+        "8 endless encoders with Knob Bank",
+        "pitch and modulation touch strips",
+        "transport controls",
+        "arpeggiator, Smart Scale, and Smart Chord controls"
+      ],
+      "pedal_port_default": "sustain pedal connection"
+    },
+    "power": {
+      "source_refs": [
+        { "source_id": "smk25-manual", "pdf_pages": [9, 10] }
+      ],
+      "power_modes": ["internal battery", "USB bus power"]
+    }
+  },
+  "connection_rules": [
+    {
+      "id": "smk25-needs-sound-source",
+      "rule": "The SMK25 cannot create audible sound by itself. Route its MIDI to a software instrument, FM-1, XPS-30, or other sound module, then route that sound source's audio separately.",
+      "source_refs": [
+        { "source_id": "smk25-manual", "pdf_pages": [9, 10] }
+      ]
+    },
+    {
+      "id": "smk25-usb-needs-host",
+      "rule": "USB-B MIDI requires a computer or mobile host. It is not a direct USB connection to the XPS-30 USB COMPUTER port.",
+      "source_refs": [
+        { "source_id": "smk25-manual", "pdf_pages": [2, 9] }
+      ]
+    },
+    {
+      "id": "smk25-pedal-port-role-change",
+      "rule": "To use the rear 1/4-inch port as wired MIDI OUT, reconfigure it in the vendor software and accept that it is no longer available for sustain. Record the adapter wiring and target before live use.",
+      "source_refs": [
+        { "source_id": "smk25-manual", "pdf_pages": [2, 9] }
+      ]
+    }
+  ],
+  "roles": [
+    "compact USB or BLE MIDI keyboard for a host",
+    "direct hardware MIDI controller after the pedal-port role is changed",
+    "wireless MIDI controller with the optional M-VAVE adapter"
+  ],
+  "unknowns": [
+    "The manual does not establish a Linux editor or BLE support path.",
+    "The exact adapter wiring required by the reconfigured 1/4-inch MIDI OUT must be recorded from the supplied hardware or verified documentation."
+  ]
+}

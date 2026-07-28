@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "device": {
+    "id": "mvave-smc-pad",
+    "manufacturer": "M-VAVE",
+    "model": "SMC-PAD",
+    "category": "MIDI pad, encoder, and transport controller",
+    "repository_root": "src/midi-controllers/mvave-smc-pad"
+  },
+  "manual_sources": [
+    {
+      "id": "smc-pad-manual",
+      "local_pdf": "../manual/source/SMC-PAD_ZE.pdf",
+      "extracted_text": "../manual/extracted/SMC-PAD_ZE.txt"
+    }
+  ],
+  "capabilities": {
+    "audio": {
+      "source_refs": [
+        { "source_id": "smc-pad-manual", "pdf_pages": [1, 6] }
+      ],
+      "generates_audio": false,
+      "audio_inputs": [],
+      "audio_outputs": [],
+      "note": "The SMC-PAD is a MIDI controller; its 3.5 mm port is MIDI OUT, not audio."
+    },
+    "midi": {
+      "source_refs": [
+        { "source_id": "smc-pad-manual", "pdf_pages": [1, 2, 4, 6] }
+      ],
+      "ports": [
+        {
+          "name": "USB-C MIDI",
+          "connector": "USB-C",
+          "direction": "out",
+          "protocol": "USB MIDI",
+          "host_required": true
+        },
+        {
+          "name": "BLE MIDI",
+          "connector": "Bluetooth",
+          "direction": "out",
+          "protocol": "BLE MIDI",
+          "host_required": true
+        },
+        {
+          "name": "wired MIDI OUT",
+          "connector": "3.5 mm MIDI OUT",
+          "direction": "out",
+          "protocol": "MIDI",
+          "host_required": false
+        },
+        {
+          "name": "optional wireless MIDI OUT",
+          "connector": "optional five-pin wireless MIDI adapter",
+          "direction": "out",
+          "protocol": "wireless MIDI",
+          "host_required": false
+        }
+      ],
+      "messages": [
+        "pad note, CC, or program-change assignments",
+        "pad aftertouch",
+        "encoder MIDI CC, aftertouch, or pitch assignments",
+        "transport and Mackie Control messages in the documented DAW setup"
+      ]
+    },
+    "controls": {
+      "source_refs": [
+        { "source_id": "smc-pad-manual", "pdf_pages": [2, 3, 4] }
+      ],
+      "surface": [
+        "16 RGB velocity-sensitive and aftertouch pads",
+        "8 assignable endless encoders",
+        "two pad banks and two encoder banks",
+        "transport controls",
+        "note repeat with rate, swing, latch, DAW sync, and tap tempo"
+      ]
+    },
+    "power": {
+      "source_refs": [
+        { "source_id": "smc-pad-manual", "pdf_pages": [1, 6] }
+      ],
+      "power_modes": ["internal battery", "USB bus power"]
+    }
+  },
+  "connection_rules": [
+    {
+      "id": "smc-pad-direct-xps30",
+      "rule": "The documented 3.5 mm MIDI OUT can drive the XPS-30 MIDI IN through a compatible adapter. Verify the adapter's wiring and test notes before a live use.",
+      "source_refs": [
+        { "source_id": "smc-pad-manual", "pdf_pages": [1, 2] }
+      ]
+    },
+    {
+      "id": "smc-pad-needs-sound-source",
+      "rule": "The SMC-PAD creates MIDI only. Use a sound module, software instrument, or synthesizer and route that device's audio independently.",
+      "source_refs": [
+        { "source_id": "smc-pad-manual", "pdf_pages": [1, 6] }
+      ]
+    },
+    {
+      "id": "smc-pad-usb-needs-host",
+      "rule": "USB-C and BLE routes need a computer or mobile MIDI host; they are not direct USB links to another USB device.",
+      "source_refs": [
+        { "source_id": "smc-pad-manual", "pdf_pages": [1] }
+      ]
+    }
+  ],
+  "roles": [
+    "direct pad controller for XPS-30 or another MIDI-IN sound module",
+    "USB or BLE pad controller for a DAW or software instrument",
+    "Mackie Control transport surface",
+    "note-repeat trigger controller"
+  ],
+  "unknowns": [
+    "The stored manual does not specify the 3.5 mm MIDI OUT adapter standard; retain the adapter model and successful test in mappings.",
+    "The vendor does not document Ubuntu editor support."
+  ]
+}

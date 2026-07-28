@@ -1,5 +1,7 @@
 # XPS-30 Reference
 
+[Structured capabilities](capabilities.json) records source-linked ports, signal directions, connection constraints, and supported roles.
+
 This is the lookup and procedure side of the project. It contains explanations,
 answers, setup recipes, catalog conventions, and operational guidance. It is
 not a study checklist; the ordered keyboard work lives in

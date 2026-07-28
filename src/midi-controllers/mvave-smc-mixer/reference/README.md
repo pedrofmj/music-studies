@@ -1,5 +1,7 @@
 # SMC-Mixer Reference
 
+[Structured capabilities](capabilities.json) records source-linked ports, signal directions, connection constraints, and supported roles.
+
 The SMC-Mixer is an eight-channel MIDI DAW surface. Faders control track
 levels, encoders control pan by default, and the track and global buttons
 control DAW functions. No audio passes through this unit.

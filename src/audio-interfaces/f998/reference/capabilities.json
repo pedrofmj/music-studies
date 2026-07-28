@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "device": {
+    "id": "f998-live-sound-card",
+    "fcc_id": "2A6NU-F998",
+    "fcc_identified_manufacturer": "Shenzhen Furuijie Electronic Technology Co., Ltd.",
+    "retail_brand": "unknown; verify physical label",
+    "model": "F998",
+    "category": "portable live sound card, microphone processor, and streaming audio interface",
+    "repository_root": "src/audio-interfaces/f998",
+    "midi_device": false,
+    "identity_confidence": "FCC manufacturer and model identified; retail revision pending physical label"
+  },
+  "manual_sources": [
+    {
+      "id": "bundle-manual",
+      "authority": "retail_bundle_document",
+      "local_pdf": "../manual/source/F998-podcast-bundle-manual.pdf",
+      "extracted_text": "../manual/extracted/F998-podcast-bundle-manual.txt"
+    },
+    {
+      "id": "fcc-filing",
+      "authority": "regulatory_filing",
+      "url": "https://fccid.io/2A6NU-F998/User-Manual/User-manual-5858583",
+      "local_pdf": null,
+      "extracted_text": null
+    },
+    {
+      "id": "third-party-port-guide",
+      "authority": "third_party",
+      "url": "https://manuals.plus/asin/B0DQ8ZFVCB",
+      "local_pdf": null,
+      "extracted_text": null
+    }
+  ],
+  "capabilities": {
+    "audio": {
+      "source_refs": [
+        { "source_id": "bundle-manual", "source_section": "Product manual and Feature" },
+        { "source_id": "third-party-port-guide", "source_section": "Connecting Your Device and Basic Controls" }
+      ],
+      "generates_audio": false,
+      "primary_role": "microphone processing, accompaniment mixing, headphone monitoring, and live-stream/record feed",
+      "documented_controls": [
+        "seven independent rotary controls for bass, mid, treble, recording, microphone, echo, and monitoring",
+        "two faders for backing track and monitoring",
+        "16 fixed effects",
+        "seven recording modes",
+        "four voice-change modes",
+        "noise cancellation and additional special functions"
+      ],
+      "analog_ports": [
+        {
+          "name": "condenser microphone input",
+          "connector": "port label and connector size require physical verification",
+          "direction": "in",
+          "signals": ["bundle condenser microphone"],
+          "status": "partially_documented",
+          "warning": "Do not assume a standard XLR microphone input; generic F998 documentation commonly describes a condenser-mic-specific port."
+        },
+        {
+          "name": "accompaniment/backing-track input",
+          "connector": "claimed 3.5 mm analog input",
+          "direction": "in",
+          "signals": ["consumer line/headphone playback"],
+          "status": "provisional_third_party"
+        },
+        {
+          "name": "headset and earphone monitoring",
+          "connector": "claimed 3.5 mm outputs",
+          "direction": "out",
+          "signals": ["headphone monitoring"],
+          "status": "provisional_third_party"
+        },
+        {
+          "name": "live-stream outputs",
+          "connector": "claimed three 3.5 mm phone/live ports",
+          "direction": "out",
+          "signals": ["mixed streaming feed"],
+          "status": "provisional_third_party",
+          "warning": "Phone compatibility can depend on TRRS wiring and adapters."
+        }
+      ]
+    },
+    "computer_and_wireless_audio": {
+      "source_refs": [
+        { "source_id": "third-party-port-guide", "source_section": "Live Streaming/PC Connection and Bluetooth Pairing" },
+        { "source_id": "fcc-filing", "source_section": "Product code, equipment class, and 2.4 GHz certification" }
+      ],
+      "usb_otg_pc_audio": {
+        "connector": "claimed OTG/PC Live port",
+        "direction": "in_out",
+        "status": "provisional_third_party",
+        "purpose": "computer or mobile live-stream/recording connection",
+        "unknowns": [
+          "USB connector type and class-compliant behavior",
+          "Ubuntu ALSA endpoint name and channel count",
+          "whether capture carries the processed final mix",
+          "whether simultaneous capture, playback, and charging are supported"
+        ]
+      },
+      "bluetooth_audio": {
+        "direction": "in",
+        "protocol": "Bluetooth audio accompaniment",
+        "status": "partially_documented",
+        "note": "Bluetooth is an audio-playback input, not BLE MIDI."
+      }
+    },
+    "power": {
+      "source_refs": [
+        { "source_id": "third-party-port-guide", "source_section": "Package Contents and Charging" }
+      ],
+      "claimed": "built-in 1200 mAh battery and 5 V / 1 A charging input",
+      "status": "provisional_third_party",
+      "required_verification": "confirm charging-port label and power requirements on the device"
+    },
+    "midi": {
+      "source_refs": [],
+      "ports": [],
+      "note": "No MIDI input, output, MIDI controller, or MIDI-routing function is documented."
+    }
+  },
+  "connection_rules": [
+    {
+      "id": "f998-not-midi",
+      "rule": "F998 has no documented MIDI capability. Keep all keyboard, controller, and synthesizer MIDI connections outside it.",
+      "source_refs": [
+        { "source_id": "bundle-manual", "source_section": "Product manual" }
+      ]
+    },
+    {
+      "id": "f998-not-keyboard-submixer",
+      "rule": "Use the TEYUN A8 for XPS-30 and FM-1 line-level mixing. F998's documented role is mic/accompaniment/streaming and its input headroom and port topology are unverified for keyboard line outputs.",
+      "source_refs": [
+        { "source_id": "bundle-manual", "source_section": "Product manual and Wide Applications" }
+      ]
+    },
+    {
+      "id": "f998-line-input-caution",
+      "rule": "Do not connect XPS-30 or FM-1 directly at normal output level to the claimed accompaniment input until its physical label and headroom are verified. If tested, start at minimum source volume and use attenuation if clipping occurs.",
+      "source_refs": [
+        { "source_id": "third-party-port-guide", "source_section": "Connecting Your Device" }
+      ]
+    },
+    {
+      "id": "f998-stream-outputs-not-pa",
+      "rule": "Treat headset, earphone, and live-stream outputs as monitoring or consumer streaming feeds, not balanced PA outputs. Do not connect them directly to passive speakers or assume they are appropriate main live outputs.",
+      "source_refs": [
+        { "source_id": "third-party-port-guide", "source_section": "Connecting Your Device" }
+      ]
+    },
+    {
+      "id": "f998-usb-needs-observed-linux-test",
+      "rule": "Use the OTG/PC path on Ubuntu only after recording its capture/playback endpoint names and verifying feedback-free operation at low level.",
+      "source_refs": [
+        { "source_id": "third-party-port-guide", "source_section": "Live Streaming/PC Connection" }
+      ]
+    }
+  ],
+  "roles": [
+    "podcast or live-stream microphone processor",
+    "Bluetooth or wired accompaniment mixer",
+    "headphone-monitoring and voice-effects board",
+    "provisional USB/OTG streaming audio endpoint",
+    "multi-phone streaming feed after connector and TRRS wiring are verified"
+  ],
+  "unknowns": [
+    "Retail brand and exact physical revision.",
+    "Exact port labels, connector sizes, and TRRS wiring.",
+    "Microphone input type, bias/phantom behavior, and compatibility with microphones other than the documented bundle mic.",
+    "Line-input headroom for XPS-30 and FM-1.",
+    "USB audio class, sample rates, channel count, and Ubuntu behavior.",
+    "Exact live-output signal routing and compatibility with each phone."
+  ]
+}

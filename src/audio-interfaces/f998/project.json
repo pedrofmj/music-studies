@@ -1,0 +1,22 @@
+{
+  "project": {
+    "name": "F998 Live Sound Card Study And Integration Plan",
+    "objective": "Create a source-linked, reproducible setup guide for the F998 portable streaming audio interface and live sound card."
+  },
+  "device": {
+    "fcc_identified_manufacturer": "Shenzhen Furuijie Electronic Technology Co., Ltd.",
+    "retail_brand": "unknown; verify physical label",
+    "model": "F998",
+    "category": "portable live sound card, microphone processor, and streaming audio interface",
+    "midi_device": false
+  },
+  "goals": [
+    "Confirm the physical port labels and retail revision from the actual unit.",
+    "Build reliable microphone, accompaniment, headphone monitoring, and computer/phone streaming paths.",
+    "Use Ubuntu only after observing ALSA and PipeWire endpoint behavior.",
+    "Keep keyboard line-level mixing on the TEYUN A8 unless the F998 input range is measured and documented."
+  ],
+  "documentation_root": "src/audio-interfaces/f998",
+  "source_status": "fcc_identified_manufacturer; retail_manual_partially_retained; port_topology_pending_physical_verification",
+  "status": "starter"
+}

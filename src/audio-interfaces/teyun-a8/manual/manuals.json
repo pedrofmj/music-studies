@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "device": "TEYUN A8",
+  "stored_for": "internal_study",
+  "source_status": "no_manufacturer_source_located; third-party sources only",
+  "documents": [
+    {
+      "id": "manualsplus-a8-8channel",
+      "title": "TEYUN A8 8-Channel Professional Portable Mixer Instruction Manual",
+      "authority": "third_party",
+      "url": "https://manuals.plus/ae/1005003477744179",
+      "direct_pdf": "https://manuals.plus/asin/B0CCXSBV7P.pdf",
+      "local_file": null,
+      "download_status": "not_retrieved_http_403",
+      "retrieval_attempted_at": "2026-07-27",
+      "use": "provisional only; review against physical unit"
+    },
+    {
+      "id": "manualsplus-a4-a6-a8-series",
+      "title": "TEYUN Professional Portable Mixer Sound Mixing Console User Manual (A4, A6, A8)",
+      "authority": "third_party",
+      "url": "https://manuals.plus/ae/1005007715703444",
+      "local_file": null,
+      "download_status": "web_source_only",
+      "retrieval_attempted_at": "2026-07-27",
+      "use": "series-level cross-check only; do not assume A8-specific layout"
+    }
+  ]
+}

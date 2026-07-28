@@ -2,6 +2,8 @@
 
 Use this document for the shared behavior of the SMK25, SMC-Mixer, SMC-PAD,
 SMC-PAD Pocket, and FM-1. Device-specific controls and workflows are in the corresponding controller study folders.
+Cross-device wiring plans and device limits are in the
+[Device Catalog](../device-catalog/README.md).
 
 ## Connection Order
 

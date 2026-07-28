@@ -1,0 +1,447 @@
+SMC-PAD
+ User Manual
+
+
+
+
+CubeSuite for Android/iOS：scan the QR code
+Ⅰ. Packing list                                                    EN
+
+■ SMC-PAD;
+■ USB-C Connection Cable;
+■ User manual;
+
+
+
+Ⅱ. Type of Connection                                              EN
+
+■ USB Connection: Plug the cable through the USB port to the
+Windows/Mac it will automatic be recognized, When plug into
+Windows/Mac the SMC-PAD will be charging at the same time；
+(Red light: charging, Green light: charging complete)
+
+■ Wireless Connection: Press and hold the BT button, when the
+light flashing the wireless function is activated, when the light stay
+on was connection successfully；
+
+■ Wireless Adapter: Plug Wireless Adapter B into Windows/Mac,
+connection was successfully when both lights stay on；
+
+■ Direct Wireless: Activated BT function of Windows/Mac/ios/
+Android, Select SMC-PAD on the list (Wireless connection requires
+devices to support BT5.0. For Windows, installation of the BLE
+MIDI driver is necessary, for more details, check the 'Connection
+Methods' section of the user manual.)；
+
+■ MIDI OUT Connection:
+Wired Connection: Utilize the 3.5mm MIDI OUT port located on
+the back of the device for MIDI OUT functionality;
+Wireless connection: Use Five-Pin wireless MIDI adapter A
+connecting to device such as synthesizer or other device that
+support MIDI IN;
+
+
+
+                                  1
+Wireless adapter A                                Wireless adapter B
+
+
+
+
+Note: Wireless Adapter A and B are not within the package
+need to buy additionally；
+Low Battery Indicator: When the device has insufficient power,
+both the left and right buttons will flash simultaneously.
+
+
+
+
+                               2
+Ⅲ. Panel Overview                                            EN
+
+
+
+
+① Back of device
+Power: Switch to turn on/off the device;
+Power Indicator: The indicator light
+illuminates red while charging and turns
+green when fully charged;
+USB: USB-C Connection port;
+MIDI OUT: Enables MIDI output for
+further connectivity.
+
+② Knobs
+Eight assignable 360-degrees rotary encoders; These eight knobs
+can also send Aftertouch, Midi CC, Pitch information through
+setting inside software.
+Hold the 'Note Repeat' function button and simultaneously rotate
+Knobs 1-4 to adjust the Note Repeat functionality. For detailed
+feature descriptions, refer to the 'Note Repeat Editing
+Instructions’;
+Note: You can only change settings inside software(Scan the QR
+code on the back of the machine to download the software).
+                                   3
+③ Pads
+Sixteen RGB back-lit pads with velocity-sensitive & aftertouch;
+Include Note, Midi CC, Program Change;
+Note: You can only change settings inside software(Scan the QR
+code on the back of the machine to download the software).
+
+④ Button area
+BT: Long press the BT button to turn the BT function on or off.
+PAD BANK: Switches to the second bank of pads.
+KNOB BANK: Switches to the second bank of knobs.
+Left: Switches to the previous group of eight tracks on the DAW.
+Right: Switches to the next group of eight tracks on the DAW.
+PLAY: Initiates the play function in your DAW.
+STOP: Initiates the stop function in your DAW.
+RECORD: Initiates the record function in your DAW.
+SHIFT: Holding the SHIFT button and pressing various pads can
+trigger additional functions:
+Shift + Note Repeat: Transforms the 16 pads to modify note
+repeat settings. For further details, see the "Note Repeat
+Instructions" section below.
+Shift + Pads 1-8: Switch between different preset configurations.
+(Pad 1 is Performance preset, Pad 2 is DAW preset, The rest are
+user presets)
+Shift + Pads 9-12: Adjust the pad's velocity curve. Pad 12 equates
+to full velocity.
+Shift + Pads 13-14: Transpose up or down.
+Shift + Pads 15-16: Shift the pad's octave range up or down.
+Shift + PAD 15 + PAD 16: Reset to the default Octave range.
+Note: When using buttons associated with the DAW, you must
+select 'Mackie Control' as the input/output option within the
+corresponding DAW's control surface.
+
+
+
+
+                                4
+Ⅳ. Note Repeat                                                  EN
+
+
+Either press the “Note Repeat" button followed by the desired
+pad, or press the desired pad and then the "Note Repeat"
+button, to activate the note repeat function.
+
+When "Shift + Note Repeat" is activated:
+Pads 1-8 (Rate): Modify the rate based on the tempo, ranging
+from 1/4 to 1/32t.
+Pads 9-13 (Swing): Set the deviation of notes. The greater the
+swing amount, the more rhythmically varied the repeating notes
+will be.
+Pad 14 (Latch): When activated, notes will continue to repeat
+even after releasing the pad.
+Pad 15 (Sync): Synchronizes the tempo with your DAW. Ensure
+that the external MIDI controller sync function is activated within
+your DAW for this feature to work.
+Pad 16 (Tap Tempo): Tap this pad to manually adjust the tempo of
+the note repeat. The pad will flash to indicate the rate of the
+tempo.
+
+"Holding the 'Note Repeat' button and rotating Knobs 1-4 can
+also activate the function printed on the product.
+
+Knob 1 (Rate): Rotate to switch between rates from 1/4 to 1/32t.
+Knob 2 (Swing): Rotate to adjust the deviation of notes.
+Knob 3 (Tempo): Rotate to modify the tempo within a range of 30
+to 300 BPM.
+Knob 4 (Latch): Rotate to toggle the latch on or off.
+
+
+
+
+                                 5
+Ⅴ. Technology Parameters                                      EN
+
+
+Product Dimensions   227mm(L) x 147mm (W)x 38mm(H)
+Product Weight       520g
+                     16 RGB Back-Lit Pads with velocity-sensitive
+Pads                 and after touch
+Knobs                8 assignable endless 360 degree encoders
+                     USB-C port
+                     Wireless connection with
+Output
+                     Windows/Mac/ios/Android
+                     3.5mm Midi Out Function
+Power                Battery supplied or USB-bus-powered
+Battery Model/Type   704060
+Battery Nominal
+                     3.7V
+Voltage
+Battery capacity     2000mAh
+
+
+
+
+                               6
+Ⅵ. Connection Method                                               EN
+
+
+
+
+                    Audio MIDI Studio
+
+Mac: Connect directly via BT inside Audio MIDI Studio Setup;
+
+
+
+                Ble MIDI Driver
+
+
+Windows: You need to download a driver, scan the QR code
+in the back of device;
+
+
+
+
+iPhone: You need to open the software that supports Ble
+MIDI, such as GarageBand,search for a MiDl keyboard in
+your MIDI device and connect it;
+
+
+
+
+Android: You need to open the software that supports Ble
+MIDI, such as FL studio. search for a MiDl keyboard in your MIDI
+device and connect it.
+
+
+
+
+                                  7
+Ⅶ. FCC Warning Statement                                           EN
+
+★Changes or modifications not expressly approved by the party
+responsible for compliance could void the user’s authority to
+operate the equipment. This equipment has been tested and
+found to comply with the limits for a Class B digital device,
+pursuant to Part 15 of the FCC Rules. These limits are designed to
+provide reasonable protection against harmful interference in a
+residential installation. This equipment generates uses and can
+radiate radio frequency energy and, if not installed and used in
+accordance with the instructions, may cause harmful interference
+to radio communications. However, there is no guarantee that
+interference will not occur in a particular installation. If this
+equipment does cause harmful interference to radio or television
+reception, which can be determined by turning the equipment off
+and on, the user is encouraged to try to correct the interference by
+one or more of the following measures:
+‐‐ Reorient or relocate the receiving antenna.
+‐‐ Increase the separation between the equipment and receiver.
+‐‐ Connect the equipment into an outlet on a circuit different from
+that to which the receiver is connected.
+‐‐ Consult the dealer or an experienced radio/TV technician for
+help.
+
+FCC Radiation Exposure Statement
+The device has been evaluated to meet general RF exposure
+requirement. The device can be used in portable exposure
+condition without restriction.
+
+This device complies with Part 15 of the FCC Rules. Operation is
+subject to the following two conditions:
+(1)This device may not cause harmful interference.
+(2)This device must accept any interference received, including
+interference that may cause undesired operation.
+
+
+
+                                 8
+SMC-PAD
+    用户指南
+
+
+
+
+手机端Android/iOS下载APP：扫描二维码下载
+一. 包装清单                                  CN
+
+■ SMC-PAD;
+■ USB-C连接线;
+■ 用户指南；
+
+
+
+
+二. 设备连接                                  CN
+
+■ 有线连接：通过USB接口连接移动设备或电脑终端
+（Windows/Mac），设备无需安装驱动可自动识别，同时设备将会自
+动充电。
+（背部指示灯为红色为正在充电；指示灯为绿色为已经充满）。
+
+
+■ 无线连接：长按设备区域4中的BT按键开启无线功能（按键灯光闪
+烁为待连接，常亮为连接成功）;
+
+
+■ 无线适配器连接：将适配器B端接入Windows/Mac，当键盘与无线
+适配器连接指示灯同时为常亮状态为连接成功。
+
+
+■ 无线直连：开启Windows/Mac/ios/Android的BT功能，菜单中选
+择SMC-PAD，配对成功后BT按键灯光常亮（无线连接需设备支持
+BT5.0 , Windows需要安装BLE MIDI驱动；）。
+
+
+■ MIDI OUT连接：
+有线连接：通过机身背后3.5mm MIDI OUT接口有线连接进行MIDI
+OUT功能。
+无线连接：使用键盘的无线功能配对五针MIDI口无线适配器A端用来
+控制合成器等支持MIDI In的设备。
+
+
+
+                     1
+  无线适配器A               无线适配器B
+
+
+
+
+注：无线适配器A端与B端需另外购买。
+低电量提示：当设备电量不足时，按键区域的左键和右键会同时闪
+烁。
+
+
+
+
+              2
+三. 功能介绍                                 CN
+
+
+
+
+区域 ①
+Power：拨动开关以开启或关闭设备。
+电源指示灯：充电时指示灯亮红色，充满
+时指示灯亮绿色。
+USB：USB-C型连接接口。
+MIDI OUT：实现MIDI输出，以进行进一
+步的连接（例如合
+成器等设备）。
+
+区域 ② 旋钮
+八组可分配的无极旋钮，通过软件设置可调整不同的信息发送类型，
+包含AfterTouch , Midi CC 。
+按住Note Repeat功能键同时旋转旋钮1-4可调节Note Repeat功能，
+具体功能介绍查看音符重复编辑说明。
+注：信息发送类型只可以通过软件调整（扫描机身背部二维码下载软
+件）。
+
+                    3
+区域 ③ 打击垫
+十六组拥有力度感应和触后功能的打击垫（可在软件中调节背光颜
+色）, 通过软件设置可调整发送不同的信息类型，包含Note , Midi
+CC , Program Change。
+注：信息发送类型只可以通过软件整（扫描机身背部二维码下载软
+件）。
+
+区域 ④按键区域
+BT：长按BT按钮开启或关闭BT功能。
+PAD BANK：切换到第二组打击垫。
+KNOB BANK：切换到旋钮的第二组。
+左键：切换至数字音频工作站（DAW）中的前八组轨道。
+右键：切换至数字音频工作站（DAW）中的后八组轨道。
+PLAY：启动DAW中的播放功能。
+STOP：启动DAW中的停止功能。
+RECORD：启动DAW中的录音功能。
+SHIFT：按住SHIFT按钮并按不同的打击垫可以触发其他功能。
+Shift + Note Repeat：将16个打击垫转化为修改音符重复设置。有
+关更多详情，请参阅下面的“音符重复说明”部分。
+Shift + PAD 1-8：在不同的预设配置之间切换。
+(PAD 1 为演奏预设，PAD 2 为宿主（DAW）预设，其余为自定义预
+设)
+Shift + PAD 9-12：调整打击垫的力度曲线(Velocity Curve)，Pad12
+等于满力度（Full Velocity)。
+Shift + PAD 13-14：单独上移或下移打击垫的音符，上下限为正负
+16个。
+Shift + PAD 15-16：将打击垫的八度范围向上或向下移动。
+Shift + PAD 15 + PAD 16：重置默认的八度范围区间。
+注：使用跟宿主相关联的按键时需在对应宿主的控制界面中将输入输
+出选择为Mackie Control。
+
+
+
+
+                        4
+四. 音符重复(Note Repeat)                   CN
+
+您可以按下"Note Repeat"按钮然后按下所需的打击垫，或者先按所
+需的打击垫然后按下"Note Repeat"按钮，以激活音符重复功能。
+当激活"Shift + Note Repeat"时：
+PAD 1-8（Rate）：根据节奏修改速率，范围从1/4到1/32t。
+PAD 9-13（Swing）：设置音符的偏差。摇摆量越大，重复的音符在
+节奏上的变化就越大。
+PAD 14（Latch）：当激活时，即使释放打击垫，音符也会继续重
+复。
+PAD 15（Sync）：与DAW同步节奏。确保在DAW中激活了外部MIDI
+控制器同步功能，以使此功能正常工作。
+PAD 16（Tap Tempo）：轻敲此打击垫以手动调整音符重复的节
+奏。打击垫将闪烁以显示节奏的速率。
+按住'Note Repeat'按钮并旋转旋钮1-4也可以激活产品上印的功能。
+旋钮1（Rate）：旋转以在1/4到1/32t之间切换速率。
+旋钮2（Swing）：旋转以调整音符的偏差。
+旋钮3（Tempo）：旋转以在30至300 BPM的范围内修改节奏。
+旋钮4（Latch）：旋转以开启/关闭Latch。
+
+
+
+
+                         5
+五. 技术参数                                   CN
+
+
+产品尺寸      227mm(L) x 147mm (W)x 38mm(H)
+产品重量      520g
+鼓垫        16个RGB背光支持力度感应和触后的打击垫
+旋钮        8个可分配的360度旋转旋钮
+          USB-C型接口
+输出        无线连接Windows/Mac/ios/Android
+          有线MIDI OUT功能
+电源        电池供电或USB供电
+电池型号规格    704060
+电池标称电压    3.7V
+电池额定容量    2000mAh
+修订        2024-08-15
+
+
+
+
+                       6
+六. 连接指南                                        CN
+
+
+
+
+                  音频MIDI设置
+
+Mac：通过音频MIDI工作室进行无线连接。
+
+
+
+           Ble MIDI Driver
+
+
+Windows：与Windows连接需要安装Ble Midi驱动，请扫描设
+备背面二维码下载。
+
+
+
+
+iPhone：需要软件支持Ble MIDI （例如库乐队），在软件MIDI
+设备中搜索并连接设备。
+
+
+
+
+Android：需要软件支持Ble MIDI （例如Fl Studio Mobile），
+在软件MIDI设备中搜索并连接设备。
+
+
+
+
+                             7
+

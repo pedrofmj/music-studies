@@ -9,6 +9,10 @@ controllers, live setup, sound design, and reproducible practice workflows.
   worship setup, sound design, and Linux workflow study.
 - [MIDI Controllers](src/midi-controllers/README.md) - M-VAVE controller and FM-synth studies, mappings, DAW-control workflows, and
   Linux verification notes.
+- [Audio Interfaces And Mixers](src/audio-interfaces/README.md) - analog
+  routing, USB audio, monitoring, and mixer integration studies.
+- [Device Catalog](src/device-catalog/README.md) - source-linked capabilities,
+  port matrix, and connection recipes across all documented hardware.
 
 ## Structure
 
@@ -25,6 +29,8 @@ controllers, live setup, sound design, and reproducible practice workflows.
   preset assignments.
 - `src/midi-controllers/<controller>/backups/` - recovery evidence and restore
   notes.
+- `src/device-catalog/` - cross-device capabilities, connection constraints,
+  and evidence-backed setup recipes.
 
 The repository keeps practical study under version control: what was learned,
 what was configured, what changed, and how to rebuild it.

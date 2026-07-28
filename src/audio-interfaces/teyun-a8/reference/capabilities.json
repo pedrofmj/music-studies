@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "device": {
+    "id": "teyun-a8",
+    "manufacturer": "TEYUN",
+    "model": "A8",
+    "category": "analog mixer with USB audio-interface capability",
+    "repository_root": "src/audio-interfaces/teyun-a8",
+    "midi_device": false,
+    "source_status": "provisional_third_party"
+  },
+  "manual_sources": [
+    {
+      "id": "manualsplus-a8-8channel",
+      "authority": "third_party",
+      "url": "https://manuals.plus/ae/1005003477744179",
+      "local_pdf": null,
+      "extracted_text": null,
+      "status": "web_source_only"
+    },
+    {
+      "id": "manualsplus-a4-a6-a8-series",
+      "authority": "third_party",
+      "url": "https://manuals.plus/ae/1005007715703444",
+      "local_pdf": null,
+      "extracted_text": null,
+      "status": "web_source_only"
+    }
+  ],
+  "capabilities": {
+    "audio": {
+      "source_refs": [
+        {
+          "source_id": "manualsplus-a8-8channel",
+          "source_section": "Product Overview, USB/MP3 Playback, PC Recording"
+        },
+        {
+          "source_id": "manualsplus-a4-a6-a8-series",
+          "source_section": "Connecting Audio Devices and Output to Amplifiers"
+        }
+      ],
+      "generates_audio": false,
+      "mixer_role": "accepts and mixes external audio sources; applies documented channel processing and DSP effects",
+      "analog_inputs": [
+        {
+          "name": "MIC/LINE channels 1-6",
+          "connector": "claimed XLR/TRS combo inputs",
+          "direction": "in",
+          "signals": ["microphone", "line-level source"],
+          "status": "provisional_third_party",
+          "required_verification": "confirm channel count, connector type, and whether all channels have the same input structure"
+        },
+        {
+          "name": "stereo line channels 7/8",
+          "connector": "claimed RCA stereo input",
+          "direction": "in",
+          "signals": ["stereo line-level playback"],
+          "status": "provisional_third_party",
+          "required_verification": "confirm exact label and connector"
+        },
+        {
+          "name": "mobile/accompaniment input",
+          "connector": "claimed 3.5 mm input",
+          "direction": "in",
+          "signals": ["consumer stereo playback"],
+          "status": "provisional_third_party",
+          "required_verification": "confirm its label, input path, and whether it is mixed to MAIN and USB"
+        }
+      ],
+      "analog_outputs": [
+        {
+          "name": "MAIN OUT L/R",
+          "connector": "claimed pair of 1/4-inch outputs",
+          "direction": "out",
+          "purpose": "powered speakers, power amplifier, or a recording interface",
+          "status": "provisional_third_party",
+          "required_verification": "confirm connector type and nominal level"
+        },
+        {
+          "name": "headphone output",
+          "connector": "headphone monitor jack",
+          "direction": "out",
+          "purpose": "monitoring",
+          "status": "provisional_third_party",
+          "required_verification": "confirm connector size and whether its level is independent of MAIN"
+        }
+      ]
+    },
+    "usb_and_playback": {
+      "source_refs": [
+        {
+          "source_id": "manualsplus-a8-8channel",
+          "source_section": "Digital Audio Interface, USB/MP3 Playback, PC Recording"
+        }
+      ],
+      "computer_usb_audio": {
+        "direction": "in_out",
+        "status": "provisional_third_party",
+        "claimed_role": "computer audio interface for PC recording and playback",
+        "unknowns": [
+          "actual USB connector and USB Audio Class compatibility",
+          "actual ALSA capture and playback channel counts",
+          "whether capture is the main stereo mix, a selected bus, or another route",
+          "whether DSP effects, Bluetooth, USB-A playback, and computer playback enter USB capture",
+          "whether the device supports simultaneous capture and playback reliably on Ubuntu"
+        ]
+      },
+      "usb_storage_playback": {
+        "direction": "in",
+        "status": "provisional_third_party",
+        "claimed_role": "USB-A U-disk MP3 playback",
+        "note": "Third-party sources conflict on U-disk recording. Treat playback only as the current safe assumption."
+      },
+      "bluetooth_audio": {
+        "direction": "in",
+        "status": "provisional_third_party",
+        "claimed_role": "Bluetooth playback streamed into the mixer",
+        "note": "This is audio streaming, not BLE MIDI."
+      }
+    },
+    "processing_and_power": {
+      "source_refs": [
+        {
+          "source_id": "manualsplus-a8-8channel",
+          "source_section": "Product Overview and Channel Controls"
+        }
+      ],
+      "claimed_processing": [
+        "channel GAIN and PEAK indication",
+        "channel HIGH, MID, and LOW EQ",
+        "24 DSP effects",
+        "channel FX/PC REC send",
+        "MAIN and headphone level controls"
+      ],
+      "phantom_power": {
+        "claimed": "48 V phantom power is present",
+        "status": "provisional_third_party",
+        "required_verification": "confirm switch label, channel scope, and which physical inputs it affects before enabling it"
+      },
+      "power": {
+        "claimed": "5 V / 2 A external USB-compatible power",
+        "status": "provisional_third_party",
+        "required_verification": "use the supplied adapter or verify the printed power label"
+      }
+    },
+    "midi": {
+      "source_refs": [],
+      "ports": [],
+      "note": "No MIDI port, MIDI controller, or MIDI routing capability is documented by the current sources."
+    }
+  },
+  "connection_rules": [
+    {
+      "id": "a8-audio-not-midi",
+      "rule": "The A8 mixes audio only. It cannot connect, route, merge, power, or translate MIDI devices. Keep MIDI routing outside the A8.",
+      "source_refs": [
+        {
+          "source_id": "manualsplus-a8-8channel",
+          "source_section": "Product Overview"
+        }
+      ]
+    },
+    {
+      "id": "a8-keyboard-line-level",
+      "rule": "Connect XPS-30 OUTPUT L/MONO or L/R to confirmed line-level mixer inputs, not a microphone input. Begin with both source and channel gain low, and keep phantom power disabled for keyboard connections.",
+      "source_refs": [
+        {
+          "source_id": "manualsplus-a4-a6-a8-series",
+          "source_section": "Connecting Audio Devices"
+        }
+      ]
+    },
+    {
+      "id": "a8-fm1-stereo-breakout",
+      "rule": "Use a 3.5 mm TRS-to-two-mono breakout from FM-1 headphone output to two confirmed A8 line inputs. Do not put a stereo TRS headphone signal into a single balanced mono input.",
+      "source_refs": [
+        {
+          "source_id": "manualsplus-a4-a6-a8-series",
+          "source_section": "Connecting Audio Devices"
+        }
+      ]
+    },
+    {
+      "id": "a8-phantom-safety",
+      "rule": "Enable 48 V only after confirming the physical switch scope and that every affected input is a compatible condenser microphone connection. Keep it off around XPS-30, FM-1, phones, computers, and line-level sources.",
+      "source_refs": [
+        {
+          "source_id": "manualsplus-a8-8channel",
+          "source_section": "Product Overview"
+        }
+      ]
+    },
+    {
+      "id": "a8-usb-stereo-assumption",
+      "rule": "Treat USB capture as one provisional stereo mix until an observed test proves otherwise. Do not plan on isolated multitrack recording or a defined loopback path.",
+      "source_refs": [
+        {
+          "source_id": "manualsplus-a8-8channel",
+          "source_section": "PC Recording and Troubleshooting"
+        }
+      ]
+    },
+    {
+      "id": "a8-needs-powered-output",
+      "rule": "MAIN OUT is a line-level output. Connect it to powered speakers, a power amplifier, or another suitable line-level destination; do not connect passive speakers directly.",
+      "source_refs": [
+        {
+          "source_id": "manualsplus-a8-8channel",
+          "source_section": "Troubleshooting"
+        }
+      ]
+    }
+  ],
+  "roles": [
+    "analog submixer for XPS-30 and FM-1",
+    "headphone monitoring point",
+    "main stereo feed to powered speakers or a PA chain",
+    "provisional two-channel USB audio interface for a computer",
+    "Bluetooth and USB-storage playback receiver"
+  ],
+  "unknowns": [
+    "Exact A8 revision and front/rear-panel connector layout.",
+    "Exact phantom-power scope and channel assignment.",
+    "Exact USB connector, class compliance, sample rate, and Linux behavior.",
+    "USB capture source, DSP/loopback behavior, and true channel count.",
+    "Exact main-output connector type, nominal level, and headphone-routing behavior."
+  ]
+}
