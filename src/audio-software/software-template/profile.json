@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "catalog_id": "replace-with-catalog-id",
+  "software": {
+    "name": "Replace with application name",
+    "publisher": "Replace with publisher or project"
+  },
+  "study_scope": "Replace with the concrete workflow to document.",
+  "platforms_in_scope": ["linux", "windows"],
+  "local_test_status": "not_tested",
+  "manual_status": "not_retained"
+}

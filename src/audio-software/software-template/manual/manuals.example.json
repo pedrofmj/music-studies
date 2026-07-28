@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalog_id": "replace-with-catalog-id",
+  "stored_for": "internal_study",
+  "documents": [
+    {
+      "id": "replace-with-document-id",
+      "title": "Replace with official document title",
+      "authority": "official_publisher_or_project",
+      "url": "https://replace-with-official-document-url",
+      "local_file": "source/replace-with-manual.pdf",
+      "extracted_text": "extracted/replace-with-manual.txt",
+      "download_status": "downloaded",
+      "downloaded_at": "YYYY-MM-DD",
+      "version_or_revision": "replace when known",
+      "page_count": 0,
+      "file_size_bytes": 0,
+      "sha256": "replace-with-64-character-sha256"
+    }
+  ]
+}

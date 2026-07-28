@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "catalog_date": "2026-07-28",
+  "purpose": "Official-source inventory of practical audio software for native Linux and Windows workflows.",
+  "scope": {
+    "platforms": ["linux", "windows"],
+    "native_support_definition": "A current official native build or support statement exists; it is not a driver, plugin, distribution, or hardware compatibility guarantee.",
+    "coverage": "Curated starter inventory; not a complete market enumeration."
+  },
+  "software": [
+    {
+      "id": "ardour",
+      "name": "Ardour",
+      "publisher": "Ardour Community",
+      "categories": ["daw"],
+      "functions": ["multitrack audio and MIDI recording", "editing, routing, mixing, automation, plugin processing"],
+      "platforms": {
+        "linux": {"status": "native_supported", "evidence_url": "https://community.ardour.org/download"},
+        "windows": {"status": "native_supported", "evidence_url": "https://community.ardour.org/download"}
+      },
+      "licensing": {
+        "source_status": "open_source",
+        "license": "GPL-2.0",
+        "cost_model": "free_source_or_distribution_with_paid_vendor_build",
+        "pricing_note": "GPL source and distribution builds are available; the project sells ready-to-run builds.",
+        "reviewed_on": "2026-07-28",
+        "evidence_url": "https://community.ardour.org/download"
+      },
+      "official_resources": ["https://community.ardour.org/download", "https://manual.ardour.org/"],
+      "manual": {"documentation_url": "https://manual.ardour.org/", "local_status": "not_retained", "documentation_root": null}
+    },
+    {
+      "id": "reaper",
+      "name": "REAPER",
+      "publisher": "Cockos Incorporated",
+      "categories": ["daw"],
+      "functions": ["audio recording and editing", "mixing, MIDI, automation, rendering, scripting"],
+      "platforms": {
+        "linux": {"status": "native_supported", "evidence_url": "https://www.reaper.fm/download.php"},
+        "windows": {"status": "native_supported", "evidence_url": "https://www.reaper.fm/download.php"}
+      },
+      "licensing": {
+        "source_status": "proprietary",
+        "license": "Cockos REAPER license",
+        "cost_model": "paid_with_trial",
+        "pricing_note": "Fully functional 60-day evaluation; official licenses are USD 60 discounted and USD 225 commercial before tax.",
+        "reviewed_on": "2026-07-28",
+        "evidence_url": "https://www.reaper.fm/purchase.php"
+      },
+      "official_resources": ["https://www.reaper.fm/download.php", "https://www.reaper.fm/purchase.php", "https://www.reaper.fm/userguide.php"],
+      "manual": {"documentation_url": "https://www.reaper.fm/userguide.php", "local_status": "not_retained", "documentation_root": null}
+    },
+    {
+      "id": "bitwig-studio",
+      "name": "Bitwig Studio",
+      "publisher": "Bitwig GmbH",
+      "categories": ["daw"],
+      "functions": ["linear arrangement and clip-launcher production", "instruments, effects, modulation, MIDI/CV control, performance"],
+      "platforms": {
+        "linux": {"status": "native_supported", "evidence_url": "https://www.bitwig.com/download/"},
+        "windows": {"status": "native_supported", "evidence_url": "https://www.bitwig.com/download/"}
+      },
+      "licensing": {
+        "source_status": "proprietary",
+        "license": "Bitwig Studio license",
+        "cost_model": "paid_with_trial",
+        "pricing_note": "Paid Essentials, Producer, and Studio editions; official download page offers a 30-day trial.",
+        "reviewed_on": "2026-07-28",
+        "evidence_url": "https://www.bitwig.com/buy/"
+      },
+      "official_resources": ["https://www.bitwig.com/download/", "https://www.bitwig.com/buy/", "https://www.bitwig.com/userguide/latest/"],
+      "manual": {"documentation_url": "https://www.bitwig.com/userguide/latest/", "local_status": "not_retained", "documentation_root": null}
+    },
+    {
+      "id": "lmms",
+      "name": "LMMS",
+      "publisher": "LMMS community",
+      "categories": ["daw"],
+      "functions": ["pattern-oriented MIDI composition", "built-in instruments, effects, automation, audio export"],
+      "platforms": {
+        "linux": {"status": "native_supported", "evidence_url": "https://lmms.io/download"},
+        "windows": {"status": "native_supported", "evidence_url": "https://lmms.io/download"}
+      },
+      "licensing": {
+        "source_status": "open_source",
+        "license": "GPL-2.0-or-later",
+        "cost_model": "free",
+        "pricing_note": "The project describes LMMS as free and open source.",
+        "reviewed_on": "2026-07-28",
+        "evidence_url": "https://lmms.io/"
+      },
+      "official_resources": ["https://lmms.io/download", "https://docs.lmms.io/user-manual/"],
+      "manual": {"documentation_url": "https://docs.lmms.io/user-manual/", "local_status": "not_retained", "documentation_root": null}
+    },
+    {
+      "id": "qtractor",
+      "name": "Qtractor",
+      "publisher": "Qtractor project",
+      "categories": ["daw"],
+      "functions": ["multitrack audio and MIDI recording", "clip-oriented composing using ALSA and JACK"],
+      "platforms": {
+        "linux": {"status": "native_supported", "evidence_url": "https://www.qtractor.org/"},
+        "windows": {"status": "not_offered", "evidence_url": "https://www.qtractor.org/doc/Manual%20-%201%20Introduction.html"}
+      },
+      "licensing": {
+        "source_status": "open_source",
+        "license": "GPL-2.0-or-later",
+        "cost_model": "free",
+        "pricing_note": "The project identifies Qtractor as free, open-source software.",
+        "reviewed_on": "2026-07-28",
+        "evidence_url": "https://www.qtractor.org/"
+      },
+      "official_resources": ["https://www.qtractor.org/", "https://www.qtractor.org/doc/Manual%20-%201%20Introduction.html"],
+      "manual": {"documentation_url": "https://www.qtractor.org/doc/Manual%20-%201%20Introduction.html", "local_status": "not_retained", "documentation_root": null}
+    },
+    {
+      "id": "audacity",
+      "name": "Audacity",
+      "publisher": "Audacity Team / Muse Group",
+      "categories": ["audio_editor"],
+      "functions": ["audio recording and waveform editing", "restoration, processing, multitrack assembly, export"],
+      "platforms": {
+        "linux": {"status": "native_supported", "evidence_url": "https://www.audacityteam.org/download/"},
+        "windows": {"status": "native_supported", "evidence_url": "https://www.audacityteam.org/download/"}
+      },
+      "licensing": {
+        "source_status": "open_source",
+        "license": "GPL-2.0",
+        "cost_model": "free",
+        "pricing_note": "The project describes Audacity as free, open-source software.",
+        "reviewed_on": "2026-07-28",
+        "evidence_url": "https://www.audacityteam.org/download/"
+      },
+      "official_resources": ["https://www.audacityteam.org/download/", "https://manual.audacityteam.org/"],
+      "manual": {"documentation_url": "https://manual.audacityteam.org/", "local_status": "not_retained", "documentation_root": null}
+    },
+    {
+      "id": "carla",
+      "name": "Carla",
+      "publisher": "KXStudio / Carla project",
+      "categories": ["plugin_host_rack", "audio_graph_router"],
+      "functions": ["load and chain plugins as a rack", "patch audio and MIDI between plugins and drivers", "host LADSPA, DSSI, LV2, VST2, VST3, AU, SF2, and SFZ where supported"],
+      "platforms": {
+        "linux": {"status": "native_supported", "evidence_url": "https://kx.studio/Applications:Carla"},
+        "windows": {"status": "native_supported", "evidence_url": "https://kx.studio/Applications:Carla"}
+      },
+      "licensing": {
+        "source_status": "open_source",
+        "license": "GPL-2.0",
+        "cost_model": "free",
+        "pricing_note": "The project describes Carla as libre, open source, and free in price and use.",
+        "reviewed_on": "2026-07-28",
+        "evidence_url": "https://kx.studio/Applications:Carla"
+      },
+      "official_resources": ["https://kx.studio/Applications:Carla", "https://github.com/falkTX/Carla"],
+      "manual": {"documentation_url": "https://kx.studio/Applications:Carla", "local_status": "not_retained", "documentation_root": null}
+    },
+    {
+      "id": "vcv-rack",
+      "name": "VCV Rack",
+      "publisher": "VCV",
+      "categories": ["modular_synth", "plugin_host_rack"],
+      "functions": ["virtual modular synthesis using patchable modules", "audio, MIDI, and CV-style routing within a modular environment"],
+      "platforms": {
+        "linux": {"status": "native_supported", "evidence_url": "https://vcvrack.com/manual/Installing"},
+        "windows": {"status": "native_supported", "evidence_url": "https://vcvrack.com/manual/Installing"}
+      },
+      "licensing": {
+        "source_status": "open_source",
+        "license": "GPL-3.0",
+        "cost_model": "free_with_paid_options",
+        "pricing_note": "Rack is free/open-source; Rack Pro and third-party modules may be paid.",
+        "reviewed_on": "2026-07-28",
+        "evidence_url": "https://vcvrack.com/manual/PluginLicensing"
+      },
+      "official_resources": ["https://vcvrack.com/downloads/", "https://vcvrack.com/manual/", "https://vcvrack.com/manual/PluginLicensing"],
+      "manual": {"documentation_url": "https://vcvrack.com/manual/", "local_status": "not_retained", "documentation_root": null}
+    },
+    {
+      "id": "pipewire",
+      "name": "PipeWire",
+      "publisher": "PipeWire project",
+      "categories": ["audio_graph_router"],
+      "functions": ["low-latency audio and MIDI graph processing", "routing with PulseAudio, JACK, ALSA, and GStreamer compatibility"],
+      "platforms": {
+        "linux": {"status": "native_supported", "evidence_url": "https://pipewire.org/"},
+        "windows": {"status": "not_offered", "evidence_url": "https://pipewire.org/"}
+      },
+      "licensing": {
+        "source_status": "open_source",
+        "license": "Free software; consult the source tree for component licenses",
+        "cost_model": "free",
+        "pricing_note": "The project describes PipeWire as free software developed in the open.",
+        "reviewed_on": "2026-07-28",
+        "evidence_url": "https://pipewire.org/"
+      },
+      "official_resources": ["https://pipewire.org/", "https://docs.pipewire.org/"],
+      "manual": {"documentation_url": "https://docs.pipewire.org/", "local_status": "not_retained", "documentation_root": null}
+    },
+    {
+      "id": "easyeffects",
+      "name": "EasyEffects",
+      "publisher": "EasyEffects project",
+      "categories": ["system_effects"],
+      "functions": ["PipeWire input and output effect chains", "equalization, compression, limiting, convolving, noise processing, level control"],
+      "platforms": {
+        "linux": {"status": "native_supported", "evidence_url": "https://github.com/wwmm/easyeffects"},
+        "windows": {"status": "not_offered", "evidence_url": "https://github.com/wwmm/easyeffects"}
+      },
+      "licensing": {
+        "source_status": "open_source",
+        "license": "GPL-3.0-or-later",
+        "cost_model": "free",
+        "pricing_note": "The project is GPL-licensed and donation-supported.",
+        "reviewed_on": "2026-07-28",
+        "evidence_url": "https://github.com/wwmm/easyeffects"
+      },
+      "official_resources": ["https://github.com/wwmm/easyeffects", "https://wwmm.github.io/easyeffects/"],
+      "manual": {"documentation_url": "https://wwmm.github.io/easyeffects/", "local_status": "not_retained", "documentation_root": null}
+    },
+    {
+      "id": "equalizer-apo",
+      "name": "Equalizer APO",
+      "publisher": "Equalizer APO project",
+      "categories": ["system_effects"],
+      "functions": ["Windows system-wide parametric equalization", "filter processing across multiple audio channels"],
+      "platforms": {
+        "linux": {"status": "not_offered", "evidence_url": "https://equalizer-apo.org/about/"},
+        "windows": {"status": "native_supported", "evidence_url": "https://equalizer-apo.org/about/"}
+      },
+      "licensing": {
+        "source_status": "open_source",
+        "license": "Open-source project; confirm exact release license before redistribution",
+        "cost_model": "free",
+        "pricing_note": "The official project describes Equalizer APO as a free, open-source Windows equalizer.",
+        "reviewed_on": "2026-07-28",
+        "evidence_url": "https://equalizer-apo.org/"
+      },
+      "official_resources": ["https://equalizer-apo.org/", "https://equalizer-apo.org/about/"],
+      "manual": {"documentation_url": "https://equalizer-apo.org/", "local_status": "not_retained", "documentation_root": null}
+    },
+    {
+      "id": "yabridge",
+      "name": "yabridge",
+      "publisher": "yabridge project",
+      "categories": ["plugin_bridge"],
+      "functions": ["bridge supported Windows VST2, VST3, and CLAP plugins into Linux plugin hosts", "integrate selected Windows plugin libraries through Wine"],
+      "platforms": {
+        "linux": {"status": "native_supported", "evidence_url": "https://github.com/robbert-vdh/yabridge"},
+        "windows": {"status": "unknown", "evidence_url": "https://github.com/robbert-vdh/yabridge"}
+      },
+      "licensing": {
+        "source_status": "open_source",
+        "license": "GPL-3.0-or-later",
+        "cost_model": "free",
+        "pricing_note": "The bridge is free and open source; each bridged plugin keeps its own license.",
+        "reviewed_on": "2026-07-28",
+        "evidence_url": "https://github.com/robbert-vdh/yabridge"
+      },
+      "official_resources": ["https://github.com/robbert-vdh/yabridge"],
+      "manual": {"documentation_url": "https://github.com/robbert-vdh/yabridge", "local_status": "not_retained", "documentation_root": null}
+    },
+    {
+      "id": "obs-studio",
+      "name": "OBS Studio",
+      "publisher": "OBS Project",
+      "categories": ["streaming_capture"],
+      "functions": ["scene-based audio/video capture and compositing", "local recording, encoding, live streaming"],
+      "platforms": {
+        "linux": {"status": "native_supported", "evidence_url": "https://obsproject.com/download"},
+        "windows": {"status": "native_supported", "evidence_url": "https://obsproject.com/download"}
+      },
+      "licensing": {
+        "source_status": "open_source",
+        "license": "GPL-2.0-or-later",
+        "cost_model": "free",
+        "pricing_note": "OBS Studio is free and open-source software.",
+        "reviewed_on": "2026-07-28",
+        "evidence_url": "https://github.com/obsproject/obs-studio"
+      },
+      "official_resources": ["https://obsproject.com/download", "https://github.com/obsproject/obs-studio"],
+      "manual": {"documentation_url": "https://obsproject.com/wiki/", "local_status": "not_retained", "documentation_root": null}
+    }
+  ]
+}

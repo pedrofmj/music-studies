@@ -13,6 +13,8 @@ controllers, live setup, sound design, and reproducible practice workflows.
   routing, USB audio, monitoring, and mixer integration studies.
 - [Device Catalog](src/device-catalog/README.md) - source-linked capabilities,
   port matrix, and connection recipes across all documented hardware.
+- [Audio Software](src/audio-software/README.md) - Linux and Windows software
+  inventory, licensing, functions, and manual-intake structure.
 
 ## Structure
 
