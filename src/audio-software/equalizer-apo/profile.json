@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "catalog_id": "equalizer-apo",
+  "software": {
+    "name": "Equalizer APO",
+    "publisher": "Equalizer APO project",
+    "source_status": "open_source"
+  },
+  "study_scope": "Build and document a safe Windows playback-device equalization baseline, then verify filters, monitoring, application behavior, and recovery.",
+  "platforms_in_scope": {
+    "linux": "not_offered",
+    "windows": "active_study"
+  },
+  "primary_functions": [
+    "system-wide parametric equalization",
+    "multichannel filter processing",
+    "playback device tuning"
+  ],
+  "local_test_status": {
+    "linux": "not_applicable",
+    "windows": "not_tested"
+  },
+  "manual_status": "official_web_documentation_only",
+  "documentation_root": "src/audio-software/equalizer-apo"
+}

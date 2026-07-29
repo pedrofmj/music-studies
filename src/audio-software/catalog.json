@@ -237,7 +237,7 @@
         "evidence_url": "https://equalizer-apo.org/"
       },
       "official_resources": ["https://equalizer-apo.org/", "https://equalizer-apo.org/about/"],
-      "manual": {"documentation_url": "https://equalizer-apo.org/", "local_status": "not_retained", "documentation_root": null}
+      "manual": {"documentation_url": "https://equalizer-apo.org/", "local_status": "not_retained", "documentation_root": "equalizer-apo"}
     },
     {
       "id": "yabridge",
