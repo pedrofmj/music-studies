@@ -22,6 +22,7 @@ been identified and tested.
 | --- | --- | --- | --- | --- |
 | XPS-30 | Yes | MIDI IN and MIDI OUT connectors | USB COMPUTER MIDI | OUTPUT R/L-MONO, PHONES, USB audio to DAW |
 | SMK25 | No | Reconfigured pedal port MIDI OUT or optional wireless adapter | USB-B or BLE MIDI | None |
+| KeyLab Essential 61 mk3 | No | 5-pin MIDI OUT | USB-C MIDI, DINTHRU, MCU/HUI, and Analog Lab display ports | None |
 | SMC-PAD | No | 3.5 mm MIDI OUT or optional wireless adapter | USB-C or BLE MIDI | None |
 | SMC-PAD Pocket | No | Optional wireless five-pin adapter only | USB-C or BLE MIDI | None |
 | SMC-Mixer | No | Optional wireless MIDI device only | USB-C or BLE MIDI | None |
@@ -47,7 +48,8 @@ assignable input. See [XPS-30 capabilities](../instruments/roland-xps30/referenc
 ## 2. Computer-Centered Recording Or Software-Instrument Setup
 
 ```text
-SMK25 / SMC-PAD / SMC-PAD Pocket / SMC-Mixer / FM-1
+KeyLab Essential 61 mk3 / SMK25 / SMC-PAD / SMC-PAD Pocket / SMC-Mixer /
+FM-1
   -> individual USB or BLE MIDI connections -> computer MIDI host
 
 XPS-30 -> USB COMPUTER MIDI/audio -> computer
@@ -65,7 +67,20 @@ For Ubuntu, first record the ALSA endpoint names with `aconnect -l` and
 `amidi -l`. The host-specific mapping belongs in that device's `mappings/`
 directory, not in its manual facts.
 
-## 3. SMC-PAD Directly Controls XPS-30
+## 3. KeyLab Essential 61 mk3 Directly Controls XPS-30
+
+\`\`\`text
+KeyLab Essential 61 mk3 MIDI OUT -> five-pin MIDI cable -> XPS-30 MIDI IN
+XPS-30 OUTPUT L/MONO              -> mixer / PA / headphones
+\`\`\`
+
+The KeyLab has a documented five-pin MIDI output for hardware synth modules,
+so this route needs no USB host. Match the KeyLab transmit channel with the
+receiving XPS-30 part, then record the observed channel, pedal behavior, and
+XPS-30 patch or performance in the KeyLab mapping log. MIDI does not carry the
+XPS-30 sound; keep the XPS-30 audio path connected separately.
+
+## 4. SMC-PAD Directly Controls XPS-30
 
 ```text
 SMC-PAD 3.5 mm MIDI OUT
@@ -80,7 +95,7 @@ specify the adapter wiring standard in the stored text, so record the exact
 adapter and perform a note test before using it on stage. Map pad notes away
 from XPS-30 phrase-pad or external-device collisions.
 
-## 4. SMK25 Directly Controls XPS-30
+## 5. SMK25 Directly Controls XPS-30
 
 ```text
 SMK25 pedal port, changed to MIDI OUT in vendor editor
@@ -94,7 +109,7 @@ This route sacrifices the SMK25's pedal input. Do not change the port role on
 the day of a performance. If sustain is necessary, use the XPS-30 keyboard and
 its DP-10 instead, or move the SMK25 to a computer-hosted setup.
 
-## 5. SMC-PAD Pocket To A Hardware Sound Module
+## 6. SMC-PAD Pocket To A Hardware Sound Module
 
 ```text
 SMC-PAD Pocket -> optional M-VAVE five-pin wireless MIDI adapter -> XPS-30 MIDI IN
@@ -105,7 +120,7 @@ The manual documents this optional wireless route and says it prevents the
 Pocket from connecting to another host. Treat it as a single-destination setup.
 There is no documented wired MIDI-OUT jack on the Pocket.
 
-## 6. FM-1 As A Second Live Sound Source
+## 7. FM-1 As A Second Live Sound Source
 
 ```text
 FM-1 headphone output -> stereo breakout / suitable audio-interface or mixer input
@@ -118,7 +133,7 @@ via USB-C MIDI, BLE MIDI, or 3.5 mm MIDI IN, but its physical 3.5 mm MIDI port
 is not a MIDI output. To play the XPS-30 from FM-1 keys, route FM-1 USB/BLE
 MIDI through a host that sends MIDI to XPS-30 MIDI IN or USB COMPUTER.
 
-## 7. SMC-Mixer In A Live Or Recording Rig
+## 8. SMC-Mixer In A Live Or Recording Rig
 
 ```text
 SMC-Mixer -> USB-C or BLE MIDI -> computer DAW
@@ -133,6 +148,7 @@ SMC-Mixer's faders control DAW parameters only.
 
 | Proposed route | Why it is not a documented direct plan |
 | --- | --- |
+| KeyLab Essential USB-C -> XPS-30 USB COMPUTER | Both connections require a USB host. Use the KeyLab five-pin MIDI OUT to XPS-30 MIDI IN, or route both through a computer. |
 | SMK25 USB-B -> XPS-30 USB COMPUTER | Both require a USB host. |
 | SMC-PAD USB-C -> XPS-30 USB COMPUTER | Both require a USB host. |
 | SMC-PAD Pocket USB-C -> XPS-30 USB COMPUTER | Both require a USB host. |
@@ -141,7 +157,7 @@ SMC-Mixer's faders control DAW parameters only.
 | Any MIDI connection -> audible FM-1 or XPS-30 sound | MIDI needs a separate audio connection or documented USB-audio route. |
 
 
-## 8. TEYUN A8 As The Audio Hub
+## 9. TEYUN A8 As The Audio Hub
 
 ```text
 XPS-30 OUTPUT L/R -> two confirmed A8 line inputs
@@ -157,7 +173,7 @@ A8 integration and its current uncertainties are in
 [TEYUN A8 capabilities](../audio-interfaces/teyun-a8/reference/capabilities.json).
 
 
-## 9. F998 For Streaming Voice, Not Instrument Mixing
+## 10. F998 For Streaming Voice, Not Instrument Mixing
 
 ```text
 voice microphone -> F998 confirmed microphone input

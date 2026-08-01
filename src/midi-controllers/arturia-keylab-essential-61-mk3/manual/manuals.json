@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "device": "Arturia KeyLab Essential 61 mk3",
+  "stored_for": "internal_study",
+  "manual": {
+    "official_product_page": "https://www.arturia.com/support/downloads-manuals/product/keylab-essential-61-mk3",
+    "official_manual_url": "https://downloads.arturia.net/products/keylab-essential-49-mk3/manual/keylab-essential-mk3_Manual_1_0_0_EN.pdf",
+    "local_file": "source/keylab-essential-mk3_Manual_1_0_0_EN.pdf",
+    "manual_version": "1.0.0 EN",
+    "local_status": "retained_and_extracted",
+    "downloaded_at": "2026-08-01",
+    "page_count": 53,
+    "file_size_bytes": 42718308,
+    "sha256": "e95657c04baefc08c9f280ba7558bc8da24beccb4d8b175db4eac5000f433d34"
+  },
+  "current_downloads_page": {
+    "english_manual_version": "1.1.6",
+    "firmware_version": "1.2.1",
+    "checked_at": "2026-08-01"
+  }
+}

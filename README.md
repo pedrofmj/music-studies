@@ -7,7 +7,7 @@ controllers, live setup, sound design, and reproducible practice workflows.
 
 - [Roland XPS-30](src/instruments/roland-xps30/README.md) - synthesizer,
   worship setup, sound design, and Linux workflow study.
-- [MIDI Controllers](src/midi-controllers/README.md) - M-VAVE controller and FM-synth studies, mappings, DAW-control workflows, and
+- [MIDI Controllers](src/midi-controllers/README.md) - Arturia and M-VAVE controller studies, mappings, DAW-control workflows, and
   Linux verification notes.
 - [Audio Interfaces And Mixers](src/audio-interfaces/README.md) - analog
   routing, USB audio, monitoring, and mixer integration studies.

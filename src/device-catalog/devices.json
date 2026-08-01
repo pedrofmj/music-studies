@@ -4,6 +4,15 @@
   "purpose": "Machine-searchable device capabilities and evidence-backed connection planning.",
   "devices": [
     {
+      "id": "arturia-keylab-essential-61-mk3",
+      "manufacturer": "Arturia",
+      "model": "KeyLab Essential 61 mk3",
+      "category": "61-key MIDI keyboard and DAW controller",
+      "generates_audio": false,
+      "root": "../midi-controllers/arturia-keylab-essential-61-mk3",
+      "capabilities_file": "../midi-controllers/arturia-keylab-essential-61-mk3/reference/capabilities.json"
+    },
+    {
       "id": "roland-xps30",
       "manufacturer": "Roland",
       "model": "XPS-30",

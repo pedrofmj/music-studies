@@ -26,7 +26,7 @@ change.
 | [VCV Rack](https://vcvrack.com/downloads/) | Virtual modular synthesizer and patchable signal environment | Native | Native | Open source, GPL-3.0 | Free base; paid Rack Pro/third-party modules |
 | [PipeWire](https://pipewire.org/) | Low-latency Linux audio/MIDI graph and routing service | Native | Not offered | Free software | Free |
 | [EasyEffects](https://github.com/wwmm/easyeffects) | PipeWire effects chains: EQ, compression, limiting, noise tools | Native | Not offered | Open source, GPL-3.0-or-later | Free |
-| [Equalizer APO](https://equalizer-apo.org/about/) | Windows system-wide parametric equalizer/filter engine | Not offered | Native | Open source | Free |
+| [Equalizer APO](https://sourceforge.net/projects/equalizerapo/) | Windows system-wide parametric equalizer/filter engine | Not offered | Native | Open source, GPL-2.0 | Free |
 | [yabridge](https://github.com/robbert-vdh/yabridge) | Linux bridge for Windows VST2/VST3/CLAP plugins | Native | N/A | Open source, GPL-3.0-or-later | Free |
 | [OBS Studio](https://obsproject.com/download) | Audio/video scene mixing, recording, and live streaming | Native | Native | Open source, GPL-2.0-or-later | Free |
 

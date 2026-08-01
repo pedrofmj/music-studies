@@ -4,15 +4,26 @@
   "stored_for": "internal_study",
   "documents": [
     {
-      "id": "equalizer-apo-project-page",
-      "title": "Equalizer APO Project Page",
-      "authority": "official_project_documentation",
-      "url": "https://equalizer-apo.org/",
+      "id": "equalizer-apo-sourceforge-project",
+      "title": "Equalizer APO SourceForge Project",
+      "authority": "project_owned_distribution_and_documentation",
+      "url": "https://sourceforge.net/projects/equalizerapo/",
       "local_file": null,
       "extracted_text": null,
       "download_status": "web_documentation_only",
-      "reviewed_at": "2026-07-28",
-      "use": "Official Windows product scope, source availability, download entry point, and documentation links. No authorized local PDF has been retained."
+      "reviewed_at": "2026-08-01",
+      "use": "Project-owned Windows scope, Windows system-effects boundary, license, download, feature, and source availability information."
+    },
+    {
+      "id": "equalizer-apo-configuration-reference",
+      "title": "Equalizer APO Configuration Reference",
+      "authority": "project_owned_documentation",
+      "url": "https://sourceforge.net/p/equalizerapo/wiki/Configuration%20reference/",
+      "local_file": null,
+      "extracted_text": null,
+      "download_status": "web_documentation_only",
+      "reviewed_at": "2026-08-01",
+      "use": "Project-owned filter, preamp, device, channel, include, convolution, and configuration syntax reference."
     }
   ]
 }

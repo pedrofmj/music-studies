@@ -11,8 +11,19 @@
       "local_file": null,
       "extracted_text": null,
       "download_status": "web_documentation_only",
-      "reviewed_at": "2026-07-28",
-      "use": "Official host purpose, routing modes, driver paths, plugin format, and download documentation. No authorized local PDF has been retained."
+      "reviewed_at": "2026-08-01",
+      "use": "Official application role, routing modes, driver paths, plugin formats, and downloads. No authorized local PDF has been retained."
+    },
+    {
+      "id": "kxstudio-carla-manual",
+      "title": "KXStudio Carla Manual",
+      "authority": "official_project_documentation",
+      "url": "https://kx.studio/Documentation:Manual:Carla",
+      "local_file": null,
+      "extracted_text": null,
+      "download_status": "web_documentation_only",
+      "reviewed_at": "2026-08-01",
+      "use": "Official modular host, patchbay, plugin-format, driver, and project-mode documentation."
     }
   ]
 }

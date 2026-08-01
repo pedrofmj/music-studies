@@ -225,19 +225,19 @@
       "categories": ["system_effects"],
       "functions": ["Windows system-wide parametric equalization", "filter processing across multiple audio channels"],
       "platforms": {
-        "linux": {"status": "not_offered", "evidence_url": "https://equalizer-apo.org/about/"},
-        "windows": {"status": "native_supported", "evidence_url": "https://equalizer-apo.org/about/"}
+        "linux": {"status": "not_offered", "evidence_url": "https://sourceforge.net/projects/equalizerapo/"},
+        "windows": {"status": "native_supported", "evidence_url": "https://sourceforge.net/projects/equalizerapo/"}
       },
       "licensing": {
         "source_status": "open_source",
-        "license": "Open-source project; confirm exact release license before redistribution",
+        "license": "GPL-2.0",
         "cost_model": "free",
-        "pricing_note": "The official project describes Equalizer APO as a free, open-source Windows equalizer.",
-        "reviewed_on": "2026-07-28",
-        "evidence_url": "https://equalizer-apo.org/"
+        "pricing_note": "The project distributes Equalizer APO as a free, open-source Windows equalizer.",
+        "reviewed_on": "2026-08-01",
+        "evidence_url": "https://sourceforge.net/projects/equalizerapo/"
       },
-      "official_resources": ["https://equalizer-apo.org/", "https://equalizer-apo.org/about/"],
-      "manual": {"documentation_url": "https://equalizer-apo.org/", "local_status": "not_retained", "documentation_root": "equalizer-apo"}
+      "official_resources": ["https://sourceforge.net/projects/equalizerapo/", "https://sourceforge.net/p/equalizerapo/wiki/Configuration%20reference/"],
+      "manual": {"documentation_url": "https://sourceforge.net/p/equalizerapo/wiki/Configuration%20reference/", "local_status": "not_retained", "documentation_root": "equalizer-apo"}
     },
     {
       "id": "yabridge",

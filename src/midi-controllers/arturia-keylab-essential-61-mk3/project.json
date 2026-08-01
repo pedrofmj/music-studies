@@ -1,0 +1,19 @@
+{
+  "project": {
+    "name": "Arturia KeyLab Essential 61 mk3 Study and Setup Plan",
+    "objective": "Create a reproducible operating setup for the Arturia KeyLab Essential 61 mk3."
+  },
+  "device": {
+    "manufacturer": "Arturia",
+    "model": "KeyLab Essential 61 mk3",
+    "category": "61-key MIDI keyboard and DAW controller"
+  },
+  "goals": [
+    "Establish and document reliable USB MIDI on Linux.",
+    "Create a direct five-pin MIDI route to the Roland XPS-30.",
+    "Keep DAW-control and performance MIDI ports distinct.",
+    "Preserve firmware and MIDI Control Center mappings before changes."
+  ],
+  "documentation_root": "src/midi-controllers/arturia-keylab-essential-61-mk3",
+  "status": "initial-integration"
+}

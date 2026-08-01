@@ -43,3 +43,4 @@ hardware.
 - [Schema](schema.md) - fields and evidence rules for capability records.
 - [Device index](devices.json) - all documented hardware and its records.
 - [Connection recipes](connection-recipes.md) - repeatable setups and limits.
+- [Documentation coverage](documentation-coverage.md) - source authority, active-study scope, and unresolved evidence across hardware and software.

@@ -5,8 +5,8 @@ inventory. Its study scope is playback-device attachment, parametric filtering,
 controlled monitoring, and repeatable per-device configuration evidence.
 
 The catalog record is at [Equalizer APO in catalog.json](../catalog.json). The
-official sources are the [project page](https://equalizer-apo.org/) and
-[about page](https://equalizer-apo.org/about/).
+project-owned sources are the [SourceForge project page](https://sourceforge.net/projects/equalizerapo/)
+and [configuration reference](https://sourceforge.net/p/equalizerapo/wiki/Configuration%20reference/).
 
 ## Platform Boundary
 

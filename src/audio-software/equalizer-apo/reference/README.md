@@ -11,7 +11,8 @@ does not define a Linux equivalent.
 - [Application compatibility checklist](04-application-compatibility-checklist.md)
   records the tested application and playback result.
 
-Use the official [Equalizer APO project](https://equalizer-apo.org/) and
-[about page](https://equalizer-apo.org/about/) for documented behavior. Local
-records must include Windows version, Equalizer APO version, device, driver,
-filter configuration, test application, steps, and result.
+Use the project-owned [SourceForge project page](https://sourceforge.net/projects/equalizerapo/)
+and [configuration reference](https://sourceforge.net/p/equalizerapo/wiki/Configuration%20reference/)
+for documented behavior. Local records must include Windows version, Equalizer
+APO version, device, driver, filter configuration, test application, steps, and
+result.

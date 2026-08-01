@@ -11,8 +11,19 @@
       "local_file": null,
       "extracted_text": null,
       "download_status": "web_documentation_only",
-      "reviewed_at": "2026-07-28",
+      "reviewed_at": "2026-08-01",
       "use": "Official installation, workflow, and feature documentation. No authorized local PDF has been retained."
+    },
+    {
+      "id": "lmms-using-midi",
+      "title": "LMMS User Manual: Using MIDI",
+      "authority": "official_project",
+      "url": "https://docs.lmms.io/user-manual/en/production/midi",
+      "local_file": null,
+      "extracted_text": null,
+      "download_status": "web_documentation_only",
+      "reviewed_at": "2026-08-01",
+      "use": "Official Linux ALSA Sequencer, Windows WinMM MIDI, quick device selection, and controller-assignment guidance."
     }
   ]
 }

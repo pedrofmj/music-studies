@@ -11,8 +11,30 @@
       "local_file": null,
       "extracted_text": null,
       "download_status": "web_documentation_only",
-      "reviewed_at": "2026-07-28",
+      "reviewed_at": "2026-08-01",
       "use": "Official PipeWire application role, effects list, installation paths, safety warning, and help links. No authorized local PDF has been retained."
+    },
+    {
+      "id": "easyeffects-user-manual",
+      "title": "EasyEffects User Manual",
+      "authority": "official_project_documentation",
+      "url": "https://wwmm.github.io/easyeffects/",
+      "local_file": null,
+      "extracted_text": null,
+      "download_status": "web_documentation_only",
+      "reviewed_at": "2026-08-01",
+      "use": "Official PipeWire input/output processing and user-interface documentation."
+    },
+    {
+      "id": "easyeffects-user-presets",
+      "title": "EasyEffects: Creating and Importing User Presets",
+      "authority": "official_project_documentation",
+      "url": "https://wwmm.github.io/easyeffects/user_interface/userpresets.html",
+      "local_file": null,
+      "extracted_text": null,
+      "download_status": "web_documentation_only",
+      "reviewed_at": "2026-08-01",
+      "use": "Official local preset import, reuse, autoload, and input/output device-association documentation."
     }
   ]
 }

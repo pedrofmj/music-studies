@@ -11,6 +11,8 @@ not define a Windows equivalent.
   headphone processing.
 - [Input chain checklist](04-input-chain-checklist.md) records microphone or
   line-input processing.
+- [Preset lifecycle](05-preset-lifecycle.md) records safe preset, autoload,
+  device-binding, and recovery practice.
 
 Use the official [EasyEffects project repository](https://github.com/wwmm/easyeffects)
 and [help pages](https://wwmm.github.io/easyeffects/) for documented behavior.
