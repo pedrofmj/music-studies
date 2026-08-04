@@ -5,7 +5,10 @@
 1. Connect and power the controller before opening Carla.
 2. Confirm PipeWire and WirePlumber are active with
    systemctl --user is-active pipewire wireplumber.
-3. Open Carla and load /c/music/carla/pedro.uproject.
+3. Launch `~/bin/carla-pedro-project`. It forwards
+   `/c/music/carla/pedro.uproject` into the Flatpak and loads the rack during
+   Carla startup. Avoid opening a blank Carla instance and then using Open for
+   this project; the multi-instance rack can hang during in-process reload.
 4. In Carla's Patchbay, confirm the KeyLab MIDI port feeds MIDI Scale CC Value
    and that the LSP Mixer outputs feed the intended audio sink.
 5. Play a note and operate the sustain pedal before adding or changing a

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly APP_ID="studio.kx.carla"
+readonly PROJECT="/c/music/carla/pedro.uproject"
+
+if [[ ! -r "$PROJECT" ]]; then
+  printf 'Carla project is not readable: %s\n' "$PROJECT" >&2
+  exit 1
+fi
+
+exec flatpak run --file-forwarding "$APP_ID" @@ "$PROJECT" @@

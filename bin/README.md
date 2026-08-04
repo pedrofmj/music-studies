@@ -15,6 +15,13 @@ ssh pedro.ferreira@airstar 'chmod +x ~/bin/pipewire-patchbay-json'
 
 ## Daily shortcuts
 
+After intentionally changing the patchbay, refresh the default snapshot and
+restart the automatic restore service with:
+
+```bash
+~/bin/pipewire-patchbay-refresh
+```
+
 Take a complete snapshot now. By default it writes to
 `~/.local/state/pipewire-patchbay/patchbay.json`:
 

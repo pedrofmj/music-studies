@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Save the current PipeWire graph and reload the automatic restore service.
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+readonly PATCHBAY_SCRIPT="${SCRIPT_DIR}/pipewire-patchbay-json"
+readonly SERVICE="pipewire-patchbay-watch.service"
+
+if [[ ! -x $PATCHBAY_SCRIPT ]]; then
+    printf 'Required executable not found: %s\n' "$PATCHBAY_SCRIPT" >&2
+    exit 1
+fi
+
+"$PATCHBAY_SCRIPT" --take-snapshot
+systemctl --user restart "$SERVICE"
+
+if ! systemctl --user is-active --quiet "$SERVICE"; then
+    printf 'Snapshot saved, but %s did not start successfully.\n' "$SERVICE" >&2
+    systemctl --user status --no-pager "$SERVICE" >&2 || true
+    exit 1
+fi
+
+printf 'Snapshot refreshed and %s restarted.\n' "$SERVICE"
