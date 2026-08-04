@@ -1,0 +1,596 @@
+#!/usr/bin/env bash
+# Export and restore PipeWire patchbay connections as JSON.
+set -euo pipefail
+
+readonly SCHEMA="https://music-studies.local/schemas/pipewire-patchbay/v1"
+readonly PROGRAM_NAME="$(basename "$0")"
+readonly DEFAULT_SNAPSHOT_FILE="${HOME}/.local/state/pipewire-patchbay/patchbay.json"
+declare -a TEMP_FILES=()
+
+cleanup() {
+    rm -f "${TEMP_FILES[@]}"
+}
+
+trap cleanup EXIT
+
+usage() {
+    cat <<EOF
+Usage:
+  $PROGRAM_NAME export [--midi-only] [FILE]
+  $PROGRAM_NAME import [--names] [--midi-component] [--dry-run] FILE
+  $PROGRAM_NAME --take-snapshot [FILE]
+  $PROGRAM_NAME --check-and-restore [--dry-run] [FILE]
+  $PROGRAM_NAME --watch-and-restore [--interval SECONDS] [FILE]
+  $PROGRAM_NAME --watch-events-and-restore [--settle SECONDS] [FILE]
+
+Export the current PipeWire patchbay as JSON. Without FILE, write JSON to
+standard output. The default export includes every PipeWire port and link;
+--midi-only keeps MIDI ports and links only.
+
+Import recreates the saved links without removing unrelated current links.
+By default it addresses endpoints by their PipeWire global port IDs. Use
+--names to resolve each endpoint by its saved semantic port alias, falling back to
+the exact node.name:port.name selector when the alias is unavailable.
+
+The script restores links only. Start devices and applications (for example,
+Carla and LMMS) before importing so their ports exist.
+
+--take-snapshot saves the complete graph to $DEFAULT_SNAPSHOT_FILE unless a
+path is supplied. --check-and-restore restores the complete connected graph
+component that contains MIDI ports, using names, from that same file by default.
+Add --dry-run to only print the connection check. --watch-and-restore keeps
+checking and restoring the MIDI-connected component when its endpoints return.
+--watch-events-and-restore performs the same restore after PipeWire graph
+events, rather than on a timer.
+EOF
+}
+
+die() {
+    printf '%s: %s\n' "$PROGRAM_NAME" "$*" >&2
+    exit 1
+}
+
+require_command() {
+    command -v "$1" >/dev/null 2>&1 || die "required command not found: $1"
+}
+
+make_document() {
+    local dump_file=$1
+    local output_file=$2
+    local midi_only=$3
+    local host_name generated_at scope
+
+    host_name=$(hostname)
+    generated_at=$(date --iso-8601=seconds)
+    scope=all
+    if [[ $midi_only == true ]]; then
+        scope=midi-only
+    fi
+
+    jq \
+        --arg schema "$SCHEMA" \
+        --arg generated_at "$generated_at" \
+        --arg hostname "$host_name" \
+        --arg scope "$scope" \
+        --argjson midi_only "$midi_only" \
+        '
+        . as $graph
+        | [
+            $graph[]
+            | select(.type == "PipeWire:Interface:Node")
+            | (.info.props // {}) as $props
+            | {
+                id: .id,
+                name: ($props["node.name"] // null),
+                description: ($props["node.description"] // null),
+                nick: ($props["node.nick"] // null),
+                media_class: ($props["media.class"] // null)
+              }
+          ] as $all_nodes
+        | ($all_nodes | map({key: (.id | tostring), value: .}) | from_entries) as $nodes_by_id
+        | [
+            $graph[]
+            | select(.type == "PipeWire:Interface:Port")
+            | (.info.props // {}) as $props
+            | (.id) as $id
+            | (($props["node.id"] | tonumber?) // $props["node.id"]) as $node_id
+            | ($props["port.name"] // null) as $port_name
+            | ($nodes_by_id[($node_id | tostring)] // null) as $node
+            | {
+                id: $id,
+                node_id: $node_id,
+                node_name: ($node.name // null),
+                node_description: ($node.description // null),
+                direction: ($props["port.direction"] // null),
+                port_id: (($props["port.id"] | tonumber?) // $props["port.id"] // null),
+                name: $port_name,
+                name_selector: (
+                    if $node.name != null and $port_name != null
+                    then "\($node.name):\($port_name)"
+                    else null
+                    end
+                ),
+                alias: ($props["port.alias"] // null),
+                object_path: ($props["object.path"] // null),
+                format_dsp: ($props["format.dsp"] // null),
+                midi: (($props["format.dsp"] // null) == "8 bit raw midi")
+              }
+          ] as $all_ports
+        | (if $midi_only then [$all_ports[] | select(.midi)] else $all_ports end) as $ports
+        | ($ports | map({key: (.id | tostring), value: .}) | from_entries) as $ports_by_id
+        | [
+            $graph[]
+            | select(.type == "PipeWire:Interface:Link")
+            | (.info // {}) as $info
+            | (($info["output-port-id"] | tonumber?) // $info["output-port-id"]) as $output_id
+            | (($info["input-port-id"] | tonumber?) // $info["input-port-id"]) as $input_id
+            | ($ports_by_id[($output_id | tostring)] // null) as $output
+            | ($ports_by_id[($input_id | tostring)] // null) as $input
+            | select($output != null and $input != null)
+            | {
+                id: .id,
+                output: $output,
+                input: $input,
+                kind: (if $output.midi or $input.midi then "midi" else "non-midi" end)
+              }
+          ] as $links
+        | ($ports | map(.node_id) | unique) as $port_node_ids
+        | {
+            schema: $schema,
+            schema_version: 1,
+            generated_at: $generated_at,
+            hostname: $hostname,
+            scope: $scope,
+            nodes: [$all_nodes[] | select(.id as $id | $port_node_ids | index($id))],
+            ports: $ports,
+            links: $links
+          }
+        ' "$dump_file" > "$output_file"
+}
+
+export_patchbay() {
+    local midi_only=false
+    local output_file=-
+    local dump_file
+
+    while (($#)); do
+        case $1 in
+            --midi-only)
+                midi_only=true
+                ;;
+            --help|-h)
+                usage
+                return 0
+                ;;
+            -*)
+                die "unknown export option: $1"
+                ;;
+            *)
+                [[ $output_file == - ]] || die "export accepts at most one output file"
+                output_file=$1
+                ;;
+        esac
+        shift
+    done
+
+    require_command pw-dump
+    require_command jq
+    dump_file=$(mktemp)
+    TEMP_FILES+=("$dump_file")
+    pw-dump > "$dump_file"
+    make_document "$dump_file" "$output_file" "$midi_only"
+}
+
+take_snapshot() {
+    local output_file=${1:-$DEFAULT_SNAPSHOT_FILE}
+
+    (($# <= 1)) || die "--take-snapshot accepts at most one output file"
+    mkdir -p "$(dirname "$output_file")"
+    export_patchbay "$output_file"
+    printf 'Full patchbay snapshot: %s\n' "$output_file" >&2
+}
+
+validate_document() {
+    local document=$1
+
+    jq -e --arg schema "$SCHEMA" '
+        .schema == $schema
+        and .schema_version == 1
+        and (.nodes | type == "array")
+        and (.ports | type == "array")
+        and (.links | type == "array")
+        and all(.ports[]; (.id | type == "number") and (.name_selector | type == "string" or . == null))
+        and all(.links[]; (.output.id | type == "number") and (.input.id | type == "number"))
+    ' "$document" >/dev/null || die "invalid patchbay JSON: $document"
+}
+
+resolve_name() {
+    local current_document=$1
+    local alias=$2
+    local selector=$3
+    local direction=$4
+    local label
+    local -a matches=()
+
+    [[ -n $alias || -n $selector ]] || return 1
+    label=$alias
+    if [[ -z $label || $label == null ]]; then
+        label=$selector
+    fi
+
+    mapfile -t matches < <(
+        jq -r --arg alias "$alias" --arg selector "$selector" --arg direction "$direction" '
+            def matching_ids($field; $value):
+                [.ports[] | select(.[$field] == $value and .direction == $direction) | .id];
+            (if $alias != "" then matching_ids("alias"; $alias) else [] end) as $aliases
+            | if ($aliases | length) == 1 then $aliases
+              elif $selector != "" then matching_ids("name_selector"; $selector)
+              else $aliases
+              end
+            | .[]
+        ' \
+            "$current_document"
+    )
+
+    case ${#matches[@]} in
+        1)
+            printf '%s\n' "${matches[0]}"
+            ;;
+        0)
+            printf 'no current port matches %s\n' "$label" >&2
+            return 1
+            ;;
+        *)
+            printf 'multiple current ports match %s: %s\n' \
+                "$label" "${matches[*]}" >&2
+            return 1
+            ;;
+    esac
+}
+
+import_patchbay() {
+    local use_names=false
+    local midi_component=false
+    local dry_run=false
+    local document=
+    local dump_file current_document
+    local total=0 restored=0 existing=0 unresolved=0 failed=0 would_restore=0
+    local output_id input_id output_alias output_selector output_direction input_alias input_selector input_direction
+    local -A active_links=()
+
+    while (($#)); do
+        case $1 in
+            --names)
+                use_names=true
+                ;;
+            --midi-component)
+                midi_component=true
+                ;;
+            --dry-run)
+                dry_run=true
+                ;;
+            --help|-h)
+                usage
+                return 0
+                ;;
+            -*)
+                die "unknown import option: $1"
+                ;;
+            *)
+                [[ -z $document ]] || die "import accepts exactly one JSON file"
+                document=$1
+                ;;
+        esac
+        shift
+    done
+
+    [[ -n $document ]] || die "import requires a JSON file"
+    [[ -r $document ]] || die "cannot read JSON file: $document"
+    require_command pw-dump
+    require_command pw-link
+    require_command jq
+    validate_document "$document"
+
+    dump_file=$(mktemp)
+    current_document=$(mktemp)
+    TEMP_FILES+=("$dump_file" "$current_document")
+    pw-dump > "$dump_file"
+    make_document "$dump_file" "$current_document" false
+
+    while IFS=$'\t' read -r output_id input_id; do
+        active_links["$output_id:$input_id"]=1
+    done < <(jq -r '.links[] | "\(.output.id)\t\(.input.id)"' "$current_document")
+
+    while IFS=$'\t' read -r output_id output_alias output_selector output_direction input_id input_alias input_selector input_direction; do
+        ((total += 1))
+
+        if [[ $use_names == true ]]; then
+            if ! output_id=$(resolve_name "$current_document" "$output_alias" "$output_selector" "$output_direction") \
+                || ! input_id=$(resolve_name "$current_document" "$input_alias" "$input_selector" "$input_direction"); then
+                ((unresolved += 1))
+                continue
+            fi
+        fi
+
+        if [[ -n ${active_links["$output_id:$input_id"]+present} ]]; then
+            ((existing += 1))
+            if [[ $dry_run == true ]]; then
+                printf 'Present: %s -> %s\n' "$output_id" "$input_id" >&2
+            fi
+            continue
+        fi
+
+        if [[ $dry_run == true ]]; then
+            ((would_restore += 1))
+            printf 'Missing: %s -> %s (would connect)\n' "$output_id" "$input_id" >&2
+            continue
+        fi
+
+        if pw-link "$output_id" "$input_id"; then
+            active_links["$output_id:$input_id"]=1
+            ((restored += 1))
+        else
+            printf 'could not connect %s -> %s\n' "$output_id" "$input_id" >&2
+            ((failed += 1))
+        fi
+    done < <(
+        jq -r --argjson midi_component "$midi_component" '
+            def midi_component_node_ids:
+                ([.ports[] | select(.midi) | .node_id] | unique) as $roots
+                | def expand($node_ids):
+                    ([.links[]
+                      | select(
+                          (.output.node_id as $id | $node_ids | index($id))
+                          or
+                          (.input.node_id as $id | $node_ids | index($id))
+                        )
+                      | .output.node_id, .input.node_id] | unique) as $neighbors
+                    | ($node_ids + $neighbors | unique) as $next
+                    | if ($next | length) == ($node_ids | length)
+                      then $next
+                      else expand($next)
+                      end;
+                expand($roots);
+            (if $midi_component then midi_component_node_ids else null end) as $node_ids
+            | .links[]
+            | select(
+                $node_ids == null
+                or (
+                    (.output.node_id as $id | $node_ids | index($id))
+                    and
+                    (.input.node_id as $id | $node_ids | index($id))
+                )
+              )
+            | [
+                .output.id,
+                (.output.alias // ""),
+                (.output.name_selector // ""),
+                (.output.direction // ""),
+                .input.id,
+                (.input.alias // ""),
+                (.input.name_selector // ""),
+                (.input.direction // "")
+              ]
+            | @tsv
+        ' "$document"
+    )
+
+    if [[ $dry_run == true ]]; then
+        printf 'Dry run: %d total, %d present, %d would restore, %d unresolved\n' \
+            "$total" "$existing" "$would_restore" "$unresolved" >&2
+    else
+        printf 'Links: %d total, %d restored, %d already present, %d unresolved, %d failed\n' \
+            "$total" "$restored" "$existing" "$unresolved" "$failed" >&2
+    fi
+
+    ((unresolved == 0 && failed == 0)) || return 1
+}
+
+check_and_restore() {
+    local dry_run=false
+    local document=
+    local -a import_options=(--names --midi-component)
+
+    while (($#)); do
+        case $1 in
+            --dry-run)
+                dry_run=true
+                ;;
+            --help|-h)
+                usage
+                return 0
+                ;;
+            -*)
+                die "unknown --check-and-restore option: $1"
+                ;;
+            *)
+                [[ -z $document ]] || die "--check-and-restore accepts at most one JSON file"
+                document=$1
+                ;;
+        esac
+        shift
+    done
+
+    document=${document:-$DEFAULT_SNAPSHOT_FILE}
+    if [[ $dry_run == true ]]; then
+        import_options+=(--dry-run)
+    fi
+    import_patchbay "${import_options[@]}" "$document"
+}
+
+watch_and_restore() {
+    local interval=2
+    local document=
+    local last_state=starting
+    local result
+
+    while [[ -n ${1-} ]]; do
+        case $1 in
+            --interval)
+                [[ -n ${2-} ]] || die "--interval requires a whole number of seconds"
+                interval=$2
+                shift
+                ;;
+            --help|-h)
+                usage
+                return 0
+                ;;
+            -*)
+                die "unknown --watch-and-restore option: $1"
+                ;;
+            *)
+                if [[ -n $document ]]; then
+                    die "--watch-and-restore accepts at most one JSON file"
+                fi
+                document=$1
+                ;;
+        esac
+        shift
+    done
+
+    document=${document:-$DEFAULT_SNAPSHOT_FILE}
+    [[ $interval =~ ^[1-9][0-9]*$ ]] || die "--interval must be a positive whole number of seconds"
+    if [[ -e $document ]]; then
+        :
+    else
+        printf 'No snapshot found; creating %s\n' "$document" >&2
+        take_snapshot "$document"
+    fi
+
+    printf 'Watching MIDI-connected Patchbay every %ss: %s\n' \
+        "$interval" "$document" >&2
+    while true; do
+        if result=$(import_patchbay --names --midi-component "$document" 2>&1); then
+            if [[ $result =~ ^Links:\ [0-9]+\ total,\ 0\ restored, ]]; then
+                if [[ $last_state == healthy ]]; then
+                    :
+                else
+                    printf 'Patchbay healthy: %s\n' "$result" >&2
+                fi
+                last_state=healthy
+            else
+                printf 'Patchbay restored: %s\n' "$result" >&2
+                last_state=healthy
+            fi
+        else
+            if [[ $last_state == unresolved ]]; then
+                :
+            else
+                printf 'Patchbay waiting for MIDI endpoints: %s\n' "$result" >&2
+            fi
+            last_state=unresolved
+        fi
+        sleep "$interval"
+    done
+}
+
+event_restore_check() {
+    local document=$1
+    local result
+
+    if result=$(import_patchbay --names --midi-component "$document" 2>&1); then
+        printf 'Patchbay event check: %s\n' "$result" >&2
+    else
+        printf 'Patchbay waiting for MIDI endpoints: %s\n' "$result" >&2
+    fi
+}
+
+watch_events_and_restore() {
+    local settle=2
+    local document=
+    local event
+    local pw_mon_fd
+    local pw_mon_pid
+
+    while [[ -n ${1-} ]]; do
+        case $1 in
+            --settle)
+                [[ -n ${2-} ]] || die "--settle requires a whole number of seconds"
+                settle=$2
+                shift
+                ;;
+            --help|-h)
+                usage
+                return 0
+                ;;
+            -*)
+                die "unknown --watch-events-and-restore option: $1"
+                ;;
+            *)
+                [[ -z $document ]] || die "--watch-events-and-restore accepts at most one JSON file"
+                document=$1
+                ;;
+        esac
+        shift
+    done
+
+    document=${document:-$DEFAULT_SNAPSHOT_FILE}
+    [[ $settle =~ ^[1-9][0-9]*$ ]] || die "--settle must be a positive whole number of seconds"
+    require_command pw-mon
+    if [[ -e $document ]]; then
+        :
+    else
+        printf 'No snapshot found; creating %s\n' "$document" >&2
+        take_snapshot "$document"
+    fi
+
+    event_restore_check "$document"
+    printf 'Watching PipeWire events with a %ss settle period: %s\n' \
+        "$settle" "$document" >&2
+    coproc PW_MON { pw-mon -N -o -a; }
+    pw_mon_fd=${PW_MON[0]}
+    pw_mon_pid=$PW_MON_PID
+
+    while IFS= read -r -u "$pw_mon_fd" event; do
+        # Consume a burst before checking against the settled graph.
+        while IFS= read -r -t "$settle" -u "$pw_mon_fd" event; do
+            :
+        done
+        event_restore_check "$document"
+    done
+
+    wait "$pw_mon_pid" || true
+    return 1
+}
+
+main() {
+    (($#)) || {
+        usage >&2
+        exit 2
+    }
+
+    case $1 in
+        export)
+            shift
+            export_patchbay "$@"
+            ;;
+        import)
+            shift
+            import_patchbay "$@"
+            ;;
+        --take-snapshot)
+            shift
+            take_snapshot "$@"
+            ;;
+        --check-and-restore)
+            shift
+            check_and_restore "$@"
+            ;;
+        --watch-and-restore|--watch)
+            shift
+            watch_and_restore "$@"
+            ;;
+        --watch-events-and-restore|--watch-events)
+            shift
+            watch_events_and_restore "$@"
+            ;;
+        --help|-h|help)
+            usage
+            ;;
+        *)
+            die "expected export, import, --take-snapshot, --check-and-restore, or --watch-and-restore, or --watch-events-and-restore, got: $1"
+            ;;
+    esac
+}
+
+main "$@"

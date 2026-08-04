@@ -18,6 +18,11 @@ the Carla Flatpak process open, and the saved project at
 - [Operating Procedure](operating-procedure.md) describes safe startup,
   refresh, expansion, and recovery steps.
 
+- [Full Patchbay Snapshot](airstar-patchbay.json) is the live PipeWire export
+  from 2026-08-03, including MIDI and non-MIDI links.
+- [MIDI Patchbay Snapshot](airstar-midi-patchbay.json) contains the MIDI
+  endpoints and routes from the same capture.
+
 ## Authoritative Rack
 
 /c/music/carla/pedro.uproject is the authoritative definition of the live

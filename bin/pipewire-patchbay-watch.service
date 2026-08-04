@@ -1,0 +1,13 @@
+[Unit]
+Description=Restore saved PipeWire MIDI Patchbay connections
+After=pipewire.service
+Wants=pipewire.service
+
+[Service]
+Type=simple
+ExecStart=/home/ldap/pedro.ferreira/bin/pipewire-patchbay-json --watch-events-and-restore --settle 2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
