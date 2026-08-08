@@ -1,0 +1,13 @@
+[Unit]
+Description=Convert Arturia central encoder to absolute master-volume MIDI CC
+After=pipewire.service
+Wants=pipewire.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/pw-jack %h/.local/bin/arturia-main-volume-encoder %h/.local/state/arturia-main-volume-encoder/value 3
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

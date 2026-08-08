@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+readonly SOURCE="$SCRIPT_DIR/arturia-main-volume-encoder.c"
+readonly SERVICE_SOURCE="$SCRIPT_DIR/arturia-main-volume-encoder.service"
+readonly BINARY="$HOME/.local/bin/arturia-main-volume-encoder"
+readonly SERVICE="$HOME/.config/systemd/user/arturia-main-volume-encoder.service"
+readonly STATE_DIR="$HOME/.local/state/arturia-main-volume-encoder"
+
+mkdir -p "$(dirname -- "$BINARY")" "$(dirname -- "$SERVICE")" "$STATE_DIR"
+
+temporary="$(mktemp "${BINARY}.tmp.XXXXXX")"
+trap 'rm -f "$temporary"' EXIT
+
+gcc -std=c11 -O2 -Wall -Wextra -Werror \
+  "$SOURCE" -Wl,-l:libjack.so.0 -o "$temporary"
+chmod 0755 "$temporary"
+mv -f "$temporary" "$BINARY"
+cp "$SERVICE_SOURCE" "$SERVICE"
+
+systemctl --user daemon-reload
+systemctl --user enable --now arturia-main-volume-encoder.service

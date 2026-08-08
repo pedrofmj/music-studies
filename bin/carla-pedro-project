@@ -3,10 +3,16 @@ set -euo pipefail
 
 readonly APP_ID="studio.kx.carla"
 readonly PROJECT="/c/music/carla/pedro.uproject"
+readonly SOUNDFONT_WORKDIR="${HOME}/.local/share/carla/pedro-soundfonts"
 
 if [[ ! -r "$PROJECT" ]]; then
   printf 'Carla project is not readable: %s\n' "$PROJECT" >&2
   exit 1
 fi
 
-exec flatpak run --file-forwarding "$APP_ID" @@ "$PROJECT" @@
+if [[ ! -d "$SOUNDFONT_WORKDIR" ]]; then
+  printf 'Carla SoundFont directory is missing: %s\n' "$SOUNDFONT_WORKDIR" >&2
+  exit 1
+fi
+
+exec flatpak run --cwd="$SOUNDFONT_WORKDIR" --file-forwarding "$APP_ID" @@ "$PROJECT" @@
