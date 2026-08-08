@@ -29,7 +29,14 @@ rack on `airstar`.
 
 The nine Arturia rack-level slot volumes and both additional controller slots
 are saved at `1.0`. Native SF2 volume paths use a `mapcc` stage that converts
-the physical control to standard instrument volume CC7.
+the physical control to standard instrument volume CC7. Native SF2 reverb
+paths likewise convert each Arturia knob to FluidSynth's standard reverb-send
+CC91. The native `Rvrb` engine remains enabled with a fixed return level; its
+host parameter is intentionally unmapped so Carla forwards CC91 to the synth.
+
+AR-CH-2 remains saved at 100% slot volume. A controller-independent stereo
+trim adds 6 dB after the Nord instrument to compensate for its quieter source
+samples without changing the fader's full-range behavior.
 
 ## Equalizer
 
@@ -54,7 +61,9 @@ are disabled to reduce live CPU usage.
 ## Audio Graph
 
 ```text
-all instruments
+AR-CH-2 -> AR-CH-2 Output Trim +6 dB --+
+other instruments --------------------+
+                                        |
   -> LSP Mixer x8 Stereo
   -> SMC-MIX - 8-Band EQ
   -> Arturia Main Volume Encoder stereo gate
@@ -111,4 +120,3 @@ Carla can load its bank 0, program 73 `Flute` preset without a `/usr` override:
 
 The original 1.3 GB `Good_flute` bank was rejected for this rack because it
 kept Carla busy for minutes and used substantially more memory during startup.
-

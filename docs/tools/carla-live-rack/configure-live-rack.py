@@ -77,6 +77,7 @@ ARTURIA_SCALE = "AR Controls - Sustain Scale"
 PAD_SCALE = "PD Controls - Sustain Scale"
 MASTER_MIXER = "LSP Mixer x8 Stereo"
 MASTER_EQ = "SMC-MIX - 8-Band EQ"
+AR2_TRIM = "AR-CH-2 Output Trim +6 dB"
 
 
 def plugin_name(plugin: ET.Element) -> str:
@@ -183,7 +184,6 @@ def configure_sf2(
     template: ET.Element,
     name: str,
     asset_key: str,
-    reverb_cc: int,
 ) -> ET.Element:
     plugin = copy.deepcopy(template)
     filename, label = ASSETS[asset_key]
@@ -192,8 +192,13 @@ def configure_sf2(
     set_text(plugin, "Info/Filename", filename)
     set_text(plugin, "Info/Label", label)
     set_text(plugin, "Data/Volume", 1)
-    map_parameter(parameter(plugin, 3, "Reverb Level"), reverb_cc)
-    set_text(parameter(plugin, 3, "Reverb Level"), "Value", 0.35)
+    set_text(parameter(plugin, 0, "Reverb On/Off"), "Value", 1)
+    set_text(parameter(plugin, 1, "Reverb Room Size"), "Value", 0.65)
+    set_text(parameter(plugin, 2, "Reverb Damp"), "Value", 0.3)
+    reverb_level = parameter(plugin, 3, "Reverb Level")
+    clear_mapping(reverb_level)
+    set_text(reverb_level, "Value", 0.8)
+    set_text(parameter(plugin, 4, "Reverb Width"), "Value", 0.8)
     return plugin
 
 
@@ -216,6 +221,18 @@ def configure_master_mixer(template: ET.Element) -> ET.Element:
     plugin = copy.deepcopy(template)
     set_text(plugin, "Data/Volume", 1)
     set_text(parameter(plugin, 2, "Output balance", "bal"), "Value", 0)
+    set_text(parameter(plugin, 16, "Channel gain 1", "cg_1"), "Value", 1)
+    return plugin
+
+
+def configure_output_trim(template: ET.Element) -> ET.Element:
+    plugin = copy.deepcopy(template)
+    set_info(plugin, AR2_TRIM)
+    set_text(plugin, "Data/Volume", 1)
+    set_text(parameter(plugin, 2, "Output balance", "bal"), "Value", 0)
+    output_gain = parameter(plugin, 5, "Output gain", "g_out")
+    clear_mapping(output_gain)
+    set_text(output_gain, "Value", 2)
     set_text(parameter(plugin, 16, "Channel gain 1", "cg_1"), "Value", 1)
     return plugin
 
@@ -299,8 +316,15 @@ def replace_patchbay(root: ET.Element, plugins: list[ET.Element]) -> None:
         ("SMK-CH-1 - Oceans Worship Pad", "out-left", "out-right"),
     ]
     for name, left, right in instruments:
+        if name == "AR-CH-2 - Nord White Grand Full 24C":
+            add_connection(patchbay, f"{name}:{left}", f"{AR2_TRIM}:Input L")
+            add_connection(patchbay, f"{name}:{right}", f"{AR2_TRIM}:Input R")
+            continue
         add_connection(patchbay, f"{name}:{left}", f"{MASTER_MIXER}:Input L")
         add_connection(patchbay, f"{name}:{right}", f"{MASTER_MIXER}:Input R")
+
+    add_connection(patchbay, f"{AR2_TRIM}:Output L", f"{MASTER_MIXER}:Input L")
+    add_connection(patchbay, f"{AR2_TRIM}:Output R", f"{MASTER_MIXER}:Input R")
 
     add_connection(patchbay, f"{MASTER_MIXER}:Output L", f"{MASTER_EQ}:Input L")
     add_connection(patchbay, f"{MASTER_MIXER}:Output R", f"{MASTER_EQ}:Input R")
@@ -327,7 +351,16 @@ def replace_patchbay(root: ET.Element, plugins: list[ET.Element]) -> None:
         (8, "AR-CH-8 - PAD EFEITOS"),
         (9, "AR-CH-9 - AtmosferaPAD"),
     ):
-        add_connection(patchbay, f"AR-CH-{channel} Volume Map:events-out", f"{target}:events-in")
+        add_connection(
+            patchbay,
+            f"AR-CH-{channel} Volume Map:events-out",
+            f"AR-CH-{channel} Reverb Map:events-in",
+        )
+        add_connection(
+            patchbay,
+            f"AR-CH-{channel} Reverb Map:events-out",
+            f"{target}:events-in",
+        )
 
     add_connection(patchbay, f"{PAD_SCALE}:events-out", "PD-CH-1 Volume Map:events-in")
     add_connection(patchbay, "PD-CH-1 Volume Map:events-out", "PD-CH-1 - Drum Set:events-in")
@@ -366,18 +399,19 @@ def build_plugins(root: ET.Element) -> list[ET.Element]:
 
     plugins = [
         configure_decent_sampler(basic, "AR-CH-1 - Basic Piano", 73, 3, "Reverb", 74),
-        configure_sf2(sf2_template, "AR-CH-2 - Nord White Grand Full 24C", "nord", 71),
+        configure_sf2(sf2_template, "AR-CH-2 - Nord White Grand Full 24C", "nord"),
         configure_decent_sampler(strings, "AR-CH-3 - Alt Strings", 79, 7, "Reverb Mix", 76),
-        configure_sf2(sf2_template, "AR-CH-4 - Good Flute", "flute", 77),
-        configure_sf2(sf2_template, "AR-CH-5 - SAX Lirakeys CL", "sax", 93),
-        configure_sf2(sf2_template, "AR-CH-6 - Hammond Organ Fast", "hammond", 18),
-        configure_sf2(sf2_template, "AR-CH-7 - Optik Synth", "optik", 19),
-        configure_sf2(sf2_template, "AR-CH-8 - PAD EFEITOS", "pad_fx", 16),
-        configure_sf2(sf2_template, "AR-CH-9 - AtmosferaPAD", "atmosphere", 17),
-        configure_sf2(sf2_template, "PD-CH-1 - Drum Set", "drums", 91),
-        configure_sf2(sf2_template, "SMK-CH-1 - Oceans Worship Pad", "oceans", 91),
+        configure_sf2(sf2_template, "AR-CH-4 - Good Flute", "flute"),
+        configure_sf2(sf2_template, "AR-CH-5 - SAX Lirakeys CL", "sax"),
+        configure_sf2(sf2_template, "AR-CH-6 - Hammond Organ Fast", "hammond"),
+        configure_sf2(sf2_template, "AR-CH-7 - Optik Synth", "optik"),
+        configure_sf2(sf2_template, "AR-CH-8 - PAD EFEITOS", "pad_fx"),
+        configure_sf2(sf2_template, "AR-CH-9 - AtmosferaPAD", "atmosphere"),
+        configure_sf2(sf2_template, "PD-CH-1 - Drum Set", "drums"),
+        configure_sf2(sf2_template, "SMK-CH-1 - Oceans Worship Pad", "oceans"),
         configure_master_mixer(mixer),
         build_eq(),
+        configure_output_trim(mixer),
         configure_scale(scale_template, ARTURIA_SCALE),
         configure_scale(scale_template, PAD_SCALE),
     ]
@@ -390,6 +424,17 @@ def build_plugins(root: ET.Element) -> list[ET.Element]:
             configure_mapcc(mapcc_template, "SMK-CH-1 Volume Map", 20, 7),
         )
     )
+    reverb_controls = (
+        (2, 71),
+        (4, 77),
+        (5, 93),
+        (6, 18),
+        (7, 19),
+        (8, 16),
+        (9, 17),
+    )
+    for channel, cc in reverb_controls:
+        plugins.append(configure_mapcc(mapcc_template, f"AR-CH-{channel} Reverb Map", cc, 91))
     for band in range(8):
         plugins.append(
             configure_mapcc(
@@ -410,15 +455,19 @@ def validate_assets() -> None:
 
 def validate_result(root: ET.Element, plugins: list[ET.Element]) -> None:
     names = [plugin_name(plugin) for plugin in plugins]
-    if len(plugins) != 32 or len(names) != len(set(names)):
-        raise ValueError("expected 32 uniquely named plugins")
+    if len(plugins) != 40 or len(names) != len(set(names)):
+        raise ValueError("expected 40 uniquely named plugins")
     expected = {f"AR-CH-{channel}" for channel in range(1, 10)}
-    found = {name.split(" - ", 1)[0] for name in names if name.startswith("AR-CH-") and "Volume Map" not in name}
+    found = {
+        name.split(" - ", 1)[0]
+        for name in names
+        if name.startswith("AR-CH-") and " - " in name
+    }
     if found != expected:
         raise ValueError(f"Arturia instrument set mismatch: {sorted(found)}")
     connections = root.findall("ExternalPatchbay/Connection")
-    if len(connections) != 65:
-        raise ValueError(f"expected 65 project connections, found {len(connections)}")
+    if len(connections) != 74:
+        raise ValueError(f"expected 74 project connections, found {len(connections)}")
 
 
 def write_project(project: Path, root: ET.Element, make_backup: bool) -> Path | None:
@@ -461,13 +510,13 @@ def main() -> int:
     validate_result(root, plugins)
 
     if args.check_only:
-        print(f"OK: would write {len(plugins)} plugins and 65 project connections")
+        print(f"OK: would write {len(plugins)} plugins and 74 project connections")
         return 0
     backup = write_project(args.project, root, not args.no_backup)
     print(f"Updated: {args.project}")
     if backup is not None:
         print(f"Backup: {backup}")
-    print(f"Plugins: {len(plugins)}; project connections: 65")
+    print(f"Plugins: {len(plugins)}; project connections: 74")
     return 0
 
 
