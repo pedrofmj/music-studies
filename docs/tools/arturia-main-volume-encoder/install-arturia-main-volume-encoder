@@ -20,4 +20,5 @@ mv -f "$temporary" "$BINARY"
 cp "$SERVICE_SOURCE" "$SERVICE"
 
 systemctl --user daemon-reload
-systemctl --user enable --now arturia-main-volume-encoder.service
+systemctl --user enable arturia-main-volume-encoder.service
+systemctl --user restart arturia-main-volume-encoder.service

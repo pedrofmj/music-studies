@@ -8,9 +8,11 @@ CC values, so directly mapping CC114 causes the master volume to jump around
 the midpoint.
 
 The adapter accumulates those relative steps into an absolute value from 0 to
-127 and emits that value as channel-1 CC119. Carla maps the LSP mixer's
-`Output gain` parameter to CC119. Fader 9 continues to emit CC85, but nothing
-in the current project consumes it.
+127 and emits that value as channel-1 CC119. The encoder click sends CC115 as
+a momentary 127/0 pair; the adapter toggles once on each press and controls a
+stereo audio gate after the LSP mixer. The gate ramps over 10 ms to avoid
+clicks. Carla maps CC119 to the LSP mixer's `Output gain`. Fader 9 continues to
+emit CC85, but nothing in the current project consumes it.
 
 ## Data flow
 
@@ -20,24 +22,34 @@ Arturia MIDI output
   |
   +--> Arturia Main Volume Encoder:relative-in
          CC114 relative -> persistent accumulator -> CC119 absolute
+         CC115 press -> persistent mute state
        Arturia Main Volume Encoder:absolute-out
-         --> MIDI Scale CC Value --> LSP Mixer x8 Stereo:Output gain
+         --> LSP Mixer x8 Stereo:events-in -> Output gain
+
+LSP Mixer x8 Stereo:Output L/R
+  --> Arturia Main Volume Encoder:audio-in-l/r
+      persistent mute state -> 10 ms stereo audio gate
+      Arturia Main Volume Encoder:audio-out-l/r
+        --> system playback L/R
 ```
 
-The adapter receives only the parallel controller feed. It is not in the note
-path, so a service failure does not prevent the keyboard from playing notes or
-the other faders from working.
+The adapter receives only the parallel controller feed and the final stereo
+rack output. It is not in the note path, so a service failure does not prevent
+the keyboard or other faders from reaching Carla. The audio route intentionally
+depends on the service because it owns the final rack-only mute gate.
 
 ## Runtime state
 
-The accumulated value is stored atomically at:
+The accumulated volume and mute state are stored atomically at:
 
 ```text
 ~/.local/state/arturia-main-volume-encoder/value
 ```
 
-The initial fallback is MIDI value 3, matching the master-gain value saved in
-the Carla project when the adapter was introduced. New encoder movement is
+The file contains `VOLUME MUTE`, where mute is 0 or 127. A legacy file with
+only the volume remains valid and starts unmuted. The initial volume fallback
+is MIDI value 3, matching the master-gain value saved in the Carla project
+when the adapter was introduced. New encoder movement and mute changes are
 persisted by the service.
 
 ## Installed files
@@ -57,7 +69,9 @@ The persistent patchbay snapshot owns these links:
 
 ```text
 KL Essential 61 mk3 MIDI -> Arturia Main Volume Encoder:relative-in
-Arturia Main Volume Encoder:absolute-out -> MIDI Scale CC Value:events-in
+Arturia Main Volume Encoder:absolute-out -> LSP Mixer x8 Stereo:events-in
+LSP Mixer x8 Stereo:Output L/R -> Arturia Main Volume Encoder:audio-in-l/r
+Arturia Main Volume Encoder:audio-out-l/r -> system playback L/R
 ```
 
 The adapter service and `pipewire-patchbay-watch.service` are both enabled as
@@ -78,9 +92,10 @@ JACK development headers.
 
 ## Portability boundary
 
-The MIDI transformation itself is platform-neutral: consume relative CC114,
-maintain a clamped accumulator, and emit absolute CC119. The current JACK
-client, systemd service, and PipeWire connections are Linux adapters.
+The controller transformation itself is platform-neutral: consume relative
+CC114, maintain a clamped accumulator, emit absolute CC119, and turn CC115
+presses into persistent stereo mute state. The current JACK MIDI/audio client,
+systemd service, and PipeWire connections are Linux adapters.
 
 A future Echora/Galaxy implementation should preserve that transformation and
 state contract while replacing device discovery, MIDI transport, persistence,

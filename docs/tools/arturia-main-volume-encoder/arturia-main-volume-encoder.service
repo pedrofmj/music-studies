@@ -1,5 +1,5 @@
 [Unit]
-Description=Convert Arturia central encoder to absolute master-volume MIDI CC
+Description=Map Arturia central control to Carla master volume and mute
 After=pipewire.service
 Wants=pipewire.service
 
