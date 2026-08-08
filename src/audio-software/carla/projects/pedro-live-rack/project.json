@@ -1,0 +1,30 @@
+{
+  "schema": "music-studies/carla-project/v1",
+  "name": "Pedro Live Rack",
+  "project_file": "pedro.uproject",
+  "captured_from": "pedro.ferreira@airstar:/c/music/carla/pedro.uproject",
+  "captured_at": "2026-08-08T15:08:40-03:00",
+  "sha256": "ba7cb9b47dbbbf06d23d832399b0e2e1340d668c30ed0e4978edd98c956551e4",
+  "size_bytes": 92377,
+  "expected": {
+    "plugins": 40,
+    "soundfont_slots": 9,
+    "carla_patchbay_connections": 74
+  },
+  "runtime": {
+    "carla_flatpak_id": "studio.kx.carla",
+    "external_assets_versioned": false,
+    "standard_asset_roots": [
+      "/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library",
+      "/home/ldap/pedro.ferreira/.local/share/sounds/sf2",
+      "/home/ldap/pedro.ferreira/.local/share/carla/pedro-soundfonts"
+    ],
+    "plugins": [
+      "DecentSampler VST2",
+      "http://lsp-plug.in/plugins/lv2/mixer_x8_stereo",
+      "http://lsp-plug.in/plugins/lv2/para_equalizer_x8_stereo",
+      "http://gareus.org/oss/lv2/midifilter#scalecc",
+      "http://gareus.org/oss/lv2/midifilter#mapcc"
+    ]
+  }
+}

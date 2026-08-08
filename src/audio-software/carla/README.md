@@ -14,6 +14,8 @@ The source repository is [falkTX/Carla](https://github.com/falkTX/Carla).
 - [Learning](learning/README.md) provides four hands-on host and patchbay sessions.
 - [Reference](reference/README.md) holds platform, format, and device evidence.
 - [Manual](manual/README.md) tracks official documentation and local retention.
+- [Projects](projects/README.md) contains deployable, versioned Carla racks and
+  their runtime dependency metadata.
 
 ## Current Evidence Status
 

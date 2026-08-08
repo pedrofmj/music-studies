@@ -1,0 +1,3250 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE CARLA-PROJECT>
+<CARLA-PROJECT VERSION="2.5">
+ <EngineSettings>
+  <ForceStereo>false</ForceStereo>
+  <PreferPluginBridges>false</PreferPluginBridges>
+  <PreferUiBridges>true</PreferUiBridges>
+  <UIsAlwaysOnTop>false</UIsAlwaysOnTop>
+  <MaxParameters>200</MaxParameters>
+  <UIBridgesTimeout>4000</UIBridgesTimeout>
+ </EngineSettings>
+ <Transport>
+  <BeatsPerMinute>120</BeatsPerMinute>
+ </Transport>
+ <Plugin>
+  <Info>
+   <Type>VST2</Type>
+   <Name>AR-CH-1 - Basic Piano</Name>
+   <Binary>/home/ldap/pedro.ferreira/.vst/DecentSampler.so</Binary>
+   <UniqueID>1148415344</UniqueID>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f9</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Main Volume</Name>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>73</MappedControlIndex>
+    <MappedMinimum>0</MappedMinimum>
+    <MappedMaximum>1</MappedMaximum>
+    <MidiCC>73</MidiCC>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Main Tuning</Name>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb</Name>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>74</MappedControlIndex>
+    <MappedMinimum>0</MappedMinimum>
+    <MappedMaximum>1</MappedMaximum>
+    <MidiCC>74</MidiCC>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/property</Type>
+    <Key>CarlaSkinIsCompacted</Key>
+    <Value>false</Value>
+   </CustomData>
+   <Chunk>
+VkMyIRANAAA8P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJVVEYtOCI/PiA8RGVjZW50U2FtcGxlciBtaW5WZXJzaW9uPSIxLjAiIF9zYW1wbGVQYXRo
+PSJ7aW5zdHJ1bWVudExpYnJhcnlSb290fS9CYXNpYyBQaWFuby5kc2J1bmRsZSIgX3ByZXNldE5hbWU9IkJhc2ljIFBpYW5vIiBfbGlicmFyeVVybD0iZmls
+ZTovL3tpbnN0cnVtZW50TGlicmFyeVJvb3R9L0Jhc2ljIFBpYW5vLmRzYnVuZGxlL0Jhc2ljIFBpYW5vLmRzcHJlc2V0IiBfbGlicmFyeUNhbm9uaWNhbFVy
+bD0iZmlsZTovL3tpbnN0cnVtZW50TGlicmFyeVJvb3R9L0Jhc2ljIFBpYW5vLmRzYnVuZGxlIiBfc2FtcGxlTGlicmFyeUlkPSI3IiBfbGlicmFyeUJvb2tt
+YXJrPSIwLiIgX3R1bmluZ0E2OUZyZXF1ZW5jeT0iNDQwLjAiIF92ZWxvY2l0eVByZXByb2Nlc3Nvck91dExvdz0iMCIgX3ZlbG9jaXR5UHJlcHJvY2Vzc29y
+T3V0SGlnaD0iMTI3IiBfdmVsb2NpdHlQcmVwcm9jZXNzb3JEcml2ZT0iMC4wIiBfdmVsb2NpdHlQcmVwcm9jZXNzb3JDb21wcmVzc2lvbj0iMC4wIiBfdmVs
+b2NpdHlQcmVwcm9jZXNzb3JSYW5kb209IjAiIF9tcGVUaW1icmVTZW5zaXRpdml0eT0iMC4wIiBfbXBlVGltYnJlTWluPSIwLjAiIF9tcGVUaW1icmVNYXg9
+IjEuMCIgX21wZVByZXNzdXJlU2Vuc2l0aXZpdHk9IjAuMCIgX21wZVByZXNzdXJlTWluPSIwLjAiIF9tcGVQcmVzc3VyZU1heD0iMS4wIj48dWkgYmdJbWFn
+ZT0iSW1hZ2VzL2JhY2tncm91bmQuanBnIiBjb3ZlckFydD0iSW1hZ2VzL2NvdmVyLWFydC5qcGciIHdpZHRoPSI4MTIiIGhlaWdodD0iMzc1Ij48dGFiIG5h
+bWU9Im1haW4iPjxsYWJlbGVkLWtub2IgeD0iNTYwIiB5PSIwIiBsYWJlbD0iVG9uZSIgdHlwZT0iZmxvYXQiIG1pblZhbHVlPSI2MCIgbWF4VmFsdWU9IjIy
+MDAwIiB0ZXh0Q29sb3I9IkZGMDAwMDAwIiB2YWx1ZT0iMjIwMDAuMCIgdWlkPSJ5OEFBNHV1VVJoMyIgX2luZGV4PSIwIiBfdWlkPSJGTDRoSzhqenh2VCI+
+PGJpbmRpbmcgdHlwZT0iZWZmZWN0IiBsZXZlbD0iaW5zdHJ1bWVudCIgcG9zaXRpb249IjAiIHBhcmFtZXRlcj0iRlhfRklMVEVSX0ZSRVFVRU5DWSIgdHJh
+bnNsYXRpb249InRhYmxlIiB0cmFuc2xhdGlvblRhYmxlPSIwLDMzOzAuMywxNTA7MC40LDQ1MDswLjUsMTEwMDswLjcsNDEwMDswLjksMTEwMDA7MS4wMDAx
+LDIyMDAwIi8+PC9sYWJlbGVkLWtub2I+PGxhYmVsZWQta25vYiB4PSI2NTUiIHk9IjAiIGxhYmVsPSJSZXZlcmIiIHR5cGU9InBlcmNlbnQiIG1pblZhbHVl
+PSIwIiBtYXhWYWx1ZT0iMTAwIiB0ZXh0Q29sb3I9IkZGMDAwMDAwIiB2YWx1ZT0iNTAuMCIgdWlkPSJsS3YyOWtnZ0RybyIgX2luZGV4PSIxIiBfdWlkPSJR
+S0VLY3FUbTRrTCI+PGJpbmRpbmcgdHlwZT0iZWZmZWN0IiBsZXZlbD0iaW5zdHJ1bWVudCIgcG9zaXRpb249IjEiIHBhcmFtZXRlcj0iRlhfUkVWRVJCX1dF
+VF9MRVZFTCIgZmFjdG9yPSIwLjAxIi8+PC9sYWJlbGVkLWtub2I+PC90YWI+PGtleWJvYXJkLz48L3VpPjxncm91cHMgYXR0YWNrPSIwLjAwMCIgZGVjYXk9
+IjI1IiBzdXN0YWluPSIxLjAiIHJlbGVhc2U9IjAuNDMwIiBhbXBWZWxUcmFjaz0iMC41IiB2b2x1bWU9IjAuMCIgZ2xvYmFsVHVuaW5nPSIwLjI4MzQ2MjUy
+NDQxNDA2MjUiPjxncm91cD48c2FtcGxlIGxvTm90ZT0iMjEiIGhpTm90ZT0iMjEiIHJvb3ROb3RlPSIyMSIgcGF0aD0iU2FtcGxlcy9EZWZhdWx0UGlhbm8t
+MjEuYWlmIiBfZ3JvdXBJbmRleD0iMCIgX2ZpbGVMZW5ndGg9IjgwNTg4OCIgX2ZpbGVTYW1wbGVSYXRlPSI0ODAwMC4wIi8+PHNhbXBsZSBsb05vdGU9IjIy
+IiBoaU5vdGU9IjMzIiByb290Tm90ZT0iMzMiIHBhdGg9IlNhbXBsZXMvRGVmYXVsdFBpYW5vLTMzLmFpZiIgX2dyb3VwSW5kZXg9IjAiIF9maWxlTGVuZ3Ro
+PSI4MDc1NTIiIF9maWxlU2FtcGxlUmF0ZT0iNDgwMDAuMCIvPjxzYW1wbGUgbG9Ob3RlPSIzNCIgaGlOb3RlPSI0NSIgcm9vdE5vdGU9IjQ1IiBwYXRoPSJT
+YW1wbGVzL0RlZmF1bHRQaWFuby00NS5haWYiIF9ncm91cEluZGV4PSIwIiBfZmlsZUxlbmd0aD0iNzU5MTY4IiBfZmlsZVNhbXBsZVJhdGU9IjQ4MDAwLjAi
+Lz48c2FtcGxlIGxvTm90ZT0iNDYiIGhpTm90ZT0iNTciIHJvb3ROb3RlPSI1NyIgcGF0aD0iU2FtcGxlcy9EZWZhdWx0UGlhbm8tNTcuYWlmIiBfZ3JvdXBJ
+bmRleD0iMCIgX2ZpbGVMZW5ndGg9Ijc1NjQ4MCIgX2ZpbGVTYW1wbGVSYXRlPSI0ODAwMC4wIi8+PHNhbXBsZSBsb05vdGU9IjU4IiBoaU5vdGU9IjY5IiBy
+b290Tm90ZT0iNjkiIHBhdGg9IlNhbXBsZXMvRGVmYXVsdFBpYW5vLTY5LmFpZiIgX2dyb3VwSW5kZXg9IjAiIF9maWxlTGVuZ3RoPSI3NTg2NTYiIF9maWxl
+U2FtcGxlUmF0ZT0iNDgwMDAuMCIvPjxzYW1wbGUgbG9Ob3RlPSI3MCIgaGlOb3RlPSI3NyIgcm9vdE5vdGU9Ijc3IiBwYXRoPSJTYW1wbGVzL0RlZmF1bHRQ
+aWFuby03Ny5haWYiIF9ncm91cEluZGV4PSIwIiBfZmlsZUxlbmd0aD0iNTk1MzI4IiBfZmlsZVNhbXBsZVJhdGU9IjQ4MDAwLjAiLz48c2FtcGxlIGxvTm90
+ZT0iNzgiIGhpTm90ZT0iODkiIHJvb3ROb3RlPSI4OSIgcGF0aD0iU2FtcGxlcy9EZWZhdWx0UGlhbm8tODkuYWlmIiBfZ3JvdXBJbmRleD0iMCIgX2ZpbGVM
+ZW5ndGg9IjQ1NzYwMCIgX2ZpbGVTYW1wbGVSYXRlPSI0ODAwMC4wIi8+PHNhbXBsZSBsb05vdGU9IjkwIiBoaU5vdGU9Ijk2IiByb290Tm90ZT0iOTYiIHBh
+dGg9IlNhbXBsZXMvRGVmYXVsdFBpYW5vLTk2LmFpZiIgX2dyb3VwSW5kZXg9IjAiIF9maWxlTGVuZ3RoPSI0Njk4ODgiIF9maWxlU2FtcGxlUmF0ZT0iNDgw
+MDAuMCIvPjxzYW1wbGUgbG9Ob3RlPSI5NCIgaGlOb3RlPSIxMDgiIHJvb3ROb3RlPSIxMDgiIHBhdGg9IlNhbXBsZXMvRGVmYXVsdFBpYW5vLTEwOC5haWYi
+IF9ncm91cEluZGV4PSIwIiBfZmlsZUxlbmd0aD0iNzUyNjQiIF9maWxlU2FtcGxlUmF0ZT0iNDgwMDAuMCIvPjxlZmZlY3RzPjxlZmZlY3QgdHlwZT0ibG93
+cGFzc180cGwiIGZyZXF1ZW5jeT0iNjAiIHJlc29uYW5jZT0iMC43Ii8+PC9lZmZlY3RzPjwvZ3JvdXA+PC9ncm91cHM+PGVmZmVjdHM+PGVmZmVjdCB0eXBl
+PSJsb3dwYXNzXzRwbCIgZnJlcXVlbmN5PSIyMjAwMC4wIi8+PGVmZmVjdCB0eXBlPSJyZXZlcmIiIHdldExldmVsPSIwLjQ5OTk5OTk4ODgyNDEyOTEiLz48
+L2VmZmVjdHM+PG1pZGk+PHZlbG9jaXR5PjxiaW5kaW5nIG1vZEFtb3VudD0iMC4zIiBsZXZlbD0iZ3JvdXAiIHBhcmFtZXRlcj0iRlhfRklMVEVSX0ZSRVFV
+RU5DWSIgcG9zaXRpb249IjAiIHR5cGU9ImVmZmVjdCIvPjwvdmVsb2NpdHk+PC9taWRpPjx0YWdzLz48YnVzZXMvPjxtb2R1bGF0b3JzLz48bm90ZVNlcXVl
+bmNlcy8+PC9EZWNlbnRTYW1wbGVyPgA=
+   </Chunk>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>SF2</Type>
+   <Name>AR-CH-2 - Nord White Grand Full 24C</Name>
+   <Filename>/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library/02_SoundFonts/01_Acoustic_Pianos/Nord White Grand Full 24C.sf2</Filename>
+   <Label>Nord White Grand Full 24C</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>VST2</Type>
+   <Name>AR-CH-3 - Alt Strings</Name>
+   <Binary>/home/ldap/pedro.ferreira/.vst/DecentSampler.so</Binary>
+   <UniqueID>1148415344</UniqueID>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f9</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Main Volume</Name>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>79</MappedControlIndex>
+    <MappedMinimum>0</MappedMinimum>
+    <MappedMaximum>1</MappedMaximum>
+    <MidiCC>79</MidiCC>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Main Tuning</Name>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Reverb Mix</Name>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>76</MappedControlIndex>
+    <MappedMinimum>0</MappedMinimum>
+    <MappedMaximum>1</MappedMaximum>
+    <MidiCC>76</MidiCC>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/property</Type>
+    <Key>CarlaSkinIsCompacted</Key>
+    <Value>false</Value>
+   </CustomData>
+   <Chunk>
+VkMyISoeAAA8P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJVVEYtOCI/PiA8RGVjZW50U2FtcGxlciBfc2FtcGxlUGF0aD0ie2luc3RydW1lbnRMaWJy
+YXJ5Um9vdH0vRFMgKyBWVCAtIGFsdHN0cmluZ3MgRnJlZSBFZGl0aW9uLmRzYnVuZGxlIiBfcHJlc2V0TmFtZT0iQ2VsbG8gJmFtcDsgVmlvbGEgLSBFYXJ0
+aHJpc2UiIF9saWJyYXJ5VXJsPSJmaWxlOi8ve2luc3RydW1lbnRMaWJyYXJ5Um9vdH0vRFMgKyBWVCAtIGFsdHN0cmluZ3MgRnJlZSBFZGl0aW9uLmRzYnVu
+ZGxlL0NlbGxvICZhbXA7IFZpb2xhIC0gRWFydGhyaXNlLmRzcHJlc2V0IiBfbGlicmFyeUNhbm9uaWNhbFVybD0iZmlsZTovL3tpbnN0cnVtZW50TGlicmFy
+eVJvb3R9L0RTICsgVlQgLSBhbHRzdHJpbmdzIEZyZWUgRWRpdGlvbi5kc2J1bmRsZS9DZWxsbyAmYW1wOyBWaW9sYSAtIEVhcnRocmlzZS5kc3ByZXNldCIg
+X3NhbXBsZUxpYnJhcnlJZD0iMSIgX2xpYnJhcnlCb29rbWFyaz0iMC4iIF90dW5pbmdBNjlGcmVxdWVuY3k9IjQ0MC4wIiBfdmVsb2NpdHlQcmVwcm9jZXNz
+b3JPdXRMb3c9IjAiIF92ZWxvY2l0eVByZXByb2Nlc3Nvck91dEhpZ2g9IjEyNyIgX3ZlbG9jaXR5UHJlcHJvY2Vzc29yRHJpdmU9IjAuMCIgX3ZlbG9jaXR5
+UHJlcHJvY2Vzc29yQ29tcHJlc3Npb249IjAuMCIgX3ZlbG9jaXR5UHJlcHJvY2Vzc29yUmFuZG9tPSIwIiBfbXBlVGltYnJlU2Vuc2l0aXZpdHk9IjAuMCIg
+X21wZVRpbWJyZU1pbj0iMC4wIiBfbXBlVGltYnJlTWF4PSIxLjAiIF9tcGVQcmVzc3VyZVNlbnNpdGl2aXR5PSIwLjAiIF9tcGVQcmVzc3VyZU1pbj0iMC4w
+IiBfbXBlUHJlc3N1cmVNYXg9IjEuMCI+PGVmZmVjdHM+PGVmZmVjdCB0eXBlPSJsb3dwYXNzIiBmcmVxdWVuY3k9IjIxOTg5LjAwNzk0MTgyNDQ2IiByZXNv
+bmFuY2U9IjAuMyIvPjxlZmZlY3QgdHlwZT0iY2hvcnVzIiBtaXg9IjAuNzE5OTk5OTgzOTA2NzQ1OSIgbW9kRGVwdGg9IjAuMiIgbW9kUmF0ZT0iMC4yIi8+
+PGVmZmVjdCB0eXBlPSJjb252b2x1dGlvbiIgbWl4PSIwLjA0OTk5OTk5NzAxOTc2Nzc2IiBpckZpbGU9IklSL1BsYXRlLndhdiIvPjwvZWZmZWN0cz48dWkg
+d2lkdGg9IjgxMiIgaGVpZ2h0PSIzNzUiIGJnSW1hZ2U9ImJnZC5wbmciPjx0YWIgbmFtZT0ibWFpbiI+PGxhYmVsIHRleHQ9IkZyZWUgRWRpdGlvbiAvLyBW
+ZXJzaW9uIDEuMCIgeD0iMzQ4IiB5PSI0NiIgd2lkdGg9IjEyMCIgaGVpZ2h0PSIzMCIgdGV4dENvbG9yPSJGRjQ4NDg0OCIgdGV4dFNpemU9IjE0IiBfaW5k
+ZXg9IjAiLz48bGFiZWxlZC1rbm9iIHg9IjMwIiB5PSI4MCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDUiIHRleHRTaXplPSIxNiIgbGFiZWw9IiIgdHlwZT0i
+ZmxvYXQiIG1pblZhbHVlPSIwLjciIG1heFZhbHVlPSI1IiB2YWx1ZT0iMC45ODAwMDAwMTkwNzM0ODYzIiBzdHlsZT0iY3VzdG9tX3NraW5fdmVydGljYWxf
+ZHJhZyIgY3VzdG9tU2tpbkltYWdlPSJLbm9iLnBuZyIgY3VzdG9tU2tpbk51bUZyYW1lcz0iMTAyIiBjdXN0b21Ta2luSW1hZ2VPcmllbnRhdGlvbj0idmVy
+dGljYWwiIG1vdXNlRHJhZ1NlbnNpdGl2aXR5PSIxMDAiIF9pbmRleD0iMSIgX3VpZD0id1JYQmNyMWJiNHYiPjxiaW5kaW5nIHR5cGU9ImFtcCIgbGV2ZWw9
+Imluc3RydW1lbnQiIHBvc2l0aW9uPSIwIiBwYXJhbWV0ZXI9IkVOVl9BVFRBQ0siLz48L2xhYmVsZWQta25vYj48bGFiZWxlZC1rbm9iIHg9IjE1MCIgeT0i
+ODAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTA1IiB0ZXh0U2l6ZT0iMTYiIGxhYmVsPSIiIHR5cGU9ImZsb2F0IiBtaW5WYWx1ZT0iMC41IiBtYXhWYWx1ZT0i
+NC4wIiB2YWx1ZT0iMS41IiBzdHlsZT0iY3VzdG9tX3NraW5fdmVydGljYWxfZHJhZyIgY3VzdG9tU2tpbkltYWdlPSJLbm9iLnBuZyIgY3VzdG9tU2tpbk51
+bUZyYW1lcz0iMTAyIiBjdXN0b21Ta2luSW1hZ2VPcmllbnRhdGlvbj0idmVydGljYWwiIG1vdXNlRHJhZ1NlbnNpdGl2aXR5PSIxMDAiIF9pbmRleD0iMiIg
+X3VpZD0ibkdYN3JUdEs3RG4iPjxiaW5kaW5nIHR5cGU9ImFtcCIgbGV2ZWw9Imluc3RydW1lbnQiIHBvc2l0aW9uPSIwIiBwYXJhbWV0ZXI9IkVOVl9SRUxF
+QVNFIi8+PC9sYWJlbGVkLWtub2I+PGxhYmVsZWQta25vYiB4PSI1NjAiIHk9IjgwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwNSIgdGV4dFNpemU9IjE2IiBs
+YWJlbD0iIiB0eXBlPSJmbG9hdCIgbWluVmFsdWU9IjAuMCIgbWF4VmFsdWU9IjEiIHZhbHVlPSIwLjcxOTk5OTk4MzkwNjc0NTkiIHN0eWxlPSJjdXN0b21f
+c2tpbl92ZXJ0aWNhbF9kcmFnIiBjdXN0b21Ta2luSW1hZ2U9Iktub2IucG5nIiBjdXN0b21Ta2luTnVtRnJhbWVzPSIxMDIiIGN1c3RvbVNraW5JbWFnZU9y
+aWVudGF0aW9uPSJ2ZXJ0aWNhbCIgbW91c2VEcmFnU2Vuc2l0aXZpdHk9IjEwMCIgX2luZGV4PSIzIiBfdWlkPSJGRFhwRmpxT0RWUyI+PGJpbmRpbmcgdHlw
+ZT0iZWZmZWN0IiBsZXZlbD0iaW5zdHJ1bWVudCIgcG9zaXRpb249IjEiIHBhcmFtZXRlcj0iRlhfTUlYIi8+PC9sYWJlbGVkLWtub2I+PGxhYmVsZWQta25v
+YiB4PSIzNDAiIHk9IjUwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1NSIgdGV4dFNpemU9IjE2IiBsYWJlbD0iIiB0eXBlPSJmbG9hdCIgbWluVmFsdWU9IjAu
+NSIgbWF4VmFsdWU9IjEiIHZhbHVlPSIwLjk5OTk5OTk4ODgyNDEyOTEiIHN0eWxlPSJjdXN0b21fc2tpbl92ZXJ0aWNhbF9kcmFnIiBjdXN0b21Ta2luSW1h
+Z2U9Iktub2IucG5nIiBjdXN0b21Ta2luTnVtRnJhbWVzPSIxMDIiIGN1c3RvbVNraW5JbWFnZU9yaWVudGF0aW9uPSJ2ZXJ0aWNhbCIgbW91c2VEcmFnU2Vu
+c2l0aXZpdHk9IjEwMCIgX2luZGV4PSI0IiBfdWlkPSJBcjBjdWY2SW9keSI+PGJpbmRpbmcgdHlwZT0iZWZmZWN0IiBsZXZlbD0iaW5zdHJ1bWVudCIgcG9z
+aXRpb249IjAiIHBhcmFtZXRlcj0iRlhfRklMVEVSX0ZSRVFVRU5DWSIgdHJhbnNsYXRpb249InRhYmxlIiB0cmFuc2xhdGlvblRhYmxlPSIwLDMzOzAuMywx
+NTA7MC40LDQ1MDswLjUsMTEwMDswLjcsNDEwMDswLjksMTEwMDA7MS4wMDAxLDIyMDAwIi8+PGJpbmRpbmcgdHlwZT0iYW1wIiBsZXZlbD0iZ3JvdXAiIHBv
+c2l0aW9uPSIwIiBwYXJhbWV0ZXI9IkFNUF9WT0xVTUUiIHRyYW5zbGF0aW9uPSJ0YWJsZSIgdHJhbnNsYXRpb25UYWJsZT0iMCwwOzAuNSwwLjI7MSwxIi8+
+PC9sYWJlbGVkLWtub2I+PGxhYmVsZWQta25vYiB4PSI2ODAiIHk9IjgwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwNSIgdGV4dFNpemU9IjE2IiBsYWJlbD0i
+IiBtaW5WYWx1ZT0iMC4wIiBtYXhWYWx1ZT0iMC4yNSIgdmFsdWU9IjAuMDQ5OTk5OTk3MDE5NzY3NzYiIHN0eWxlPSJjdXN0b21fc2tpbl92ZXJ0aWNhbF9k
+cmFnIiBjdXN0b21Ta2luSW1hZ2U9Iktub2IucG5nIiBjdXN0b21Ta2luTnVtRnJhbWVzPSIxMDIiIGN1c3RvbVNraW5JbWFnZU9yaWVudGF0aW9uPSJ2ZXJ0
+aWNhbCIgbW91c2VEcmFnU2Vuc2l0aXZpdHk9IjEwMCIgX2luZGV4PSI1IiBfdWlkPSJVd0tFVkpwWmxkZCI+PGJpbmRpbmcgdHlwZT0iZWZmZWN0IiBsZXZl
+bD0iaW5zdHJ1bWVudCIgcG9zaXRpb249IjIiIHBhcmFtZXRlcj0iRlhfTUlYIi8+PC9sYWJlbGVkLWtub2I+PG1lbnUgeD0iNjc1IiB5PSIxNzUiIHdpZHRo
+PSIxMTAiIGhlaWdodD0iMzAiIHJlcXVpcmVTZWxlY3Rpb249InRydWUiIHBsYWNlaG9sZGVyVGV4dD0iQ2hvb3NlLi4uIiB2YWx1ZT0iNCIgX2luZGV4PSI2
+Ij48b3B0aW9uIG5hbWU9IlRhcGUgRWNobyI+PGJpbmRpbmcgdHlwZT0iZWZmZWN0IiBsZXZlbD0iaW5zdHJ1bWVudCIgcG9zaXRpb249IjIiIHBhcmFtZXRl
+cj0iRlhfSVJfRklMRSIgdHJhbnNsYXRpb249ImZpeGVkX3ZhbHVlIiB0cmFuc2xhdGlvblZhbHVlPSJJUi9UYXBlRWNoby53YXYiLz48L29wdGlvbj48b3B0
+aW9uIG5hbWU9IkFuZHJvbWVkYSI+PGJpbmRpbmcgdHlwZT0iZWZmZWN0IiBsZXZlbD0iaW5zdHJ1bWVudCIgcG9zaXRpb249IjIiIHBhcmFtZXRlcj0iRlhf
+SVJfRklMRSIgdHJhbnNsYXRpb249ImZpeGVkX3ZhbHVlIiB0cmFuc2xhdGlvblZhbHVlPSJJUi9BbmRyb21lZGEud2F2Ii8+PC9vcHRpb24+PG9wdGlvbiBu
+YW1lPSJIYWxsIj48YmluZGluZyB0eXBlPSJlZmZlY3QiIGxldmVsPSJpbnN0cnVtZW50IiBwb3NpdGlvbj0iMiIgcGFyYW1ldGVyPSJGWF9JUl9GSUxFIiB0
+cmFuc2xhdGlvbj0iZml4ZWRfdmFsdWUiIHRyYW5zbGF0aW9uVmFsdWU9IklSL0hhbGwud2F2Ii8+PC9vcHRpb24+PG9wdGlvbiBuYW1lPSJQbGF0ZSI+PGJp
+bmRpbmcgdHlwZT0iZWZmZWN0IiBsZXZlbD0iaW5zdHJ1bWVudCIgcG9zaXRpb249IjIiIHBhcmFtZXRlcj0iRlhfSVJfRklMRSIgdHJhbnNsYXRpb249ImZp
+eGVkX3ZhbHVlIiB0cmFuc2xhdGlvblZhbHVlPSJJUi9QbGF0ZS53YXYiLz48L29wdGlvbj48b3B0aW9uIG5hbWU9IlJvb20iPjxiaW5kaW5nIHR5cGU9ImVm
+ZmVjdCIgbGV2ZWw9Imluc3RydW1lbnQiIHBvc2l0aW9uPSIyIiBwYXJhbWV0ZXI9IkZYX0lSX0ZJTEUiIHRyYW5zbGF0aW9uPSJmaXhlZF92YWx1ZSIgdHJh
+bnNsYXRpb25WYWx1ZT0iSVIvUm9vbS53YXYiLz48L29wdGlvbj48b3B0aW9uIG5hbWU9IlNwcmluZyI+PGJpbmRpbmcgdHlwZT0iZWZmZWN0IiBsZXZlbD0i
+aW5zdHJ1bWVudCIgcG9zaXRpb249IjIiIHBhcmFtZXRlcj0iRlhfSVJfRklMRSIgdHJhbnNsYXRpb249ImZpeGVkX3ZhbHVlIiB0cmFuc2xhdGlvblZhbHVl
+PSJJUi9TcHJpbmcud2F2Ii8+PC9vcHRpb24+PC9tZW51PjwvdGFiPjxrZXlib2FyZC8+PC91aT48Z3JvdXBzIGFtcFZlbFRyYWNrPSIwLjIiIGF0dGFja0N1
+cnZlPSIwIiBhdHRhY2s9IjAuOTgwMDAwMDE5MDczNDg2MyIgZGVjYXk9IjEuMCIgc3VzdGFpbj0iMS4wIiByZWxlYXNlPSIxLjUiIGdsb2JhbFR1bmluZz0i
+MC4yODM0NjI1MjQ0MTQwNjI1IiB2b2x1bWU9IjAuMCI+PGdyb3VwIG5hbWU9IkZYIiBtb2RWb2x1bWU9IjAuOTk5OTk5OTgyMTE4NjA2NiI+PHNhbXBsZSBs
+b29wRW5hYmxlZD0idHJ1ZSIgbG9vcFN0YXJ0PSIxNDQwMDAiIGxvb3BFbmQ9Ijk2MDAwMCIgbG9vcENyb3NzZmFkZT0iNDgwMDAiIHBhdGg9IlNhbXBsZXMv
+U1BUMTI5X0lkZWE1XzM2LndhdiIgbmFtZT0iU1BUMTI5X0lkZWE1XzM2IiByb290Tm90ZT0iMzYiIGxvTm90ZT0iMjQiIGhpTm90ZT0iMzkiIGxvVmVsPSIw
+IiBoaVZlbD0iMTI3IiBlbmQ9IjE0NDAwMDAiIF9ncm91cEluZGV4PSIwIiBfZmlsZUxlbmd0aD0iOTYwMDAwIiBfZmlsZVNhbXBsZVJhdGU9IjQ4MDAwLjAi
+Lz48c2FtcGxlIGxvb3BFbmFibGVkPSJ0cnVlIiBsb29wU3RhcnQ9IjE0NDAwMCIgbG9vcEVuZD0iOTYwMDAwIiBsb29wQ3Jvc3NmYWRlPSI0ODAwMCIgcGF0
+aD0iU2FtcGxlcy9TUFQxMjlfSWRlYTVfNTUud2F2IiBuYW1lPSJTUFQxMjlfSWRlYTVfNTUiIHJvb3ROb3RlPSI1NSIgbG9Ob3RlPSI1MiIgaGlOb3RlPSI1
+OCIgbG9WZWw9IjAiIGhpVmVsPSIxMjciIGVuZD0iMTQ5MTMyNCIgX2dyb3VwSW5kZXg9IjAiIF9maWxlTGVuZ3RoPSI5NjAwMDAiIF9maWxlU2FtcGxlUmF0
+ZT0iNDgwMDAuMCIvPjxzYW1wbGUgbG9vcEVuYWJsZWQ9InRydWUiIGxvb3BTdGFydD0iMTQ0MDAwIiBsb29wRW5kPSI5NjAwMDAiIGxvb3BDcm9zc2ZhZGU9
+IjQ4MDAwIiBwYXRoPSJTYW1wbGVzL1NQVDEyOV9JZGVhNV82Mi53YXYiIG5hbWU9IlNQVDEyOV9JZGVhNV82MiIgcm9vdE5vdGU9IjYyIiBsb05vdGU9IjU5
+IiBoaU5vdGU9IjY1IiBsb1ZlbD0iMCIgaGlWZWw9IjEyNyIgZW5kPSIxMjczMzE5IiBfZ3JvdXBJbmRleD0iMCIgX2ZpbGVMZW5ndGg9Ijk2MDAwMCIgX2Zp
+bGVTYW1wbGVSYXRlPSI0ODAwMC4wIi8+PHNhbXBsZSBsb29wRW5hYmxlZD0idHJ1ZSIgbG9vcFN0YXJ0PSIxNDQwMDAiIGxvb3BFbmQ9Ijk2MDAwMCIgbG9v
+cENyb3NzZmFkZT0iNDgwMDAiIHBhdGg9IlNhbXBsZXMvU1BUMTI5X0lkZWE1XzY5LndhdiIgbmFtZT0iU1BUMTI5X0lkZWE1XzY5IiByb290Tm90ZT0iNjki
+IGxvTm90ZT0iNjYiIGhpTm90ZT0iNzIiIGxvVmVsPSIwIiBoaVZlbD0iMTI3IiBlbmQ9IjExNTIwMDAiIF9ncm91cEluZGV4PSIwIiBfZmlsZUxlbmd0aD0i
+OTYwMDAwIiBfZmlsZVNhbXBsZVJhdGU9IjQ4MDAwLjAiLz48c2FtcGxlIGxvb3BFbmFibGVkPSJ0cnVlIiBsb29wU3RhcnQ9IjE0NDAwMCIgbG9vcEVuZD0i
+OTYwMDAwIiBsb29wQ3Jvc3NmYWRlPSI0ODAwMCIgcGF0aD0iU2FtcGxlcy9TUFQxMjlfSWRlYTVfNDMud2F2IiBuYW1lPSJTUFQxMjlfSWRlYTVfNDMiIHJv
+b3ROb3RlPSI0MyIgbG9Ob3RlPSI0MCIgaGlOb3RlPSI0NSIgbG9WZWw9IjAiIGhpVmVsPSIxMjciIGVuZD0iMTM0NDAwMCIgX2dyb3VwSW5kZXg9IjAiIF9m
+aWxlTGVuZ3RoPSI5NjAwMDAiIF9maWxlU2FtcGxlUmF0ZT0iNDgwMDAuMCIvPjxzYW1wbGUgbG9vcEVuYWJsZWQ9InRydWUiIGxvb3BTdGFydD0iMTQ0MDAw
+IiBsb29wRW5kPSI5NjAwMDAiIGxvb3BDcm9zc2ZhZGU9IjQ4MDAwIiBwYXRoPSJTYW1wbGVzL1NQVDEyOV9JZGVhNV80OC53YXYiIG5hbWU9IlNQVDEyOV9J
+ZGVhNV80OCIgcm9vdE5vdGU9IjQ4IiBsb05vdGU9IjQ2IiBoaU5vdGU9IjUxIiBsb1ZlbD0iMCIgaGlWZWw9IjEyNyIgZW5kPSIxMjM5MTk4IiBfZ3JvdXBJ
+bmRleD0iMCIgX2ZpbGVMZW5ndGg9Ijk2MDAwMCIgX2ZpbGVTYW1wbGVSYXRlPSI0ODAwMC4wIi8+PHNhbXBsZSBsb29wRW5hYmxlZD0idHJ1ZSIgbG9vcFN0
+YXJ0PSIxNDQwMDAiIGxvb3BFbmQ9Ijk2MDAwMCIgbG9vcENyb3NzZmFkZT0iNDgwMDAiIHBhdGg9IlNhbXBsZXMvU1BUMTI5X0lkZWE1Xzc2LndhdiIgbmFt
+ZT0iU1BUMTI5X0lkZWE1Xzc2IiByb290Tm90ZT0iNzYiIGxvTm90ZT0iNzMiIGhpTm90ZT0iNzgiIGxvVmVsPSIwIiBoaVZlbD0iMTI3IiBlbmQ9IjE0NDAw
+MDAiIF9ncm91cEluZGV4PSIwIiBfZmlsZUxlbmd0aD0iOTYwMDAwIiBfZmlsZVNhbXBsZVJhdGU9IjQ4MDAwLjAiLz48c2FtcGxlIGxvb3BFbmFibGVkPSJ0
+cnVlIiBsb29wU3RhcnQ9IjE0NDAwMCIgbG9vcEVuZD0iOTYwMDAwIiBsb29wQ3Jvc3NmYWRlPSI0ODAwMCIgcGF0aD0iU2FtcGxlcy9TUFQxMjlfSWRlYTVf
+ODEud2F2IiBuYW1lPSJTUFQxMjlfSWRlYTVfODEiIHJvb3ROb3RlPSI4MSIgbG9Ob3RlPSI3OSIgaGlOb3RlPSI4NiIgbG9WZWw9IjAiIGhpVmVsPSIxMjci
+IGVuZD0iMTI0ODAwMCIgX2dyb3VwSW5kZXg9IjAiIF9maWxlTGVuZ3RoPSI5NjAwMDAiIF9maWxlU2FtcGxlUmF0ZT0iNDgwMDAuMCIvPjxzYW1wbGUgbG9v
+cEVuYWJsZWQ9InRydWUiIGxvb3BTdGFydD0iMTQ0MDAwIiBsb29wRW5kPSI5NjAwMDAiIGxvb3BDcm9zc2ZhZGU9IjQ4MDAwIiBwYXRoPSJTYW1wbGVzL1NQ
+VDEyOV9JZGVhNV85MS53YXYiIG5hbWU9IlNQVDEyOV9JZGVhNV85MSIgcm9vdE5vdGU9IjkxIiBsb05vdGU9Ijg3IiBoaU5vdGU9IjkxIiBsb1ZlbD0iMCIg
+aGlWZWw9IjEyNyIgZW5kPSIxMDU2MDAwIiBfZ3JvdXBJbmRleD0iMCIgX2ZpbGVMZW5ndGg9Ijk2MDAwMCIgX2ZpbGVTYW1wbGVSYXRlPSI0ODAwMC4wIi8+
+PGVmZmVjdHMvPjwvZ3JvdXA+PC9ncm91cHM+PG1pZGk+PGNjIG51bWJlcj0iMSI+PGJpbmRpbmcgbGV2ZWw9InVpIiB0eXBlPSJjb250cm9sIiBwYXJhbWV0
+ZXI9IlZBTFVFIiBwb3NpdGlvbj0iMyIgdHJhbnNsYXRpb249ImxpbmVhciIgdHJhbnNsYXRpb25PdXRwdXRNaW49IjAuNSIgdHJhbnNsYXRpb25PdXRwdXRN
+YXg9IjEiLz48L2NjPjwvbWlkaT48bW9kdWxhdG9ycy8+PHRhZ3MvPjxidXNlcy8+PG5vdGVTZXF1ZW5jZXMvPjwvRGVjZW50U2FtcGxlcj4A
+   </Chunk>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>SF2</Type>
+   <Name>AR-CH-4 - Good Flute</Name>
+   <Filename>/home/ldap/pedro.ferreira/.local/share/sounds/sf2/FluidR3_GM.sf2</Filename>
+   <Label>Flute</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>SF2</Type>
+   <Name>AR-CH-5 - SAX Lirakeys CL</Name>
+   <Filename>/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library/02_SoundFonts/06_Brass_and_Winds/SAX_Lirakeys LITE.sf2</Filename>
+   <Label>SAX Lirakeys CL</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>SF2</Type>
+   <Name>AR-CH-6 - Hammond Organ Fast</Name>
+   <Filename>/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library/02_SoundFonts/03_Organs_and_Keys/Hammond_B3_organ_Fast_Leslie [outros-timbres-pra-audio-evolution-leads-2].sf2</Filename>
+   <Label>Hammond_B3_organ_Fast_Leslie [outros-timbres-pra-audio-evolution-leads-2]</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>SF2</Type>
+   <Name>AR-CH-7 - Optik Synth</Name>
+   <Filename>/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library/02_SoundFonts/10_Synth_Leads_Arps_and_Plucks/G072 Optik_Synth.sf2</Filename>
+   <Label>G072 Optik_Synth</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>SF2</Type>
+   <Name>AR-CH-8 - PAD EFEITOS</Name>
+   <Filename>/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library/02_SoundFonts/11_Pads_and_Ambience/PAD EFEITOS 1 _ Infinity_studio.sf2</Filename>
+   <Label>PAD EFEITOS 1 _ Infinity_studio</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>SF2</Type>
+   <Name>AR-CH-9 - AtmosferaPAD</Name>
+   <Filename>/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library/02_SoundFonts/11_Pads_and_Ambience/AtmosferaPAD - TIMBRES PREMIUM.sf2</Filename>
+   <Label>AtmosferaPAD - TIMBRES PREMIUM</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>SF2</Type>
+   <Name>PD-CH-1 - Drum Set</Name>
+   <Filename>/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library/02_SoundFonts/09_Drums_and_Percussion/Drum_Set.sf2</Filename>
+   <Label>Drum_Set</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>SF2</Type>
+   <Name>SMK-CH-1 - Oceans Worship Pad</Name>
+   <Filename>/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library/02_SoundFonts/11_Pads_and_Ambience/OceansPad - TIMBRES PREMIUM.sf2</Filename>
+   <Label>OceansPad - TIMBRES</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>LSP Mixer x8 Stereo</Name>
+   <URI>http://lsp-plug.in/plugins/lv2/mixer_x8_stereo</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Enabled</Name>
+    <Symbol>enabled</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Mono output</Name>
+    <Symbol>mono</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Output balance</Name>
+    <Symbol>bal</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Dry amount</Name>
+    <Symbol>dry</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Wet amount</Name>
+    <Symbol>wet</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Output gain</Name>
+    <Symbol>g_out</Symbol>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>119</MappedControlIndex>
+    <MappedMinimum>0</MappedMinimum>
+    <MappedMaximum>3.98107004165649</MappedMaximum>
+    <MidiCC>119</MidiCC>
+    <Value>0.0930044874548912</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Channel solo 1</Name>
+    <Symbol>cs_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Channel mute 1</Name>
+    <Symbol>cm_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Channel phase invert 1</Name>
+    <Symbol>ci_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>13</Index>
+    <Name>Channel pan left 1</Name>
+    <Symbol>cp_1l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>14</Index>
+    <Name>Channel pan right 1</Name>
+    <Symbol>cp_1r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>15</Index>
+    <Name>Channel output balance 1</Name>
+    <Symbol>cb_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>16</Index>
+    <Name>Channel gain 1</Name>
+    <Symbol>cg_1</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>19</Index>
+    <Name>Channel solo 2</Name>
+    <Symbol>cs_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>20</Index>
+    <Name>Channel mute 2</Name>
+    <Symbol>cm_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>21</Index>
+    <Name>Channel phase invert 2</Name>
+    <Symbol>ci_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>22</Index>
+    <Name>Channel pan left 2</Name>
+    <Symbol>cp_2l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>23</Index>
+    <Name>Channel pan right 2</Name>
+    <Symbol>cp_2r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>24</Index>
+    <Name>Channel output balance 2</Name>
+    <Symbol>cb_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>25</Index>
+    <Name>Channel gain 2</Name>
+    <Symbol>cg_2</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>28</Index>
+    <Name>Channel solo 3</Name>
+    <Symbol>cs_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>29</Index>
+    <Name>Channel mute 3</Name>
+    <Symbol>cm_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>30</Index>
+    <Name>Channel phase invert 3</Name>
+    <Symbol>ci_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>31</Index>
+    <Name>Channel pan left 3</Name>
+    <Symbol>cp_3l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>32</Index>
+    <Name>Channel pan right 3</Name>
+    <Symbol>cp_3r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>33</Index>
+    <Name>Channel output balance 3</Name>
+    <Symbol>cb_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>34</Index>
+    <Name>Channel gain 3</Name>
+    <Symbol>cg_3</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>37</Index>
+    <Name>Channel solo 4</Name>
+    <Symbol>cs_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>38</Index>
+    <Name>Channel mute 4</Name>
+    <Symbol>cm_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>39</Index>
+    <Name>Channel phase invert 4</Name>
+    <Symbol>ci_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>40</Index>
+    <Name>Channel pan left 4</Name>
+    <Symbol>cp_4l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>41</Index>
+    <Name>Channel pan right 4</Name>
+    <Symbol>cp_4r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>42</Index>
+    <Name>Channel output balance 4</Name>
+    <Symbol>cb_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>43</Index>
+    <Name>Channel gain 4</Name>
+    <Symbol>cg_4</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>46</Index>
+    <Name>Channel solo 5</Name>
+    <Symbol>cs_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>47</Index>
+    <Name>Channel mute 5</Name>
+    <Symbol>cm_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>48</Index>
+    <Name>Channel phase invert 5</Name>
+    <Symbol>ci_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>49</Index>
+    <Name>Channel pan left 5</Name>
+    <Symbol>cp_5l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>50</Index>
+    <Name>Channel pan right 5</Name>
+    <Symbol>cp_5r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>51</Index>
+    <Name>Channel output balance 5</Name>
+    <Symbol>cb_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>52</Index>
+    <Name>Channel gain 5</Name>
+    <Symbol>cg_5</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>55</Index>
+    <Name>Channel solo 6</Name>
+    <Symbol>cs_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>56</Index>
+    <Name>Channel mute 6</Name>
+    <Symbol>cm_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>57</Index>
+    <Name>Channel phase invert 6</Name>
+    <Symbol>ci_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>58</Index>
+    <Name>Channel pan left 6</Name>
+    <Symbol>cp_6l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>59</Index>
+    <Name>Channel pan right 6</Name>
+    <Symbol>cp_6r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>60</Index>
+    <Name>Channel output balance 6</Name>
+    <Symbol>cb_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>61</Index>
+    <Name>Channel gain 6</Name>
+    <Symbol>cg_6</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>64</Index>
+    <Name>Channel solo 7</Name>
+    <Symbol>cs_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>65</Index>
+    <Name>Channel mute 7</Name>
+    <Symbol>cm_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>66</Index>
+    <Name>Channel phase invert 7</Name>
+    <Symbol>ci_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>67</Index>
+    <Name>Channel pan left 7</Name>
+    <Symbol>cp_7l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>68</Index>
+    <Name>Channel pan right 7</Name>
+    <Symbol>cp_7r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>69</Index>
+    <Name>Channel output balance 7</Name>
+    <Symbol>cb_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>70</Index>
+    <Name>Channel gain 7</Name>
+    <Symbol>cg_7</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>73</Index>
+    <Name>Channel solo 8</Name>
+    <Symbol>cs_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>74</Index>
+    <Name>Channel mute 8</Name>
+    <Symbol>cm_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>75</Index>
+    <Name>Channel phase invert 8</Name>
+    <Symbol>ci_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>76</Index>
+    <Name>Channel pan left 8</Name>
+    <Symbol>cp_8l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>77</Index>
+    <Name>Channel pan right 8</Name>
+    <Symbol>cp_8r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>78</Index>
+    <Name>Channel output balance 8</Name>
+    <Symbol>cb_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>79</Index>
+    <Name>Channel gain 8</Name>
+    <Symbol>cg_8</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/property</Type>
+    <Key>CarlaSkinIsCompacted</Key>
+    <Value>false</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>SMC-MIX - 8-Band EQ</Name>
+   <URI>http://lsp-plug.in/plugins/lv2/para_equalizer_x8_stereo</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1</Options>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Input FFT graph enable Left</Name>
+    <Symbol>ife_l</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Output FFT graph enable Left</Name>
+    <Symbol>ofe_l</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>13</Index>
+    <Name>Input FFT graph enable Right</Name>
+    <Symbol>ife_r</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>14</Index>
+    <Name>Output FFT graph enable Right</Name>
+    <Symbol>ofe_r</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>21</Index>
+    <Name>Filter type 0</Name>
+    <Symbol>ft_0</Symbol>
+    <Value>5</Value>
+   </Parameter>
+   <Parameter>
+    <Index>26</Index>
+    <Name>Frequency 0</Name>
+    <Symbol>f_0</Symbol>
+    <Value>63</Value>
+   </Parameter>
+   <Parameter>
+    <Index>28</Index>
+    <Name>Gain 0</Name>
+    <Symbol>g_0</Symbol>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>102</MappedControlIndex>
+    <MappedMinimum>0.2511886432</MappedMinimum>
+    <MappedMaximum>3.981071706</MappedMaximum>
+    <MidiCC>102</MidiCC>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>32</Index>
+    <Name>Filter type 1</Name>
+    <Symbol>ft_1</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>37</Index>
+    <Name>Frequency 1</Name>
+    <Symbol>f_1</Symbol>
+    <Value>125</Value>
+   </Parameter>
+   <Parameter>
+    <Index>39</Index>
+    <Name>Gain 1</Name>
+    <Symbol>g_1</Symbol>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>103</MappedControlIndex>
+    <MappedMinimum>0.2511886432</MappedMinimum>
+    <MappedMaximum>3.981071706</MappedMaximum>
+    <MidiCC>103</MidiCC>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>43</Index>
+    <Name>Filter type 2</Name>
+    <Symbol>ft_2</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>48</Index>
+    <Name>Frequency 2</Name>
+    <Symbol>f_2</Symbol>
+    <Value>250</Value>
+   </Parameter>
+   <Parameter>
+    <Index>50</Index>
+    <Name>Gain 2</Name>
+    <Symbol>g_2</Symbol>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>104</MappedControlIndex>
+    <MappedMinimum>0.2511886432</MappedMinimum>
+    <MappedMaximum>3.981071706</MappedMaximum>
+    <MidiCC>104</MidiCC>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>54</Index>
+    <Name>Filter type 3</Name>
+    <Symbol>ft_3</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>59</Index>
+    <Name>Frequency 3</Name>
+    <Symbol>f_3</Symbol>
+    <Value>500</Value>
+   </Parameter>
+   <Parameter>
+    <Index>61</Index>
+    <Name>Gain 3</Name>
+    <Symbol>g_3</Symbol>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>105</MappedControlIndex>
+    <MappedMinimum>0.2511886432</MappedMinimum>
+    <MappedMaximum>3.981071706</MappedMaximum>
+    <MidiCC>105</MidiCC>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>65</Index>
+    <Name>Filter type 4</Name>
+    <Symbol>ft_4</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>70</Index>
+    <Name>Frequency 4</Name>
+    <Symbol>f_4</Symbol>
+    <Value>1000</Value>
+   </Parameter>
+   <Parameter>
+    <Index>72</Index>
+    <Name>Gain 4</Name>
+    <Symbol>g_4</Symbol>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>106</MappedControlIndex>
+    <MappedMinimum>0.2511886432</MappedMinimum>
+    <MappedMaximum>3.981071706</MappedMaximum>
+    <MidiCC>106</MidiCC>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>76</Index>
+    <Name>Filter type 5</Name>
+    <Symbol>ft_5</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>81</Index>
+    <Name>Frequency 5</Name>
+    <Symbol>f_5</Symbol>
+    <Value>2000</Value>
+   </Parameter>
+   <Parameter>
+    <Index>83</Index>
+    <Name>Gain 5</Name>
+    <Symbol>g_5</Symbol>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>107</MappedControlIndex>
+    <MappedMinimum>0.2511886432</MappedMinimum>
+    <MappedMaximum>3.981071706</MappedMaximum>
+    <MidiCC>107</MidiCC>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>87</Index>
+    <Name>Filter type 6</Name>
+    <Symbol>ft_6</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>92</Index>
+    <Name>Frequency 6</Name>
+    <Symbol>f_6</Symbol>
+    <Value>4000</Value>
+   </Parameter>
+   <Parameter>
+    <Index>94</Index>
+    <Name>Gain 6</Name>
+    <Symbol>g_6</Symbol>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>108</MappedControlIndex>
+    <MappedMinimum>0.2511886432</MappedMinimum>
+    <MappedMaximum>3.981071706</MappedMaximum>
+    <MidiCC>108</MidiCC>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>98</Index>
+    <Name>Filter type 7</Name>
+    <Symbol>ft_7</Symbol>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>103</Index>
+    <Name>Frequency 7</Name>
+    <Symbol>f_7</Symbol>
+    <Value>8000</Value>
+   </Parameter>
+   <Parameter>
+    <Index>105</Index>
+    <Name>Gain 7</Name>
+    <Symbol>g_7</Symbol>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>109</MappedControlIndex>
+    <MappedMinimum>0.2511886432</MappedMinimum>
+    <MappedMaximum>3.981071706</MappedMaximum>
+    <MidiCC>109</MidiCC>
+    <Value>1</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/property</Type>
+    <Key>CarlaSkinIsCompacted</Key>
+    <Value>false</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR-CH-2 Output Trim +6 dB</Name>
+   <URI>http://lsp-plug.in/plugins/lv2/mixer_x8_stereo</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Enabled</Name>
+    <Symbol>enabled</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Mono output</Name>
+    <Symbol>mono</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Output balance</Name>
+    <Symbol>bal</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Dry amount</Name>
+    <Symbol>dry</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Wet amount</Name>
+    <Symbol>wet</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Output gain</Name>
+    <Symbol>g_out</Symbol>
+    <Value>2</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Channel solo 1</Name>
+    <Symbol>cs_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Channel mute 1</Name>
+    <Symbol>cm_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Channel phase invert 1</Name>
+    <Symbol>ci_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>13</Index>
+    <Name>Channel pan left 1</Name>
+    <Symbol>cp_1l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>14</Index>
+    <Name>Channel pan right 1</Name>
+    <Symbol>cp_1r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>15</Index>
+    <Name>Channel output balance 1</Name>
+    <Symbol>cb_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>16</Index>
+    <Name>Channel gain 1</Name>
+    <Symbol>cg_1</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>19</Index>
+    <Name>Channel solo 2</Name>
+    <Symbol>cs_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>20</Index>
+    <Name>Channel mute 2</Name>
+    <Symbol>cm_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>21</Index>
+    <Name>Channel phase invert 2</Name>
+    <Symbol>ci_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>22</Index>
+    <Name>Channel pan left 2</Name>
+    <Symbol>cp_2l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>23</Index>
+    <Name>Channel pan right 2</Name>
+    <Symbol>cp_2r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>24</Index>
+    <Name>Channel output balance 2</Name>
+    <Symbol>cb_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>25</Index>
+    <Name>Channel gain 2</Name>
+    <Symbol>cg_2</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>28</Index>
+    <Name>Channel solo 3</Name>
+    <Symbol>cs_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>29</Index>
+    <Name>Channel mute 3</Name>
+    <Symbol>cm_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>30</Index>
+    <Name>Channel phase invert 3</Name>
+    <Symbol>ci_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>31</Index>
+    <Name>Channel pan left 3</Name>
+    <Symbol>cp_3l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>32</Index>
+    <Name>Channel pan right 3</Name>
+    <Symbol>cp_3r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>33</Index>
+    <Name>Channel output balance 3</Name>
+    <Symbol>cb_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>34</Index>
+    <Name>Channel gain 3</Name>
+    <Symbol>cg_3</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>37</Index>
+    <Name>Channel solo 4</Name>
+    <Symbol>cs_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>38</Index>
+    <Name>Channel mute 4</Name>
+    <Symbol>cm_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>39</Index>
+    <Name>Channel phase invert 4</Name>
+    <Symbol>ci_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>40</Index>
+    <Name>Channel pan left 4</Name>
+    <Symbol>cp_4l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>41</Index>
+    <Name>Channel pan right 4</Name>
+    <Symbol>cp_4r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>42</Index>
+    <Name>Channel output balance 4</Name>
+    <Symbol>cb_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>43</Index>
+    <Name>Channel gain 4</Name>
+    <Symbol>cg_4</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>46</Index>
+    <Name>Channel solo 5</Name>
+    <Symbol>cs_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>47</Index>
+    <Name>Channel mute 5</Name>
+    <Symbol>cm_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>48</Index>
+    <Name>Channel phase invert 5</Name>
+    <Symbol>ci_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>49</Index>
+    <Name>Channel pan left 5</Name>
+    <Symbol>cp_5l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>50</Index>
+    <Name>Channel pan right 5</Name>
+    <Symbol>cp_5r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>51</Index>
+    <Name>Channel output balance 5</Name>
+    <Symbol>cb_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>52</Index>
+    <Name>Channel gain 5</Name>
+    <Symbol>cg_5</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>55</Index>
+    <Name>Channel solo 6</Name>
+    <Symbol>cs_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>56</Index>
+    <Name>Channel mute 6</Name>
+    <Symbol>cm_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>57</Index>
+    <Name>Channel phase invert 6</Name>
+    <Symbol>ci_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>58</Index>
+    <Name>Channel pan left 6</Name>
+    <Symbol>cp_6l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>59</Index>
+    <Name>Channel pan right 6</Name>
+    <Symbol>cp_6r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>60</Index>
+    <Name>Channel output balance 6</Name>
+    <Symbol>cb_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>61</Index>
+    <Name>Channel gain 6</Name>
+    <Symbol>cg_6</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>64</Index>
+    <Name>Channel solo 7</Name>
+    <Symbol>cs_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>65</Index>
+    <Name>Channel mute 7</Name>
+    <Symbol>cm_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>66</Index>
+    <Name>Channel phase invert 7</Name>
+    <Symbol>ci_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>67</Index>
+    <Name>Channel pan left 7</Name>
+    <Symbol>cp_7l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>68</Index>
+    <Name>Channel pan right 7</Name>
+    <Symbol>cp_7r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>69</Index>
+    <Name>Channel output balance 7</Name>
+    <Symbol>cb_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>70</Index>
+    <Name>Channel gain 7</Name>
+    <Symbol>cg_7</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>73</Index>
+    <Name>Channel solo 8</Name>
+    <Symbol>cs_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>74</Index>
+    <Name>Channel mute 8</Name>
+    <Symbol>cm_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>75</Index>
+    <Name>Channel phase invert 8</Name>
+    <Symbol>ci_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>76</Index>
+    <Name>Channel pan left 8</Name>
+    <Symbol>cp_8l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>77</Index>
+    <Name>Channel pan right 8</Name>
+    <Symbol>cp_8r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>78</Index>
+    <Name>Channel output balance 8</Name>
+    <Symbol>cb_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>79</Index>
+    <Name>Channel gain 8</Name>
+    <Symbol>cg_8</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/property</Type>
+    <Key>CarlaSkinIsCompacted</Key>
+    <Value>false</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR Controls - Sustain Scale</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#scalecc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Parameter (Min)</Name>
+    <Symbol>lower</Symbol>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Parameter (Max)</Name>
+    <Symbol>upper</Symbol>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Parameter Mode</Name>
+    <Symbol>pmode</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Value Scale</Name>
+    <Symbol>valmul</Symbol>
+    <Value>-1.00000047683716</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Value Offset</Name>
+    <Symbol>valoff</Symbol>
+    <Value>-1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Value Mode</Name>
+    <Symbol>vmode</Symbol>
+    <Value>2</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/property</Type>
+    <Key>CarlaSkinIsCompacted</Key>
+    <Value>false</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>PD Controls - Sustain Scale</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#scalecc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Parameter (Min)</Name>
+    <Symbol>lower</Symbol>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Parameter (Max)</Name>
+    <Symbol>upper</Symbol>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Parameter Mode</Name>
+    <Symbol>pmode</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Value Scale</Name>
+    <Symbol>valmul</Symbol>
+    <Value>-1.00000047683716</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Value Offset</Name>
+    <Symbol>valoff</Symbol>
+    <Value>-1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Value Mode</Name>
+    <Symbol>vmode</Symbol>
+    <Value>2</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/property</Type>
+    <Key>CarlaSkinIsCompacted</Key>
+    <Value>false</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR-CH-2 Volume Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>75</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>7</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR-CH-4 Volume Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>72</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>7</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR-CH-5 Volume Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>80</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>7</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR-CH-6 Volume Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>81</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>7</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR-CH-7 Volume Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>82</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>7</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR-CH-8 Volume Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>83</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>7</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR-CH-9 Volume Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>85</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>7</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>PD-CH-1 Volume Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>36</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>7</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>SMK-CH-1 Volume Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>20</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>7</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR-CH-2 Reverb Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>71</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>91</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR-CH-4 Reverb Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>77</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>91</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR-CH-5 Reverb Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>93</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>91</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR-CH-6 Reverb Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>18</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>91</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR-CH-7 Reverb Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>19</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>91</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR-CH-8 Reverb Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>16</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>91</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>AR-CH-9 Reverb Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>17</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>91</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>SMC-EQ-1 CC Scale</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>40</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>102</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>SMC-EQ-2 CC Scale</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>41</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>103</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>SMC-EQ-3 CC Scale</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>42</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>104</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>SMC-EQ-4 CC Scale</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>43</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>105</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>SMC-EQ-5 CC Scale</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>44</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>106</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>SMC-EQ-6 CC Scale</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>45</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>107</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>SMC-EQ-7 CC Scale</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>46</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>108</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>SMC-EQ-8 CC Scale</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>47</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>109</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
+ <ExternalPatchbay>
+  <Connection>
+   <Source>PipeWire ALSA [java]/ALSA Playback [java]:output_FL</Source>
+   <Target>Tiger Lake-LP Smart Sound Technology Audio Controller Speaker + Headphones:playback_FL</Target>
+  </Connection>
+  <Connection>
+   <Source>PipeWire ALSA [java]/ALSA Playback [java]:output_FR</Source>
+   <Target>Tiger Lake-LP Smart Sound Technology Audio Controller Speaker + Headphones:playback_FR</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-1 - Basic Piano:output_1</Source>
+   <Target>LSP Mixer x8 Stereo:Input L</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-1 - Basic Piano:output_2</Source>
+   <Target>LSP Mixer x8 Stereo:Input R</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-2 - Nord White Grand Full 24C:out-left</Source>
+   <Target>AR-CH-2 Output Trim +6 dB:Input L</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-2 - Nord White Grand Full 24C:out-right</Source>
+   <Target>AR-CH-2 Output Trim +6 dB:Input R</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-3 - Alt Strings:output_1</Source>
+   <Target>LSP Mixer x8 Stereo:Input L</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-3 - Alt Strings:output_2</Source>
+   <Target>LSP Mixer x8 Stereo:Input R</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-4 - Good Flute:out-left</Source>
+   <Target>LSP Mixer x8 Stereo:Input L</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-4 - Good Flute:out-right</Source>
+   <Target>LSP Mixer x8 Stereo:Input R</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-5 - SAX Lirakeys CL:out-left</Source>
+   <Target>LSP Mixer x8 Stereo:Input L</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-5 - SAX Lirakeys CL:out-right</Source>
+   <Target>LSP Mixer x8 Stereo:Input R</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-6 - Hammond Organ Fast:out-left</Source>
+   <Target>LSP Mixer x8 Stereo:Input L</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-6 - Hammond Organ Fast:out-right</Source>
+   <Target>LSP Mixer x8 Stereo:Input R</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-7 - Optik Synth:out-left</Source>
+   <Target>LSP Mixer x8 Stereo:Input L</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-7 - Optik Synth:out-right</Source>
+   <Target>LSP Mixer x8 Stereo:Input R</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-8 - PAD EFEITOS:out-left</Source>
+   <Target>LSP Mixer x8 Stereo:Input L</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-8 - PAD EFEITOS:out-right</Source>
+   <Target>LSP Mixer x8 Stereo:Input R</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-9 - AtmosferaPAD:out-left</Source>
+   <Target>LSP Mixer x8 Stereo:Input L</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-9 - AtmosferaPAD:out-right</Source>
+   <Target>LSP Mixer x8 Stereo:Input R</Target>
+  </Connection>
+  <Connection>
+   <Source>PD-CH-1 - Drum Set:out-left</Source>
+   <Target>LSP Mixer x8 Stereo:Input L</Target>
+  </Connection>
+  <Connection>
+   <Source>PD-CH-1 - Drum Set:out-right</Source>
+   <Target>LSP Mixer x8 Stereo:Input R</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-1 - Oceans Worship Pad:out-left</Source>
+   <Target>LSP Mixer x8 Stereo:Input L</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-1 - Oceans Worship Pad:out-right</Source>
+   <Target>LSP Mixer x8 Stereo:Input R</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-2 Output Trim +6 dB:Output L</Source>
+   <Target>LSP Mixer x8 Stereo:Input L</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-2 Output Trim +6 dB:Output R</Source>
+   <Target>LSP Mixer x8 Stereo:Input R</Target>
+  </Connection>
+  <Connection>
+   <Source>LSP Mixer x8 Stereo:Output L</Source>
+   <Target>SMC-MIX - 8-Band EQ:Input L</Target>
+  </Connection>
+  <Connection>
+   <Source>LSP Mixer x8 Stereo:Output R</Source>
+   <Target>SMC-MIX - 8-Band EQ:Input R</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:KL Essential 61 mk3 1:(capture_0) KL Essential 61 mk3 MIDI</Source>
+   <Target>AR Controls - Sustain Scale:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:SINCO 2:(capture_1) SINCO SMC-PAD Pocket-Master</Source>
+   <Target>PD Controls - Sustain Scale:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-2- full speed:(capture_1) SINCO SMC-PAD-Master</Source>
+   <Target>PD Controls - Sustain Scale:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-3- full speed:(capture_1) SINCO SMK25-Master</Source>
+   <Target>SMK-CH-1 Volume Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR Controls - Sustain Scale:events-out</Source>
+   <Target>AR-CH-1 - Basic Piano:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR Controls - Sustain Scale:events-out</Source>
+   <Target>AR-CH-3 - Alt Strings:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR Controls - Sustain Scale:events-out</Source>
+   <Target>AR-CH-2 Volume Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR Controls - Sustain Scale:events-out</Source>
+   <Target>AR-CH-4 Volume Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR Controls - Sustain Scale:events-out</Source>
+   <Target>AR-CH-5 Volume Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR Controls - Sustain Scale:events-out</Source>
+   <Target>AR-CH-6 Volume Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR Controls - Sustain Scale:events-out</Source>
+   <Target>AR-CH-7 Volume Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR Controls - Sustain Scale:events-out</Source>
+   <Target>AR-CH-8 Volume Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR Controls - Sustain Scale:events-out</Source>
+   <Target>AR-CH-9 Volume Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-2 Volume Map:events-out</Source>
+   <Target>AR-CH-2 Reverb Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-2 Reverb Map:events-out</Source>
+   <Target>AR-CH-2 - Nord White Grand Full 24C:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-4 Volume Map:events-out</Source>
+   <Target>AR-CH-4 Reverb Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-4 Reverb Map:events-out</Source>
+   <Target>AR-CH-4 - Good Flute:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-5 Volume Map:events-out</Source>
+   <Target>AR-CH-5 Reverb Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-5 Reverb Map:events-out</Source>
+   <Target>AR-CH-5 - SAX Lirakeys CL:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-6 Volume Map:events-out</Source>
+   <Target>AR-CH-6 Reverb Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-6 Reverb Map:events-out</Source>
+   <Target>AR-CH-6 - Hammond Organ Fast:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-7 Volume Map:events-out</Source>
+   <Target>AR-CH-7 Reverb Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-7 Reverb Map:events-out</Source>
+   <Target>AR-CH-7 - Optik Synth:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-8 Volume Map:events-out</Source>
+   <Target>AR-CH-8 Reverb Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-8 Reverb Map:events-out</Source>
+   <Target>AR-CH-8 - PAD EFEITOS:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-9 Volume Map:events-out</Source>
+   <Target>AR-CH-9 Reverb Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>AR-CH-9 Reverb Map:events-out</Source>
+   <Target>AR-CH-9 - AtmosferaPAD:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>PD Controls - Sustain Scale:events-out</Source>
+   <Target>PD-CH-1 Volume Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>PD-CH-1 Volume Map:events-out</Source>
+   <Target>PD-CH-1 - Drum Set:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-1 Volume Map:events-out</Source>
+   <Target>SMK-CH-1 - Oceans Worship Pad:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-4- full speed:(capture_1) SINCO SMC-Mixer-Master</Source>
+   <Target>SMC-EQ-1 CC Scale:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMC-EQ-1 CC Scale:events-out</Source>
+   <Target>SMC-MIX - 8-Band EQ:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-4- full speed:(capture_1) SINCO SMC-Mixer-Master</Source>
+   <Target>SMC-EQ-2 CC Scale:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMC-EQ-2 CC Scale:events-out</Source>
+   <Target>SMC-MIX - 8-Band EQ:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-4- full speed:(capture_1) SINCO SMC-Mixer-Master</Source>
+   <Target>SMC-EQ-3 CC Scale:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMC-EQ-3 CC Scale:events-out</Source>
+   <Target>SMC-MIX - 8-Band EQ:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-4- full speed:(capture_1) SINCO SMC-Mixer-Master</Source>
+   <Target>SMC-EQ-4 CC Scale:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMC-EQ-4 CC Scale:events-out</Source>
+   <Target>SMC-MIX - 8-Band EQ:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-4- full speed:(capture_1) SINCO SMC-Mixer-Master</Source>
+   <Target>SMC-EQ-5 CC Scale:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMC-EQ-5 CC Scale:events-out</Source>
+   <Target>SMC-MIX - 8-Band EQ:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-4- full speed:(capture_1) SINCO SMC-Mixer-Master</Source>
+   <Target>SMC-EQ-6 CC Scale:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMC-EQ-6 CC Scale:events-out</Source>
+   <Target>SMC-MIX - 8-Band EQ:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-4- full speed:(capture_1) SINCO SMC-Mixer-Master</Source>
+   <Target>SMC-EQ-7 CC Scale:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMC-EQ-7 CC Scale:events-out</Source>
+   <Target>SMC-MIX - 8-Band EQ:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-4- full speed:(capture_1) SINCO SMC-Mixer-Master</Source>
+   <Target>SMC-EQ-8 CC Scale:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMC-EQ-8 CC Scale:events-out</Source>
+   <Target>SMC-MIX - 8-Band EQ:events-in</Target>
+  </Connection>
+  <Positions>
+   <Position x1="60" y1="70" pluginId="0">
+    <Name>AR-CH-1 - Basic Piano</Name>
+   </Position>
+   <Position x1="420" y1="70" pluginId="1">
+    <Name>AR-CH-2 - Nord White Grand Full 24C</Name>
+   </Position>
+   <Position x1="780" y1="70" pluginId="2">
+    <Name>AR-CH-3 - Alt Strings</Name>
+   </Position>
+   <Position x1="1140" y1="70" pluginId="3">
+    <Name>AR-CH-4 - Good Flute</Name>
+   </Position>
+   <Position x1="60" y1="220" pluginId="4">
+    <Name>AR-CH-5 - SAX Lirakeys CL</Name>
+   </Position>
+   <Position x1="420" y1="220" pluginId="5">
+    <Name>AR-CH-6 - Hammond Organ Fast</Name>
+   </Position>
+   <Position x1="780" y1="220" pluginId="6">
+    <Name>AR-CH-7 - Optik Synth</Name>
+   </Position>
+   <Position x1="1140" y1="220" pluginId="7">
+    <Name>AR-CH-8 - PAD EFEITOS</Name>
+   </Position>
+   <Position x1="60" y1="370" pluginId="8">
+    <Name>AR-CH-9 - AtmosferaPAD</Name>
+   </Position>
+   <Position x1="420" y1="370" pluginId="9">
+    <Name>PD-CH-1 - Drum Set</Name>
+   </Position>
+   <Position x1="780" y1="370" pluginId="10">
+    <Name>SMK-CH-1 - Oceans Worship Pad</Name>
+   </Position>
+   <Position x1="1140" y1="370" pluginId="11">
+    <Name>LSP Mixer x8 Stereo</Name>
+   </Position>
+   <Position x1="60" y1="520" pluginId="12">
+    <Name>SMC-MIX - 8-Band EQ</Name>
+   </Position>
+   <Position x1="420" y1="520" pluginId="13">
+    <Name>AR-CH-2 Output Trim +6 dB</Name>
+   </Position>
+   <Position x1="780" y1="520" pluginId="14">
+    <Name>AR Controls - Sustain Scale</Name>
+   </Position>
+   <Position x1="1140" y1="520" pluginId="15">
+    <Name>PD Controls - Sustain Scale</Name>
+   </Position>
+   <Position x1="60" y1="670" pluginId="16">
+    <Name>AR-CH-2 Volume Map</Name>
+   </Position>
+   <Position x1="420" y1="670" pluginId="17">
+    <Name>AR-CH-4 Volume Map</Name>
+   </Position>
+   <Position x1="780" y1="670" pluginId="18">
+    <Name>AR-CH-5 Volume Map</Name>
+   </Position>
+   <Position x1="1140" y1="670" pluginId="19">
+    <Name>AR-CH-6 Volume Map</Name>
+   </Position>
+   <Position x1="60" y1="820" pluginId="20">
+    <Name>AR-CH-7 Volume Map</Name>
+   </Position>
+   <Position x1="420" y1="820" pluginId="21">
+    <Name>AR-CH-8 Volume Map</Name>
+   </Position>
+   <Position x1="780" y1="820" pluginId="22">
+    <Name>AR-CH-9 Volume Map</Name>
+   </Position>
+   <Position x1="1140" y1="820" pluginId="23">
+    <Name>PD-CH-1 Volume Map</Name>
+   </Position>
+   <Position x1="60" y1="970" pluginId="24">
+    <Name>SMK-CH-1 Volume Map</Name>
+   </Position>
+   <Position x1="420" y1="970" pluginId="25">
+    <Name>AR-CH-2 Reverb Map</Name>
+   </Position>
+   <Position x1="780" y1="970" pluginId="26">
+    <Name>AR-CH-4 Reverb Map</Name>
+   </Position>
+   <Position x1="1140" y1="970" pluginId="27">
+    <Name>AR-CH-5 Reverb Map</Name>
+   </Position>
+   <Position x1="60" y1="1120" pluginId="28">
+    <Name>AR-CH-6 Reverb Map</Name>
+   </Position>
+   <Position x1="420" y1="1120" pluginId="29">
+    <Name>AR-CH-7 Reverb Map</Name>
+   </Position>
+   <Position x1="780" y1="1120" pluginId="30">
+    <Name>AR-CH-8 Reverb Map</Name>
+   </Position>
+   <Position x1="1140" y1="1120" pluginId="31">
+    <Name>AR-CH-9 Reverb Map</Name>
+   </Position>
+   <Position x1="60" y1="1270" pluginId="32">
+    <Name>SMC-EQ-1 CC Scale</Name>
+   </Position>
+   <Position x1="420" y1="1270" pluginId="33">
+    <Name>SMC-EQ-2 CC Scale</Name>
+   </Position>
+   <Position x1="780" y1="1270" pluginId="34">
+    <Name>SMC-EQ-3 CC Scale</Name>
+   </Position>
+   <Position x1="1140" y1="1270" pluginId="35">
+    <Name>SMC-EQ-4 CC Scale</Name>
+   </Position>
+   <Position x1="60" y1="1420" pluginId="36">
+    <Name>SMC-EQ-5 CC Scale</Name>
+   </Position>
+   <Position x1="420" y1="1420" pluginId="37">
+    <Name>SMC-EQ-6 CC Scale</Name>
+   </Position>
+   <Position x1="780" y1="1420" pluginId="38">
+    <Name>SMC-EQ-7 CC Scale</Name>
+   </Position>
+   <Position x1="1140" y1="1420" pluginId="39">
+    <Name>SMC-EQ-8 CC Scale</Name>
+   </Position>
+  </Positions>
+ </ExternalPatchbay>
+</CARLA-PROJECT>

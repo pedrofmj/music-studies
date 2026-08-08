@@ -3,6 +3,10 @@
 This folder contains the reproducible configuration for Pedro's live Carla
 rack on `airstar`.
 
+The current deployable project snapshot is versioned under
+[`src/audio-software/carla/projects/pedro-live-rack`](../../../src/audio-software/carla/projects/pedro-live-rack/README.md).
+SoundFonts and sample libraries remain external.
+
 ## Files
 
 - `configure-live-rack.py`: rebuilds `/c/music/carla/pedro.uproject`, validates
