@@ -30,10 +30,20 @@ SoundFonts and sample libraries remain external.
 | AR-CH-9 | Arturia | AtmosferaPAD | Fader 9 / CC85 | Knob 9 / CC17 |
 | PD-CH-1 | SMC-PAD / Pocket | Drum Set | CC36 | CC91 |
 | SMK-CH-1 | SMK-25 | Oceans Worship Pad | Knob 1 / CC20 | CC91 |
+| SMK-CH-2 | SMK-25 | Warm Worship Pad | Knob 2 / CC21 | CC91 |
+| SMK-CH-3 | SMK-25 | Hillsong Pad | Knob 3 / CC22 | CC91 |
+| SMK-CH-4 | SMK-25 | Worship Shimmer | Knob 4 / CC23 | CC91 |
+| SMK-CH-5 | SMK-25 | Cloud Shimmer | Knob 5 / CC24 | CC91 |
+| SMK-CH-6 | SMK-25 | Magic Ambient | Knob 6 / CC25 | CC91 |
+| SMK-CH-7 | SMK-25 | Majesty Pad | Knob 7 / CC26 | CC91 |
+| SMK-CH-8 | SMK-25 | Sanctorium Pad | Knob 8 / CC27 | CC91 |
 
-The nine Arturia rack-level slot volumes and both additional controller slots
-are saved at `1.0`. Native SF2 volume paths use a `mapcc` stage that converts
-the physical control to standard instrument volume CC7. Native SF2 reverb
+All instrument rack-level slot volumes are saved at `1.0`. The eight SMK
+instruments feed a dedicated `SMK Layer Mixer x8 Stereo`; physical Knobs 1-8
+(CC20-27) map directly to its channel gains 1-8. A gain value of zero therefore
+hard-mutes the corresponding audio layer instead of depending on an SF2 engine
+honoring MIDI CC7. Arturia and pad SF2 volume paths continue to use `mapcc`
+conversion. Native SF2 reverb
 paths likewise convert each Arturia knob to FluidSynth's standard reverb-send
 CC91. The native `Rvrb` engine remains enabled with a fixed return level; its
 host parameter is intentionally unmapped so Carla forwards CC91 to the synth.
@@ -41,6 +51,14 @@ host parameter is intentionally unmapped so Carla forwards CC91 to the synth.
 AR-CH-2 remains saved at 100% slot volume. A controller-independent stereo
 trim adds 6 dB after the Nord instrument to compensate for its quieter source
 samples without changing the fader's full-range behavior.
+
+The eight SMK layers receive MIDI from the
+[SMK-25 Pad Layers](../smk25-pad-layers/README.md) service. Performance data
+uses `SMK25-Master`; Stop and Play use the controller AUX `capture_2` endpoint.
+The AUX JACK name ends with whitespace, so the PipeWire snapshot watcher owns
+that external AUX-to-router link after deployment. Side-A Pads 1-8
+control independent continuous hold, while Knobs 1-8 control the corresponding
+dedicated mixer channel. The selected SF2 banks all contain looped pad samples.
 
 ## Equalizer
 
@@ -66,8 +84,9 @@ are disabled to reduce live CPU usage.
 
 ```text
 AR-CH-2 -> AR-CH-2 Output Trim +6 dB --+
-other instruments --------------------+
-                                        |
+SMK instruments -> SMK Layer Mixer x8 -+
+other instruments ---------------------+
+                                         |
   -> LSP Mixer x8 Stereo
   -> SMC-MIX - 8-Band EQ
   -> Arturia Main Volume Encoder stereo gate

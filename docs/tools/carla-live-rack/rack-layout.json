@@ -2,31 +2,228 @@
   "schema": "pedro-carla-live-rack/v1",
   "project": "/c/music/carla/pedro.uproject",
   "instruments": [
-    {"name": "AR-CH-1 - Basic Piano", "controller": "Arturia", "volume_cc": 73, "reverb_cc": 74},
-    {"name": "AR-CH-2 - Nord White Grand Full 24C", "controller": "Arturia", "volume_cc": 75, "reverb_cc": 71, "reverb_mapped_cc": 91, "output_trim_db": 6.0206},
-    {"name": "AR-CH-3 - Alt Strings", "controller": "Arturia", "volume_cc": 79, "reverb_cc": 76},
-    {"name": "AR-CH-4 - Good Flute", "controller": "Arturia", "volume_cc": 72, "reverb_cc": 77, "reverb_mapped_cc": 91},
-    {"name": "AR-CH-5 - SAX Lirakeys CL", "controller": "Arturia", "volume_cc": 80, "reverb_cc": 93, "reverb_mapped_cc": 91},
-    {"name": "AR-CH-6 - Hammond Organ Fast", "controller": "Arturia", "volume_cc": 81, "reverb_cc": 18, "reverb_mapped_cc": 91},
-    {"name": "AR-CH-7 - Optik Synth", "controller": "Arturia", "volume_cc": 82, "reverb_cc": 19, "reverb_mapped_cc": 91},
-    {"name": "AR-CH-8 - PAD EFEITOS", "controller": "Arturia", "volume_cc": 83, "reverb_cc": 16, "reverb_mapped_cc": 91},
-    {"name": "AR-CH-9 - AtmosferaPAD", "controller": "Arturia", "volume_cc": 85, "reverb_cc": 17, "reverb_mapped_cc": 91},
-    {"name": "PD-CH-1 - Drum Set", "controller": "SMC-PAD and SMC-PAD Pocket", "volume_cc": 36, "reverb_cc": 91},
-    {"name": "SMK-CH-1 - Oceans Worship Pad", "controller": "SMK-25", "volume_cc": 20, "reverb_cc": 91}
+    {
+      "name": "AR-CH-1 - Basic Piano",
+      "controller": "Arturia",
+      "volume_cc": 73,
+      "reverb_cc": 74
+    },
+    {
+      "name": "AR-CH-2 - Nord White Grand Full 24C",
+      "controller": "Arturia",
+      "volume_cc": 75,
+      "reverb_cc": 71,
+      "reverb_mapped_cc": 91,
+      "output_trim_db": 6.0206
+    },
+    {
+      "name": "AR-CH-3 - Alt Strings",
+      "controller": "Arturia",
+      "volume_cc": 79,
+      "reverb_cc": 76
+    },
+    {
+      "name": "AR-CH-4 - Good Flute",
+      "controller": "Arturia",
+      "volume_cc": 72,
+      "reverb_cc": 77,
+      "reverb_mapped_cc": 91
+    },
+    {
+      "name": "AR-CH-5 - SAX Lirakeys CL",
+      "controller": "Arturia",
+      "volume_cc": 80,
+      "reverb_cc": 93,
+      "reverb_mapped_cc": 91
+    },
+    {
+      "name": "AR-CH-6 - Hammond Organ Fast",
+      "controller": "Arturia",
+      "volume_cc": 81,
+      "reverb_cc": 18,
+      "reverb_mapped_cc": 91
+    },
+    {
+      "name": "AR-CH-7 - Optik Synth",
+      "controller": "Arturia",
+      "volume_cc": 82,
+      "reverb_cc": 19,
+      "reverb_mapped_cc": 91
+    },
+    {
+      "name": "AR-CH-8 - PAD EFEITOS",
+      "controller": "Arturia",
+      "volume_cc": 83,
+      "reverb_cc": 16,
+      "reverb_mapped_cc": 91
+    },
+    {
+      "name": "AR-CH-9 - AtmosferaPAD",
+      "controller": "Arturia",
+      "volume_cc": 85,
+      "reverb_cc": 17,
+      "reverb_mapped_cc": 91
+    },
+    {
+      "name": "PD-CH-1 - Drum Set",
+      "controller": "SMC-PAD and SMC-PAD Pocket",
+      "volume_cc": 36,
+      "reverb_cc": 91
+    },
+    {
+      "name": "SMK-CH-1 - Oceans Worship Pad",
+      "controller": "SMK-25",
+      "volume_cc": 20,
+      "latch_pad": 1,
+      "reverb_cc": 91
+    },
+    {
+      "name": "SMK-CH-2 - Warm Worship Pad",
+      "controller": "SMK-25",
+      "volume_cc": 21,
+      "latch_pad": 2,
+      "reverb_cc": 91
+    },
+    {
+      "name": "SMK-CH-3 - Hillsong Pad",
+      "controller": "SMK-25",
+      "volume_cc": 22,
+      "latch_pad": 3,
+      "reverb_cc": 91
+    },
+    {
+      "name": "SMK-CH-4 - Worship Shimmer",
+      "controller": "SMK-25",
+      "volume_cc": 23,
+      "latch_pad": 4,
+      "reverb_cc": 91
+    },
+    {
+      "name": "SMK-CH-5 - Cloud Shimmer",
+      "controller": "SMK-25",
+      "volume_cc": 24,
+      "latch_pad": 5,
+      "reverb_cc": 91
+    },
+    {
+      "name": "SMK-CH-6 - Magic Ambient",
+      "controller": "SMK-25",
+      "volume_cc": 25,
+      "latch_pad": 6,
+      "reverb_cc": 91
+    },
+    {
+      "name": "SMK-CH-7 - Majesty Pad",
+      "controller": "SMK-25",
+      "volume_cc": 26,
+      "latch_pad": 7,
+      "reverb_cc": 91
+    },
+    {
+      "name": "SMK-CH-8 - Sanctorium Pad",
+      "controller": "SMK-25",
+      "volume_cc": 27,
+      "latch_pad": 8,
+      "reverb_cc": 91
+    }
   ],
+  "smk25_router": {
+    "performance_source": "SMK25-Master capture_1",
+    "transport_source": "SMK25 AUX capture_2",
+    "side_a_pad_ccs": [
+      40,
+      41,
+      42,
+      43,
+      36,
+      37,
+      38,
+      39
+    ],
+    "side_a_pad_channels": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "knob_ccs": [
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27
+    ],
+    "stop_note": 93,
+    "play_note": 94
+  },
   "equalizer": {
     "name": "SMC-MIX - 8-Band EQ",
     "plugin_uri": "http://lsp-plug.in/plugins/lv2/para_equalizer_x8_stereo",
-    "source_ccs": [40, 41, 42, 43, 44, 45, 46, 47],
-    "mapped_ccs": [102, 103, 104, 105, 106, 107, 108, 109],
-    "frequencies_hz": [63, 125, 250, 500, 1000, 2000, 4000, 8000],
-    "gain_range_db": [-12, 12]
+    "source_ccs": [
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47
+    ],
+    "mapped_ccs": [
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109
+    ],
+    "frequencies_hz": [
+      63,
+      125,
+      250,
+      500,
+      1000,
+      2000,
+      4000,
+      8000
+    ],
+    "gain_range_db": [
+      -12,
+      12
+    ]
   },
   "audio_route": [
-    "instruments",
+    "SMK instruments -> SMK Layer Mixer x8 Stereo; other instruments",
     "LSP Mixer x8 Stereo",
     "SMC-MIX - 8-Band EQ",
     "Arturia Main Volume Encoder",
     "system playback"
-  ]
+  ],
+  "smk25_layer_mixer": {
+    "name": "SMK Layer Mixer x8 Stereo",
+    "input_ccs": [
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27
+    ],
+    "channel_gain_range": [
+      0,
+      1
+    ],
+    "initial_channel_gain": 0
+  }
 }

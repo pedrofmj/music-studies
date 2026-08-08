@@ -56,6 +56,44 @@ ASSETS = {
         SOUND_ROOT / "02_SoundFonts/11_Pads_and_Ambience/OceansPad - TIMBRES PREMIUM.sf2",
         "OceansPad - TIMBRES",
     ),
+    "warm_pad": (
+        SOUND_ROOT / "02_SoundFonts/11_Pads_and_Ambience/WarmPad - TIMBRES PREMIUM.sf2",
+        "WarmPad - TIMBRES PREMIUM",
+    ),
+    "hillsong_pad": (
+        SOUND_ROOT / "02_SoundFonts/11_Pads_and_Ambience/Hillsong Pad - TIMBRES PREMIUM.sf2",
+        "Hillsong Pad - TIMBRES",
+    ),
+    "worship_shimmer": (
+        SOUND_ROOT
+        / "02_SoundFonts/11_Pads_and_Ambience"
+        / "PAD WorshipShimmer - TIMBRES PREMIUM.sf2",
+        "PAD WorshipShimmer",
+    ),
+    "cloud_shimmer": (
+        SOUND_ROOT
+        / "02_SoundFonts/11_Pads_and_Ambience"
+        / "Cloud Shimmer - TIMBRES PREMIUM.sf2",
+        "Cloud Shimmer - TIMBRES",
+    ),
+    "magic_ambient": (
+        SOUND_ROOT
+        / "02_SoundFonts/11_Pads_and_Ambience"
+        / "MagicAmbient - TIMBRES PREMIUM.sf2",
+        "MagicAmbient - TIMBRES",
+    ),
+    "majesty_pad": (
+        SOUND_ROOT
+        / "02_SoundFonts/11_Pads_and_Ambience"
+        / "MajestyPad - TIMBRES PREMIUM.sf2",
+        "MajestyPad - TIMBRES",
+    ),
+    "sanctorium_pad": (
+        SOUND_ROOT
+        / "02_SoundFonts/11_Pads_and_Ambience"
+        / "Sanctorium Pad - TIMBRES PREMIUM.sf2",
+        "Sanctorium Pad - TIMBRES",
+    ),
 }
 
 ARTURIA_SOURCE = "Midi-Bridge:KL Essential 61 mk3 1:(capture_0) KL Essential 61 mk3 MIDI"
@@ -68,6 +106,12 @@ SMK_SOURCE = (
     "Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-3- full speed:"
     "(capture_1) SINCO SMK25-Master"
 )
+SMK_TRANSPORT_SOURCE = (
+    "Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-3- full speed:"
+    "(capture_2) SINCO "
+)
+SMK_LAYER_ROUTER = "SMK25 Pad Layers"
+SMK_LAYER_MIXER = "SMK Layer Mixer x8 Stereo"
 SMC_MIXER_SOURCE = (
     "Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-4- full speed:"
     "(capture_1) SINCO SMC-Mixer-Master"
@@ -217,6 +261,26 @@ def configure_scale(template: ET.Element, name: str) -> ET.Element:
     return plugin
 
 
+def configure_smk_layer_mixer(template: ET.Element) -> ET.Element:
+    plugin = copy.deepcopy(template)
+    set_info(plugin, SMK_LAYER_MIXER)
+    set_text(plugin, "Data/Volume", 1)
+    set_text(parameter(plugin, 2, "Output balance", "bal"), "Value", 0)
+    output_gain = parameter(plugin, 5, "Output gain", "g_out")
+    clear_mapping(output_gain)
+    set_text(output_gain, "Value", 1)
+    for layer in range(1, 9):
+        gain = parameter(
+            plugin,
+            16 + 9 * (layer - 1),
+            f"Channel gain {layer}",
+            f"cg_{layer}",
+        )
+        map_parameter(gain, 19 + layer, 0, 1)
+        set_text(gain, "Value", 0)
+    return plugin
+
+
 def configure_master_mixer(template: ET.Element) -> ET.Element:
     plugin = copy.deepcopy(template)
     set_text(plugin, "Data/Volume", 1)
@@ -314,8 +378,30 @@ def replace_patchbay(root: ET.Element, plugins: list[ET.Element]) -> None:
         ("AR-CH-9 - AtmosferaPAD", "out-left", "out-right"),
         ("PD-CH-1 - Drum Set", "out-left", "out-right"),
         ("SMK-CH-1 - Oceans Worship Pad", "out-left", "out-right"),
+        ("SMK-CH-2 - Warm Worship Pad", "out-left", "out-right"),
+        ("SMK-CH-3 - Hillsong Pad", "out-left", "out-right"),
+        ("SMK-CH-4 - Worship Shimmer", "out-left", "out-right"),
+        ("SMK-CH-5 - Cloud Shimmer", "out-left", "out-right"),
+        ("SMK-CH-6 - Magic Ambient", "out-left", "out-right"),
+        ("SMK-CH-7 - Majesty Pad", "out-left", "out-right"),
+        ("SMK-CH-8 - Sanctorium Pad", "out-left", "out-right"),
     ]
+    smk_channels = {
+        name: channel
+        for channel, (name, _left, _right) in enumerate(instruments[-8:], start=1)
+    }
     for name, left, right in instruments:
+        if name in smk_channels:
+            channel = smk_channels[name]
+            add_connection(
+                patchbay, f"{name}:{left}",
+                f"{SMK_LAYER_MIXER}:Audio input left {channel}",
+            )
+            add_connection(
+                patchbay, f"{name}:{right}",
+                f"{SMK_LAYER_MIXER}:Audio input right {channel}",
+            )
+            continue
         if name == "AR-CH-2 - Nord White Grand Full 24C":
             add_connection(patchbay, f"{name}:{left}", f"{AR2_TRIM}:Input L")
             add_connection(patchbay, f"{name}:{right}", f"{AR2_TRIM}:Input R")
@@ -325,6 +411,12 @@ def replace_patchbay(root: ET.Element, plugins: list[ET.Element]) -> None:
 
     add_connection(patchbay, f"{AR2_TRIM}:Output L", f"{MASTER_MIXER}:Input L")
     add_connection(patchbay, f"{AR2_TRIM}:Output R", f"{MASTER_MIXER}:Input R")
+    add_connection(
+        patchbay, f"{SMK_LAYER_MIXER}:Output L", f"{MASTER_MIXER}:Input L"
+    )
+    add_connection(
+        patchbay, f"{SMK_LAYER_MIXER}:Output R", f"{MASTER_MIXER}:Input R"
+    )
 
     add_connection(patchbay, f"{MASTER_MIXER}:Output L", f"{MASTER_EQ}:Input L")
     add_connection(patchbay, f"{MASTER_MIXER}:Output R", f"{MASTER_EQ}:Input R")
@@ -332,7 +424,10 @@ def replace_patchbay(root: ET.Element, plugins: list[ET.Element]) -> None:
     add_connection(patchbay, ARTURIA_SOURCE, f"{ARTURIA_SCALE}:events-in")
     add_connection(patchbay, PAD_POCKET_SOURCE, f"{PAD_SCALE}:events-in")
     add_connection(patchbay, PAD_SOURCE, f"{PAD_SCALE}:events-in")
-    add_connection(patchbay, SMK_SOURCE, "SMK-CH-1 Volume Map:events-in")
+    add_connection(patchbay, SMK_SOURCE, f"{SMK_LAYER_ROUTER}:midi-in")
+    add_connection(
+        patchbay, SMK_TRANSPORT_SOURCE, f"{SMK_LAYER_ROUTER}:midi-in"
+    )
 
     add_connection(patchbay, f"{ARTURIA_SCALE}:events-out", "AR-CH-1 - Basic Piano:events-in")
     add_connection(patchbay, f"{ARTURIA_SCALE}:events-out", "AR-CH-3 - Alt Strings:events-in")
@@ -364,7 +459,27 @@ def replace_patchbay(root: ET.Element, plugins: list[ET.Element]) -> None:
 
     add_connection(patchbay, f"{PAD_SCALE}:events-out", "PD-CH-1 Volume Map:events-in")
     add_connection(patchbay, "PD-CH-1 Volume Map:events-out", "PD-CH-1 - Drum Set:events-in")
-    add_connection(patchbay, "SMK-CH-1 Volume Map:events-out", "SMK-CH-1 - Oceans Worship Pad:events-in")
+    smk_targets = (
+        "SMK-CH-1 - Oceans Worship Pad",
+        "SMK-CH-2 - Warm Worship Pad",
+        "SMK-CH-3 - Hillsong Pad",
+        "SMK-CH-4 - Worship Shimmer",
+        "SMK-CH-5 - Cloud Shimmer",
+        "SMK-CH-6 - Magic Ambient",
+        "SMK-CH-7 - Majesty Pad",
+        "SMK-CH-8 - Sanctorium Pad",
+    )
+    for layer, target in enumerate(smk_targets, start=1):
+        add_connection(
+            patchbay,
+            f"{SMK_LAYER_ROUTER}:layer-{layer}",
+            f"{target}:events-in",
+        )
+        add_connection(
+            patchbay,
+            f"{SMK_LAYER_ROUTER}:layer-{layer}",
+            f"{SMK_LAYER_MIXER}:events-in",
+        )
 
     for band in range(8):
         mapper = f"SMC-EQ-{band + 1} CC Scale"
@@ -409,6 +524,18 @@ def build_plugins(root: ET.Element) -> list[ET.Element]:
         configure_sf2(sf2_template, "AR-CH-9 - AtmosferaPAD", "atmosphere"),
         configure_sf2(sf2_template, "PD-CH-1 - Drum Set", "drums"),
         configure_sf2(sf2_template, "SMK-CH-1 - Oceans Worship Pad", "oceans"),
+        configure_sf2(sf2_template, "SMK-CH-2 - Warm Worship Pad", "warm_pad"),
+        configure_sf2(sf2_template, "SMK-CH-3 - Hillsong Pad", "hillsong_pad"),
+        configure_sf2(
+            sf2_template, "SMK-CH-4 - Worship Shimmer", "worship_shimmer"
+        ),
+        configure_sf2(sf2_template, "SMK-CH-5 - Cloud Shimmer", "cloud_shimmer"),
+        configure_sf2(sf2_template, "SMK-CH-6 - Magic Ambient", "magic_ambient"),
+        configure_sf2(sf2_template, "SMK-CH-7 - Majesty Pad", "majesty_pad"),
+        configure_sf2(
+            sf2_template, "SMK-CH-8 - Sanctorium Pad", "sanctorium_pad"
+        ),
+        configure_smk_layer_mixer(mixer),
         configure_master_mixer(mixer),
         build_eq(),
         configure_output_trim(mixer),
@@ -421,7 +548,6 @@ def build_plugins(root: ET.Element) -> list[ET.Element]:
     plugins.extend(
         (
             configure_mapcc(mapcc_template, "PD-CH-1 Volume Map", 36, 7),
-            configure_mapcc(mapcc_template, "SMK-CH-1 Volume Map", 20, 7),
         )
     )
     reverb_controls = (
@@ -455,8 +581,8 @@ def validate_assets() -> None:
 
 def validate_result(root: ET.Element, plugins: list[ET.Element]) -> None:
     names = [plugin_name(plugin) for plugin in plugins]
-    if len(plugins) != 40 or len(names) != len(set(names)):
-        raise ValueError("expected 40 uniquely named plugins")
+    if len(plugins) != 47 or len(names) != len(set(names)):
+        raise ValueError("expected 47 uniquely named plugins")
     expected = {f"AR-CH-{channel}" for channel in range(1, 10)}
     found = {
         name.split(" - ", 1)[0]
@@ -466,8 +592,8 @@ def validate_result(root: ET.Element, plugins: list[ET.Element]) -> None:
     if found != expected:
         raise ValueError(f"Arturia instrument set mismatch: {sorted(found)}")
     connections = root.findall("ExternalPatchbay/Connection")
-    if len(connections) != 74:
-        raise ValueError(f"expected 74 project connections, found {len(connections)}")
+    if len(connections) != 106:
+        raise ValueError(f"expected 106 project connections, found {len(connections)}")
 
 
 def write_project(project: Path, root: ET.Element, make_backup: bool) -> Path | None:
@@ -510,13 +636,13 @@ def main() -> int:
     validate_result(root, plugins)
 
     if args.check_only:
-        print(f"OK: would write {len(plugins)} plugins and 74 project connections")
+        print(f"OK: would write {len(plugins)} plugins and 106 project connections")
         return 0
     backup = write_project(args.project, root, not args.no_backup)
     print(f"Updated: {args.project}")
     if backup is not None:
         print(f"Backup: {backup}")
-    print(f"Plugins: {len(plugins)}; project connections: 74")
+    print(f"Plugins: {len(plugins)}; project connections: 106")
     return 0
 
 

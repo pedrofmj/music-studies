@@ -3,13 +3,13 @@
   "name": "Pedro Live Rack",
   "project_file": "pedro.uproject",
   "captured_from": "pedro.ferreira@airstar:/c/music/carla/pedro.uproject",
-  "captured_at": "2026-08-08T15:08:40-03:00",
-  "sha256": "ba7cb9b47dbbbf06d23d832399b0e2e1340d668c30ed0e4978edd98c956551e4",
-  "size_bytes": 92377,
+  "captured_at": "2026-08-08T18:03:52-03:00",
+  "sha256": "e3e748cda372c044e86679589f4061bb8633ac361939859b9322fdd0d262bf91",
+  "size_bytes": 121306,
   "expected": {
-    "plugins": 40,
-    "soundfont_slots": 9,
-    "carla_patchbay_connections": 74
+    "plugins": 47,
+    "soundfont_slots": 16,
+    "carla_patchbay_connections": 106
   },
   "runtime": {
     "carla_flatpak_id": "studio.kx.carla",

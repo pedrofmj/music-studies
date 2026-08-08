@@ -1,0 +1,13 @@
+[Unit]
+Description=SMK-25 eight-layer pad latch and transport router
+After=pipewire.service
+Wants=pipewire.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/pw-jack %h/.local/bin/smk25-pad-layers %h/.config/smk25-pad-layers.conf %h/.local/state/smk25-pad-layers/state
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

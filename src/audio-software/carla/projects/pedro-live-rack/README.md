@@ -41,8 +41,8 @@ ssh pedro.ferreira@airstar '~/bin/carla-pedro-project'
 ```
 
 The PipeWire restore service owns connections outside Carla, including the
-final EQ-to-volume-gate and gate-to-system links. It is intentionally separate
-from this project snapshot.
+SMK-25 AUX transport input, final EQ-to-volume-gate, and gate-to-system
+links. It is intentionally separate from this project snapshot.
 
 ## Capture From Airstar
 

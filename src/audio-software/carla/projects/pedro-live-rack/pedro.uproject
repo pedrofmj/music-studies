@@ -980,6 +980,1024 @@ YXg9IjEiLz48L2NjPjwvbWlkaT48bW9kdWxhdG9ycy8+PHRhZ3MvPjxidXNlcy8+PG5vdGVTZXF1ZW5j
  </Plugin>
  <Plugin>
   <Info>
+   <Type>SF2</Type>
+   <Name>SMK-CH-2 - Warm Worship Pad</Name>
+   <Filename>/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library/02_SoundFonts/11_Pads_and_Ambience/WarmPad - TIMBRES PREMIUM.sf2</Filename>
+   <Label>WarmPad - TIMBRES PREMIUM</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>SF2</Type>
+   <Name>SMK-CH-3 - Hillsong Pad</Name>
+   <Filename>/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library/02_SoundFonts/11_Pads_and_Ambience/Hillsong Pad - TIMBRES PREMIUM.sf2</Filename>
+   <Label>Hillsong Pad - TIMBRES</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>SF2</Type>
+   <Name>SMK-CH-4 - Worship Shimmer</Name>
+   <Filename>/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library/02_SoundFonts/11_Pads_and_Ambience/PAD WorshipShimmer - TIMBRES PREMIUM.sf2</Filename>
+   <Label>PAD WorshipShimmer</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>SF2</Type>
+   <Name>SMK-CH-5 - Cloud Shimmer</Name>
+   <Filename>/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library/02_SoundFonts/11_Pads_and_Ambience/Cloud Shimmer - TIMBRES PREMIUM.sf2</Filename>
+   <Label>Cloud Shimmer - TIMBRES</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>SF2</Type>
+   <Name>SMK-CH-6 - Magic Ambient</Name>
+   <Filename>/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library/02_SoundFonts/11_Pads_and_Ambience/MagicAmbient - TIMBRES PREMIUM.sf2</Filename>
+   <Label>MagicAmbient - TIMBRES</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>SF2</Type>
+   <Name>SMK-CH-7 - Majesty Pad</Name>
+   <Filename>/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library/02_SoundFonts/11_Pads_and_Ambience/MajestyPad - TIMBRES PREMIUM.sf2</Filename>
+   <Label>MajestyPad - TIMBRES</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>SF2</Type>
+   <Name>SMK-CH-8 - Sanctorium Pad</Name>
+   <Filename>/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library/02_SoundFonts/11_Pads_and_Ambience/Sanctorium Pad - TIMBRES PREMIUM.sf2</Filename>
+   <Label>Sanctorium Pad - TIMBRES</Label>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1f4</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Reverb On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Reverb Room Size</Name>
+    <Value>0.65</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Reverb Damp</Name>
+    <Value>0.3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Reverb Level</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Reverb Width</Name>
+    <Value>0.8</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Chorus On/Off</Name>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>6</Index>
+    <Name>Chorus Voice Count</Name>
+    <Value>3</Value>
+   </Parameter>
+   <Parameter>
+    <Index>7</Index>
+    <Name>Chorus Level</Name>
+    <Value>0.600000023841858</Value>
+   </Parameter>
+   <Parameter>
+    <Index>8</Index>
+    <Name>Chorus Speed</Name>
+    <Value>0.28999999165535</Value>
+   </Parameter>
+   <Parameter>
+    <Index>9</Index>
+    <Name>Chorus Depth</Name>
+    <Value>4.25</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Chorus Type</Name>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Polyphony</Name>
+    <Value>64</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Interpolation</Name>
+    <Value>4</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/string</Type>
+    <Key>midiPrograms</Key>
+    <Value>0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>SMK Layer Mixer x8 Stereo</Name>
+   <URI>http://lsp-plug.in/plugins/lv2/mixer_x8_stereo</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Enabled</Name>
+    <Symbol>enabled</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Mono output</Name>
+    <Symbol>mono</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Output balance</Name>
+    <Symbol>bal</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Dry amount</Name>
+    <Symbol>dry</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Wet amount</Name>
+    <Symbol>wet</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Output gain</Name>
+    <Symbol>g_out</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Channel solo 1</Name>
+    <Symbol>cs_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Channel mute 1</Name>
+    <Symbol>cm_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Channel phase invert 1</Name>
+    <Symbol>ci_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>13</Index>
+    <Name>Channel pan left 1</Name>
+    <Symbol>cp_1l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>14</Index>
+    <Name>Channel pan right 1</Name>
+    <Symbol>cp_1r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>15</Index>
+    <Name>Channel output balance 1</Name>
+    <Symbol>cb_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>16</Index>
+    <Name>Channel gain 1</Name>
+    <Symbol>cg_1</Symbol>
+    <Value>0</Value>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>20</MappedControlIndex>
+    <MappedMinimum>0</MappedMinimum>
+    <MappedMaximum>1</MappedMaximum>
+    <MidiCC>20</MidiCC>
+   </Parameter>
+   <Parameter>
+    <Index>19</Index>
+    <Name>Channel solo 2</Name>
+    <Symbol>cs_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>20</Index>
+    <Name>Channel mute 2</Name>
+    <Symbol>cm_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>21</Index>
+    <Name>Channel phase invert 2</Name>
+    <Symbol>ci_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>22</Index>
+    <Name>Channel pan left 2</Name>
+    <Symbol>cp_2l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>23</Index>
+    <Name>Channel pan right 2</Name>
+    <Symbol>cp_2r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>24</Index>
+    <Name>Channel output balance 2</Name>
+    <Symbol>cb_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>25</Index>
+    <Name>Channel gain 2</Name>
+    <Symbol>cg_2</Symbol>
+    <Value>0</Value>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>21</MappedControlIndex>
+    <MappedMinimum>0</MappedMinimum>
+    <MappedMaximum>1</MappedMaximum>
+    <MidiCC>21</MidiCC>
+   </Parameter>
+   <Parameter>
+    <Index>28</Index>
+    <Name>Channel solo 3</Name>
+    <Symbol>cs_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>29</Index>
+    <Name>Channel mute 3</Name>
+    <Symbol>cm_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>30</Index>
+    <Name>Channel phase invert 3</Name>
+    <Symbol>ci_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>31</Index>
+    <Name>Channel pan left 3</Name>
+    <Symbol>cp_3l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>32</Index>
+    <Name>Channel pan right 3</Name>
+    <Symbol>cp_3r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>33</Index>
+    <Name>Channel output balance 3</Name>
+    <Symbol>cb_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>34</Index>
+    <Name>Channel gain 3</Name>
+    <Symbol>cg_3</Symbol>
+    <Value>0</Value>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>22</MappedControlIndex>
+    <MappedMinimum>0</MappedMinimum>
+    <MappedMaximum>1</MappedMaximum>
+    <MidiCC>22</MidiCC>
+   </Parameter>
+   <Parameter>
+    <Index>37</Index>
+    <Name>Channel solo 4</Name>
+    <Symbol>cs_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>38</Index>
+    <Name>Channel mute 4</Name>
+    <Symbol>cm_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>39</Index>
+    <Name>Channel phase invert 4</Name>
+    <Symbol>ci_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>40</Index>
+    <Name>Channel pan left 4</Name>
+    <Symbol>cp_4l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>41</Index>
+    <Name>Channel pan right 4</Name>
+    <Symbol>cp_4r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>42</Index>
+    <Name>Channel output balance 4</Name>
+    <Symbol>cb_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>43</Index>
+    <Name>Channel gain 4</Name>
+    <Symbol>cg_4</Symbol>
+    <Value>0</Value>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>23</MappedControlIndex>
+    <MappedMinimum>0</MappedMinimum>
+    <MappedMaximum>1</MappedMaximum>
+    <MidiCC>23</MidiCC>
+   </Parameter>
+   <Parameter>
+    <Index>46</Index>
+    <Name>Channel solo 5</Name>
+    <Symbol>cs_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>47</Index>
+    <Name>Channel mute 5</Name>
+    <Symbol>cm_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>48</Index>
+    <Name>Channel phase invert 5</Name>
+    <Symbol>ci_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>49</Index>
+    <Name>Channel pan left 5</Name>
+    <Symbol>cp_5l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>50</Index>
+    <Name>Channel pan right 5</Name>
+    <Symbol>cp_5r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>51</Index>
+    <Name>Channel output balance 5</Name>
+    <Symbol>cb_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>52</Index>
+    <Name>Channel gain 5</Name>
+    <Symbol>cg_5</Symbol>
+    <Value>0</Value>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>24</MappedControlIndex>
+    <MappedMinimum>0</MappedMinimum>
+    <MappedMaximum>1</MappedMaximum>
+    <MidiCC>24</MidiCC>
+   </Parameter>
+   <Parameter>
+    <Index>55</Index>
+    <Name>Channel solo 6</Name>
+    <Symbol>cs_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>56</Index>
+    <Name>Channel mute 6</Name>
+    <Symbol>cm_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>57</Index>
+    <Name>Channel phase invert 6</Name>
+    <Symbol>ci_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>58</Index>
+    <Name>Channel pan left 6</Name>
+    <Symbol>cp_6l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>59</Index>
+    <Name>Channel pan right 6</Name>
+    <Symbol>cp_6r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>60</Index>
+    <Name>Channel output balance 6</Name>
+    <Symbol>cb_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>61</Index>
+    <Name>Channel gain 6</Name>
+    <Symbol>cg_6</Symbol>
+    <Value>0</Value>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>25</MappedControlIndex>
+    <MappedMinimum>0</MappedMinimum>
+    <MappedMaximum>1</MappedMaximum>
+    <MidiCC>25</MidiCC>
+   </Parameter>
+   <Parameter>
+    <Index>64</Index>
+    <Name>Channel solo 7</Name>
+    <Symbol>cs_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>65</Index>
+    <Name>Channel mute 7</Name>
+    <Symbol>cm_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>66</Index>
+    <Name>Channel phase invert 7</Name>
+    <Symbol>ci_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>67</Index>
+    <Name>Channel pan left 7</Name>
+    <Symbol>cp_7l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>68</Index>
+    <Name>Channel pan right 7</Name>
+    <Symbol>cp_7r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>69</Index>
+    <Name>Channel output balance 7</Name>
+    <Symbol>cb_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>70</Index>
+    <Name>Channel gain 7</Name>
+    <Symbol>cg_7</Symbol>
+    <Value>0</Value>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>26</MappedControlIndex>
+    <MappedMinimum>0</MappedMinimum>
+    <MappedMaximum>1</MappedMaximum>
+    <MidiCC>26</MidiCC>
+   </Parameter>
+   <Parameter>
+    <Index>73</Index>
+    <Name>Channel solo 8</Name>
+    <Symbol>cs_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>74</Index>
+    <Name>Channel mute 8</Name>
+    <Symbol>cm_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>75</Index>
+    <Name>Channel phase invert 8</Name>
+    <Symbol>ci_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>76</Index>
+    <Name>Channel pan left 8</Name>
+    <Symbol>cp_8l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>77</Index>
+    <Name>Channel pan right 8</Name>
+    <Symbol>cp_8r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>78</Index>
+    <Name>Channel output balance 8</Name>
+    <Symbol>cb_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>79</Index>
+    <Name>Channel gain 8</Name>
+    <Symbol>cg_8</Symbol>
+    <Value>0</Value>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>27</MappedControlIndex>
+    <MappedMinimum>0</MappedMinimum>
+    <MappedMaximum>1</MappedMaximum>
+    <MidiCC>27</MidiCC>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/property</Type>
+    <Key>CarlaSkinIsCompacted</Key>
+    <Value>false</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
    <Type>LV2</Type>
    <Name>LSP Mixer x8 Stereo</Name>
    <URI>http://lsp-plug.in/plugins/lv2/mixer_x8_stereo</URI>
@@ -2350,36 +3368,6 @@ YXg9IjEiLz48L2NjPjwvbWlkaT48bW9kdWxhdG9ycy8+PHRhZ3MvPjxidXNlcy8+PG5vdGVTZXF1ZW5j
  <Plugin>
   <Info>
    <Type>LV2</Type>
-   <Name>SMK-CH-1 Volume Map</Name>
-   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
-  </Info>
-  <Data>
-   <Active>Yes</Active>
-   <ControlChannel>1</ControlChannel>
-   <Options>0x3f1</Options>
-   <Parameter>
-    <Index>1</Index>
-    <Name>Filter Channel</Name>
-    <Symbol>channelf</Symbol>
-    <Value>0</Value>
-   </Parameter>
-   <Parameter>
-    <Index>2</Index>
-    <Name>CC Input</Name>
-    <Symbol>ccin</Symbol>
-    <Value>20</Value>
-   </Parameter>
-   <Parameter>
-    <Index>3</Index>
-    <Name>CC Output</Name>
-    <Symbol>ccout</Symbol>
-    <Value>7</Value>
-   </Parameter>
-  </Data>
- </Plugin>
- <Plugin>
-  <Info>
-   <Type>LV2</Type>
    <Name>AR-CH-2 Reverb Map</Name>
    <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
   </Info>
@@ -2918,11 +3906,67 @@ YXg9IjEiLz48L2NjPjwvbWlkaT48bW9kdWxhdG9ycy8+PHRhZ3MvPjxidXNlcy8+PG5vdGVTZXF1ZW5j
   </Connection>
   <Connection>
    <Source>SMK-CH-1 - Oceans Worship Pad:out-left</Source>
-   <Target>LSP Mixer x8 Stereo:Input L</Target>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input left 1</Target>
   </Connection>
   <Connection>
    <Source>SMK-CH-1 - Oceans Worship Pad:out-right</Source>
-   <Target>LSP Mixer x8 Stereo:Input R</Target>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input right 1</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-2 - Warm Worship Pad:out-left</Source>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input left 2</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-2 - Warm Worship Pad:out-right</Source>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input right 2</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-3 - Hillsong Pad:out-left</Source>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input left 3</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-3 - Hillsong Pad:out-right</Source>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input right 3</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-4 - Worship Shimmer:out-left</Source>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input left 4</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-4 - Worship Shimmer:out-right</Source>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input right 4</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-5 - Cloud Shimmer:out-left</Source>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input left 5</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-5 - Cloud Shimmer:out-right</Source>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input right 5</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-6 - Magic Ambient:out-left</Source>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input left 6</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-6 - Magic Ambient:out-right</Source>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input right 6</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-7 - Majesty Pad:out-left</Source>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input left 7</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-7 - Majesty Pad:out-right</Source>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input right 7</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-8 - Sanctorium Pad:out-left</Source>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input left 8</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK-CH-8 - Sanctorium Pad:out-right</Source>
+   <Target>SMK Layer Mixer x8 Stereo:Audio input right 8</Target>
   </Connection>
   <Connection>
    <Source>AR-CH-2 Output Trim +6 dB:Output L</Source>
@@ -2930,6 +3974,14 @@ YXg9IjEiLz48L2NjPjwvbWlkaT48bW9kdWxhdG9ycy8+PHRhZ3MvPjxidXNlcy8+PG5vdGVTZXF1ZW5j
   </Connection>
   <Connection>
    <Source>AR-CH-2 Output Trim +6 dB:Output R</Source>
+   <Target>LSP Mixer x8 Stereo:Input R</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK Layer Mixer x8 Stereo:Output L</Source>
+   <Target>LSP Mixer x8 Stereo:Input L</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK Layer Mixer x8 Stereo:Output R</Source>
    <Target>LSP Mixer x8 Stereo:Input R</Target>
   </Connection>
   <Connection>
@@ -2954,7 +4006,11 @@ YXg9IjEiLz48L2NjPjwvbWlkaT48bW9kdWxhdG9ycy8+PHRhZ3MvPjxidXNlcy8+PG5vdGVTZXF1ZW5j
   </Connection>
   <Connection>
    <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-3- full speed:(capture_1) SINCO SMK25-Master</Source>
-   <Target>SMK-CH-1 Volume Map:events-in</Target>
+   <Target>SMK25 Pad Layers:midi-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-3- full speed:(capture_2) SINCO </Source>
+   <Target>SMK25 Pad Layers:midi-in</Target>
   </Connection>
   <Connection>
    <Source>AR Controls - Sustain Scale:events-out</Source>
@@ -3057,8 +4113,68 @@ YXg9IjEiLz48L2NjPjwvbWlkaT48bW9kdWxhdG9ycy8+PHRhZ3MvPjxidXNlcy8+PG5vdGVTZXF1ZW5j
    <Target>PD-CH-1 - Drum Set:events-in</Target>
   </Connection>
   <Connection>
-   <Source>SMK-CH-1 Volume Map:events-out</Source>
+   <Source>SMK25 Pad Layers:layer-1</Source>
    <Target>SMK-CH-1 - Oceans Worship Pad:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK25 Pad Layers:layer-1</Source>
+   <Target>SMK Layer Mixer x8 Stereo:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK25 Pad Layers:layer-2</Source>
+   <Target>SMK-CH-2 - Warm Worship Pad:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK25 Pad Layers:layer-2</Source>
+   <Target>SMK Layer Mixer x8 Stereo:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK25 Pad Layers:layer-3</Source>
+   <Target>SMK-CH-3 - Hillsong Pad:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK25 Pad Layers:layer-3</Source>
+   <Target>SMK Layer Mixer x8 Stereo:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK25 Pad Layers:layer-4</Source>
+   <Target>SMK-CH-4 - Worship Shimmer:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK25 Pad Layers:layer-4</Source>
+   <Target>SMK Layer Mixer x8 Stereo:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK25 Pad Layers:layer-5</Source>
+   <Target>SMK-CH-5 - Cloud Shimmer:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK25 Pad Layers:layer-5</Source>
+   <Target>SMK Layer Mixer x8 Stereo:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK25 Pad Layers:layer-6</Source>
+   <Target>SMK-CH-6 - Magic Ambient:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK25 Pad Layers:layer-6</Source>
+   <Target>SMK Layer Mixer x8 Stereo:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK25 Pad Layers:layer-7</Source>
+   <Target>SMK-CH-7 - Majesty Pad:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK25 Pad Layers:layer-7</Source>
+   <Target>SMK Layer Mixer x8 Stereo:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK25 Pad Layers:layer-8</Source>
+   <Target>SMK-CH-8 - Sanctorium Pad:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>SMK25 Pad Layers:layer-8</Source>
+   <Target>SMK Layer Mixer x8 Stereo:events-in</Target>
   </Connection>
   <Connection>
    <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-4- full speed:(capture_1) SINCO SMC-Mixer-Master</Source>
@@ -3159,90 +4275,111 @@ YXg9IjEiLz48L2NjPjwvbWlkaT48bW9kdWxhdG9ycy8+PHRhZ3MvPjxidXNlcy8+PG5vdGVTZXF1ZW5j
     <Name>SMK-CH-1 - Oceans Worship Pad</Name>
    </Position>
    <Position x1="1140" y1="370" pluginId="11">
-    <Name>LSP Mixer x8 Stereo</Name>
+    <Name>SMK-CH-2 - Warm Worship Pad</Name>
    </Position>
    <Position x1="60" y1="520" pluginId="12">
-    <Name>SMC-MIX - 8-Band EQ</Name>
+    <Name>SMK-CH-3 - Hillsong Pad</Name>
    </Position>
    <Position x1="420" y1="520" pluginId="13">
-    <Name>AR-CH-2 Output Trim +6 dB</Name>
+    <Name>SMK-CH-4 - Worship Shimmer</Name>
    </Position>
    <Position x1="780" y1="520" pluginId="14">
-    <Name>AR Controls - Sustain Scale</Name>
+    <Name>SMK-CH-5 - Cloud Shimmer</Name>
    </Position>
    <Position x1="1140" y1="520" pluginId="15">
-    <Name>PD Controls - Sustain Scale</Name>
+    <Name>SMK-CH-6 - Magic Ambient</Name>
    </Position>
    <Position x1="60" y1="670" pluginId="16">
-    <Name>AR-CH-2 Volume Map</Name>
+    <Name>SMK-CH-7 - Majesty Pad</Name>
    </Position>
    <Position x1="420" y1="670" pluginId="17">
-    <Name>AR-CH-4 Volume Map</Name>
+    <Name>SMK-CH-8 - Sanctorium Pad</Name>
    </Position>
    <Position x1="780" y1="670" pluginId="18">
-    <Name>AR-CH-5 Volume Map</Name>
+    <Name>SMK Layer Mixer x8 Stereo</Name>
    </Position>
    <Position x1="1140" y1="670" pluginId="19">
-    <Name>AR-CH-6 Volume Map</Name>
+    <Name>LSP Mixer x8 Stereo</Name>
    </Position>
    <Position x1="60" y1="820" pluginId="20">
-    <Name>AR-CH-7 Volume Map</Name>
+    <Name>SMC-MIX - 8-Band EQ</Name>
    </Position>
    <Position x1="420" y1="820" pluginId="21">
-    <Name>AR-CH-8 Volume Map</Name>
+    <Name>AR-CH-2 Output Trim +6 dB</Name>
    </Position>
    <Position x1="780" y1="820" pluginId="22">
-    <Name>AR-CH-9 Volume Map</Name>
+    <Name>AR Controls - Sustain Scale</Name>
    </Position>
    <Position x1="1140" y1="820" pluginId="23">
-    <Name>PD-CH-1 Volume Map</Name>
+    <Name>PD Controls - Sustain Scale</Name>
    </Position>
    <Position x1="60" y1="970" pluginId="24">
-    <Name>SMK-CH-1 Volume Map</Name>
+    <Name>AR-CH-2 Volume Map</Name>
    </Position>
    <Position x1="420" y1="970" pluginId="25">
-    <Name>AR-CH-2 Reverb Map</Name>
+    <Name>AR-CH-4 Volume Map</Name>
    </Position>
    <Position x1="780" y1="970" pluginId="26">
-    <Name>AR-CH-4 Reverb Map</Name>
+    <Name>AR-CH-5 Volume Map</Name>
    </Position>
    <Position x1="1140" y1="970" pluginId="27">
-    <Name>AR-CH-5 Reverb Map</Name>
+    <Name>AR-CH-6 Volume Map</Name>
    </Position>
    <Position x1="60" y1="1120" pluginId="28">
-    <Name>AR-CH-6 Reverb Map</Name>
+    <Name>AR-CH-7 Volume Map</Name>
    </Position>
    <Position x1="420" y1="1120" pluginId="29">
-    <Name>AR-CH-7 Reverb Map</Name>
+    <Name>AR-CH-8 Volume Map</Name>
    </Position>
    <Position x1="780" y1="1120" pluginId="30">
-    <Name>AR-CH-8 Reverb Map</Name>
+    <Name>AR-CH-9 Volume Map</Name>
    </Position>
    <Position x1="1140" y1="1120" pluginId="31">
-    <Name>AR-CH-9 Reverb Map</Name>
+    <Name>PD-CH-1 Volume Map</Name>
    </Position>
    <Position x1="60" y1="1270" pluginId="32">
-    <Name>SMC-EQ-1 CC Scale</Name>
+    <Name>AR-CH-2 Reverb Map</Name>
    </Position>
    <Position x1="420" y1="1270" pluginId="33">
-    <Name>SMC-EQ-2 CC Scale</Name>
+    <Name>AR-CH-4 Reverb Map</Name>
    </Position>
    <Position x1="780" y1="1270" pluginId="34">
-    <Name>SMC-EQ-3 CC Scale</Name>
+    <Name>AR-CH-5 Reverb Map</Name>
    </Position>
    <Position x1="1140" y1="1270" pluginId="35">
-    <Name>SMC-EQ-4 CC Scale</Name>
+    <Name>AR-CH-6 Reverb Map</Name>
    </Position>
    <Position x1="60" y1="1420" pluginId="36">
-    <Name>SMC-EQ-5 CC Scale</Name>
+    <Name>AR-CH-7 Reverb Map</Name>
    </Position>
    <Position x1="420" y1="1420" pluginId="37">
-    <Name>SMC-EQ-6 CC Scale</Name>
+    <Name>AR-CH-8 Reverb Map</Name>
    </Position>
    <Position x1="780" y1="1420" pluginId="38">
-    <Name>SMC-EQ-7 CC Scale</Name>
+    <Name>AR-CH-9 Reverb Map</Name>
    </Position>
    <Position x1="1140" y1="1420" pluginId="39">
+    <Name>SMC-EQ-1 CC Scale</Name>
+   </Position>
+   <Position x1="60" y1="1570" pluginId="40">
+    <Name>SMC-EQ-2 CC Scale</Name>
+   </Position>
+   <Position x1="420" y1="1570" pluginId="41">
+    <Name>SMC-EQ-3 CC Scale</Name>
+   </Position>
+   <Position x1="780" y1="1570" pluginId="42">
+    <Name>SMC-EQ-4 CC Scale</Name>
+   </Position>
+   <Position x1="1140" y1="1570" pluginId="43">
+    <Name>SMC-EQ-5 CC Scale</Name>
+   </Position>
+   <Position x1="60" y1="1720" pluginId="44">
+    <Name>SMC-EQ-6 CC Scale</Name>
+   </Position>
+   <Position x1="420" y1="1720" pluginId="45">
+    <Name>SMC-EQ-7 CC Scale</Name>
+   </Position>
+   <Position x1="780" y1="1720" pluginId="46">
     <Name>SMC-EQ-8 CC Scale</Name>
    </Position>
   </Positions>

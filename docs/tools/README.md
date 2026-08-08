@@ -9,6 +9,8 @@ documentation together so it can be understood or replaced independently.
 - [Arturia Main Volume Encoder](arturia-main-volume-encoder/README.md) converts
   the KeyLab Essential central knob's relative MIDI messages into an absolute
   master-volume control while leaving fader 9 available for an instrument.
+- [SMK-25 Pad Layers](smk25-pad-layers/README.md) provides eight independently
+  latchable Carla instrument layers with per-knob volume and Play/Stop recall.
 
 ## Future direction
 
