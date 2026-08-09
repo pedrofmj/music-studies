@@ -5,54 +5,63 @@
 | Item | Verified state |
 | --- | --- |
 | Host | airstar, Ubuntu 24.04.4 LTS, x86_64 |
-| Audio/MIDI services | PipeWire 1.0.5, WirePlumber 0.4.17, and PipeWire Pulse are active in the pedro.ferreira user session. |
-| Plugin host | Carla 2.5.10, installed system-wide from Flathub as studio.kx.carla. |
-| Active project | /c/music/carla/pedro.uproject, 2026-08-02 snapshot. |
-| Default audio output | Tiger Lake-LP Smart Sound Technology Audio Controller Speaker + Headphones. |
-| External audio interface | Not present in the live PipeWire graph during verification. |
+| Audio/MIDI | PipeWire 1.0.5, WirePlumber 0.4.17, PipeWire Pulse |
+| Host | Carla Flatpak 2.5.10, studio.kx.carla |
+| Project | /c/music/carla/pedro.uproject |
+| Rack structure | 47 uniquely named plugins, 16 native SF2 slots, 106 Carla project connections |
+| Saved graph | 112 raw links; 110 performance-owned deployment links; 64 MIDI links |
+| Quantum | 2048 frames, persisted by pipewire-carla-quantum.service |
+| Output | Tiger Lake Speaker + Headphones through the rack EQ and Arturia gate |
 
-The Carla Flatpak sees home-directory plugins directly. System LV2 plugins are
-available through the existing XDG document-portal grant at
-/run/user/50001/doc/516068e9/lv2; Carla's configured LV2 path includes that
-grant. Do not replace it with a direct /usr/lib/lv2 Flatpak override: Flatpak
-reserves /usr, while the portal grant is working and exposes installed bundles.
+The project stored in Git and the deployed project had SHA-256
+e3e748cda372c044e86679589f4061bb8633ac361939859b9322fdd0d262bf91
+at capture.
 
-## Detected MIDI Inputs
+## Controllers
 
-- Midi-Bridge:KL Essential 61 mk3 3:(capture_0) KL Essential 61 mk3 MIDI
-- Midi-Bridge:USB Composite Device 5:(capture_0) USB Composite Device MIDI 1
-- SMC-PAD, SMK25, SMC-Mixer, and SMC-PAD Pocket ports exposed as SINCO MIDI
-  endpoints.
+- Arturia KeyLab Essential 61 mk3: nine instrument layers, reverb controls,
+  central master-volume encoder, and Carla-only mute click.
+- M-VAVE SMK-25: eight independently latchable pad instruments, eight volume
+  knobs, and MCP Play/Stop through the AUX port.
+- M-VAVE SMC-Mixer: eight faders mapped through CC intermediaries to the
+  eight-band LSP equalizer.
+- M-VAVE SMC-PAD and SMC-PAD Pocket: both feed the PD-CH-1 drum SoundFont.
 
-The KeyLab has additional DIN-thru, MCU/HUI, and ALV ports. The performance
-rack uses only the KL Essential 61 mk3 MIDI endpoint, not the DAW-control
-ports.
+All M-VAVE devices expose the same USB product ID and several SINCO endpoints.
+The saved graph resolves semantic PipeWire aliases, not changing global port
+IDs. The SMK AUX alias ends in whitespace; do not normalize it manually.
 
-## Verified Carla Graph
+## Instrument And Audio Flow
 
 ~~~text
-KeyLab Essential 61 mk3 MIDI
-  -> MIDI Scale CC Value (CC 64 transformation)
-  -> DecentSampler. Basic Piano
-  -> DecentSampler - Alt Strings
-  -> ACE Fluid Synth
-  -> ACE Fluid Synth (2)
-  -> LSP Mixer x8 Stereo
-  -> Tiger Lake Speaker + Headphones
+Arturia -> AR Controls -> AR-CH-1..9 -----------+
+SMC-PAD/Pocket -> PD Controls -> PD-CH-1 --------+-> LSP Mixer x8 Stereo
+SMK-25 -> SMK Pad Layers -> SMK-CH-1..8 -> SMK Layer Mixer x8 --+
+                                                                 |
+LSP Mixer -> SMC-MIX 8-Band EQ -> Arturia volume/mute gate
+          -> Speaker + Headphones
 ~~~
 
-Each instrument's stereo outputs feed the LSP mixer, whose outputs feed the
-default Tiger Lake sink. MIDI Scale CC Value is configured for parameter 64
-with a negative value scale and is the existing pedal-value transformation.
+AR-CH-2 has a dedicated +6 dB trim before the master mixer. SMK Knobs 1-8
+control hard mixer gains for their corresponding layers. The Arturia central
+encoder is converted from relative CC114 to persistent absolute CC119.
 
-Fluida is installed on disk but is not active in the current graph. The saved
-project has a stale Fluida position label; its active plugin list uses the two
-ACE FluidSynth instances instead.
+## Active User Services
 
-## Verification Limits
+- pipewire-patchbay-watch.service
+- smk25-pad-layers.service
+- arturia-main-volume-encoder.service
+- pipewire-carla-quantum.service
 
-- The live PipeWire graph and file visibility were verified over SSH.
-- qpwgraph and Audacity were installed successfully but their GUI was not
-  opened from SSH, because no graphical display is available in that session.
-- Dragonfly and Surge bundles are visible to Carla. They need a normal Carla
-  plugin refresh before they appear in its Add Plugin dialog.
+All four were enabled and active at capture.
+
+## External Dependencies
+
+The direct project assets are 16 SoundFonts plus DecentSampler.so. The two
+DecentSampler slots additionally require Basic Piano.dsbundle and DS + VT -
+altstrings Free Edition.dsbundle. Exact paths, byte sizes, and hashes are in
+[setup.json](../../docs/tools/airstar-live-setup/setup.json).
+
+Carla Flatpak must see lsp-plugins.lv2 and midifilter.lv2. The reproducible
+installer copies the package-owned bundles to ~/.lv2; it does not depend on
+a machine-specific document-portal ID.

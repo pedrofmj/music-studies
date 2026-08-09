@@ -1,0 +1,234 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../../.." && pwd)"
+readonly MANIFEST="${SCRIPT_DIR}/setup.json"
+readonly PROJECT_SOURCE="${REPO_ROOT}/src/audio-software/carla/projects/pedro-live-rack/pedro.uproject"
+readonly PATCHBAY_SOURCE="${REPO_ROOT}/src/midi-setup/pedro-live-rack-patchbay.json"
+
+soundfont_root="${HOME}/Flash/PED/MIDI/Pack de Timbres/Library"
+project_target="/c/music/carla/pedro.uproject"
+skip_packages=false
+replace_snapshot=false
+check_only=false
+full_check=false
+
+usage() {
+    printf '%s\n' "Usage: $(basename "$0") [OPTIONS]" "" "Install the versioned Pedro live rack on Ubuntu 24.04." "" "  --check-only           Validate the target without changing it" "  --skip-packages        Do not install apt or Flatpak dependencies" "  --replace-snapshot     Replace an existing Patchbay snapshot" "  --fast                 Skip large asset hashes (the default)" "  --full-check           Hash every large external asset after install" "  --soundfont-root PATH  Override the standard SoundFont library root" "  --project PATH         Override /c/music/carla/pedro.uproject"
+}
+
+while (($#)); do
+    case $1 in
+        --check-only)
+            check_only=true
+            ;;
+        --skip-packages)
+            skip_packages=true
+            ;;
+        --replace-snapshot)
+            replace_snapshot=true
+            ;;
+        --fast)
+            full_check=false
+            ;;
+        --full-check)
+            full_check=true
+            ;;
+        --soundfont-root)
+            [[ -n ${2-} ]] || {
+                printf '%s\n' "--soundfont-root requires a path" >&2
+                exit 2
+            }
+            soundfont_root=$2
+            shift
+            ;;
+        --project)
+            [[ -n ${2-} ]] || {
+                printf '%s\n' "--project requires a path" >&2
+                exit 2
+            }
+            project_target=$2
+            shift
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            printf 'Unknown option: %s\n' "$1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
+
+validator_options=(--soundfont-root "$soundfont_root" --project "$project_target")
+if [[ $full_check == false ]]; then
+    validator_options+=(--fast)
+fi
+if [[ $check_only == true ]]; then
+    exec "${SCRIPT_DIR}/validate-airstar-live-setup" "${validator_options[@]}"
+fi
+if pgrep -f '/app/share/carla/carla' >/dev/null 2>&1; then
+    printf 'Close Carla before installing or updating the live rack.\n' >&2
+    exit 1
+fi
+
+
+as_root() {
+    if ((EUID == 0)); then
+        "$@"
+    else
+        sudo "$@"
+    fi
+}
+
+if [[ $skip_packages == false ]]; then
+    if ! command -v jq >/dev/null 2>&1; then
+        as_root apt-get update
+        as_root apt-get install -y jq
+    fi
+else
+    command -v jq >/dev/null 2>&1 || {
+        printf 'jq is required; rerun without --skip-packages or install jq.\n' >&2
+        exit 1
+    }
+fi
+
+if [[ $skip_packages == false ]]; then
+    mapfile -t apt_packages < <(jq -r '.packages.apt_required[]' "$MANIFEST")
+    as_root apt-get update
+    as_root apt-get install -y "${apt_packages[@]}"
+
+    as_root flatpak remote-add --if-not-exists         flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+    while IFS= read -r app_id; do
+        if ! flatpak info "$app_id" >/dev/null 2>&1; then
+            as_root flatpak install -y flathub "$app_id"
+        fi
+    done < <(jq -r '.packages.flatpaks[].id' "$MANIFEST")
+fi
+
+mkdir -p "$HOME/.lv2"
+while IFS= read -r bundle; do
+    source_bundle="/usr/lib/lv2/$bundle"
+    target_bundle="$HOME/.lv2/$bundle"
+    [[ -d $source_bundle ]] || {
+        printf 'Required system LV2 bundle is missing: %s\n' "$source_bundle" >&2
+        exit 1
+    }
+    mkdir -p "$target_bundle"
+    cp -rT --preserve=mode,timestamps "$source_bundle" "$target_bundle"
+done < <(jq -r '.carla.user_lv2_bundles[]' "$MANIFEST")
+
+fluid_target="$HOME/$(jq -r '.paths.fluid_soundfont' "$MANIFEST")"
+if [[ ! -f $fluid_target ]]; then
+    fluid_source=/usr/share/sounds/sf2/FluidR3_GM.sf2
+    [[ -f $fluid_source ]] || {
+        printf 'FluidR3 source bank is missing after package installation: %s\n'             "$fluid_source" >&2
+        exit 1
+    }
+    install -D -m 0644 "$fluid_source" "$fluid_target"
+fi
+
+while IFS=$'\t' read -r role base relative; do
+    case $base in
+        home)
+            path="$HOME/$relative"
+            ;;
+        soundfont_root)
+            path="$soundfont_root/$relative"
+            ;;
+        *)
+            printf 'Unknown asset base %s for %s\n' "$base" "$role" >&2
+            exit 1
+            ;;
+    esac
+    [[ -f $path ]] || {
+        printf 'Required external asset is missing (%s): %s\n' "$role" "$path" >&2
+        exit 1
+    }
+done < <(jq -r '.external_assets[] | [.role, .base, .path] | @tsv' "$MANIFEST")
+
+decent_root="$HOME/$(jq -r '.paths.decent_sampler_library_root' "$MANIFEST")"
+while IFS= read -r bundle; do
+    [[ -d "$decent_root/$bundle" ]] || {
+        printf 'Required DecentSampler library is missing: %s\n'             "$decent_root/$bundle" >&2
+        exit 1
+    }
+done < <(jq -r '.decent_sampler_libraries[].bundle' "$MANIFEST")
+
+python3 "${SCRIPT_DIR}/materialize-carla-project.py"     "$PROJECT_SOURCE" "$project_target"     --home "$HOME"     --soundfont-root "$soundfont_root"
+
+workdir="$HOME/$(jq -r '.paths.soundfont_workdir' "$MANIFEST")"
+mkdir -p "$workdir"
+while IFS=$'\t' read -r base relative; do
+    case $base in
+        home)
+            path="$HOME/$relative"
+            ;;
+        soundfont_root)
+            path="$soundfont_root/$relative"
+            ;;
+        *)
+            continue
+            ;;
+    esac
+    if [[ $path == *.sf2 ]]; then
+        ln -sfn "$path" "$workdir/$(basename "$path")"
+    fi
+done < <(jq -r '.external_assets[] | [.base, .path] | @tsv' "$MANIFEST")
+
+launcher_config="$HOME/.config/pedro-live-rack.conf"
+mkdir -p "$(dirname -- "$launcher_config")"
+printf 'CARLA_PEDRO_PROJECT=%q\n' "$project_target" > "$launcher_config"
+
+mkdir -p "$HOME/bin"
+install -m 0755 "${REPO_ROOT}/bin/carla-pedro-project" "$HOME/bin/"
+install -m 0755 "${REPO_ROOT}/bin/pipewire-patchbay-json" "$HOME/bin/"
+install -m 0755 "${REPO_ROOT}/bin/pipewire-patchbay-refresh" "$HOME/bin/"
+
+desktop_target="$HOME/.local/share/applications/carla-pedro-project.desktop"
+mkdir -p "$(dirname -- "$desktop_target")"
+sed "s|^Exec=.*|Exec=$HOME/bin/carla-pedro-project|"     "${REPO_ROOT}/bin/carla-pedro-project.desktop" > "$desktop_target"
+if command -v desktop-file-validate >/dev/null 2>&1; then
+    desktop-file-validate "$desktop_target"
+fi
+if command -v update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database "$HOME/.local/share/applications"
+fi
+
+"${REPO_ROOT}/docs/tools/arturia-main-volume-encoder/install-arturia-main-volume-encoder"
+"${REPO_ROOT}/docs/tools/smk25-pad-layers/install-smk25-pad-layers"
+"${REPO_ROOT}/docs/tools/pipewire-carla-quantum/install-pipewire-carla-quantum"
+
+snapshot="$HOME/$(jq -r '.paths.patchbay_snapshot' "$MANIFEST")"
+if [[ ! -e $snapshot || $replace_snapshot == true ]]; then
+    mkdir -p "$(dirname -- "$snapshot")"
+    current_graph=$(mktemp)
+    "$HOME/bin/pipewire-patchbay-json" export "$current_graph"
+    default_node=$(wpctl inspect @DEFAULT_AUDIO_SINK@ | sed -n 's/.*node.name = "\(.*\)"/\1/p')
+    [[ -n $default_node ]] || {
+        rm -f "$current_graph"
+        printf 'Could not resolve the default PipeWire audio sink.\n' >&2
+        exit 1
+    }
+    python3 "${SCRIPT_DIR}/materialize-patchbay.py" "$PATCHBAY_SOURCE" "$current_graph" "$snapshot" --default-node-name "$default_node" --reference-left-alias "$(jq -r '.patchbay.reference_output_aliases.left' "$MANIFEST")" --reference-right-alias "$(jq -r '.patchbay.reference_output_aliases.right' "$MANIFEST")"
+    rm -f "$current_graph"
+else
+    printf 'Preserving existing Patchbay snapshot: %s\n' "$snapshot"
+fi
+
+service_target="$HOME/.config/systemd/user/pipewire-patchbay-watch.service"
+mkdir -p "$(dirname -- "$service_target")"
+install -m 0644 "${REPO_ROOT}/bin/pipewire-patchbay-watch.service" "$service_target"
+systemctl --user daemon-reload
+systemctl --user enable --now pipewire-patchbay-watch.service
+
+"${SCRIPT_DIR}/validate-airstar-live-setup" "${validator_options[@]}"
+
+printf '\nInstalled Pedro live rack. Connect all controllers, then run:\n'
+printf '  %s\n' "$HOME/bin/carla-pedro-project"
+printf 'After Carla finishes loading, validate the live graph with:\n'
+printf '  %s --live --fast\n'     "${SCRIPT_DIR}/validate-airstar-live-setup"

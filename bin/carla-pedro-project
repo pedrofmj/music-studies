@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+readonly CONFIG_FILE="${CARLA_PEDRO_CONFIG:-${HOME}/.config/pedro-live-rack.conf}"
+if [[ -r $CONFIG_FILE ]]; then
+  # shellcheck disable=SC1090
+  source "$CONFIG_FILE"
+fi
+
 readonly APP_ID="studio.kx.carla"
-readonly PROJECT="/c/music/carla/pedro.uproject"
-readonly SOUNDFONT_WORKDIR="${HOME}/.local/share/carla/pedro-soundfonts"
+readonly PROJECT="${CARLA_PEDRO_PROJECT:-/c/music/carla/pedro.uproject}"
+readonly SOUNDFONT_WORKDIR="${CARLA_PEDRO_SOUNDFONT_WORKDIR:-${HOME}/.local/share/carla/pedro-soundfonts}"
 
 if [[ ! -r "$PROJECT" ]]; then
   printf 'Carla project is not readable: %s\n' "$PROJECT" >&2

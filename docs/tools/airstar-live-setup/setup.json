@@ -1,0 +1,418 @@
+{
+  "schema": "music-studies/pedro-live-setup/v1",
+  "captured_at": "2026-08-09T07:33:16-03:00",
+  "reference_host": {
+    "hostname": "airstar",
+    "architecture": "x86_64",
+    "os_id": "ubuntu",
+    "os_version": "24.04",
+    "os_pretty_name": "Ubuntu 24.04.4 LTS",
+    "kernel_at_capture": "7.0.0-28-generic"
+  },
+  "paths": {
+    "project_source": "src/audio-software/carla/projects/pedro-live-rack/pedro.uproject",
+    "project_target": "/c/music/carla/pedro.uproject",
+    "soundfont_root": "Flash/PED/MIDI/Pack de Timbres/Library",
+    "fluid_soundfont": ".local/share/sounds/sf2/FluidR3_GM.sf2",
+    "decent_sampler_binary": ".vst/DecentSampler.so",
+    "decent_sampler_library_root": ".config/DecentSampler/Sample Libraries",
+    "soundfont_workdir": ".local/share/carla/pedro-soundfonts",
+    "patchbay_snapshot": ".local/state/pipewire-patchbay/patchbay.json",
+    "launcher_config": ".config/pedro-live-rack.conf"
+  },
+  "packages": {
+    "apt_required": [
+      "desktop-file-utils",
+      "flatpak",
+      "fluid-soundfont-gm",
+      "gcc",
+      "jq",
+      "libjack-jackd2-0",
+      "lsp-plugins-lv2",
+      "pipewire-audio",
+      "pipewire-jack",
+      "python3",
+      "usbutils",
+      "wireplumber",
+      "x42-plugins"
+    ],
+    "reference_versions": {
+      "desktop-file-utils": "0.27-2build1",
+      "flatpak": "1.14.6-1ubuntu0.1",
+      "fluid-soundfont-gm": "3.1-5.3",
+      "gcc": "4:13.2.0-7ubuntu1",
+      "jq": "1.7.1-3ubuntu0.24.04.2",
+      "libjack-jackd2-0": "1.9.21~dfsg-3ubuntu3",
+      "lsp-plugins-lv2": "1.2.14-1",
+      "pipewire-audio": "1.0.5-1ubuntu3.3",
+      "pipewire-jack": "1.0.5-1ubuntu3.3",
+      "python3": "3.12.3-0ubuntu2.1",
+      "wireplumber": "0.4.17-1ubuntu4.1",
+      "x42-plugins": "20230915+ds-1build2",
+      "usbutils": "1:017-3build1"
+    },
+    "flatpaks": [
+      {
+        "id": "studio.kx.carla",
+        "branch": "stable",
+        "version_at_capture": "2.5.10",
+        "commit_at_capture": "fa60a43e2b09b9e1e6068cac487423dbccea1337cc11f45c87423579fddd9955"
+      }
+    ]
+  },
+  "carla": {
+    "project_sha256": "e3e748cda372c044e86679589f4061bb8633ac361939859b9322fdd0d262bf91",
+    "project_size_bytes": 121306,
+    "plugins": 47,
+    "soundfont_slots": 16,
+    "project_patchbay_connections": 106,
+    "pipewire_quantum": 2048,
+    "plugin_uris": [
+      "http://gareus.org/oss/lv2/midifilter#mapcc",
+      "http://gareus.org/oss/lv2/midifilter#scalecc",
+      "http://lsp-plug.in/plugins/lv2/mixer_x8_stereo",
+      "http://lsp-plug.in/plugins/lv2/para_equalizer_x8_stereo"
+    ],
+    "user_lv2_bundles": [
+      "lsp-plugins.lv2",
+      "midifilter.lv2"
+    ]
+  },
+  "services": [
+    {
+      "name": "arturia-main-volume-encoder.service",
+      "installer": "docs/tools/arturia-main-volume-encoder/install-arturia-main-volume-encoder"
+    },
+    {
+      "name": "smk25-pad-layers.service",
+      "installer": "docs/tools/smk25-pad-layers/install-smk25-pad-layers"
+    },
+    {
+      "name": "pipewire-carla-quantum.service",
+      "installer": "docs/tools/pipewire-carla-quantum/install-pipewire-carla-quantum"
+    },
+    {
+      "name": "pipewire-patchbay-watch.service",
+      "installer": "docs/tools/airstar-live-setup/install-airstar-live-setup"
+    }
+  ],
+  "hardware": [
+    {
+      "role": "Arturia keyboard and rack controls",
+      "model": "KeyLab Essential 61 mk3",
+      "usb_id": "1c75:028c",
+      "pipewire_alias": "KL Essential 61 mk3:KL Essential 61 mk3 MIDI"
+    },
+    {
+      "role": "Eight pad instrument layers",
+      "model": "M-VAVE SMK-25",
+      "usb_id": "4353:4b4d",
+      "pipewire_alias": "SINCO:SINCO SMK25-Master"
+    },
+    {
+      "role": "Eight-band equalizer",
+      "model": "M-VAVE SMC-Mixer",
+      "usb_id": "4353:4b4d",
+      "pipewire_alias": "SINCO:SINCO SMC-Mixer-Master"
+    },
+    {
+      "role": "Drum performance",
+      "model": "M-VAVE SMC-PAD",
+      "usb_id": "4353:4b4d",
+      "pipewire_alias": "SINCO:SINCO SMC-PAD-Master"
+    },
+    {
+      "role": "Drum performance",
+      "model": "M-VAVE SMC-PAD Pocket",
+      "usb_id": "4353:4b4d",
+      "pipewire_alias": "SINCO:SINCO SMC-PAD Pocket-Master"
+    }
+  ],
+  "controller_profile": {
+    "arturia": {
+      "channel": 1,
+      "fader_ccs": [
+        73,
+        75,
+        79,
+        72,
+        80,
+        81,
+        82,
+        83,
+        85
+      ],
+      "instrument_knob_ccs": [
+        74,
+        71,
+        76,
+        77,
+        93,
+        18,
+        19,
+        16,
+        17
+      ],
+      "central_encoder": {
+        "mode": "relative",
+        "input_cc": 114,
+        "mapped_output_cc": 119
+      },
+      "central_click": {
+        "mode": "push",
+        "cc": 115,
+        "action": "toggle Carla rack mute"
+      }
+    },
+    "smk25": {
+      "knobs": {
+        "mode": "CC",
+        "channel": 1,
+        "ccs": [
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27
+        ],
+        "minimum": 0,
+        "maximum": 127
+      },
+      "side_a_pads": {
+        "mode": "CC Toggle",
+        "ccs": [
+          40,
+          41,
+          42,
+          43,
+          36,
+          37,
+          38,
+          39
+        ],
+        "channels": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "off_value": 0,
+        "on_value": 127
+      },
+      "transport": {
+        "mode": "MCP",
+        "stop_note": 93,
+        "play_note": 94,
+        "channel": 1,
+        "endpoint": "AUX capture_2"
+      }
+    },
+    "smc_mixer": {
+      "fader_mode": "CC",
+      "channel": 1,
+      "fader_ccs": [
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47
+      ],
+      "mapped_eq_ccs": [
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109
+      ]
+    },
+    "pad_devices": {
+      "route": "Master capture_1 to PD-CH-1 Drum Set",
+      "notes": "The drum SoundFont consumes normal GM-style note events."
+    }
+  },
+  "external_assets": [
+    {
+      "role": "DecentSampler VST2",
+      "base": "home",
+      "path": ".vst/DecentSampler.so",
+      "size_bytes": 19879704,
+      "sha256": "77fc2373a39711b021dd06f7406368a67425f0262c660f83d84ea38b0390cc75",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "FluidR3 GM bank",
+      "base": "home",
+      "path": ".local/share/sounds/sf2/FluidR3_GM.sf2",
+      "size_bytes": 148398306,
+      "sha256": "74594e8f4250680adf590507a306655a299935343583256f3b722c48a1bc1cb0",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "Nord White Grand",
+      "base": "soundfont_root",
+      "path": "02_SoundFonts/01_Acoustic_Pianos/Nord White Grand Full 24C.sf2",
+      "size_bytes": 830932522,
+      "sha256": "d894b4df5ffd03fafda1298be5fb8cb0ee21fce84b50e27ac90db2e55c006eba",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "Hammond organ",
+      "base": "soundfont_root",
+      "path": "02_SoundFonts/03_Organs_and_Keys/Hammond_B3_organ_Fast_Leslie [outros-timbres-pra-audio-evolution-leads-2].sf2",
+      "size_bytes": 4450254,
+      "sha256": "a5a873693d57959c1bef4ce7de6dd743b36f7c0d7021e7228abee986d89d4445",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "Sax",
+      "base": "soundfont_root",
+      "path": "02_SoundFonts/06_Brass_and_Winds/SAX_Lirakeys LITE.sf2",
+      "size_bytes": 22772150,
+      "sha256": "3273cff8fc8ebed85cb6fbdd37b41a15db86ad8e5b6ec82e798b3b8562d727a6",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "Drums",
+      "base": "soundfont_root",
+      "path": "02_SoundFonts/09_Drums_and_Percussion/Drum_Set.sf2",
+      "size_bytes": 1553716,
+      "sha256": "6155eb1371131d3442553fabebb1d76ad0954f04ece7b2c4e7fe2e01d05341b4",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "Optik synth",
+      "base": "soundfont_root",
+      "path": "02_SoundFonts/10_Synth_Leads_Arps_and_Plucks/G072 Optik_Synth.sf2",
+      "size_bytes": 7720658,
+      "sha256": "50bdba0b1242770eaf60904d4c60bffe3250c6e10f5651ab9082fedbc4cc05c0",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "Atmosfera pad",
+      "base": "soundfont_root",
+      "path": "02_SoundFonts/11_Pads_and_Ambience/AtmosferaPAD - TIMBRES PREMIUM.sf2",
+      "size_bytes": 85119340,
+      "sha256": "be3cf06f96c84135089e0deca5eb29a42bf96931b36264fdd5f11ce8baacab74",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "Cloud Shimmer pad",
+      "base": "soundfont_root",
+      "path": "02_SoundFonts/11_Pads_and_Ambience/Cloud Shimmer - TIMBRES PREMIUM.sf2",
+      "size_bytes": 30760244,
+      "sha256": "933e9c3acac21d32c222a35456eace4f7479a31fb63cacdbac0e97cf09dd2038",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "Hillsong pad",
+      "base": "soundfont_root",
+      "path": "02_SoundFonts/11_Pads_and_Ambience/Hillsong Pad - TIMBRES PREMIUM.sf2",
+      "size_bytes": 36871492,
+      "sha256": "74128233bbda4731700f3f162d4b15ea37e617a58b2c43c8ab5b6f647300c4de",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "Magic Ambient pad",
+      "base": "soundfont_root",
+      "path": "02_SoundFonts/11_Pads_and_Ambience/MagicAmbient - TIMBRES PREMIUM.sf2",
+      "size_bytes": 51402628,
+      "sha256": "61207c6252b005ede6feee7f4b092abad94b174f01852fbcbdf4be4393a65e53",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "Majesty pad",
+      "base": "soundfont_root",
+      "path": "02_SoundFonts/11_Pads_and_Ambience/MajestyPad - TIMBRES PREMIUM.sf2",
+      "size_bytes": 36871490,
+      "sha256": "910681cb2c56af0656b9e4b947761d9bb1aa7d943565470cfaeac12b3d0fdf74",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "Oceans worship pad",
+      "base": "soundfont_root",
+      "path": "02_SoundFonts/11_Pads_and_Ambience/OceansPad - TIMBRES PREMIUM.sf2",
+      "size_bytes": 36871488,
+      "sha256": "06cde31ba951f4466644824b1b7156d3c6c0a4f2db040f3770b53df0b39ccbcb",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "Effects pad",
+      "base": "soundfont_root",
+      "path": "02_SoundFonts/11_Pads_and_Ambience/PAD EFEITOS 1 _ Infinity_studio.sf2",
+      "size_bytes": 16178594,
+      "sha256": "a3d085982ebe2da505638f264db2a9c9c676511e4d99f3cd75f531b5575c0e15",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "Worship Shimmer pad",
+      "base": "soundfont_root",
+      "path": "02_SoundFonts/11_Pads_and_Ambience/PAD WorshipShimmer - TIMBRES PREMIUM.sf2",
+      "size_bytes": 24005790,
+      "sha256": "3fa1af3a0b7b99051ae1cfe49e6cb7ad5a5bad7a4a93a6f61859548ebdb25f0f",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "Sanctorium pad",
+      "base": "soundfont_root",
+      "path": "02_SoundFonts/11_Pads_and_Ambience/Sanctorium Pad - TIMBRES PREMIUM.sf2",
+      "size_bytes": 36871494,
+      "sha256": "63b5cc264e1f19fe69cfa4a9b8a03a9798d639064b5861f4786fc5ffd7cc8e73",
+      "redistributable_by_repository": false
+    },
+    {
+      "role": "Warm worship pad",
+      "base": "soundfont_root",
+      "path": "02_SoundFonts/11_Pads_and_Ambience/WarmPad - TIMBRES PREMIUM.sf2",
+      "size_bytes": 29109886,
+      "sha256": "78fcff5d02bf0e64e45465a631e5efb208ddc02a6c420ee379ade874db78d8e2",
+      "redistributable_by_repository": false
+    }
+  ],
+  "decent_sampler_libraries": [
+    {
+      "bundle": "Basic Piano.dsbundle",
+      "preset": "Basic Piano.dspreset",
+      "files": 17,
+      "size_bytes": 39820933,
+      "tree_sha256": "bbfd69193ca5a823bbb140409486f5daea75d5c310ec095121a766a0aad027d8"
+    },
+    {
+      "bundle": "DS + VT - altstrings Free Edition.dsbundle",
+      "preset": "Cello & Viola - Earthrise.dspreset",
+      "files": 31,
+      "size_bytes": 125683594,
+      "tree_sha256": "8c06e2ef6415ea53403ec7ce29c32b7cb98c1336d39b12442c162a8bf66d57d3"
+    }
+  ],
+  "patchbay": {
+    "raw_snapshot": "src/midi-setup/airstar-patchbay.json",
+    "raw_sha256": "be0c51bfb48cd6409ce2f8d739d4eaaf2062fb8c1b55a0adff1b6e4f3e1d04f1",
+    "raw_links": 112,
+    "midi_snapshot": "src/midi-setup/airstar-midi-patchbay.json",
+    "midi_sha256": "82c1a2e6897584d4ca3d728f9431b807cbe8a10a04c8a49fdc91ef1a79b57000",
+    "midi_links": 64,
+    "deployment_snapshot": "src/midi-setup/pedro-live-rack-patchbay.json",
+    "deployment_sha256": "e0a38241190cae6b0ad0b0d72a0734bd78984b3c5149b82014716b472dfcf85d",
+    "deployment_links": 110,
+    "excluded_from_deployment": [
+      "ALSA Playback [java] audio links are unrelated to the performance rack."
+    ],
+    "reference_output_aliases": {
+      "left": "Speaker + Headphones:playback_FL",
+      "right": "Speaker + Headphones:playback_FR"
+    }
+  }
+}

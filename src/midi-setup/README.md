@@ -1,36 +1,39 @@
 # Airstar MIDI Setup
 
-This directory records the active Linux workstation setup on airstar: the
-machine to which the MIDI controllers are connected and that hosts the Carla
-live rack.
+This directory stores the captured Linux workstation graph for the Carla live
+rack on airstar. The current reference was verified on 2026-08-08 and is paired
+with the complete deployment tooling under
+[docs/tools/airstar-live-setup](../../docs/tools/airstar-live-setup/README.md).
 
-The initial verification was performed on 2026-08-02 against the live system,
-not inferred from a package list. It found PipeWire and WirePlumber running,
-the Carla Flatpak process open, and the saved project at
-/c/music/carla/pedro.uproject.
+## Artifacts
 
-## Documents
+- [Current State](current-state.md) summarizes the verified host, rack, devices,
+  services, and graph.
+- [Operating Procedure](operating-procedure.md) covers startup, snapshot
+  refresh, validation, recovery, and capture.
+- [Plugin Inventory](plugin-inventory.md) records package and manual plugin
+  ownership.
+- [Raw Patchbay](airstar-patchbay.json) contains 112 links exactly as captured
+  on airstar.
+- [MIDI Patchbay](airstar-midi-patchbay.json) contains 64 MIDI links and their
+  endpoints.
+- [Deployment Patchbay](pedro-live-rack-patchbay.json) contains the 110 links
+  owned by the performance setup. It excludes two unrelated Java playback
+  links from the shared system sink.
 
-- [Current State](current-state.md) records the verified graph, controller
-  ports, host versions, and system boundaries.
-- [Plugin Inventory](plugin-inventory.md) distinguishes package-owned plugins
-  from manually copied ones and records the remaining deliberate gaps.
-- [Operating Procedure](operating-procedure.md) describes safe startup,
-  refresh, expansion, and recovery steps.
+The raw snapshots are evidence. The deployment snapshot, Carla project,
+setup.json manifest, and helper service sources are the rebuild inputs.
 
-- [Full Patchbay Snapshot](airstar-patchbay.json) is the live PipeWire export
-  from 2026-08-03, including MIDI and non-MIDI links.
-- [MIDI Patchbay Snapshot](airstar-midi-patchbay.json) contains the MIDI
-  endpoints and routes from the same capture.
+## Sources Of Truth
 
-## Authoritative Rack
+- Carla plugin instances, parameters, rack order, and Carla-owned connections:
+  src/audio-software/carla/projects/pedro-live-rack/pedro.uproject
+- External PipeWire links and automatic restoration:
+  ~/.local/state/pipewire-patchbay/patchbay.json on the installed machine
+- Controller messages, packages, external asset fingerprints, and expected
+  service state: docs/tools/airstar-live-setup/setup.json
+- Stateful SMK chord/layer logic and Arturia master volume/mute behavior:
+  docs/tools/smk25-pad-layers and docs/tools/arturia-main-volume-encoder
 
-/c/music/carla/pedro.uproject is the authoritative definition of the live
-rack. It already contains the MIDI source, the CC transformation, instruments,
-mixer, and output connections. Do not create an equivalent permanent graph in
-qpwgraph while this project is restoring the same links; doing so makes the
-source of truth ambiguous and can duplicate connections.
-
-qpwgraph is installed as a separate inspection and recovery tool. It is useful
-when a device name changes or Carla does not restore a connection, but it is
-not the primary store for this rack.
+SoundFonts, DecentSampler binaries, and sample libraries remain external and
+are verified by checksum rather than committed to Git.

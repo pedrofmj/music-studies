@@ -2,7 +2,7 @@
 Type=Application
 Name=Carla - Pedro Project
 Comment=Open the Pedro live rack in Carla
-Exec=/home/ldap/pedro.ferreira/bin/carla-pedro-project
+Exec=carla-pedro-project
 Icon=studio.kx.carla
 Terminal=false
 Categories=AudioVideo;Audio;

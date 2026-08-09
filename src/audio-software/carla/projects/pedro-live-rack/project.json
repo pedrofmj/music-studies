@@ -3,7 +3,7 @@
   "name": "Pedro Live Rack",
   "project_file": "pedro.uproject",
   "captured_from": "pedro.ferreira@airstar:/c/music/carla/pedro.uproject",
-  "captured_at": "2026-08-08T18:03:52-03:00",
+  "captured_at": "2026-08-09T07:33:16-03:00",
   "sha256": "e3e748cda372c044e86679589f4061bb8633ac361939859b9322fdd0d262bf91",
   "size_bytes": 121306,
   "expected": {
@@ -15,9 +15,9 @@
     "carla_flatpak_id": "studio.kx.carla",
     "external_assets_versioned": false,
     "standard_asset_roots": [
-      "/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library",
-      "/home/ldap/pedro.ferreira/.local/share/sounds/sf2",
-      "/home/ldap/pedro.ferreira/.local/share/carla/pedro-soundfonts"
+      "~/Flash/PED/MIDI/Pack de Timbres/Library",
+      "~/.local/share/sounds/sf2",
+      "~/.local/share/carla/pedro-soundfonts"
     ],
     "plugins": [
       "DecentSampler VST2",

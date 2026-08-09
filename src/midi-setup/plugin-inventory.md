@@ -10,11 +10,12 @@ bundle's manifest.ttl; apt-get -s autoremove reported no orphan packages.
 | --- | --- | --- | --- |
 | Carla | Flatpak 2.5.10 | Plugin host and patchbay | Open with pedro.uproject |
 | PipeWire / WirePlumber | Ubuntu 1.0.5 / 0.4.17 | Audio and MIDI graph | Active |
-| DecentSampler | Manual ~/.vst/DecentSampler.so | VST2, .dspreset / .dslibrary player | Two active instances |
-| ACE FluidSynth | ardour-lv2-plugins 8.4.0 | LV2, SF2/SF3 player | Two active instances |
+| DecentSampler | Manual ~/.vst/DecentSampler.so | VST2, .dspreset / .dsbundle player | Two active instances |
+| Carla native SF2 engine | Included in Carla Flatpak | SF2 player | Sixteen active instrument slots |
+| ACE FluidSynth | ardour-lv2-plugins 8.4.0 | LV2, SF2/SF3 player | Installed, not active; Carla native SF2 slots replaced it |
 | Fluida | Manual ~/.lv2/Fluida.lv2 | LV2, SF2/SF3 player | Installed, not in active graph |
-| LSP Plugins | lsp-plugins-lv2 1.2.14 | LV2 effects, metering, mixer | LSP Mixer x8 is active |
-| x42 Plugins | x42-plugins 20230915 | LV2 utility, MIDI, metering, Tuna | Installed |
+| LSP Plugins | lsp-plugins-lv2 1.2.14 | LV2 effects, metering, mixer | Master mixer, SMK mixer, output trim, and 8-band EQ active |
+| x42 Plugins | x42-plugins 20230915 | LV2 utility and MIDI filters | scalecc and mapcc instances active |
 | Dragonfly Reverb | dragonfly-reverb-lv2 3.2.10 | Four LV2 reverbs | Installed; refresh Carla before use |
 | Surge XT | Official surge-xt 1.3.4 Debian package | LV2 instrument/effects, VST3, CLAP, standalone | Installed; refresh Carla before use |
 | qpwgraph | Flatpak 1.0.3 | PipeWire graph inspection and optional patchbay recovery | Installed |
@@ -47,7 +48,7 @@ and DecentSampler in the user home directory.
 | --- | --- | --- |
 | sfizz | Not installed | Ubuntu 24.04 has no candidate package. The published Ubuntu route is an OBS repository named home:sfztools:sfizz:develop; it was intentionally not added to a production workstation. Prefer a reviewed stable package or a user-local build in ~/.lv2. |
 | Vital | Not installed | No Ubuntu package candidate was present. The official Linux download is account-gated, so it cannot be downloaded or licensed on the user's behalf. Install its official Debian package after signing in, then verify the LV2 bundle through Carla. |
-| Standalone FluidSynth | Not installed | Not required for this rack: ACE FluidSynth already supplies the requested SoundFont-player role in Carla. |
+| Standalone FluidSynth | Not installed | Not required for this rack: Carla native SF2 slots supply the active SoundFont-player role. |
 | MidiMinder | Not installed | This was a product idea in the original suggestion, not an identified package or required component of the current rack. |
 
 Surge XT and DecentSampler satisfy the synthesizer and modern sample-library

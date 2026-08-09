@@ -1,0 +1,301 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../../.." && pwd)"
+readonly MANIFEST="${SCRIPT_DIR}/setup.json"
+
+soundfont_root="${HOME}/Flash/PED/MIDI/Pack de Timbres/Library"
+project_target="/c/music/carla/pedro.uproject"
+fast=false
+live=false
+failures=0
+warnings=0
+
+usage() {
+    printf '%s\n'         "Usage: $(basename "$0") [--fast] [--live] [--soundfont-root PATH] [--project PATH]"         ""         "Validate the installed Pedro live rack against the versioned manifest."         "--fast skips large asset checksums. --live additionally requires connected"         "controllers, running services, Carla ports, and a complete Patchbay restore."
+}
+
+pass() {
+    printf 'PASS  %s\n' "$*"
+}
+
+fail() {
+    printf 'FAIL  %s\n' "$*" >&2
+    ((failures += 1))
+}
+
+while (($#)); do
+    case $1 in
+        --fast)
+            fast=true
+            ;;
+        --live)
+            live=true
+            ;;
+        --soundfont-root)
+            [[ -n ${2-} ]] || {
+                printf '%s\n' "--soundfont-root requires a path" >&2
+                exit 2
+            }
+            soundfont_root=$2
+            shift
+            ;;
+        --project)
+            [[ -n ${2-} ]] || {
+                printf '%s\n' "--project requires a path" >&2
+                exit 2
+            }
+            project_target=$2
+            shift
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            printf 'Unknown option: %s\n' "$1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
+
+if ! command -v jq >/dev/null 2>&1; then
+    fail "jq is required to read the setup manifest"
+    printf 'Validation failed: %d failure(s)\n' "$failures" >&2
+    exit 1
+fi
+
+if jq -e '
+    .schema == "music-studies/pedro-live-setup/v1"
+    and (.external_assets | length == 17)
+    and (.decent_sampler_libraries | length == 2)
+    and (.services | length == 4)
+' "$MANIFEST" >/dev/null; then
+    pass "setup manifest schema and required collections"
+else
+    fail "invalid setup manifest: $MANIFEST"
+fi
+
+if [[ -r /etc/os-release ]]; then
+    # shellcheck disable=SC1091
+    source /etc/os-release
+    expected_id=$(jq -r '.reference_host.os_id' "$MANIFEST")
+    expected_version=$(jq -r '.reference_host.os_version' "$MANIFEST")
+    if [[ ${ID-} == "$expected_id" && ${VERSION_ID-} == "$expected_version"* ]]; then
+        pass "operating system ${PRETTY_NAME:-${ID-} ${VERSION_ID-}}"
+    else
+        fail "expected $expected_id $expected_version, found ${PRETTY_NAME:-unknown}"
+    fi
+else
+    fail "cannot read /etc/os-release"
+fi
+
+while IFS= read -r package; do
+    if dpkg-query -W -f='${Status}' "$package" 2>/dev/null         | grep -qx 'install ok installed'; then
+        pass "package $package"
+    else
+        fail "missing package $package"
+    fi
+done < <(jq -r '.packages.apt_required[]' "$MANIFEST")
+
+while IFS= read -r app_id; do
+    if command -v flatpak >/dev/null 2>&1         && flatpak info "$app_id" >/dev/null 2>&1; then
+        pass "Flatpak $app_id"
+    else
+        fail "missing Flatpak $app_id"
+    fi
+done < <(jq -r '.packages.flatpaks[].id' "$MANIFEST")
+
+while IFS= read -r bundle; do
+    if [[ -f "$HOME/.lv2/$bundle/manifest.ttl" ]]; then
+        pass "user-visible LV2 bundle $bundle"
+    else
+        fail "missing user-visible LV2 bundle $HOME/.lv2/$bundle"
+    fi
+done < <(jq -r '.carla.user_lv2_bundles[]' "$MANIFEST")
+
+resolve_asset() {
+    local base=$1
+    local relative=$2
+    case $base in
+        home)
+            printf '%s/%s\n' "$HOME" "$relative"
+            ;;
+        soundfont_root)
+            printf '%s/%s\n' "$soundfont_root" "$relative"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+while IFS=$'\t' read -r role base relative size expected_hash; do
+    path=$(resolve_asset "$base" "$relative") || {
+        fail "$role has unknown asset base $base"
+        continue
+    }
+    if [[ ! -f $path ]]; then
+        fail "$role missing: $path"
+        continue
+    fi
+    actual_size=$(stat -c '%s' "$path")
+    if [[ $actual_size != "$size" ]]; then
+        fail "$role size mismatch: $actual_size, expected $size"
+        continue
+    fi
+    if [[ $fast == false ]]; then
+        actual_hash=$(sha256sum "$path")
+        actual_hash=${actual_hash%% *}
+        if [[ $actual_hash != "$expected_hash" ]]; then
+            fail "$role checksum mismatch: $path"
+            continue
+        fi
+    fi
+    pass "$role asset"
+done < <(
+    jq -r '
+        .external_assets[]
+        | [.role, .base, .path, (.size_bytes | tostring), .sha256]
+        | @tsv
+    ' "$MANIFEST"
+)
+
+decent_root="$HOME/$(jq -r '.paths.decent_sampler_library_root' "$MANIFEST")"
+while IFS=$'\t' read -r bundle expected_files expected_size expected_hash; do
+    path="$decent_root/$bundle"
+    if [[ ! -d $path ]]; then
+        fail "DecentSampler library missing: $path"
+        continue
+    fi
+    actual_files=$(find "$path" -type f | wc -l)
+    actual_size=$(du -sb "$path")
+    actual_size=${actual_size%%[[:space:]]*}
+    if [[ $actual_files != "$expected_files" || $actual_size != "$expected_size" ]]; then
+        fail "DecentSampler library inventory mismatch: $bundle"
+        continue
+    fi
+    if [[ $fast == false ]]; then
+        actual_hash=$(
+            cd "$path"
+            find . -type f -print0                 | sort -z                 | xargs -0 sha256sum                 | sha256sum
+        )
+        actual_hash=${actual_hash%% *}
+        if [[ $actual_hash != "$expected_hash" ]]; then
+            fail "DecentSampler library checksum mismatch: $bundle"
+            continue
+        fi
+    fi
+    pass "DecentSampler library $bundle"
+done < <(
+    jq -r '
+        .decent_sampler_libraries[]
+        | [.bundle, (.files | tostring), (.size_bytes | tostring), .tree_sha256]
+        | @tsv
+    ' "$MANIFEST"
+)
+
+project_source="$REPO_ROOT/$(jq -r '.paths.project_source' "$MANIFEST")"
+if [[ -f $project_source ]]; then
+    expected_hash=$(jq -r '.carla.project_sha256' "$MANIFEST")
+    actual_hash=$(sha256sum "$project_source")
+    actual_hash=${actual_hash%% *}
+    if [[ $actual_hash == "$expected_hash" ]]; then
+        pass "versioned Carla project checksum"
+    else
+        fail "versioned Carla project checksum mismatch"
+    fi
+fi
+
+if [[ -f $project_target ]]; then
+    if python3 -c '
+import sys
+import xml.etree.ElementTree as ET
+root = ET.parse(sys.argv[1]).getroot()
+plugins = root.findall("Plugin")
+connections = root.findall("ExternalPatchbay/Connection")
+names = [item.findtext("Info/Name") or "" for item in plugins]
+valid = len(plugins) == 47 and len(set(names)) == 47 and len(connections) == 106
+raise SystemExit(0 if valid else 1)
+' "$project_target"; then
+        pass "deployed Carla project structure"
+    else
+        fail "deployed Carla project does not contain 47 plugins and 106 connections"
+    fi
+else
+    fail "deployed Carla project missing: $project_target"
+fi
+
+snapshot="$HOME/$(jq -r '.paths.patchbay_snapshot' "$MANIFEST")"
+if [[ -f $snapshot ]] && jq -e '
+    .schema == "https://music-studies.local/schemas/pipewire-patchbay/v1"
+    and (.links | length) >= 110
+' "$snapshot" >/dev/null; then
+    pass "Patchbay snapshot schema and link inventory"
+else
+    fail "Patchbay snapshot missing or incomplete: $snapshot"
+fi
+
+while IFS= read -r service; do
+    if systemctl --user is-enabled --quiet "$service"; then
+        pass "$service enabled"
+    else
+        fail "$service is not enabled"
+    fi
+    if systemctl --user is-active --quiet "$service"; then
+        pass "$service active"
+    else
+        fail "$service is not active"
+    fi
+done < <(jq -r '.services[].name' "$MANIFEST")
+
+if [[ $live == true ]]; then
+    arturia_count=$(lsusb -d 1c75:028c 2>/dev/null | wc -l)
+    mvave_count=$(lsusb -d 4353:4b4d 2>/dev/null | wc -l)
+    if ((arturia_count >= 1)); then
+        pass "Arturia USB controller connected"
+    else
+        fail "Arturia USB controller not connected"
+    fi
+    if ((mvave_count >= 4)); then
+        pass "four M-VAVE USB controllers connected"
+    else
+        fail "expected four M-VAVE USB controllers, found $mvave_count"
+    fi
+
+    if pgrep -f '/app/share/carla/carla' >/dev/null 2>&1; then
+        pass "Carla is running"
+    else
+        fail "Carla is not running"
+    fi
+
+    patchbay_tool="$HOME/bin/pipewire-patchbay-json"
+    if [[ -x $patchbay_tool ]]; then
+        if output=$("$patchbay_tool" --check-and-restore --dry-run 2>&1); then
+            summary=${output##*$'\n'}
+            pass "live Patchbay matches the saved graph: $summary"
+        else
+            fail "live Patchbay has unresolved endpoints: $output"
+        fi
+    else
+        fail "Patchbay tool missing: $patchbay_tool"
+    fi
+
+    quantum=$(pw-metadata -n settings 2>/dev/null         | sed -n "s/.*key:'clock.force-quantum' value:'\([^']*\)'.*/\1/p"         | tail -1)
+    expected_quantum=$(jq -r '.carla.pipewire_quantum' "$MANIFEST")
+    if [[ $quantum == "$expected_quantum" ]]; then
+        pass "PipeWire quantum $quantum"
+    else
+        fail "PipeWire quantum is ${quantum:-unset}, expected $expected_quantum"
+    fi
+fi
+
+if ((failures > 0)); then
+    printf 'Validation failed: %d failure(s)\n' "$failures" >&2
+    exit 1
+fi
+
+printf 'Validation complete: 0 failures\n'

@@ -2,69 +2,75 @@
 
 ## Normal Startup
 
-1. Connect and power the controller before opening Carla.
-2. Confirm PipeWire and WirePlumber are active with
-   systemctl --user is-active pipewire wireplumber.
-3. Launch `~/bin/carla-pedro-project`. It forwards
-   `/c/music/carla/pedro.uproject` into the Flatpak and loads the rack during
-   Carla startup. Avoid opening a blank Carla instance and then using Open for
-   this project; the multi-instance rack can hang during in-process reload.
-4. In Carla's Patchbay, confirm the KeyLab MIDI port feeds MIDI Scale CC Value
-   and that the LSP Mixer outputs feed the intended audio sink.
-5. Play a note and operate the sustain pedal before adding or changing a
-   plugin.
+1. Connect the Arturia and all four M-VAVE controllers.
+2. Confirm PipeWire, WirePlumber, and the four setup services are active.
+3. Launch ~/bin/carla-pedro-project. Do not open a blank Carla instance and
+   then load this large project through Open; direct project startup avoids
+   the previously observed in-process reload hang.
+4. Wait for all SoundFonts to load.
+5. Play the Arturia, SMK-25, and pad devices and confirm Carla meters move.
+6. Run the live validator from the repository:
 
-The project stores its ExternalPatchbay connections, so Carla is responsible
-for restoring this performance graph. qpwgraph is best used to inspect failed
-restoration or a changed device name, not to duplicate the normal links.
+~~~bash
+docs/tools/airstar-live-setup/validate-airstar-live-setup --live --fast
+~~~
 
-## Adding The New Plugins
+## Intentional Routing Changes
 
-Save the current project first. In Carla, open the Add Plugin dialog, refresh
-the LV2 scan, and search for Surge XT and Dragonfly. The required bundles are
-already visible to Carla through its working document-portal LV2 path.
+After changing a live connection and confirming audio:
 
-For Surge XT, add the instrument and connect its MIDI input to MIDI Scale CC
-Value; send its stereo outputs to unused LSP Mixer inputs. For Dragonfly,
-start with an instrument-specific or send/return reverb path. Do not insert a
-fully wet reverb after the LSP master output by default, because that affects
-every existing layer.
+~~~bash
+~/bin/pipewire-patchbay-refresh
+~~~
 
-Save a new project revision after a successful audio and pedal test. Keep the
-working pedro.uproject unchanged until the new revision is confirmed.
+That command takes a new full snapshot and restarts the event-driven restore
+service. It affects the machine's runtime snapshot, not the Git artifacts.
 
-## qpwgraph Recovery Use
+To inspect restoration without changing links:
 
-Open qpwgraph only after Carla and the controllers are running. It should show
-the same KeyLab-to-filter and mixer-to-sink links documented in
-[Current State](current-state.md). If a controller re-enumerates with a new
-port name, repair that one link, test it, then save the Carla project so its
-ExternalPatchbay records the corrected endpoint.
+~~~bash
+~/bin/pipewire-patchbay-json --check-and-restore --dry-run
+~~~
 
-Do not configure qpwgraph to persist a second copy of the entire Carla rack.
-Use a qpwgraph patchbay profile only for links that deliberately live outside
-the Carla project, such as a controller-to-standalone-application connection.
+## Versioning A Confirmed Change
 
-## Backup And Diagnostics
+Save the Carla project, refresh the live snapshot, then run locally:
 
-Before modifying the rack, create a dated copy of the project:
+~~~bash
+docs/tools/airstar-live-setup/capture-from-airstar
+~~~
+
+Review the project, raw snapshot, MIDI snapshot, deployment snapshot,
+project.json, and setup.json changes together. The capture refuses an
+unexpected plugin or connection count so structural changes require a
+deliberate manifest update.
+
+## New Machine
+
+Provision the external SoundFont and DecentSampler assets, apply the controller
+profiles, then run:
+
+~~~bash
+docs/tools/airstar-live-setup/install-airstar-live-setup
+~~~
+
+Use --replace-snapshot only when the versioned deployment graph should replace
+an already configured machine's snapshot.
+
+## Recovery
+
+If devices disappear, reconnect the USB root and allow two seconds for the
+event watcher. If links remain missing, run the dry check above. Do not refresh
+the snapshot while devices or Carla ports are absent, because that would make
+the incomplete graph authoritative.
+
+If Carla is unresponsive, close it and relaunch the project through
+~/bin/carla-pedro-project. The helper services and event watcher can remain
+running; their named ports will reconnect when Carla returns.
+
+Before manual project replacement, keep a timestamped backup:
 
 ~~~bash
 cp -a /c/music/carla/pedro.uproject \
   /c/music/carla/pedro-$(date +%F-%H%M%S).uproject
 ~~~
-
-Useful non-destructive checks on airstar are:
-
-~~~bash
-pw-link -iol
-wpctl status
-flatpak info studio.kx.carla
-dpkg-query -S /usr/lib/lv2/'Surge XT.lv2'/manifest.ttl
-~~~
-
-If a package-installed LV2 plugin is absent from Carla, first confirm that the
-existing document-portal LV2 path is still present in
-~/.var/app/studio.kx.carla/config/falkTX/Carla2.conf. Do not add a direct
-/usr/lib/lv2 Flatpak override; it is rejected because /usr is reserved by the
-Flatpak runtime.

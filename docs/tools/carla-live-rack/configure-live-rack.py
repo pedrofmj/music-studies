@@ -14,7 +14,10 @@ from pathlib import Path
 
 
 SOUND_ROOT = Path(
-    "/home/ldap/pedro.ferreira/Flash/PED/MIDI/Pack de Timbres/Library"
+    os.environ.get(
+        "PEDRO_SOUNDFONT_ROOT",
+        Path.home() / "Flash/PED/MIDI/Pack de Timbres/Library",
+    )
 )
 
 ASSETS = {
@@ -23,7 +26,7 @@ ASSETS = {
         "Nord White Grand Full 24C",
     ),
     "flute": (
-        Path("/home/ldap/pedro.ferreira/.local/share/sounds/sf2/FluidR3_GM.sf2"),
+        Path.home() / ".local/share/sounds/sf2/FluidR3_GM.sf2",
         "Flute",
     ),
     "sax": (
