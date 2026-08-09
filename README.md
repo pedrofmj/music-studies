@@ -3,6 +3,15 @@
 This repository stores structured study material for instruments, MIDI
 controllers, live setup, sound design, and reproducible practice workflows.
 
+The proposed Configurable Performance Rig
+([English](docs/features/configurable-performance-rig.md),
+[Português (Brasil)](docs/features/configurable-performance-rig.pt-BR.md))
+defines the next-step concepts for global and per-device profiles,
+low-latency CLI switching, and future MIDI-triggered profile changes. The
+[implementation plan](docs/features/configurable-performance-rig-implementation-plan.md)
+defines the architecture, milestones, validation gates, multiplatform
+delivery, deployment, and rollback.
+
 ## Current Collections
 
 - [Roland XPS-30](src/instruments/roland-xps30/README.md) - synthesizer,
