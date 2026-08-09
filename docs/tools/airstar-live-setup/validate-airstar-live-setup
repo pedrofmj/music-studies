@@ -218,12 +218,12 @@ root = ET.parse(sys.argv[1]).getroot()
 plugins = root.findall("Plugin")
 connections = root.findall("ExternalPatchbay/Connection")
 names = [item.findtext("Info/Name") or "" for item in plugins]
-valid = len(plugins) == 47 and len(set(names)) == 47 and len(connections) == 106
+valid = len(plugins) == 49 and len(set(names)) == 49 and len(connections) == 111
 raise SystemExit(0 if valid else 1)
 ' "$project_target"; then
         pass "deployed Carla project structure"
     else
-        fail "deployed Carla project does not contain 47 plugins and 106 connections"
+        fail "deployed Carla project does not contain 49 plugins and 111 connections"
     fi
 else
     fail "deployed Carla project missing: $project_target"

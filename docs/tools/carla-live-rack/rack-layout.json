@@ -68,7 +68,14 @@
       "name": "PD-CH-1 - Drum Set",
       "controller": "SMC-PAD and SMC-PAD Pocket",
       "volume_cc": 36,
-      "reverb_cc": 91
+      "reverb_cc": 91,
+      "output_gain_cc": 37,
+      "output_gain_mapped_cc": 110,
+      "output_gain_range_db": [
+        0,
+        12
+      ],
+      "saved_output_gain_db": 6.0206
     },
     {
       "name": "SMK-CH-1 - Oceans Worship Pad",

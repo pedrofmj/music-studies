@@ -77,6 +77,12 @@ Route SMC-PAD-Master and SMC-PAD Pocket-Master into PD Controls - Sustain
 Scale. Their normal note events drive PD-CH-1 - Drum Set. The private endpoints
 are not part of the rack.
 
+On SMC-PAD-Master, Knob 1 sends channel-1 CC36 and controls the drum SoundFont
+volume through the CC7 mapper. Knob 2 was measured as channel-1 CC37. Both
+Master ports feed a dedicated `PD-CH-1 Gain Map` intermediary that converts CC37
+to private CC110, controlling post-instrument output gain from 0 to approximately
++12 dB without passing through the sustain-only filter.
+
 ## Physical Verification
 
 After configuring a replacement controller, use jack_midi_dump or another raw

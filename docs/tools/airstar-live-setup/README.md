@@ -92,10 +92,10 @@ services, the 2048-frame quantum, and every saved link.
 
 ## Graph Artifacts
 
-- src/midi-setup/airstar-patchbay.json is the raw 112-link reference-host
+- src/midi-setup/airstar-patchbay.json is the raw 117-link reference-host
   snapshot.
 - src/midi-setup/airstar-midi-patchbay.json is its MIDI-only inventory.
-- src/midi-setup/pedro-live-rack-patchbay.json is the 110-link deployment
+- src/midi-setup/pedro-live-rack-patchbay.json is the 115-link deployment
   snapshot.
 
 The deployment snapshot excludes two ALSA Playback [java] links that happened
@@ -114,7 +114,7 @@ docs/tools/airstar-live-setup/capture-from-airstar
 
 The command fetches /c/music/carla/pedro.uproject, exports the full and
 MIDI-only live graphs, rebuilds the curated deployment graph, validates the
-47-plugin/106-connection contract, and updates checksums. Review and commit the
+48-plugin/109-connection contract, and updates checksums. Review and commit the
 result. If the rack gains or loses plugins, deliberately update the manifest
 and validators rather than bypassing the structural check.
 

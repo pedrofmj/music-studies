@@ -7,7 +7,7 @@ documentation together so it can be understood or replaced independently.
 ## Current tools
 
 - [Airstar Live Setup Deployment](airstar-live-setup/README.md) installs and validates the complete Ubuntu Carla rack, controller services, external assets, and PipeWire graph from a versioned manifest.
-- [Carla Live Rack](carla-live-rack/README.md) defines the 47-plugin instrument, mixer, EQ, and controller layout.
+- [Carla Live Rack](carla-live-rack/README.md) defines the 48-plugin instrument, mixer, EQ, and controller layout.
 - [Arturia Main Volume Encoder](arturia-main-volume-encoder/README.md) converts
   the KeyLab Essential central knob's relative MIDI messages into an absolute
   master-volume control while leaving fader 9 available for an instrument.

@@ -55,11 +55,11 @@ def validate(root: ET.Element, home: Path, soundfont_root: Path) -> None:
     plugins = root.findall("Plugin")
     connections = root.findall("ExternalPatchbay/Connection")
     names = [plugin.findtext("Info/Name") or "" for plugin in plugins]
-    if len(plugins) != 47 or len(names) != len(set(names)):
-        raise ValueError("expected 47 uniquely named plugins")
-    if len(connections) != 106:
+    if len(plugins) != 49 or len(names) != len(set(names)):
+        raise ValueError("expected 49 uniquely named plugins")
+    if len(connections) != 111:
         raise ValueError(
-            f"expected 106 project connections, found {len(connections)}"
+            f"expected 111 project connections, found {len(connections)}"
         )
 
     missing = []
@@ -115,7 +115,7 @@ def main() -> int:
     validate(tree.getroot(), args.home, args.soundfont_root)
     if args.check_only:
         print(
-            f"OK: 47 plugins, 106 connections, {replacements} path replacements"
+            f"OK: 49 plugins, 111 connections, {replacements} path replacements"
         )
         return 0
 

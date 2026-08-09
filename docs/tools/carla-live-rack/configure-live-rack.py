@@ -125,6 +125,9 @@ PAD_SCALE = "PD Controls - Sustain Scale"
 MASTER_MIXER = "LSP Mixer x8 Stereo"
 MASTER_EQ = "SMC-MIX - 8-Band EQ"
 AR2_TRIM = "AR-CH-2 Output Trim +6 dB"
+DRUM_TRIM = "PD-CH-1 Output Gain 0 to +12 dB"
+DRUM_GAIN_MAP = "PD-CH-1 Gain Map"
+DRUM_GAIN_MAPPED_CC = 110
 
 
 def plugin_name(plugin: ET.Element) -> str:
@@ -292,13 +295,18 @@ def configure_master_mixer(template: ET.Element) -> ET.Element:
     return plugin
 
 
-def configure_output_trim(template: ET.Element) -> ET.Element:
+def configure_output_trim(
+    template: ET.Element, name: str, output_gain_cc: int | None = None
+) -> ET.Element:
     plugin = copy.deepcopy(template)
-    set_info(plugin, AR2_TRIM)
+    set_info(plugin, name)
     set_text(plugin, "Data/Volume", 1)
     set_text(parameter(plugin, 2, "Output balance", "bal"), "Value", 0)
     output_gain = parameter(plugin, 5, "Output gain", "g_out")
-    clear_mapping(output_gain)
+    if output_gain_cc is None:
+        clear_mapping(output_gain)
+    else:
+        map_parameter(output_gain, output_gain_cc, 1, 4)
     set_text(output_gain, "Value", 2)
     set_text(parameter(plugin, 16, "Channel gain 1", "cg_1"), "Value", 1)
     return plugin
@@ -409,11 +417,17 @@ def replace_patchbay(root: ET.Element, plugins: list[ET.Element]) -> None:
             add_connection(patchbay, f"{name}:{left}", f"{AR2_TRIM}:Input L")
             add_connection(patchbay, f"{name}:{right}", f"{AR2_TRIM}:Input R")
             continue
+        if name == "PD-CH-1 - Drum Set":
+            add_connection(patchbay, f"{name}:{left}", f"{DRUM_TRIM}:Input L")
+            add_connection(patchbay, f"{name}:{right}", f"{DRUM_TRIM}:Input R")
+            continue
         add_connection(patchbay, f"{name}:{left}", f"{MASTER_MIXER}:Input L")
         add_connection(patchbay, f"{name}:{right}", f"{MASTER_MIXER}:Input R")
 
     add_connection(patchbay, f"{AR2_TRIM}:Output L", f"{MASTER_MIXER}:Input L")
     add_connection(patchbay, f"{AR2_TRIM}:Output R", f"{MASTER_MIXER}:Input R")
+    add_connection(patchbay, f"{DRUM_TRIM}:Output L", f"{MASTER_MIXER}:Input L")
+    add_connection(patchbay, f"{DRUM_TRIM}:Output R", f"{MASTER_MIXER}:Input R")
     add_connection(
         patchbay, f"{SMK_LAYER_MIXER}:Output L", f"{MASTER_MIXER}:Input L"
     )
@@ -427,6 +441,8 @@ def replace_patchbay(root: ET.Element, plugins: list[ET.Element]) -> None:
     add_connection(patchbay, ARTURIA_SOURCE, f"{ARTURIA_SCALE}:events-in")
     add_connection(patchbay, PAD_POCKET_SOURCE, f"{PAD_SCALE}:events-in")
     add_connection(patchbay, PAD_SOURCE, f"{PAD_SCALE}:events-in")
+    add_connection(patchbay, PAD_POCKET_SOURCE, f"{DRUM_GAIN_MAP}:events-in")
+    add_connection(patchbay, PAD_SOURCE, f"{DRUM_GAIN_MAP}:events-in")
     add_connection(patchbay, SMK_SOURCE, f"{SMK_LAYER_ROUTER}:midi-in")
     add_connection(
         patchbay, SMK_TRANSPORT_SOURCE, f"{SMK_LAYER_ROUTER}:midi-in"
@@ -461,6 +477,7 @@ def replace_patchbay(root: ET.Element, plugins: list[ET.Element]) -> None:
         )
 
     add_connection(patchbay, f"{PAD_SCALE}:events-out", "PD-CH-1 Volume Map:events-in")
+    add_connection(patchbay, f"{DRUM_GAIN_MAP}:events-out", f"{DRUM_TRIM}:events-in")
     add_connection(patchbay, "PD-CH-1 Volume Map:events-out", "PD-CH-1 - Drum Set:events-in")
     smk_targets = (
         "SMK-CH-1 - Oceans Worship Pad",
@@ -541,7 +558,7 @@ def build_plugins(root: ET.Element) -> list[ET.Element]:
         configure_smk_layer_mixer(mixer),
         configure_master_mixer(mixer),
         build_eq(),
-        configure_output_trim(mixer),
+        configure_output_trim(mixer, AR2_TRIM),
         configure_scale(scale_template, ARTURIA_SCALE),
         configure_scale(scale_template, PAD_SCALE),
     ]
@@ -573,6 +590,11 @@ def build_plugins(root: ET.Element) -> list[ET.Element]:
                 102 + band,
             )
         )
+    # Keep all existing plugin IDs stable; append the new mapper after the drum gain.
+    plugins.append(configure_output_trim(mixer, DRUM_TRIM, DRUM_GAIN_MAPPED_CC))
+    plugins.append(
+        configure_mapcc(mapcc_template, DRUM_GAIN_MAP, 37, DRUM_GAIN_MAPPED_CC)
+    )
     return plugins
 
 
@@ -584,8 +606,8 @@ def validate_assets() -> None:
 
 def validate_result(root: ET.Element, plugins: list[ET.Element]) -> None:
     names = [plugin_name(plugin) for plugin in plugins]
-    if len(plugins) != 47 or len(names) != len(set(names)):
-        raise ValueError("expected 47 uniquely named plugins")
+    if len(plugins) != 49 or len(names) != len(set(names)):
+        raise ValueError("expected 49 uniquely named plugins")
     expected = {f"AR-CH-{channel}" for channel in range(1, 10)}
     found = {
         name.split(" - ", 1)[0]
@@ -595,8 +617,8 @@ def validate_result(root: ET.Element, plugins: list[ET.Element]) -> None:
     if found != expected:
         raise ValueError(f"Arturia instrument set mismatch: {sorted(found)}")
     connections = root.findall("ExternalPatchbay/Connection")
-    if len(connections) != 106:
-        raise ValueError(f"expected 106 project connections, found {len(connections)}")
+    if len(connections) != 111:
+        raise ValueError(f"expected 111 project connections, found {len(connections)}")
 
 
 def write_project(project: Path, root: ET.Element, make_backup: bool) -> Path | None:
@@ -639,13 +661,13 @@ def main() -> int:
     validate_result(root, plugins)
 
     if args.check_only:
-        print(f"OK: would write {len(plugins)} plugins and 106 project connections")
+        print(f"OK: would write {len(plugins)} plugins and 111 project connections")
         return 0
     backup = write_project(args.project, root, not args.no_backup)
     print(f"Updated: {args.project}")
     if backup is not None:
         print(f"Backup: {backup}")
-    print(f"Plugins: {len(plugins)}; project connections: 106")
+    print(f"Plugins: {len(plugins)}; project connections: 111")
     return 0
 
 

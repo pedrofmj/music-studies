@@ -3815,6 +3815,431 @@ YXg9IjEiLz48L2NjPjwvbWlkaT48bW9kdWxhdG9ycy8+PHRhZ3MvPjxidXNlcy8+PG5vdGVTZXF1ZW5j
    </Parameter>
   </Data>
  </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>PD-CH-1 Output Gain 0 to +12 dB</Name>
+   <URI>http://lsp-plug.in/plugins/lv2/mixer_x8_stereo</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <Volume>1</Volume>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x1</Options>
+   <Parameter>
+    <Index>0</Index>
+    <Name>Enabled</Name>
+    <Symbol>enabled</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Mono output</Name>
+    <Symbol>mono</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>Output balance</Name>
+    <Symbol>bal</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>Dry amount</Name>
+    <Symbol>dry</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>4</Index>
+    <Name>Wet amount</Name>
+    <Symbol>wet</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>5</Index>
+    <Name>Output gain</Name>
+    <Symbol>g_out</Symbol>
+    <Value>2</Value>
+    <MidiChannel>1</MidiChannel>
+    <MappedControlIndex>110</MappedControlIndex>
+    <MappedMinimum>1</MappedMinimum>
+    <MappedMaximum>4</MappedMaximum>
+    <MidiCC>110</MidiCC>
+   </Parameter>
+   <Parameter>
+    <Index>10</Index>
+    <Name>Channel solo 1</Name>
+    <Symbol>cs_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>11</Index>
+    <Name>Channel mute 1</Name>
+    <Symbol>cm_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>12</Index>
+    <Name>Channel phase invert 1</Name>
+    <Symbol>ci_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>13</Index>
+    <Name>Channel pan left 1</Name>
+    <Symbol>cp_1l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>14</Index>
+    <Name>Channel pan right 1</Name>
+    <Symbol>cp_1r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>15</Index>
+    <Name>Channel output balance 1</Name>
+    <Symbol>cb_1</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>16</Index>
+    <Name>Channel gain 1</Name>
+    <Symbol>cg_1</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>19</Index>
+    <Name>Channel solo 2</Name>
+    <Symbol>cs_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>20</Index>
+    <Name>Channel mute 2</Name>
+    <Symbol>cm_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>21</Index>
+    <Name>Channel phase invert 2</Name>
+    <Symbol>ci_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>22</Index>
+    <Name>Channel pan left 2</Name>
+    <Symbol>cp_2l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>23</Index>
+    <Name>Channel pan right 2</Name>
+    <Symbol>cp_2r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>24</Index>
+    <Name>Channel output balance 2</Name>
+    <Symbol>cb_2</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>25</Index>
+    <Name>Channel gain 2</Name>
+    <Symbol>cg_2</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>28</Index>
+    <Name>Channel solo 3</Name>
+    <Symbol>cs_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>29</Index>
+    <Name>Channel mute 3</Name>
+    <Symbol>cm_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>30</Index>
+    <Name>Channel phase invert 3</Name>
+    <Symbol>ci_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>31</Index>
+    <Name>Channel pan left 3</Name>
+    <Symbol>cp_3l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>32</Index>
+    <Name>Channel pan right 3</Name>
+    <Symbol>cp_3r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>33</Index>
+    <Name>Channel output balance 3</Name>
+    <Symbol>cb_3</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>34</Index>
+    <Name>Channel gain 3</Name>
+    <Symbol>cg_3</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>37</Index>
+    <Name>Channel solo 4</Name>
+    <Symbol>cs_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>38</Index>
+    <Name>Channel mute 4</Name>
+    <Symbol>cm_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>39</Index>
+    <Name>Channel phase invert 4</Name>
+    <Symbol>ci_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>40</Index>
+    <Name>Channel pan left 4</Name>
+    <Symbol>cp_4l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>41</Index>
+    <Name>Channel pan right 4</Name>
+    <Symbol>cp_4r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>42</Index>
+    <Name>Channel output balance 4</Name>
+    <Symbol>cb_4</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>43</Index>
+    <Name>Channel gain 4</Name>
+    <Symbol>cg_4</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>46</Index>
+    <Name>Channel solo 5</Name>
+    <Symbol>cs_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>47</Index>
+    <Name>Channel mute 5</Name>
+    <Symbol>cm_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>48</Index>
+    <Name>Channel phase invert 5</Name>
+    <Symbol>ci_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>49</Index>
+    <Name>Channel pan left 5</Name>
+    <Symbol>cp_5l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>50</Index>
+    <Name>Channel pan right 5</Name>
+    <Symbol>cp_5r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>51</Index>
+    <Name>Channel output balance 5</Name>
+    <Symbol>cb_5</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>52</Index>
+    <Name>Channel gain 5</Name>
+    <Symbol>cg_5</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>55</Index>
+    <Name>Channel solo 6</Name>
+    <Symbol>cs_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>56</Index>
+    <Name>Channel mute 6</Name>
+    <Symbol>cm_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>57</Index>
+    <Name>Channel phase invert 6</Name>
+    <Symbol>ci_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>58</Index>
+    <Name>Channel pan left 6</Name>
+    <Symbol>cp_6l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>59</Index>
+    <Name>Channel pan right 6</Name>
+    <Symbol>cp_6r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>60</Index>
+    <Name>Channel output balance 6</Name>
+    <Symbol>cb_6</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>61</Index>
+    <Name>Channel gain 6</Name>
+    <Symbol>cg_6</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>64</Index>
+    <Name>Channel solo 7</Name>
+    <Symbol>cs_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>65</Index>
+    <Name>Channel mute 7</Name>
+    <Symbol>cm_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>66</Index>
+    <Name>Channel phase invert 7</Name>
+    <Symbol>ci_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>67</Index>
+    <Name>Channel pan left 7</Name>
+    <Symbol>cp_7l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>68</Index>
+    <Name>Channel pan right 7</Name>
+    <Symbol>cp_7r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>69</Index>
+    <Name>Channel output balance 7</Name>
+    <Symbol>cb_7</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>70</Index>
+    <Name>Channel gain 7</Name>
+    <Symbol>cg_7</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <Parameter>
+    <Index>73</Index>
+    <Name>Channel solo 8</Name>
+    <Symbol>cs_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>74</Index>
+    <Name>Channel mute 8</Name>
+    <Symbol>cm_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>75</Index>
+    <Name>Channel phase invert 8</Name>
+    <Symbol>ci_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>76</Index>
+    <Name>Channel pan left 8</Name>
+    <Symbol>cp_8l</Symbol>
+    <Value>-100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>77</Index>
+    <Name>Channel pan right 8</Name>
+    <Symbol>cp_8r</Symbol>
+    <Value>100</Value>
+   </Parameter>
+   <Parameter>
+    <Index>78</Index>
+    <Name>Channel output balance 8</Name>
+    <Symbol>cb_8</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>79</Index>
+    <Name>Channel gain 8</Name>
+    <Symbol>cg_8</Symbol>
+    <Value>1</Value>
+   </Parameter>
+   <CustomData>
+    <Type>http://kxstudio.sf.net/ns/carla/property</Type>
+    <Key>CarlaSkinIsCompacted</Key>
+    <Value>false</Value>
+   </CustomData>
+  </Data>
+ </Plugin>
+ <Plugin>
+  <Info>
+   <Type>LV2</Type>
+   <Name>PD-CH-1 Gain Map</Name>
+   <URI>http://gareus.org/oss/lv2/midifilter#mapcc</URI>
+  </Info>
+  <Data>
+   <Active>Yes</Active>
+   <ControlChannel>1</ControlChannel>
+   <Options>0x3f1</Options>
+   <Parameter>
+    <Index>1</Index>
+    <Name>Filter Channel</Name>
+    <Symbol>channelf</Symbol>
+    <Value>0</Value>
+   </Parameter>
+   <Parameter>
+    <Index>2</Index>
+    <Name>CC Input</Name>
+    <Symbol>ccin</Symbol>
+    <Value>37</Value>
+   </Parameter>
+   <Parameter>
+    <Index>3</Index>
+    <Name>CC Output</Name>
+    <Symbol>ccout</Symbol>
+    <Value>110</Value>
+   </Parameter>
+  </Data>
+ </Plugin>
  <ExternalPatchbay>
   <Connection>
    <Source>PipeWire ALSA [java]/ALSA Playback [java]:output_FL</Source>
@@ -3898,11 +4323,11 @@ YXg9IjEiLz48L2NjPjwvbWlkaT48bW9kdWxhdG9ycy8+PHRhZ3MvPjxidXNlcy8+PG5vdGVTZXF1ZW5j
   </Connection>
   <Connection>
    <Source>PD-CH-1 - Drum Set:out-left</Source>
-   <Target>LSP Mixer x8 Stereo:Input L</Target>
+   <Target>PD-CH-1 Output Gain 0 to +12 dB:Input L</Target>
   </Connection>
   <Connection>
    <Source>PD-CH-1 - Drum Set:out-right</Source>
-   <Target>LSP Mixer x8 Stereo:Input R</Target>
+   <Target>PD-CH-1 Output Gain 0 to +12 dB:Input R</Target>
   </Connection>
   <Connection>
    <Source>SMK-CH-1 - Oceans Worship Pad:out-left</Source>
@@ -3977,6 +4402,14 @@ YXg9IjEiLz48L2NjPjwvbWlkaT48bW9kdWxhdG9ycy8+PHRhZ3MvPjxidXNlcy8+PG5vdGVTZXF1ZW5j
    <Target>LSP Mixer x8 Stereo:Input R</Target>
   </Connection>
   <Connection>
+   <Source>PD-CH-1 Output Gain 0 to +12 dB:Output L</Source>
+   <Target>LSP Mixer x8 Stereo:Input L</Target>
+  </Connection>
+  <Connection>
+   <Source>PD-CH-1 Output Gain 0 to +12 dB:Output R</Source>
+   <Target>LSP Mixer x8 Stereo:Input R</Target>
+  </Connection>
+  <Connection>
    <Source>SMK Layer Mixer x8 Stereo:Output L</Source>
    <Target>LSP Mixer x8 Stereo:Input L</Target>
   </Connection>
@@ -4003,6 +4436,14 @@ YXg9IjEiLz48L2NjPjwvbWlkaT48bW9kdWxhdG9ycy8+PHRhZ3MvPjxidXNlcy8+PG5vdGVTZXF1ZW5j
   <Connection>
    <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-2- full speed:(capture_1) SINCO SMC-PAD-Master</Source>
    <Target>PD Controls - Sustain Scale:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:SINCO 2:(capture_1) SINCO SMC-PAD Pocket-Master</Source>
+   <Target>PD-CH-1 Gain Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-2- full speed:(capture_1) SINCO SMC-PAD-Master</Source>
+   <Target>PD-CH-1 Gain Map:events-in</Target>
   </Connection>
   <Connection>
    <Source>Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-3- full speed:(capture_1) SINCO SMK25-Master</Source>
@@ -4107,6 +4548,10 @@ YXg9IjEiLz48L2NjPjwvbWlkaT48bW9kdWxhdG9ycy8+PHRhZ3MvPjxidXNlcy8+PG5vdGVTZXF1ZW5j
   <Connection>
    <Source>PD Controls - Sustain Scale:events-out</Source>
    <Target>PD-CH-1 Volume Map:events-in</Target>
+  </Connection>
+  <Connection>
+   <Source>PD-CH-1 Gain Map:events-out</Source>
+   <Target>PD-CH-1 Output Gain 0 to +12 dB:events-in</Target>
   </Connection>
   <Connection>
    <Source>PD-CH-1 Volume Map:events-out</Source>
@@ -4381,6 +4826,12 @@ YXg9IjEiLz48L2NjPjwvbWlkaT48bW9kdWxhdG9ycy8+PHRhZ3MvPjxidXNlcy8+PG5vdGVTZXF1ZW5j
    </Position>
    <Position x1="780" y1="1720" pluginId="46">
     <Name>SMC-EQ-8 CC Scale</Name>
+   </Position>
+   <Position x1="1140" y1="1720" pluginId="47">
+    <Name>PD-CH-1 Output Gain 0 to +12 dB</Name>
+   </Position>
+   <Position x1="60" y1="1870" pluginId="48">
+    <Name>PD-CH-1 Gain Map</Name>
    </Position>
   </Positions>
  </ExternalPatchbay>

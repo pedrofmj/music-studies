@@ -41,10 +41,10 @@ root = ET.parse(sys.argv[1]).getroot()
 plugins = root.findall("Plugin")
 connections = root.findall("ExternalPatchbay/Connection")
 names = [item.findtext("Info/Name") or "" for item in plugins]
-valid = len(plugins) == 47 and len(set(names)) == 47 and len(connections) == 106
+valid = len(plugins) == 49 and len(set(names)) == 49 and len(connections) == 111
 raise SystemExit(0 if valid else 1)
 ' "$temporary/pedro.uproject" || {
-    printf 'Captured project does not match the expected 47/106 structure.\n' >&2
+    printf 'Captured project does not match the expected 49/111 structure.\n' >&2
     exit 1
 }
 

@@ -1,7 +1,7 @@
 {
   "schema": "https://music-studies.local/schemas/pipewire-patchbay/v1",
   "schema_version": 1,
-  "generated_at": "2026-08-09T07:33:17-03:00",
+  "generated_at": "2026-08-09T15:03:56-03:00",
   "hostname": "airstar",
   "scope": "midi-only",
   "nodes": [
@@ -27,331 +27,345 @@
       "media_class": null
     },
     {
-      "id": 497,
+      "id": 460,
       "name": "AR-CH-1 - Basic Piano",
       "description": "AR-CH-1 - Basic Piano",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 397,
+      "id": 557,
       "name": "AR-CH-2 - Nord White Grand Full 24C",
       "description": "AR-CH-2 - Nord White Grand Full 24C",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 346,
+      "id": 525,
       "name": "AR-CH-3 - Alt Strings",
       "description": "AR-CH-3 - Alt Strings",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 469,
+      "id": 485,
       "name": "AR-CH-4 - Good Flute",
       "description": "AR-CH-4 - Good Flute",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 409,
+      "id": 276,
       "name": "AR-CH-5 - SAX Lirakeys CL",
       "description": "AR-CH-5 - SAX Lirakeys CL",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 474,
+      "id": 431,
       "name": "AR-CH-6 - Hammond Organ Fast",
       "description": "AR-CH-6 - Hammond Organ Fast",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 577,
+      "id": 533,
       "name": "AR-CH-7 - Optik Synth",
       "description": "AR-CH-7 - Optik Synth",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 374,
+      "id": 464,
       "name": "AR-CH-8 - PAD EFEITOS",
       "description": "AR-CH-8 - PAD EFEITOS",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 516,
+      "id": 596,
       "name": "AR-CH-9 - AtmosferaPAD",
       "description": "AR-CH-9 - AtmosferaPAD",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 232,
+      "id": 277,
       "name": "PD-CH-1 - Drum Set",
       "description": "PD-CH-1 - Drum Set",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 301,
+      "id": 314,
       "name": "SMK-CH-1 - Oceans Worship Pad",
       "description": "SMK-CH-1 - Oceans Worship Pad",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 231,
+      "id": 400,
       "name": "SMK-CH-2 - Warm Worship Pad",
       "description": "SMK-CH-2 - Warm Worship Pad",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 285,
+      "id": 428,
       "name": "SMK-CH-3 - Hillsong Pad",
       "description": "SMK-CH-3 - Hillsong Pad",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 585,
+      "id": 203,
       "name": "SMK-CH-4 - Worship Shimmer",
       "description": "SMK-CH-4 - Worship Shimmer",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 255,
+      "id": 334,
       "name": "SMK-CH-5 - Cloud Shimmer",
       "description": "SMK-CH-5 - Cloud Shimmer",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 509,
+      "id": 322,
       "name": "SMK-CH-6 - Magic Ambient",
       "description": "SMK-CH-6 - Magic Ambient",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 277,
+      "id": 387,
       "name": "SMK-CH-7 - Majesty Pad",
       "description": "SMK-CH-7 - Majesty Pad",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 321,
+      "id": 328,
       "name": "SMK-CH-8 - Sanctorium Pad",
       "description": "SMK-CH-8 - Sanctorium Pad",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 593,
+      "id": 178,
       "name": "SMK Layer Mixer x8 Stereo",
       "description": "SMK Layer Mixer x8 Stereo",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 385,
+      "id": 359,
       "name": "LSP Mixer x8 Stereo",
       "description": "LSP Mixer x8 Stereo",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 311,
+      "id": 348,
       "name": "SMC-MIX - 8-Band EQ",
       "description": "SMC-MIX - 8-Band EQ",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 348,
+      "id": 422,
       "name": "AR-CH-2 Output Trim +6 dB",
       "description": "AR-CH-2 Output Trim +6 dB",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 195,
+      "id": 339,
       "name": "AR Controls - Sustain Scale",
       "description": "AR Controls - Sustain Scale",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 121,
+      "id": 444,
       "name": "PD Controls - Sustain Scale",
       "description": "PD Controls - Sustain Scale",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 383,
+      "id": 500,
       "name": "AR-CH-2 Volume Map",
       "description": "AR-CH-2 Volume Map",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 366,
+      "id": 375,
       "name": "AR-CH-4 Volume Map",
       "description": "AR-CH-4 Volume Map",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 340,
+      "id": 279,
       "name": "AR-CH-5 Volume Map",
       "description": "AR-CH-5 Volume Map",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 498,
+      "id": 561,
       "name": "AR-CH-6 Volume Map",
       "description": "AR-CH-6 Volume Map",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 449,
+      "id": 281,
       "name": "AR-CH-7 Volume Map",
       "description": "AR-CH-7 Volume Map",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 464,
+      "id": 404,
       "name": "AR-CH-8 Volume Map",
       "description": "AR-CH-8 Volume Map",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 133,
+      "id": 502,
       "name": "AR-CH-9 Volume Map",
       "description": "AR-CH-9 Volume Map",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 586,
+      "id": 482,
       "name": "PD-CH-1 Volume Map",
       "description": "PD-CH-1 Volume Map",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 380,
+      "id": 496,
       "name": "AR-CH-2 Reverb Map",
       "description": "AR-CH-2 Reverb Map",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 139,
+      "id": 223,
       "name": "AR-CH-4 Reverb Map",
       "description": "AR-CH-4 Reverb Map",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 505,
+      "id": 419,
       "name": "AR-CH-5 Reverb Map",
       "description": "AR-CH-5 Reverb Map",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 284,
+      "id": 182,
       "name": "AR-CH-6 Reverb Map",
       "description": "AR-CH-6 Reverb Map",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 584,
+      "id": 338,
       "name": "AR-CH-7 Reverb Map",
       "description": "AR-CH-7 Reverb Map",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 227,
+      "id": 208,
       "name": "AR-CH-8 Reverb Map",
       "description": "AR-CH-8 Reverb Map",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 241,
+      "id": 240,
       "name": "AR-CH-9 Reverb Map",
       "description": "AR-CH-9 Reverb Map",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 136,
+      "id": 247,
       "name": "SMC-EQ-1 CC Scale",
       "description": "SMC-EQ-1 CC Scale",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 163,
+      "id": 228,
       "name": "SMC-EQ-2 CC Scale",
       "description": "SMC-EQ-2 CC Scale",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 239,
+      "id": 250,
       "name": "SMC-EQ-3 CC Scale",
       "description": "SMC-EQ-3 CC Scale",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 236,
+      "id": 244,
       "name": "SMC-EQ-4 CC Scale",
       "description": "SMC-EQ-4 CC Scale",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 472,
+      "id": 421,
       "name": "SMC-EQ-5 CC Scale",
       "description": "SMC-EQ-5 CC Scale",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 219,
+      "id": 587,
       "name": "SMC-EQ-6 CC Scale",
       "description": "SMC-EQ-6 CC Scale",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 217,
+      "id": 259,
       "name": "SMC-EQ-7 CC Scale",
       "description": "SMC-EQ-7 CC Scale",
       "nick": null,
       "media_class": null
     },
     {
-      "id": 213,
+      "id": 201,
       "name": "SMC-EQ-8 CC Scale",
       "description": "SMC-EQ-8 CC Scale",
+      "nick": null,
+      "media_class": null
+    },
+    {
+      "id": 396,
+      "name": "PD-CH-1 Output Gain 0 to +12 dB",
+      "description": "PD-CH-1 Output Gain 0 to +12 dB",
+      "nick": null,
+      "media_class": null
+    },
+    {
+      "id": 278,
+      "name": "PD-CH-1 Gain Map",
+      "description": "PD-CH-1 Gain Map",
       "nick": null,
       "media_class": null
     }
@@ -666,90 +680,6 @@
       "midi": true
     },
     {
-      "id": 48,
-      "node_id": 42,
-      "node_name": "Midi-Bridge",
-      "node_description": null,
-      "direction": "in",
-      "port_id": 5,
-      "name": "SINCO 2:(playback_0) SINCO SMC-PAD Pocket-Private",
-      "name_selector": "Midi-Bridge:SINCO 2:(playback_0) SINCO SMC-PAD Pocket-Private",
-      "alias": "SINCO:SINCO SMC-PAD Pocket-Private",
-      "object_path": "alsa:seq:default:client_24:playback_0",
-      "format_dsp": "8 bit raw midi",
-      "midi": true
-    },
-    {
-      "id": 74,
-      "node_id": 42,
-      "node_name": "Midi-Bridge",
-      "node_description": null,
-      "direction": "out",
-      "port_id": 5,
-      "name": "SINCO 2:(capture_0) SINCO SMC-PAD Pocket-Private",
-      "name_selector": "Midi-Bridge:SINCO 2:(capture_0) SINCO SMC-PAD Pocket-Private",
-      "alias": "SINCO:SINCO SMC-PAD Pocket-Private",
-      "object_path": "alsa:seq:default:client_24:capture_0",
-      "format_dsp": "8 bit raw midi",
-      "midi": true
-    },
-    {
-      "id": 49,
-      "node_id": 42,
-      "node_name": "Midi-Bridge",
-      "node_description": null,
-      "direction": "in",
-      "port_id": 6,
-      "name": "SINCO 2:(playback_1) SINCO SMC-PAD Pocket-Master",
-      "name_selector": "Midi-Bridge:SINCO 2:(playback_1) SINCO SMC-PAD Pocket-Master",
-      "alias": "SINCO:SINCO SMC-PAD Pocket-Master",
-      "object_path": "alsa:seq:default:client_24:playback_1",
-      "format_dsp": "8 bit raw midi",
-      "midi": true
-    },
-    {
-      "id": 179,
-      "node_id": 42,
-      "node_name": "Midi-Bridge",
-      "node_description": null,
-      "direction": "out",
-      "port_id": 6,
-      "name": "SINCO 2:(capture_1) SINCO SMC-PAD Pocket-Master",
-      "name_selector": "Midi-Bridge:SINCO 2:(capture_1) SINCO SMC-PAD Pocket-Master",
-      "alias": "SINCO:SINCO SMC-PAD Pocket-Master",
-      "object_path": "alsa:seq:default:client_24:capture_1",
-      "format_dsp": "8 bit raw midi",
-      "midi": true
-    },
-    {
-      "id": 75,
-      "node_id": 42,
-      "node_name": "Midi-Bridge",
-      "node_description": null,
-      "direction": "in",
-      "port_id": 7,
-      "name": "SINCO 2:(playback_2) SINCO ",
-      "name_selector": "Midi-Bridge:SINCO 2:(playback_2) SINCO ",
-      "alias": "SINCO:SINCO ",
-      "object_path": "alsa:seq:default:client_24:playback_2",
-      "format_dsp": "8 bit raw midi",
-      "midi": true
-    },
-    {
-      "id": 50,
-      "node_id": 42,
-      "node_name": "Midi-Bridge",
-      "node_description": null,
-      "direction": "out",
-      "port_id": 7,
-      "name": "SINCO 2:(capture_2) SINCO ",
-      "name_selector": "Midi-Bridge:SINCO 2:(capture_2) SINCO ",
-      "alias": "SINCO:SINCO ",
-      "object_path": "alsa:seq:default:client_24:capture_2",
-      "format_dsp": "8 bit raw midi",
-      "midi": true
-    },
-    {
       "id": 56,
       "node_id": 42,
       "node_name": "Midi-Bridge",
@@ -988,7 +918,7 @@
       "midi": true
     },
     {
-      "id": 73,
+      "id": 47,
       "node_id": 42,
       "node_name": "Midi-Bridge",
       "node_description": null,
@@ -1002,7 +932,7 @@
       "midi": true
     },
     {
-      "id": 47,
+      "id": 72,
       "node_id": 42,
       "node_name": "Midi-Bridge",
       "node_description": null,
@@ -1016,7 +946,7 @@
       "midi": true
     },
     {
-      "id": 72,
+      "id": 46,
       "node_id": 42,
       "node_name": "Midi-Bridge",
       "node_description": null,
@@ -1030,7 +960,7 @@
       "midi": true
     },
     {
-      "id": 46,
+      "id": 624,
       "node_id": 42,
       "node_name": "Midi-Bridge",
       "node_description": null,
@@ -1100,8 +1030,92 @@
       "midi": true
     },
     {
-      "id": 274,
-      "node_id": 497,
+      "id": 48,
+      "node_id": 42,
+      "node_name": "Midi-Bridge",
+      "node_description": null,
+      "direction": "in",
+      "port_id": 5,
+      "name": "SINCO 2:(playback_0) SINCO SMC-PAD Pocket-Private",
+      "name_selector": "Midi-Bridge:SINCO 2:(playback_0) SINCO SMC-PAD Pocket-Private",
+      "alias": "SINCO:SINCO SMC-PAD Pocket-Private",
+      "object_path": "alsa:seq:default:client_24:playback_0",
+      "format_dsp": "8 bit raw midi",
+      "midi": true
+    },
+    {
+      "id": 74,
+      "node_id": 42,
+      "node_name": "Midi-Bridge",
+      "node_description": null,
+      "direction": "out",
+      "port_id": 5,
+      "name": "SINCO 2:(capture_0) SINCO SMC-PAD Pocket-Private",
+      "name_selector": "Midi-Bridge:SINCO 2:(capture_0) SINCO SMC-PAD Pocket-Private",
+      "alias": "SINCO:SINCO SMC-PAD Pocket-Private",
+      "object_path": "alsa:seq:default:client_24:capture_0",
+      "format_dsp": "8 bit raw midi",
+      "midi": true
+    },
+    {
+      "id": 49,
+      "node_id": 42,
+      "node_name": "Midi-Bridge",
+      "node_description": null,
+      "direction": "in",
+      "port_id": 6,
+      "name": "SINCO 2:(playback_1) SINCO SMC-PAD Pocket-Master",
+      "name_selector": "Midi-Bridge:SINCO 2:(playback_1) SINCO SMC-PAD Pocket-Master",
+      "alias": "SINCO:SINCO SMC-PAD Pocket-Master",
+      "object_path": "alsa:seq:default:client_24:playback_1",
+      "format_dsp": "8 bit raw midi",
+      "midi": true
+    },
+    {
+      "id": 205,
+      "node_id": 42,
+      "node_name": "Midi-Bridge",
+      "node_description": null,
+      "direction": "out",
+      "port_id": 6,
+      "name": "SINCO 2:(capture_1) SINCO SMC-PAD Pocket-Master",
+      "name_selector": "Midi-Bridge:SINCO 2:(capture_1) SINCO SMC-PAD Pocket-Master",
+      "alias": "SINCO:SINCO SMC-PAD Pocket-Master",
+      "object_path": "alsa:seq:default:client_24:capture_1",
+      "format_dsp": "8 bit raw midi",
+      "midi": true
+    },
+    {
+      "id": 179,
+      "node_id": 42,
+      "node_name": "Midi-Bridge",
+      "node_description": null,
+      "direction": "in",
+      "port_id": 7,
+      "name": "SINCO 2:(playback_2) SINCO ",
+      "name_selector": "Midi-Bridge:SINCO 2:(playback_2) SINCO ",
+      "alias": "SINCO:SINCO ",
+      "object_path": "alsa:seq:default:client_24:playback_2",
+      "format_dsp": "8 bit raw midi",
+      "midi": true
+    },
+    {
+      "id": 75,
+      "node_id": 42,
+      "node_name": "Midi-Bridge",
+      "node_description": null,
+      "direction": "out",
+      "port_id": 7,
+      "name": "SINCO 2:(capture_2) SINCO ",
+      "name_selector": "Midi-Bridge:SINCO 2:(capture_2) SINCO ",
+      "alias": "SINCO:SINCO ",
+      "object_path": "alsa:seq:default:client_24:capture_2",
+      "format_dsp": "8 bit raw midi",
+      "midi": true
+    },
+    {
+      "id": 378,
+      "node_id": 460,
       "node_name": "AR-CH-1 - Basic Piano",
       "node_description": "AR-CH-1 - Basic Piano",
       "direction": "in",
@@ -1114,8 +1128,8 @@
       "midi": true
     },
     {
-      "id": 221,
-      "node_id": 497,
+      "id": 50,
+      "node_id": 460,
       "node_name": "AR-CH-1 - Basic Piano",
       "node_description": "AR-CH-1 - Basic Piano",
       "direction": "out",
@@ -1128,8 +1142,8 @@
       "midi": true
     },
     {
-      "id": 415,
-      "node_id": 397,
+      "id": 162,
+      "node_id": 557,
       "node_name": "AR-CH-2 - Nord White Grand Full 24C",
       "node_description": "AR-CH-2 - Nord White Grand Full 24C",
       "direction": "in",
@@ -1142,8 +1156,8 @@
       "midi": true
     },
     {
-      "id": 582,
-      "node_id": 397,
+      "id": 572,
+      "node_id": 557,
       "node_name": "AR-CH-2 - Nord White Grand Full 24C",
       "node_description": "AR-CH-2 - Nord White Grand Full 24C",
       "direction": "out",
@@ -1156,8 +1170,8 @@
       "midi": true
     },
     {
-      "id": 390,
-      "node_id": 346,
+      "id": 564,
+      "node_id": 525,
       "node_name": "AR-CH-3 - Alt Strings",
       "node_description": "AR-CH-3 - Alt Strings",
       "direction": "in",
@@ -1170,8 +1184,8 @@
       "midi": true
     },
     {
-      "id": 433,
-      "node_id": 346,
+      "id": 592,
+      "node_id": 525,
       "node_name": "AR-CH-3 - Alt Strings",
       "node_description": "AR-CH-3 - Alt Strings",
       "direction": "out",
@@ -1184,8 +1198,8 @@
       "midi": true
     },
     {
-      "id": 595,
-      "node_id": 469,
+      "id": 542,
+      "node_id": 485,
       "node_name": "AR-CH-4 - Good Flute",
       "node_description": "AR-CH-4 - Good Flute",
       "direction": "in",
@@ -1198,8 +1212,8 @@
       "midi": true
     },
     {
-      "id": 514,
-      "node_id": 469,
+      "id": 177,
+      "node_id": 485,
       "node_name": "AR-CH-4 - Good Flute",
       "node_description": "AR-CH-4 - Good Flute",
       "direction": "out",
@@ -1212,8 +1226,8 @@
       "midi": true
     },
     {
-      "id": 76,
-      "node_id": 409,
+      "id": 300,
+      "node_id": 276,
       "node_name": "AR-CH-5 - SAX Lirakeys CL",
       "node_description": "AR-CH-5 - SAX Lirakeys CL",
       "direction": "in",
@@ -1226,8 +1240,8 @@
       "midi": true
     },
     {
-      "id": 583,
-      "node_id": 409,
+      "id": 220,
+      "node_id": 276,
       "node_name": "AR-CH-5 - SAX Lirakeys CL",
       "node_description": "AR-CH-5 - SAX Lirakeys CL",
       "direction": "out",
@@ -1240,8 +1254,8 @@
       "midi": true
     },
     {
-      "id": 386,
-      "node_id": 474,
+      "id": 489,
+      "node_id": 431,
       "node_name": "AR-CH-6 - Hammond Organ Fast",
       "node_description": "AR-CH-6 - Hammond Organ Fast",
       "direction": "in",
@@ -1254,8 +1268,8 @@
       "midi": true
     },
     {
-      "id": 379,
-      "node_id": 474,
+      "id": 576,
+      "node_id": 431,
       "node_name": "AR-CH-6 - Hammond Organ Fast",
       "node_description": "AR-CH-6 - Hammond Organ Fast",
       "direction": "out",
@@ -1268,8 +1282,8 @@
       "midi": true
     },
     {
-      "id": 302,
-      "node_id": 577,
+      "id": 509,
+      "node_id": 533,
       "node_name": "AR-CH-7 - Optik Synth",
       "node_description": "AR-CH-7 - Optik Synth",
       "direction": "in",
@@ -1282,8 +1296,8 @@
       "midi": true
     },
     {
-      "id": 420,
-      "node_id": 577,
+      "id": 541,
+      "node_id": 533,
       "node_name": "AR-CH-7 - Optik Synth",
       "node_description": "AR-CH-7 - Optik Synth",
       "direction": "out",
@@ -1296,8 +1310,8 @@
       "midi": true
     },
     {
-      "id": 235,
-      "node_id": 374,
+      "id": 566,
+      "node_id": 464,
       "node_name": "AR-CH-8 - PAD EFEITOS",
       "node_description": "AR-CH-8 - PAD EFEITOS",
       "direction": "in",
@@ -1310,8 +1324,8 @@
       "midi": true
     },
     {
-      "id": 591,
-      "node_id": 374,
+      "id": 526,
+      "node_id": 464,
       "node_name": "AR-CH-8 - PAD EFEITOS",
       "node_description": "AR-CH-8 - PAD EFEITOS",
       "direction": "out",
@@ -1324,8 +1338,8 @@
       "midi": true
     },
     {
-      "id": 288,
-      "node_id": 516,
+      "id": 555,
+      "node_id": 596,
       "node_name": "AR-CH-9 - AtmosferaPAD",
       "node_description": "AR-CH-9 - AtmosferaPAD",
       "direction": "in",
@@ -1338,8 +1352,8 @@
       "midi": true
     },
     {
-      "id": 403,
-      "node_id": 516,
+      "id": 446,
+      "node_id": 596,
       "node_name": "AR-CH-9 - AtmosferaPAD",
       "node_description": "AR-CH-9 - AtmosferaPAD",
       "direction": "out",
@@ -1352,8 +1366,8 @@
       "midi": true
     },
     {
-      "id": 557,
-      "node_id": 232,
+      "id": 123,
+      "node_id": 277,
       "node_name": "PD-CH-1 - Drum Set",
       "node_description": "PD-CH-1 - Drum Set",
       "direction": "in",
@@ -1366,8 +1380,8 @@
       "midi": true
     },
     {
-      "id": 324,
-      "node_id": 232,
+      "id": 239,
+      "node_id": 277,
       "node_name": "PD-CH-1 - Drum Set",
       "node_description": "PD-CH-1 - Drum Set",
       "direction": "out",
@@ -1380,8 +1394,8 @@
       "midi": true
     },
     {
-      "id": 345,
-      "node_id": 301,
+      "id": 138,
+      "node_id": 314,
       "node_name": "SMK-CH-1 - Oceans Worship Pad",
       "node_description": "SMK-CH-1 - Oceans Worship Pad",
       "direction": "in",
@@ -1394,8 +1408,8 @@
       "midi": true
     },
     {
-      "id": 565,
-      "node_id": 301,
+      "id": 588,
+      "node_id": 314,
       "node_name": "SMK-CH-1 - Oceans Worship Pad",
       "node_description": "SMK-CH-1 - Oceans Worship Pad",
       "direction": "out",
@@ -1408,8 +1422,8 @@
       "midi": true
     },
     {
-      "id": 572,
-      "node_id": 231,
+      "id": 230,
+      "node_id": 400,
       "node_name": "SMK-CH-2 - Warm Worship Pad",
       "node_description": "SMK-CH-2 - Warm Worship Pad",
       "direction": "in",
@@ -1422,8 +1436,8 @@
       "midi": true
     },
     {
-      "id": 604,
-      "node_id": 231,
+      "id": 170,
+      "node_id": 400,
       "node_name": "SMK-CH-2 - Warm Worship Pad",
       "node_description": "SMK-CH-2 - Warm Worship Pad",
       "direction": "out",
@@ -1436,8 +1450,8 @@
       "midi": true
     },
     {
-      "id": 596,
-      "node_id": 285,
+      "id": 271,
+      "node_id": 428,
       "node_name": "SMK-CH-3 - Hillsong Pad",
       "node_description": "SMK-CH-3 - Hillsong Pad",
       "direction": "in",
@@ -1450,8 +1464,8 @@
       "midi": true
     },
     {
-      "id": 601,
-      "node_id": 285,
+      "id": 546,
+      "node_id": 428,
       "node_name": "SMK-CH-3 - Hillsong Pad",
       "node_description": "SMK-CH-3 - Hillsong Pad",
       "direction": "out",
@@ -1464,8 +1478,8 @@
       "midi": true
     },
     {
-      "id": 444,
-      "node_id": 585,
+      "id": 461,
+      "node_id": 203,
       "node_name": "SMK-CH-4 - Worship Shimmer",
       "node_description": "SMK-CH-4 - Worship Shimmer",
       "direction": "in",
@@ -1478,8 +1492,8 @@
       "midi": true
     },
     {
-      "id": 589,
-      "node_id": 585,
+      "id": 320,
+      "node_id": 203,
       "node_name": "SMK-CH-4 - Worship Shimmer",
       "node_description": "SMK-CH-4 - Worship Shimmer",
       "direction": "out",
@@ -1492,8 +1506,8 @@
       "midi": true
     },
     {
-      "id": 172,
-      "node_id": 255,
+      "id": 236,
+      "node_id": 334,
       "node_name": "SMK-CH-5 - Cloud Shimmer",
       "node_description": "SMK-CH-5 - Cloud Shimmer",
       "direction": "in",
@@ -1506,8 +1520,8 @@
       "midi": true
     },
     {
-      "id": 485,
-      "node_id": 255,
+      "id": 563,
+      "node_id": 334,
       "node_name": "SMK-CH-5 - Cloud Shimmer",
       "node_description": "SMK-CH-5 - Cloud Shimmer",
       "direction": "out",
@@ -1520,8 +1534,8 @@
       "midi": true
     },
     {
-      "id": 594,
-      "node_id": 509,
+      "id": 552,
+      "node_id": 322,
       "node_name": "SMK-CH-6 - Magic Ambient",
       "node_description": "SMK-CH-6 - Magic Ambient",
       "direction": "in",
@@ -1534,8 +1548,8 @@
       "midi": true
     },
     {
-      "id": 282,
-      "node_id": 509,
+      "id": 315,
+      "node_id": 322,
       "node_name": "SMK-CH-6 - Magic Ambient",
       "node_description": "SMK-CH-6 - Magic Ambient",
       "direction": "out",
@@ -1548,8 +1562,8 @@
       "midi": true
     },
     {
-      "id": 507,
-      "node_id": 277,
+      "id": 412,
+      "node_id": 387,
       "node_name": "SMK-CH-7 - Majesty Pad",
       "node_description": "SMK-CH-7 - Majesty Pad",
       "direction": "in",
@@ -1562,8 +1576,8 @@
       "midi": true
     },
     {
-      "id": 558,
-      "node_id": 277,
+      "id": 168,
+      "node_id": 387,
       "node_name": "SMK-CH-7 - Majesty Pad",
       "node_description": "SMK-CH-7 - Majesty Pad",
       "direction": "out",
@@ -1576,8 +1590,8 @@
       "midi": true
     },
     {
-      "id": 314,
-      "node_id": 321,
+      "id": 206,
+      "node_id": 328,
       "node_name": "SMK-CH-8 - Sanctorium Pad",
       "node_description": "SMK-CH-8 - Sanctorium Pad",
       "direction": "in",
@@ -1590,8 +1604,8 @@
       "midi": true
     },
     {
-      "id": 493,
-      "node_id": 321,
+      "id": 462,
+      "node_id": 328,
       "node_name": "SMK-CH-8 - Sanctorium Pad",
       "node_description": "SMK-CH-8 - Sanctorium Pad",
       "direction": "out",
@@ -1604,8 +1618,8 @@
       "midi": true
     },
     {
-      "id": 328,
-      "node_id": 593,
+      "id": 167,
+      "node_id": 178,
       "node_name": "SMK Layer Mixer x8 Stereo",
       "node_description": "SMK Layer Mixer x8 Stereo",
       "direction": "in",
@@ -1618,8 +1632,8 @@
       "midi": true
     },
     {
-      "id": 181,
-      "node_id": 593,
+      "id": 491,
+      "node_id": 178,
       "node_name": "SMK Layer Mixer x8 Stereo",
       "node_description": "SMK Layer Mixer x8 Stereo",
       "direction": "out",
@@ -1632,8 +1646,8 @@
       "midi": true
     },
     {
-      "id": 351,
-      "node_id": 385,
+      "id": 476,
+      "node_id": 359,
       "node_name": "LSP Mixer x8 Stereo",
       "node_description": "LSP Mixer x8 Stereo",
       "direction": "in",
@@ -1646,8 +1660,8 @@
       "midi": true
     },
     {
-      "id": 350,
-      "node_id": 385,
+      "id": 358,
+      "node_id": 359,
       "node_name": "LSP Mixer x8 Stereo",
       "node_description": "LSP Mixer x8 Stereo",
       "direction": "out",
@@ -1660,8 +1674,8 @@
       "midi": true
     },
     {
-      "id": 310,
-      "node_id": 311,
+      "id": 437,
+      "node_id": 348,
       "node_name": "SMC-MIX - 8-Band EQ",
       "node_description": "SMC-MIX - 8-Band EQ",
       "direction": "in",
@@ -1674,8 +1688,8 @@
       "midi": true
     },
     {
-      "id": 490,
-      "node_id": 311,
+      "id": 589,
+      "node_id": 348,
       "node_name": "SMC-MIX - 8-Band EQ",
       "node_description": "SMC-MIX - 8-Band EQ",
       "direction": "out",
@@ -1688,8 +1702,8 @@
       "midi": true
     },
     {
-      "id": 352,
-      "node_id": 348,
+      "id": 211,
+      "node_id": 422,
       "node_name": "AR-CH-2 Output Trim +6 dB",
       "node_description": "AR-CH-2 Output Trim +6 dB",
       "direction": "in",
@@ -1702,8 +1716,8 @@
       "midi": true
     },
     {
-      "id": 349,
-      "node_id": 348,
+      "id": 210,
+      "node_id": 422,
       "node_name": "AR-CH-2 Output Trim +6 dB",
       "node_description": "AR-CH-2 Output Trim +6 dB",
       "direction": "out",
@@ -1716,8 +1730,8 @@
       "midi": true
     },
     {
-      "id": 193,
-      "node_id": 195,
+      "id": 538,
+      "node_id": 339,
       "node_name": "AR Controls - Sustain Scale",
       "node_description": "AR Controls - Sustain Scale",
       "direction": "in",
@@ -1730,8 +1744,8 @@
       "midi": true
     },
     {
-      "id": 362,
-      "node_id": 195,
+      "id": 449,
+      "node_id": 339,
       "node_name": "AR Controls - Sustain Scale",
       "node_description": "AR Controls - Sustain Scale",
       "direction": "out",
@@ -1744,8 +1758,8 @@
       "midi": true
     },
     {
-      "id": 371,
-      "node_id": 121,
+      "id": 544,
+      "node_id": 444,
       "node_name": "PD Controls - Sustain Scale",
       "node_description": "PD Controls - Sustain Scale",
       "direction": "in",
@@ -1758,8 +1772,8 @@
       "midi": true
     },
     {
-      "id": 120,
-      "node_id": 121,
+      "id": 124,
+      "node_id": 444,
       "node_name": "PD Controls - Sustain Scale",
       "node_description": "PD Controls - Sustain Scale",
       "direction": "out",
@@ -1772,8 +1786,8 @@
       "midi": true
     },
     {
-      "id": 416,
-      "node_id": 383,
+      "id": 332,
+      "node_id": 500,
       "node_name": "AR-CH-2 Volume Map",
       "node_description": "AR-CH-2 Volume Map",
       "direction": "in",
@@ -1786,8 +1800,8 @@
       "midi": true
     },
     {
-      "id": 590,
-      "node_id": 383,
+      "id": 585,
+      "node_id": 500,
       "node_name": "AR-CH-2 Volume Map",
       "node_description": "AR-CH-2 Volume Map",
       "direction": "out",
@@ -1800,8 +1814,8 @@
       "midi": true
     },
     {
-      "id": 488,
-      "node_id": 366,
+      "id": 253,
+      "node_id": 375,
       "node_name": "AR-CH-4 Volume Map",
       "node_description": "AR-CH-4 Volume Map",
       "direction": "in",
@@ -1814,8 +1828,8 @@
       "midi": true
     },
     {
-      "id": 453,
-      "node_id": 366,
+      "id": 568,
+      "node_id": 375,
       "node_name": "AR-CH-4 Volume Map",
       "node_description": "AR-CH-4 Volume Map",
       "direction": "out",
@@ -1828,8 +1842,8 @@
       "midi": true
     },
     {
-      "id": 529,
-      "node_id": 340,
+      "id": 402,
+      "node_id": 279,
       "node_name": "AR-CH-5 Volume Map",
       "node_description": "AR-CH-5 Volume Map",
       "direction": "in",
@@ -1842,8 +1856,8 @@
       "midi": true
     },
     {
-      "id": 465,
-      "node_id": 340,
+      "id": 154,
+      "node_id": 279,
       "node_name": "AR-CH-5 Volume Map",
       "node_description": "AR-CH-5 Volume Map",
       "direction": "out",
@@ -1856,8 +1870,8 @@
       "midi": true
     },
     {
-      "id": 398,
-      "node_id": 498,
+      "id": 512,
+      "node_id": 561,
       "node_name": "AR-CH-6 Volume Map",
       "node_description": "AR-CH-6 Volume Map",
       "direction": "in",
@@ -1870,8 +1884,8 @@
       "midi": true
     },
     {
-      "id": 384,
-      "node_id": 498,
+      "id": 484,
+      "node_id": 561,
       "node_name": "AR-CH-6 Volume Map",
       "node_description": "AR-CH-6 Volume Map",
       "direction": "out",
@@ -1884,8 +1898,8 @@
       "midi": true
     },
     {
-      "id": 336,
-      "node_id": 449,
+      "id": 405,
+      "node_id": 281,
       "node_name": "AR-CH-7 Volume Map",
       "node_description": "AR-CH-7 Volume Map",
       "direction": "in",
@@ -1898,8 +1912,8 @@
       "midi": true
     },
     {
-      "id": 339,
-      "node_id": 449,
+      "id": 395,
+      "node_id": 281,
       "node_name": "AR-CH-7 Volume Map",
       "node_description": "AR-CH-7 Volume Map",
       "direction": "out",
@@ -1912,8 +1926,8 @@
       "midi": true
     },
     {
-      "id": 489,
-      "node_id": 464,
+      "id": 169,
+      "node_id": 404,
       "node_name": "AR-CH-8 Volume Map",
       "node_description": "AR-CH-8 Volume Map",
       "direction": "in",
@@ -1926,8 +1940,8 @@
       "midi": true
     },
     {
-      "id": 576,
-      "node_id": 464,
+      "id": 603,
+      "node_id": 404,
       "node_name": "AR-CH-8 Volume Map",
       "node_description": "AR-CH-8 Volume Map",
       "direction": "out",
@@ -1940,8 +1954,8 @@
       "midi": true
     },
     {
-      "id": 185,
-      "node_id": 133,
+      "id": 222,
+      "node_id": 502,
       "node_name": "AR-CH-9 Volume Map",
       "node_description": "AR-CH-9 Volume Map",
       "direction": "in",
@@ -1954,8 +1968,8 @@
       "midi": true
     },
     {
-      "id": 331,
-      "node_id": 133,
+      "id": 264,
+      "node_id": 502,
       "node_name": "AR-CH-9 Volume Map",
       "node_description": "AR-CH-9 Volume Map",
       "direction": "out",
@@ -1968,8 +1982,8 @@
       "midi": true
     },
     {
-      "id": 501,
-      "node_id": 586,
+      "id": 368,
+      "node_id": 482,
       "node_name": "PD-CH-1 Volume Map",
       "node_description": "PD-CH-1 Volume Map",
       "direction": "in",
@@ -1982,8 +1996,8 @@
       "midi": true
     },
     {
-      "id": 190,
-      "node_id": 586,
+      "id": 390,
+      "node_id": 482,
       "node_name": "PD-CH-1 Volume Map",
       "node_description": "PD-CH-1 Volume Map",
       "direction": "out",
@@ -1996,8 +2010,8 @@
       "midi": true
     },
     {
-      "id": 134,
-      "node_id": 380,
+      "id": 331,
+      "node_id": 496,
       "node_name": "AR-CH-2 Reverb Map",
       "node_description": "AR-CH-2 Reverb Map",
       "direction": "in",
@@ -2010,8 +2024,8 @@
       "midi": true
     },
     {
-      "id": 137,
-      "node_id": 380,
+      "id": 389,
+      "node_id": 496,
       "node_name": "AR-CH-2 Reverb Map",
       "node_description": "AR-CH-2 Reverb Map",
       "direction": "out",
@@ -2024,8 +2038,8 @@
       "midi": true
     },
     {
-      "id": 135,
-      "node_id": 139,
+      "id": 641,
+      "node_id": 223,
       "node_name": "AR-CH-4 Reverb Map",
       "node_description": "AR-CH-4 Reverb Map",
       "direction": "in",
@@ -2038,8 +2052,8 @@
       "midi": true
     },
     {
-      "id": 579,
-      "node_id": 139,
+      "id": 185,
+      "node_id": 223,
       "node_name": "AR-CH-4 Reverb Map",
       "node_description": "AR-CH-4 Reverb Map",
       "direction": "out",
@@ -2052,8 +2066,8 @@
       "midi": true
     },
     {
-      "id": 249,
-      "node_id": 505,
+      "id": 582,
+      "node_id": 419,
       "node_name": "AR-CH-5 Reverb Map",
       "node_description": "AR-CH-5 Reverb Map",
       "direction": "in",
@@ -2066,8 +2080,8 @@
       "midi": true
     },
     {
-      "id": 289,
-      "node_id": 505,
+      "id": 280,
+      "node_id": 419,
       "node_name": "AR-CH-5 Reverb Map",
       "node_description": "AR-CH-5 Reverb Map",
       "direction": "out",
@@ -2080,8 +2094,8 @@
       "midi": true
     },
     {
-      "id": 581,
-      "node_id": 284,
+      "id": 580,
+      "node_id": 182,
       "node_name": "AR-CH-6 Reverb Map",
       "node_description": "AR-CH-6 Reverb Map",
       "direction": "in",
@@ -2094,8 +2108,8 @@
       "midi": true
     },
     {
-      "id": 225,
-      "node_id": 284,
+      "id": 218,
+      "node_id": 182,
       "node_name": "AR-CH-6 Reverb Map",
       "node_description": "AR-CH-6 Reverb Map",
       "direction": "out",
@@ -2108,8 +2122,8 @@
       "midi": true
     },
     {
-      "id": 270,
-      "node_id": 584,
+      "id": 497,
+      "node_id": 338,
       "node_name": "AR-CH-7 Reverb Map",
       "node_description": "AR-CH-7 Reverb Map",
       "direction": "in",
@@ -2122,8 +2136,8 @@
       "midi": true
     },
     {
-      "id": 242,
-      "node_id": 584,
+      "id": 415,
+      "node_id": 338,
       "node_name": "AR-CH-7 Reverb Map",
       "node_description": "AR-CH-7 Reverb Map",
       "direction": "out",
@@ -2136,8 +2150,8 @@
       "midi": true
     },
     {
-      "id": 257,
-      "node_id": 227,
+      "id": 221,
+      "node_id": 208,
       "node_name": "AR-CH-8 Reverb Map",
       "node_description": "AR-CH-8 Reverb Map",
       "direction": "in",
@@ -2150,8 +2164,8 @@
       "midi": true
     },
     {
-      "id": 226,
-      "node_id": 227,
+      "id": 189,
+      "node_id": 208,
       "node_name": "AR-CH-8 Reverb Map",
       "node_description": "AR-CH-8 Reverb Map",
       "direction": "out",
@@ -2164,8 +2178,8 @@
       "midi": true
     },
     {
-      "id": 256,
-      "node_id": 241,
+      "id": 275,
+      "node_id": 240,
       "node_name": "AR-CH-9 Reverb Map",
       "node_description": "AR-CH-9 Reverb Map",
       "direction": "in",
@@ -2178,8 +2192,8 @@
       "midi": true
     },
     {
-      "id": 287,
-      "node_id": 241,
+      "id": 216,
+      "node_id": 240,
       "node_name": "AR-CH-9 Reverb Map",
       "node_description": "AR-CH-9 Reverb Map",
       "direction": "out",
@@ -2192,8 +2206,8 @@
       "midi": true
     },
     {
-      "id": 263,
-      "node_id": 136,
+      "id": 238,
+      "node_id": 247,
       "node_name": "SMC-EQ-1 CC Scale",
       "node_description": "SMC-EQ-1 CC Scale",
       "direction": "in",
@@ -2206,8 +2220,8 @@
       "midi": true
     },
     {
-      "id": 283,
-      "node_id": 136,
+      "id": 237,
+      "node_id": 247,
       "node_name": "SMC-EQ-1 CC Scale",
       "node_description": "SMC-EQ-1 CC Scale",
       "direction": "out",
@@ -2220,8 +2234,8 @@
       "midi": true
     },
     {
-      "id": 413,
-      "node_id": 163,
+      "id": 267,
+      "node_id": 228,
       "node_name": "SMC-EQ-2 CC Scale",
       "node_description": "SMC-EQ-2 CC Scale",
       "direction": "in",
@@ -2234,8 +2248,8 @@
       "midi": true
     },
     {
-      "id": 546,
-      "node_id": 163,
+      "id": 217,
+      "node_id": 228,
       "node_name": "SMC-EQ-2 CC Scale",
       "node_description": "SMC-EQ-2 CC Scale",
       "direction": "out",
@@ -2248,8 +2262,8 @@
       "midi": true
     },
     {
-      "id": 559,
-      "node_id": 239,
+      "id": 248,
+      "node_id": 250,
       "node_name": "SMC-EQ-3 CC Scale",
       "node_description": "SMC-EQ-3 CC Scale",
       "direction": "in",
@@ -2262,8 +2276,8 @@
       "midi": true
     },
     {
-      "id": 207,
-      "node_id": 239,
+      "id": 126,
+      "node_id": 250,
       "node_name": "SMC-EQ-3 CC Scale",
       "node_description": "SMC-EQ-3 CC Scale",
       "direction": "out",
@@ -2276,8 +2290,8 @@
       "midi": true
     },
     {
-      "id": 233,
-      "node_id": 236,
+      "id": 486,
+      "node_id": 244,
       "node_name": "SMC-EQ-4 CC Scale",
       "node_description": "SMC-EQ-4 CC Scale",
       "direction": "in",
@@ -2290,8 +2304,8 @@
       "midi": true
     },
     {
-      "id": 205,
-      "node_id": 236,
+      "id": 394,
+      "node_id": 244,
       "node_name": "SMC-EQ-4 CC Scale",
       "node_description": "SMC-EQ-4 CC Scale",
       "direction": "out",
@@ -2304,8 +2318,8 @@
       "midi": true
     },
     {
-      "id": 222,
-      "node_id": 472,
+      "id": 487,
+      "node_id": 421,
       "node_name": "SMC-EQ-5 CC Scale",
       "node_description": "SMC-EQ-5 CC Scale",
       "direction": "in",
@@ -2318,8 +2332,8 @@
       "midi": true
     },
     {
-      "id": 281,
-      "node_id": 472,
+      "id": 599,
+      "node_id": 421,
       "node_name": "SMC-EQ-5 CC Scale",
       "node_description": "SMC-EQ-5 CC Scale",
       "direction": "out",
@@ -2332,8 +2346,8 @@
       "midi": true
     },
     {
-      "id": 215,
-      "node_id": 219,
+      "id": 197,
+      "node_id": 587,
       "node_name": "SMC-EQ-6 CC Scale",
       "node_description": "SMC-EQ-6 CC Scale",
       "direction": "in",
@@ -2346,8 +2360,8 @@
       "midi": true
     },
     {
-      "id": 218,
-      "node_id": 219,
+      "id": 130,
+      "node_id": 587,
       "node_name": "SMC-EQ-6 CC Scale",
       "node_description": "SMC-EQ-6 CC Scale",
       "direction": "out",
@@ -2360,8 +2374,8 @@
       "midi": true
     },
     {
-      "id": 126,
-      "node_id": 217,
+      "id": 234,
+      "node_id": 259,
       "node_name": "SMC-EQ-7 CC Scale",
       "node_description": "SMC-EQ-7 CC Scale",
       "direction": "in",
@@ -2374,8 +2388,8 @@
       "midi": true
     },
     {
-      "id": 214,
-      "node_id": 217,
+      "id": 198,
+      "node_id": 259,
       "node_name": "SMC-EQ-7 CC Scale",
       "node_description": "SMC-EQ-7 CC Scale",
       "direction": "out",
@@ -2388,8 +2402,8 @@
       "midi": true
     },
     {
-      "id": 131,
-      "node_id": 213,
+      "id": 204,
+      "node_id": 201,
       "node_name": "SMC-EQ-8 CC Scale",
       "node_description": "SMC-EQ-8 CC Scale",
       "direction": "in",
@@ -2402,8 +2416,8 @@
       "midi": true
     },
     {
-      "id": 130,
-      "node_id": 213,
+      "id": 621,
+      "node_id": 201,
       "node_name": "SMC-EQ-8 CC Scale",
       "node_description": "SMC-EQ-8 CC Scale",
       "direction": "out",
@@ -2412,6 +2426,62 @@
       "name_selector": "SMC-EQ-8 CC Scale:events-out",
       "alias": "SMC-EQ-8 CC Scale:events-out",
       "object_path": "SMC-EQ-8 CC Scale:output_0",
+      "format_dsp": "8 bit raw midi",
+      "midi": true
+    },
+    {
+      "id": 393,
+      "node_id": 396,
+      "node_name": "PD-CH-1 Output Gain 0 to +12 dB",
+      "node_description": "PD-CH-1 Output Gain 0 to +12 dB",
+      "direction": "in",
+      "port_id": 18,
+      "name": "events-in",
+      "name_selector": "PD-CH-1 Output Gain 0 to +12 dB:events-in",
+      "alias": "PD-CH-1 Output Gain 0 to +12 dB:events-in",
+      "object_path": "PD-CH-1 Output Gain 0 to +12 dB:input_18",
+      "format_dsp": "8 bit raw midi",
+      "midi": true
+    },
+    {
+      "id": 569,
+      "node_id": 396,
+      "node_name": "PD-CH-1 Output Gain 0 to +12 dB",
+      "node_description": "PD-CH-1 Output Gain 0 to +12 dB",
+      "direction": "out",
+      "port_id": 2,
+      "name": "events-out",
+      "name_selector": "PD-CH-1 Output Gain 0 to +12 dB:events-out",
+      "alias": "PD-CH-1 Output Gain 0 to +12 dB:events-out",
+      "object_path": "PD-CH-1 Output Gain 0 to +12 dB:output_2",
+      "format_dsp": "8 bit raw midi",
+      "midi": true
+    },
+    {
+      "id": 341,
+      "node_id": 278,
+      "node_name": "PD-CH-1 Gain Map",
+      "node_description": "PD-CH-1 Gain Map",
+      "direction": "in",
+      "port_id": 0,
+      "name": "events-in",
+      "name_selector": "PD-CH-1 Gain Map:events-in",
+      "alias": "PD-CH-1 Gain Map:events-in",
+      "object_path": "PD-CH-1 Gain Map:input_0",
+      "format_dsp": "8 bit raw midi",
+      "midi": true
+    },
+    {
+      "id": 318,
+      "node_id": 278,
+      "node_name": "PD-CH-1 Gain Map",
+      "node_description": "PD-CH-1 Gain Map",
+      "direction": "out",
+      "port_id": 0,
+      "name": "events-out",
+      "name_selector": "PD-CH-1 Gain Map:events-out",
+      "alias": "PD-CH-1 Gain Map:events-out",
+      "object_path": "PD-CH-1 Gain Map:output_0",
       "format_dsp": "8 bit raw midi",
       "midi": true
     }
@@ -2450,9 +2520,41 @@
       "kind": "midi"
     },
     {
+      "id": 607,
+      "output": {
+        "id": 81,
+        "node_id": 42,
+        "node_name": "Midi-Bridge",
+        "node_description": null,
+        "direction": "out",
+        "port_id": 13,
+        "name": "SINCO 4:(capture_2) SINCO ",
+        "name_selector": "Midi-Bridge:SINCO 4:(capture_2) SINCO ",
+        "alias": "SINCO:SINCO ",
+        "object_path": "alsa:seq:default:client_32:capture_2",
+        "format_dsp": "8 bit raw midi",
+        "midi": true
+      },
+      "input": {
+        "id": 520,
+        "node_id": 575,
+        "node_name": "SMK25 Pad Layers",
+        "node_description": "SMK25 Pad Layers",
+        "direction": "in",
+        "port_id": 0,
+        "name": "midi-in",
+        "name_selector": "SMK25 Pad Layers:midi-in",
+        "alias": "SMK25 Pad Layers:midi-in",
+        "object_path": "SMK25 Pad Layers:input_0",
+        "format_dsp": "8 bit raw midi",
+        "midi": true
+      },
+      "kind": "midi"
+    },
+    {
       "id": 70,
       "output": {
-        "id": 47,
+        "id": 72,
         "node_id": 42,
         "node_name": "Midi-Bridge",
         "node_description": null,
@@ -2482,9 +2584,9 @@
       "kind": "midi"
     },
     {
-      "id": 534,
+      "id": 467,
       "output": {
-        "id": 47,
+        "id": 72,
         "node_id": 42,
         "node_name": "Midi-Bridge",
         "node_description": null,
@@ -2498,8 +2600,8 @@
         "midi": true
       },
       "input": {
-        "id": 193,
-        "node_id": 195,
+        "id": 538,
+        "node_id": 339,
         "node_name": "AR Controls - Sustain Scale",
         "node_description": "AR Controls - Sustain Scale",
         "direction": "in",
@@ -2514,9 +2616,9 @@
       "kind": "midi"
     },
     {
-      "id": 210,
+      "id": 298,
       "output": {
-        "id": 179,
+        "id": 205,
         "node_id": 42,
         "node_name": "Midi-Bridge",
         "node_description": null,
@@ -2530,8 +2632,8 @@
         "midi": true
       },
       "input": {
-        "id": 371,
-        "node_id": 121,
+        "id": 544,
+        "node_id": 444,
         "node_name": "PD Controls - Sustain Scale",
         "node_description": "PD Controls - Sustain Scale",
         "direction": "in",
@@ -2546,7 +2648,7 @@
       "kind": "midi"
     },
     {
-      "id": 211,
+      "id": 376,
       "output": {
         "id": 78,
         "node_id": 42,
@@ -2562,8 +2664,8 @@
         "midi": true
       },
       "input": {
-        "id": 371,
-        "node_id": 121,
+        "id": 544,
+        "node_id": 444,
         "node_name": "PD Controls - Sustain Scale",
         "node_description": "PD Controls - Sustain Scale",
         "direction": "in",
@@ -2578,10 +2680,74 @@
       "kind": "midi"
     },
     {
-      "id": 209,
+      "id": 622,
       "output": {
-        "id": 362,
-        "node_id": 195,
+        "id": 205,
+        "node_id": 42,
+        "node_name": "Midi-Bridge",
+        "node_description": null,
+        "direction": "out",
+        "port_id": 6,
+        "name": "SINCO 2:(capture_1) SINCO SMC-PAD Pocket-Master",
+        "name_selector": "Midi-Bridge:SINCO 2:(capture_1) SINCO SMC-PAD Pocket-Master",
+        "alias": "SINCO:SINCO SMC-PAD Pocket-Master",
+        "object_path": "alsa:seq:default:client_24:capture_1",
+        "format_dsp": "8 bit raw midi",
+        "midi": true
+      },
+      "input": {
+        "id": 341,
+        "node_id": 278,
+        "node_name": "PD-CH-1 Gain Map",
+        "node_description": "PD-CH-1 Gain Map",
+        "direction": "in",
+        "port_id": 0,
+        "name": "events-in",
+        "name_selector": "PD-CH-1 Gain Map:events-in",
+        "alias": "PD-CH-1 Gain Map:events-in",
+        "object_path": "PD-CH-1 Gain Map:input_0",
+        "format_dsp": "8 bit raw midi",
+        "midi": true
+      },
+      "kind": "midi"
+    },
+    {
+      "id": 129,
+      "output": {
+        "id": 78,
+        "node_id": 42,
+        "node_name": "Midi-Bridge",
+        "node_description": null,
+        "direction": "out",
+        "port_id": 9,
+        "name": "Jieli Technology SINCO at usb-0000:00:14-0-4-2- full speed:(capture_1) SINCO SMC-PAD-Master",
+        "name_selector": "Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-2- full speed:(capture_1) SINCO SMC-PAD-Master",
+        "alias": "SINCO:SINCO SMC-PAD-Master",
+        "object_path": "alsa:seq:default:client_28:capture_1",
+        "format_dsp": "8 bit raw midi",
+        "midi": true
+      },
+      "input": {
+        "id": 341,
+        "node_id": 278,
+        "node_name": "PD-CH-1 Gain Map",
+        "node_description": "PD-CH-1 Gain Map",
+        "direction": "in",
+        "port_id": 0,
+        "name": "events-in",
+        "name_selector": "PD-CH-1 Gain Map:events-in",
+        "alias": "PD-CH-1 Gain Map:events-in",
+        "object_path": "PD-CH-1 Gain Map:input_0",
+        "format_dsp": "8 bit raw midi",
+        "midi": true
+      },
+      "kind": "midi"
+    },
+    {
+      "id": 619,
+      "output": {
+        "id": 449,
+        "node_id": 339,
         "node_name": "AR Controls - Sustain Scale",
         "node_description": "AR Controls - Sustain Scale",
         "direction": "out",
@@ -2594,8 +2760,8 @@
         "midi": true
       },
       "input": {
-        "id": 274,
-        "node_id": 497,
+        "id": 378,
+        "node_id": 460,
         "node_name": "AR-CH-1 - Basic Piano",
         "node_description": "AR-CH-1 - Basic Piano",
         "direction": "in",
@@ -2610,10 +2776,10 @@
       "kind": "midi"
     },
     {
-      "id": 496,
+      "id": 269,
       "output": {
-        "id": 362,
-        "node_id": 195,
+        "id": 449,
+        "node_id": 339,
         "node_name": "AR Controls - Sustain Scale",
         "node_description": "AR Controls - Sustain Scale",
         "direction": "out",
@@ -2626,8 +2792,8 @@
         "midi": true
       },
       "input": {
-        "id": 390,
-        "node_id": 346,
+        "id": 564,
+        "node_id": 525,
         "node_name": "AR-CH-3 - Alt Strings",
         "node_description": "AR-CH-3 - Alt Strings",
         "direction": "in",
@@ -2642,10 +2808,10 @@
       "kind": "midi"
     },
     {
-      "id": 612,
+      "id": 149,
       "output": {
-        "id": 362,
-        "node_id": 195,
+        "id": 449,
+        "node_id": 339,
         "node_name": "AR Controls - Sustain Scale",
         "node_description": "AR Controls - Sustain Scale",
         "direction": "out",
@@ -2658,8 +2824,8 @@
         "midi": true
       },
       "input": {
-        "id": 416,
-        "node_id": 383,
+        "id": 332,
+        "node_id": 500,
         "node_name": "AR-CH-2 Volume Map",
         "node_description": "AR-CH-2 Volume Map",
         "direction": "in",
@@ -2674,10 +2840,10 @@
       "kind": "midi"
     },
     {
-      "id": 613,
+      "id": 241,
       "output": {
-        "id": 362,
-        "node_id": 195,
+        "id": 449,
+        "node_id": 339,
         "node_name": "AR Controls - Sustain Scale",
         "node_description": "AR Controls - Sustain Scale",
         "direction": "out",
@@ -2690,8 +2856,8 @@
         "midi": true
       },
       "input": {
-        "id": 488,
-        "node_id": 366,
+        "id": 253,
+        "node_id": 375,
         "node_name": "AR-CH-4 Volume Map",
         "node_description": "AR-CH-4 Volume Map",
         "direction": "in",
@@ -2706,10 +2872,10 @@
       "kind": "midi"
     },
     {
-      "id": 544,
+      "id": 158,
       "output": {
-        "id": 362,
-        "node_id": 195,
+        "id": 449,
+        "node_id": 339,
         "node_name": "AR Controls - Sustain Scale",
         "node_description": "AR Controls - Sustain Scale",
         "direction": "out",
@@ -2722,8 +2888,8 @@
         "midi": true
       },
       "input": {
-        "id": 529,
-        "node_id": 340,
+        "id": 402,
+        "node_id": 279,
         "node_name": "AR-CH-5 Volume Map",
         "node_description": "AR-CH-5 Volume Map",
         "direction": "in",
@@ -2738,10 +2904,10 @@
       "kind": "midi"
     },
     {
-      "id": 543,
+      "id": 251,
       "output": {
-        "id": 362,
-        "node_id": 195,
+        "id": 449,
+        "node_id": 339,
         "node_name": "AR Controls - Sustain Scale",
         "node_description": "AR Controls - Sustain Scale",
         "direction": "out",
@@ -2754,8 +2920,8 @@
         "midi": true
       },
       "input": {
-        "id": 398,
-        "node_id": 498,
+        "id": 512,
+        "node_id": 561,
         "node_name": "AR-CH-6 Volume Map",
         "node_description": "AR-CH-6 Volume Map",
         "direction": "in",
@@ -2770,10 +2936,10 @@
       "kind": "midi"
     },
     {
-      "id": 212,
+      "id": 190,
       "output": {
-        "id": 362,
-        "node_id": 195,
+        "id": 449,
+        "node_id": 339,
         "node_name": "AR Controls - Sustain Scale",
         "node_description": "AR Controls - Sustain Scale",
         "direction": "out",
@@ -2786,8 +2952,8 @@
         "midi": true
       },
       "input": {
-        "id": 336,
-        "node_id": 449,
+        "id": 405,
+        "node_id": 281,
         "node_name": "AR-CH-7 Volume Map",
         "node_description": "AR-CH-7 Volume Map",
         "direction": "in",
@@ -2802,10 +2968,10 @@
       "kind": "midi"
     },
     {
-      "id": 533,
+      "id": 547,
       "output": {
-        "id": 362,
-        "node_id": 195,
+        "id": 449,
+        "node_id": 339,
         "node_name": "AR Controls - Sustain Scale",
         "node_description": "AR Controls - Sustain Scale",
         "direction": "out",
@@ -2818,8 +2984,8 @@
         "midi": true
       },
       "input": {
-        "id": 489,
-        "node_id": 464,
+        "id": 169,
+        "node_id": 404,
         "node_name": "AR-CH-8 Volume Map",
         "node_description": "AR-CH-8 Volume Map",
         "direction": "in",
@@ -2834,10 +3000,10 @@
       "kind": "midi"
     },
     {
-      "id": 641,
+      "id": 209,
       "output": {
-        "id": 362,
-        "node_id": 195,
+        "id": 449,
+        "node_id": 339,
         "node_name": "AR Controls - Sustain Scale",
         "node_description": "AR Controls - Sustain Scale",
         "direction": "out",
@@ -2850,8 +3016,8 @@
         "midi": true
       },
       "input": {
-        "id": 185,
-        "node_id": 133,
+        "id": 222,
+        "node_id": 502,
         "node_name": "AR-CH-9 Volume Map",
         "node_description": "AR-CH-9 Volume Map",
         "direction": "in",
@@ -2866,10 +3032,10 @@
       "kind": "midi"
     },
     {
-      "id": 165,
+      "id": 273,
       "output": {
-        "id": 590,
-        "node_id": 383,
+        "id": 585,
+        "node_id": 500,
         "node_name": "AR-CH-2 Volume Map",
         "node_description": "AR-CH-2 Volume Map",
         "direction": "out",
@@ -2882,8 +3048,8 @@
         "midi": true
       },
       "input": {
-        "id": 134,
-        "node_id": 380,
+        "id": 331,
+        "node_id": 496,
         "node_name": "AR-CH-2 Reverb Map",
         "node_description": "AR-CH-2 Reverb Map",
         "direction": "in",
@@ -2898,10 +3064,10 @@
       "kind": "midi"
     },
     {
-      "id": 147,
+      "id": 617,
       "output": {
-        "id": 137,
-        "node_id": 380,
+        "id": 389,
+        "node_id": 496,
         "node_name": "AR-CH-2 Reverb Map",
         "node_description": "AR-CH-2 Reverb Map",
         "direction": "out",
@@ -2914,8 +3080,8 @@
         "midi": true
       },
       "input": {
-        "id": 415,
-        "node_id": 397,
+        "id": 162,
+        "node_id": 557,
         "node_name": "AR-CH-2 - Nord White Grand Full 24C",
         "node_description": "AR-CH-2 - Nord White Grand Full 24C",
         "direction": "in",
@@ -2930,10 +3096,10 @@
       "kind": "midi"
     },
     {
-      "id": 531,
+      "id": 637,
       "output": {
-        "id": 453,
-        "node_id": 366,
+        "id": 568,
+        "node_id": 375,
         "node_name": "AR-CH-4 Volume Map",
         "node_description": "AR-CH-4 Volume Map",
         "direction": "out",
@@ -2946,8 +3112,8 @@
         "midi": true
       },
       "input": {
-        "id": 135,
-        "node_id": 139,
+        "id": 641,
+        "node_id": 223,
         "node_name": "AR-CH-4 Reverb Map",
         "node_description": "AR-CH-4 Reverb Map",
         "direction": "in",
@@ -2962,10 +3128,10 @@
       "kind": "midi"
     },
     {
-      "id": 160,
+      "id": 586,
       "output": {
-        "id": 579,
-        "node_id": 139,
+        "id": 185,
+        "node_id": 223,
         "node_name": "AR-CH-4 Reverb Map",
         "node_description": "AR-CH-4 Reverb Map",
         "direction": "out",
@@ -2978,8 +3144,8 @@
         "midi": true
       },
       "input": {
-        "id": 595,
-        "node_id": 469,
+        "id": 542,
+        "node_id": 485,
         "node_name": "AR-CH-4 - Good Flute",
         "node_description": "AR-CH-4 - Good Flute",
         "direction": "in",
@@ -2994,10 +3160,10 @@
       "kind": "midi"
     },
     {
-      "id": 532,
+      "id": 638,
       "output": {
-        "id": 465,
-        "node_id": 340,
+        "id": 154,
+        "node_id": 279,
         "node_name": "AR-CH-5 Volume Map",
         "node_description": "AR-CH-5 Volume Map",
         "direction": "out",
@@ -3010,8 +3176,8 @@
         "midi": true
       },
       "input": {
-        "id": 249,
-        "node_id": 505,
+        "id": 582,
+        "node_id": 419,
         "node_name": "AR-CH-5 Reverb Map",
         "node_description": "AR-CH-5 Reverb Map",
         "direction": "in",
@@ -3026,10 +3192,10 @@
       "kind": "midi"
     },
     {
-      "id": 540,
+      "id": 196,
       "output": {
-        "id": 289,
-        "node_id": 505,
+        "id": 280,
+        "node_id": 419,
         "node_name": "AR-CH-5 Reverb Map",
         "node_description": "AR-CH-5 Reverb Map",
         "direction": "out",
@@ -3042,8 +3208,8 @@
         "midi": true
       },
       "input": {
-        "id": 76,
-        "node_id": 409,
+        "id": 300,
+        "node_id": 276,
         "node_name": "AR-CH-5 - SAX Lirakeys CL",
         "node_description": "AR-CH-5 - SAX Lirakeys CL",
         "direction": "in",
@@ -3058,10 +3224,10 @@
       "kind": "midi"
     },
     {
-      "id": 539,
+      "id": 290,
       "output": {
-        "id": 384,
-        "node_id": 498,
+        "id": 484,
+        "node_id": 561,
         "node_name": "AR-CH-6 Volume Map",
         "node_description": "AR-CH-6 Volume Map",
         "direction": "out",
@@ -3074,8 +3240,8 @@
         "midi": true
       },
       "input": {
-        "id": 581,
-        "node_id": 284,
+        "id": 580,
+        "node_id": 182,
         "node_name": "AR-CH-6 Reverb Map",
         "node_description": "AR-CH-6 Reverb Map",
         "direction": "in",
@@ -3090,10 +3256,10 @@
       "kind": "midi"
     },
     {
-      "id": 146,
+      "id": 450,
       "output": {
-        "id": 225,
-        "node_id": 284,
+        "id": 218,
+        "node_id": 182,
         "node_name": "AR-CH-6 Reverb Map",
         "node_description": "AR-CH-6 Reverb Map",
         "direction": "out",
@@ -3106,8 +3272,8 @@
         "midi": true
       },
       "input": {
-        "id": 386,
-        "node_id": 474,
+        "id": 489,
+        "node_id": 431,
         "node_name": "AR-CH-6 - Hammond Organ Fast",
         "node_description": "AR-CH-6 - Hammond Organ Fast",
         "direction": "in",
@@ -3122,10 +3288,10 @@
       "kind": "midi"
     },
     {
-      "id": 144,
+      "id": 429,
       "output": {
-        "id": 339,
-        "node_id": 449,
+        "id": 395,
+        "node_id": 281,
         "node_name": "AR-CH-7 Volume Map",
         "node_description": "AR-CH-7 Volume Map",
         "direction": "out",
@@ -3138,8 +3304,8 @@
         "midi": true
       },
       "input": {
-        "id": 270,
-        "node_id": 584,
+        "id": 497,
+        "node_id": 338,
         "node_name": "AR-CH-7 Reverb Map",
         "node_description": "AR-CH-7 Reverb Map",
         "direction": "in",
@@ -3154,10 +3320,10 @@
       "kind": "midi"
     },
     {
-      "id": 145,
+      "id": 640,
       "output": {
-        "id": 242,
-        "node_id": 584,
+        "id": 415,
+        "node_id": 338,
         "node_name": "AR-CH-7 Reverb Map",
         "node_description": "AR-CH-7 Reverb Map",
         "direction": "out",
@@ -3170,8 +3336,8 @@
         "midi": true
       },
       "input": {
-        "id": 302,
-        "node_id": 577,
+        "id": 509,
+        "node_id": 533,
         "node_name": "AR-CH-7 - Optik Synth",
         "node_description": "AR-CH-7 - Optik Synth",
         "direction": "in",
@@ -3186,10 +3352,10 @@
       "kind": "midi"
     },
     {
-      "id": 149,
+      "id": 629,
       "output": {
-        "id": 576,
-        "node_id": 464,
+        "id": 603,
+        "node_id": 404,
         "node_name": "AR-CH-8 Volume Map",
         "node_description": "AR-CH-8 Volume Map",
         "direction": "out",
@@ -3202,8 +3368,8 @@
         "midi": true
       },
       "input": {
-        "id": 257,
-        "node_id": 227,
+        "id": 221,
+        "node_id": 208,
         "node_name": "AR-CH-8 Reverb Map",
         "node_description": "AR-CH-8 Reverb Map",
         "direction": "in",
@@ -3218,10 +3384,10 @@
       "kind": "midi"
     },
     {
-      "id": 143,
+      "id": 578,
       "output": {
-        "id": 226,
-        "node_id": 227,
+        "id": 189,
+        "node_id": 208,
         "node_name": "AR-CH-8 Reverb Map",
         "node_description": "AR-CH-8 Reverb Map",
         "direction": "out",
@@ -3234,8 +3400,8 @@
         "midi": true
       },
       "input": {
-        "id": 235,
-        "node_id": 374,
+        "id": 566,
+        "node_id": 464,
         "node_name": "AR-CH-8 - PAD EFEITOS",
         "node_description": "AR-CH-8 - PAD EFEITOS",
         "direction": "in",
@@ -3250,10 +3416,10 @@
       "kind": "midi"
     },
     {
-      "id": 152,
+      "id": 252,
       "output": {
-        "id": 331,
-        "node_id": 133,
+        "id": 264,
+        "node_id": 502,
         "node_name": "AR-CH-9 Volume Map",
         "node_description": "AR-CH-9 Volume Map",
         "direction": "out",
@@ -3266,8 +3432,8 @@
         "midi": true
       },
       "input": {
-        "id": 256,
-        "node_id": 241,
+        "id": 275,
+        "node_id": 240,
         "node_name": "AR-CH-9 Reverb Map",
         "node_description": "AR-CH-9 Reverb Map",
         "direction": "in",
@@ -3282,10 +3448,10 @@
       "kind": "midi"
     },
     {
-      "id": 150,
+      "id": 442,
       "output": {
-        "id": 287,
-        "node_id": 241,
+        "id": 216,
+        "node_id": 240,
         "node_name": "AR-CH-9 Reverb Map",
         "node_description": "AR-CH-9 Reverb Map",
         "direction": "out",
@@ -3298,8 +3464,8 @@
         "midi": true
       },
       "input": {
-        "id": 288,
-        "node_id": 516,
+        "id": 555,
+        "node_id": 596,
         "node_name": "AR-CH-9 - AtmosferaPAD",
         "node_description": "AR-CH-9 - AtmosferaPAD",
         "direction": "in",
@@ -3314,10 +3480,10 @@
       "kind": "midi"
     },
     {
-      "id": 148,
+      "id": 131,
       "output": {
-        "id": 120,
-        "node_id": 121,
+        "id": 124,
+        "node_id": 444,
         "node_name": "PD Controls - Sustain Scale",
         "node_description": "PD Controls - Sustain Scale",
         "direction": "out",
@@ -3330,8 +3496,8 @@
         "midi": true
       },
       "input": {
-        "id": 501,
-        "node_id": 586,
+        "id": 368,
+        "node_id": 482,
         "node_name": "PD-CH-1 Volume Map",
         "node_description": "PD-CH-1 Volume Map",
         "direction": "in",
@@ -3346,10 +3512,42 @@
       "kind": "midi"
     },
     {
-      "id": 442,
+      "id": 313,
       "output": {
-        "id": 190,
-        "node_id": 586,
+        "id": 318,
+        "node_id": 278,
+        "node_name": "PD-CH-1 Gain Map",
+        "node_description": "PD-CH-1 Gain Map",
+        "direction": "out",
+        "port_id": 0,
+        "name": "events-out",
+        "name_selector": "PD-CH-1 Gain Map:events-out",
+        "alias": "PD-CH-1 Gain Map:events-out",
+        "object_path": "PD-CH-1 Gain Map:output_0",
+        "format_dsp": "8 bit raw midi",
+        "midi": true
+      },
+      "input": {
+        "id": 393,
+        "node_id": 396,
+        "node_name": "PD-CH-1 Output Gain 0 to +12 dB",
+        "node_description": "PD-CH-1 Output Gain 0 to +12 dB",
+        "direction": "in",
+        "port_id": 18,
+        "name": "events-in",
+        "name_selector": "PD-CH-1 Output Gain 0 to +12 dB:events-in",
+        "alias": "PD-CH-1 Output Gain 0 to +12 dB:events-in",
+        "object_path": "PD-CH-1 Output Gain 0 to +12 dB:input_18",
+        "format_dsp": "8 bit raw midi",
+        "midi": true
+      },
+      "kind": "midi"
+    },
+    {
+      "id": 501,
+      "output": {
+        "id": 390,
+        "node_id": 482,
         "node_name": "PD-CH-1 Volume Map",
         "node_description": "PD-CH-1 Volume Map",
         "direction": "out",
@@ -3362,8 +3560,8 @@
         "midi": true
       },
       "input": {
-        "id": 557,
-        "node_id": 232,
+        "id": 123,
+        "node_id": 277,
         "node_name": "PD-CH-1 - Drum Set",
         "node_description": "PD-CH-1 - Drum Set",
         "direction": "in",
@@ -3378,7 +3576,7 @@
       "kind": "midi"
     },
     {
-      "id": 151,
+      "id": 148,
       "output": {
         "id": 517,
         "node_id": 575,
@@ -3394,8 +3592,8 @@
         "midi": true
       },
       "input": {
-        "id": 345,
-        "node_id": 301,
+        "id": 138,
+        "node_id": 314,
         "node_name": "SMK-CH-1 - Oceans Worship Pad",
         "node_description": "SMK-CH-1 - Oceans Worship Pad",
         "direction": "in",
@@ -3410,7 +3608,7 @@
       "kind": "midi"
     },
     {
-      "id": 468,
+      "id": 630,
       "output": {
         "id": 517,
         "node_id": 575,
@@ -3426,8 +3624,8 @@
         "midi": true
       },
       "input": {
-        "id": 328,
-        "node_id": 593,
+        "id": 167,
+        "node_id": 178,
         "node_name": "SMK Layer Mixer x8 Stereo",
         "node_description": "SMK Layer Mixer x8 Stereo",
         "direction": "in",
@@ -3442,7 +3640,7 @@
       "kind": "midi"
     },
     {
-      "id": 528,
+      "id": 380,
       "output": {
         "id": 620,
         "node_id": 575,
@@ -3458,8 +3656,8 @@
         "midi": true
       },
       "input": {
-        "id": 572,
-        "node_id": 231,
+        "id": 230,
+        "node_id": 400,
         "node_name": "SMK-CH-2 - Warm Worship Pad",
         "node_description": "SMK-CH-2 - Warm Worship Pad",
         "direction": "in",
@@ -3474,7 +3672,7 @@
       "kind": "midi"
     },
     {
-      "id": 457,
+      "id": 626,
       "output": {
         "id": 620,
         "node_id": 575,
@@ -3490,8 +3688,8 @@
         "midi": true
       },
       "input": {
-        "id": 328,
-        "node_id": 593,
+        "id": 167,
+        "node_id": 178,
         "node_name": "SMK Layer Mixer x8 Stereo",
         "node_description": "SMK Layer Mixer x8 Stereo",
         "direction": "in",
@@ -3506,7 +3704,7 @@
       "kind": "midi"
     },
     {
-      "id": 443,
+      "id": 134,
       "output": {
         "id": 508,
         "node_id": 575,
@@ -3522,8 +3720,8 @@
         "midi": true
       },
       "input": {
-        "id": 596,
-        "node_id": 285,
+        "id": 271,
+        "node_id": 428,
         "node_name": "SMK-CH-3 - Hillsong Pad",
         "node_description": "SMK-CH-3 - Hillsong Pad",
         "direction": "in",
@@ -3538,7 +3736,7 @@
       "kind": "midi"
     },
     {
-      "id": 387,
+      "id": 137,
       "output": {
         "id": 508,
         "node_id": 575,
@@ -3554,8 +3752,8 @@
         "midi": true
       },
       "input": {
-        "id": 328,
-        "node_id": 593,
+        "id": 167,
+        "node_id": 178,
         "node_name": "SMK Layer Mixer x8 Stereo",
         "node_description": "SMK Layer Mixer x8 Stereo",
         "direction": "in",
@@ -3570,7 +3768,7 @@
       "kind": "midi"
     },
     {
-      "id": 456,
+      "id": 147,
       "output": {
         "id": 524,
         "node_id": 575,
@@ -3586,8 +3784,8 @@
         "midi": true
       },
       "input": {
-        "id": 444,
-        "node_id": 585,
+        "id": 461,
+        "node_id": 203,
         "node_name": "SMK-CH-4 - Worship Shimmer",
         "node_description": "SMK-CH-4 - Worship Shimmer",
         "direction": "in",
@@ -3602,7 +3800,7 @@
       "kind": "midi"
     },
     {
-      "id": 463,
+      "id": 627,
       "output": {
         "id": 524,
         "node_id": 575,
@@ -3618,8 +3816,8 @@
         "midi": true
       },
       "input": {
-        "id": 328,
-        "node_id": 593,
+        "id": 167,
+        "node_id": 178,
         "node_name": "SMK Layer Mixer x8 Stereo",
         "node_description": "SMK Layer Mixer x8 Stereo",
         "direction": "in",
@@ -3634,7 +3832,7 @@
       "kind": "midi"
     },
     {
-      "id": 164,
+      "id": 539,
       "output": {
         "id": 521,
         "node_id": 575,
@@ -3650,8 +3848,8 @@
         "midi": true
       },
       "input": {
-        "id": 172,
-        "node_id": 255,
+        "id": 236,
+        "node_id": 334,
         "node_name": "SMK-CH-5 - Cloud Shimmer",
         "node_description": "SMK-CH-5 - Cloud Shimmer",
         "direction": "in",
@@ -3666,7 +3864,7 @@
       "kind": "midi"
     },
     {
-      "id": 168,
+      "id": 224,
       "output": {
         "id": 521,
         "node_id": 575,
@@ -3682,8 +3880,8 @@
         "midi": true
       },
       "input": {
-        "id": 328,
-        "node_id": 593,
+        "id": 167,
+        "node_id": 178,
         "node_name": "SMK Layer Mixer x8 Stereo",
         "node_description": "SMK Layer Mixer x8 Stereo",
         "direction": "in",
@@ -3698,7 +3896,7 @@
       "kind": "midi"
     },
     {
-      "id": 276,
+      "id": 146,
       "output": {
         "id": 519,
         "node_id": 575,
@@ -3714,8 +3912,8 @@
         "midi": true
       },
       "input": {
-        "id": 594,
-        "node_id": 509,
+        "id": 552,
+        "node_id": 322,
         "node_name": "SMK-CH-6 - Magic Ambient",
         "node_description": "SMK-CH-6 - Magic Ambient",
         "direction": "in",
@@ -3730,7 +3928,7 @@
       "kind": "midi"
     },
     {
-      "id": 412,
+      "id": 581,
       "output": {
         "id": 519,
         "node_id": 575,
@@ -3746,8 +3944,8 @@
         "midi": true
       },
       "input": {
-        "id": 328,
-        "node_id": 593,
+        "id": 167,
+        "node_id": 178,
         "node_name": "SMK Layer Mixer x8 Stereo",
         "node_description": "SMK Layer Mixer x8 Stereo",
         "direction": "in",
@@ -3762,7 +3960,7 @@
       "kind": "midi"
     },
     {
-      "id": 526,
+      "id": 284,
       "output": {
         "id": 518,
         "node_id": 575,
@@ -3778,8 +3976,8 @@
         "midi": true
       },
       "input": {
-        "id": 507,
-        "node_id": 277,
+        "id": 412,
+        "node_id": 387,
         "node_name": "SMK-CH-7 - Majesty Pad",
         "node_description": "SMK-CH-7 - Majesty Pad",
         "direction": "in",
@@ -3794,7 +3992,7 @@
       "kind": "midi"
     },
     {
-      "id": 445,
+      "id": 225,
       "output": {
         "id": 518,
         "node_id": 575,
@@ -3810,8 +4008,8 @@
         "midi": true
       },
       "input": {
-        "id": 328,
-        "node_id": 593,
+        "id": 167,
+        "node_id": 178,
         "node_name": "SMK Layer Mixer x8 Stereo",
         "node_description": "SMK Layer Mixer x8 Stereo",
         "direction": "in",
@@ -3826,7 +4024,7 @@
       "kind": "midi"
     },
     {
-      "id": 446,
+      "id": 532,
       "output": {
         "id": 614,
         "node_id": 575,
@@ -3842,8 +4040,8 @@
         "midi": true
       },
       "input": {
-        "id": 314,
-        "node_id": 321,
+        "id": 206,
+        "node_id": 328,
         "node_name": "SMK-CH-8 - Sanctorium Pad",
         "node_description": "SMK-CH-8 - Sanctorium Pad",
         "direction": "in",
@@ -3858,7 +4056,7 @@
       "kind": "midi"
     },
     {
-      "id": 171,
+      "id": 246,
       "output": {
         "id": 614,
         "node_id": 575,
@@ -3874,8 +4072,8 @@
         "midi": true
       },
       "input": {
-        "id": 328,
-        "node_id": 593,
+        "id": 167,
+        "node_id": 178,
         "node_name": "SMK Layer Mixer x8 Stereo",
         "node_description": "SMK Layer Mixer x8 Stereo",
         "direction": "in",
@@ -3890,7 +4088,7 @@
       "kind": "midi"
     },
     {
-      "id": 480,
+      "id": 540,
       "output": {
         "id": 84,
         "node_id": 42,
@@ -3906,8 +4104,8 @@
         "midi": true
       },
       "input": {
-        "id": 263,
-        "node_id": 136,
+        "id": 238,
+        "node_id": 247,
         "node_name": "SMC-EQ-1 CC Scale",
         "node_description": "SMC-EQ-1 CC Scale",
         "direction": "in",
@@ -3922,10 +4120,10 @@
       "kind": "midi"
     },
     {
-      "id": 410,
+      "id": 249,
       "output": {
-        "id": 283,
-        "node_id": 136,
+        "id": 237,
+        "node_id": 247,
         "node_name": "SMC-EQ-1 CC Scale",
         "node_description": "SMC-EQ-1 CC Scale",
         "direction": "out",
@@ -3938,8 +4136,8 @@
         "midi": true
       },
       "input": {
-        "id": 310,
-        "node_id": 311,
+        "id": 437,
+        "node_id": 348,
         "node_name": "SMC-MIX - 8-Band EQ",
         "node_description": "SMC-MIX - 8-Band EQ",
         "direction": "in",
@@ -3954,7 +4152,7 @@
       "kind": "midi"
     },
     {
-      "id": 470,
+      "id": 505,
       "output": {
         "id": 84,
         "node_id": 42,
@@ -3970,8 +4168,8 @@
         "midi": true
       },
       "input": {
-        "id": 413,
-        "node_id": 163,
+        "id": 267,
+        "node_id": 228,
         "node_name": "SMC-EQ-2 CC Scale",
         "node_description": "SMC-EQ-2 CC Scale",
         "direction": "in",
@@ -3986,10 +4184,10 @@
       "kind": "midi"
     },
     {
-      "id": 418,
+      "id": 289,
       "output": {
-        "id": 546,
-        "node_id": 163,
+        "id": 217,
+        "node_id": 228,
         "node_name": "SMC-EQ-2 CC Scale",
         "node_description": "SMC-EQ-2 CC Scale",
         "direction": "out",
@@ -4002,8 +4200,8 @@
         "midi": true
       },
       "input": {
-        "id": 310,
-        "node_id": 311,
+        "id": 437,
+        "node_id": 348,
         "node_name": "SMC-MIX - 8-Band EQ",
         "node_description": "SMC-MIX - 8-Band EQ",
         "direction": "in",
@@ -4018,7 +4216,7 @@
       "kind": "midi"
     },
     {
-      "id": 566,
+      "id": 531,
       "output": {
         "id": 84,
         "node_id": 42,
@@ -4034,8 +4232,8 @@
         "midi": true
       },
       "input": {
-        "id": 559,
-        "node_id": 239,
+        "id": 248,
+        "node_id": 250,
         "node_name": "SMC-EQ-3 CC Scale",
         "node_description": "SMC-EQ-3 CC Scale",
         "direction": "in",
@@ -4050,10 +4248,10 @@
       "kind": "midi"
     },
     {
-      "id": 473,
+      "id": 549,
       "output": {
-        "id": 207,
-        "node_id": 239,
+        "id": 126,
+        "node_id": 250,
         "node_name": "SMC-EQ-3 CC Scale",
         "node_description": "SMC-EQ-3 CC Scale",
         "direction": "out",
@@ -4066,8 +4264,8 @@
         "midi": true
       },
       "input": {
-        "id": 310,
-        "node_id": 311,
+        "id": 437,
+        "node_id": 348,
         "node_name": "SMC-MIX - 8-Band EQ",
         "node_description": "SMC-MIX - 8-Band EQ",
         "direction": "in",
@@ -4082,7 +4280,7 @@
       "kind": "midi"
     },
     {
-      "id": 608,
+      "id": 163,
       "output": {
         "id": 84,
         "node_id": 42,
@@ -4098,8 +4296,8 @@
         "midi": true
       },
       "input": {
-        "id": 233,
-        "node_id": 236,
+        "id": 486,
+        "node_id": 244,
         "node_name": "SMC-EQ-4 CC Scale",
         "node_description": "SMC-EQ-4 CC Scale",
         "direction": "in",
@@ -4114,10 +4312,10 @@
       "kind": "midi"
     },
     {
-      "id": 606,
+      "id": 579,
       "output": {
-        "id": 205,
-        "node_id": 236,
+        "id": 394,
+        "node_id": 244,
         "node_name": "SMC-EQ-4 CC Scale",
         "node_description": "SMC-EQ-4 CC Scale",
         "direction": "out",
@@ -4130,8 +4328,8 @@
         "midi": true
       },
       "input": {
-        "id": 310,
-        "node_id": 311,
+        "id": 437,
+        "node_id": 348,
         "node_name": "SMC-MIX - 8-Band EQ",
         "node_description": "SMC-MIX - 8-Band EQ",
         "direction": "in",
@@ -4146,7 +4344,7 @@
       "kind": "midi"
     },
     {
-      "id": 605,
+      "id": 165,
       "output": {
         "id": 84,
         "node_id": 42,
@@ -4162,8 +4360,8 @@
         "midi": true
       },
       "input": {
-        "id": 222,
-        "node_id": 472,
+        "id": 487,
+        "node_id": 421,
         "node_name": "SMC-EQ-5 CC Scale",
         "node_description": "SMC-EQ-5 CC Scale",
         "direction": "in",
@@ -4178,10 +4376,10 @@
       "kind": "midi"
     },
     {
-      "id": 603,
+      "id": 144,
       "output": {
-        "id": 281,
-        "node_id": 472,
+        "id": 599,
+        "node_id": 421,
         "node_name": "SMC-EQ-5 CC Scale",
         "node_description": "SMC-EQ-5 CC Scale",
         "direction": "out",
@@ -4194,8 +4392,8 @@
         "midi": true
       },
       "input": {
-        "id": 310,
-        "node_id": 311,
+        "id": 437,
+        "node_id": 348,
         "node_name": "SMC-MIX - 8-Band EQ",
         "node_description": "SMC-MIX - 8-Band EQ",
         "direction": "in",
@@ -4210,7 +4408,7 @@
       "kind": "midi"
     },
     {
-      "id": 307,
+      "id": 143,
       "output": {
         "id": 84,
         "node_id": 42,
@@ -4226,8 +4424,8 @@
         "midi": true
       },
       "input": {
-        "id": 215,
-        "node_id": 219,
+        "id": 197,
+        "node_id": 587,
         "node_name": "SMC-EQ-6 CC Scale",
         "node_description": "SMC-EQ-6 CC Scale",
         "direction": "in",
@@ -4242,10 +4440,10 @@
       "kind": "midi"
     },
     {
-      "id": 189,
+      "id": 423,
       "output": {
-        "id": 218,
-        "node_id": 219,
+        "id": 130,
+        "node_id": 587,
         "node_name": "SMC-EQ-6 CC Scale",
         "node_description": "SMC-EQ-6 CC Scale",
         "direction": "out",
@@ -4258,8 +4456,8 @@
         "midi": true
       },
       "input": {
-        "id": 310,
-        "node_id": 311,
+        "id": 437,
+        "node_id": 348,
         "node_name": "SMC-MIX - 8-Band EQ",
         "node_description": "SMC-MIX - 8-Band EQ",
         "direction": "in",
@@ -4274,7 +4472,7 @@
       "kind": "midi"
     },
     {
-      "id": 599,
+      "id": 305,
       "output": {
         "id": 84,
         "node_id": 42,
@@ -4290,8 +4488,8 @@
         "midi": true
       },
       "input": {
-        "id": 126,
-        "node_id": 217,
+        "id": 234,
+        "node_id": 259,
         "node_name": "SMC-EQ-7 CC Scale",
         "node_description": "SMC-EQ-7 CC Scale",
         "direction": "in",
@@ -4306,10 +4504,10 @@
       "kind": "midi"
     },
     {
-      "id": 438,
+      "id": 161,
       "output": {
-        "id": 214,
-        "node_id": 217,
+        "id": 198,
+        "node_id": 259,
         "node_name": "SMC-EQ-7 CC Scale",
         "node_description": "SMC-EQ-7 CC Scale",
         "direction": "out",
@@ -4322,8 +4520,8 @@
         "midi": true
       },
       "input": {
-        "id": 310,
-        "node_id": 311,
+        "id": 437,
+        "node_id": 348,
         "node_name": "SMC-MIX - 8-Band EQ",
         "node_description": "SMC-MIX - 8-Band EQ",
         "direction": "in",
@@ -4338,7 +4536,7 @@
       "kind": "midi"
     },
     {
-      "id": 440,
+      "id": 139,
       "output": {
         "id": 84,
         "node_id": 42,
@@ -4354,8 +4552,8 @@
         "midi": true
       },
       "input": {
-        "id": 131,
-        "node_id": 213,
+        "id": 204,
+        "node_id": 201,
         "node_name": "SMC-EQ-8 CC Scale",
         "node_description": "SMC-EQ-8 CC Scale",
         "direction": "in",
@@ -4370,10 +4568,10 @@
       "kind": "midi"
     },
     {
-      "id": 280,
+      "id": 644,
       "output": {
-        "id": 130,
-        "node_id": 213,
+        "id": 621,
+        "node_id": 201,
         "node_name": "SMC-EQ-8 CC Scale",
         "node_description": "SMC-EQ-8 CC Scale",
         "direction": "out",
@@ -4386,8 +4584,8 @@
         "midi": true
       },
       "input": {
-        "id": 310,
-        "node_id": 311,
+        "id": 437,
+        "node_id": 348,
         "node_name": "SMC-MIX - 8-Band EQ",
         "node_description": "SMC-MIX - 8-Band EQ",
         "direction": "in",
@@ -4402,7 +4600,7 @@
       "kind": "midi"
     },
     {
-      "id": 448,
+      "id": 645,
       "output": {
         "id": 155,
         "node_id": 295,
@@ -4418,8 +4616,8 @@
         "midi": true
       },
       "input": {
-        "id": 351,
-        "node_id": 385,
+        "id": 476,
+        "node_id": 359,
         "node_name": "LSP Mixer x8 Stereo",
         "node_description": "LSP Mixer x8 Stereo",
         "direction": "in",
@@ -4428,38 +4626,6 @@
         "name_selector": "LSP Mixer x8 Stereo:events-in",
         "alias": "LSP Mixer x8 Stereo:events-in",
         "object_path": "LSP Mixer x8 Stereo:input_18",
-        "format_dsp": "8 bit raw midi",
-        "midi": true
-      },
-      "kind": "midi"
-    },
-    {
-      "id": 607,
-      "output": {
-        "id": 81,
-        "node_id": 42,
-        "node_name": "Midi-Bridge",
-        "node_description": null,
-        "direction": "out",
-        "port_id": 13,
-        "name": "SINCO 4:(capture_2) SINCO ",
-        "name_selector": "Midi-Bridge:SINCO 4:(capture_2) SINCO ",
-        "alias": "SINCO:SINCO ",
-        "object_path": "alsa:seq:default:client_32:capture_2",
-        "format_dsp": "8 bit raw midi",
-        "midi": true
-      },
-      "input": {
-        "id": 520,
-        "node_id": 575,
-        "node_name": "SMK25 Pad Layers",
-        "node_description": "SMK25 Pad Layers",
-        "direction": "in",
-        "port_id": 0,
-        "name": "midi-in",
-        "name_selector": "SMK25 Pad Layers:midi-in",
-        "alias": "SMK25 Pad Layers:midi-in",
-        "object_path": "SMK25 Pad Layers:input_0",
         "format_dsp": "8 bit raw midi",
         "midi": true
       },

@@ -1,6 +1,6 @@
 {
   "schema": "music-studies/pedro-live-setup/v1",
-  "captured_at": "2026-08-09T07:33:16-03:00",
+  "captured_at": "2026-08-09T15:03:55-03:00",
   "reference_host": {
     "hostname": "airstar",
     "architecture": "x86_64",
@@ -61,11 +61,11 @@
     ]
   },
   "carla": {
-    "project_sha256": "e3e748cda372c044e86679589f4061bb8633ac361939859b9322fdd0d262bf91",
-    "project_size_bytes": 121306,
-    "plugins": 47,
+    "project_sha256": "48ea4f777c68ebd39105902739258795edfa96fefd8820b62fb31d4efe329974",
+    "project_size_bytes": 132028,
+    "plugins": 49,
     "soundfont_slots": 16,
-    "project_patchbay_connections": 106,
+    "project_patchbay_connections": 111,
     "pipewire_quantum": 2048,
     "plugin_uris": [
       "http://gareus.org/oss/lv2/midifilter#mapcc",
@@ -399,14 +399,14 @@
   ],
   "patchbay": {
     "raw_snapshot": "src/midi-setup/airstar-patchbay.json",
-    "raw_sha256": "be0c51bfb48cd6409ce2f8d739d4eaaf2062fb8c1b55a0adff1b6e4f3e1d04f1",
-    "raw_links": 112,
+    "raw_sha256": "7f055a94ca98b945d7dc7372bd4e88246c26ade74a45beff217460eb75dbece1",
+    "raw_links": 117,
     "midi_snapshot": "src/midi-setup/airstar-midi-patchbay.json",
-    "midi_sha256": "82c1a2e6897584d4ca3d728f9431b807cbe8a10a04c8a49fdc91ef1a79b57000",
-    "midi_links": 64,
+    "midi_sha256": "8bf1bfdc156fa26583fe8a96142a1a550111b945ca2a91e7fd2b94462e2b305c",
+    "midi_links": 67,
     "deployment_snapshot": "src/midi-setup/pedro-live-rack-patchbay.json",
-    "deployment_sha256": "e0a38241190cae6b0ad0b0d72a0734bd78984b3c5149b82014716b472dfcf85d",
-    "deployment_links": 110,
+    "deployment_sha256": "f6170a4c49579711033ed0379d4a7426f4ee15d1f441adbbbfedb358d016b429",
+    "deployment_links": 115,
     "excluded_from_deployment": [
       "ALSA Playback [java] audio links are unrelated to the performance rack."
     ],

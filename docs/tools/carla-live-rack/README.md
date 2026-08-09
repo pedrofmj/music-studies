@@ -28,7 +28,7 @@ SoundFonts and sample libraries remain external.
 | AR-CH-7 | Arturia | Optik Synth | Fader 7 / CC82 | Knob 7 / CC19 |
 | AR-CH-8 | Arturia | PAD EFEITOS | Fader 8 / CC83 | Knob 8 / CC16 |
 | AR-CH-9 | Arturia | AtmosferaPAD | Fader 9 / CC85 | Knob 9 / CC17 |
-| PD-CH-1 | SMC-PAD / Pocket | Drum Set | CC36 | CC91 |
+| PD-CH-1 | SMC-PAD / Pocket | Drum Set | Knob 1 / CC36 | CC91 |
 | SMK-CH-1 | SMK-25 | Oceans Worship Pad | Knob 1 / CC20 | CC91 |
 | SMK-CH-2 | SMK-25 | Warm Worship Pad | Knob 2 / CC21 | CC91 |
 | SMK-CH-3 | SMK-25 | Hillsong Pad | Knob 3 / CC22 | CC91 |
@@ -51,6 +51,15 @@ host parameter is intentionally unmapped so Carla forwards CC91 to the synth.
 AR-CH-2 remains saved at 100% slot volume. A controller-independent stereo
 trim adds 6 dB after the Nord instrument to compensate for its quieter source
 samples without changing the fader's full-range behavior.
+
+PD-CH-1 also remains saved at 100% slot volume. SMC-Pad Knob 1 maps CC36
+to the drum SoundFont's CC7 volume, so it remains the control that reaches true
+zero. Knob 2 emits channel-1 CC37. A dedicated `PD-CH-1 Gain Map` intermediary
+reads that control directly from the SMC-Pad Master ports, converts it to
+private CC110, and maps the post-instrument LSP Output gain from 1.0 to 4.0
+(0 to approximately +12 dB). The project starts at
+2.0 (+6.0206 dB) until Knob 2 moves. The downstream master mixer, EQ, main
+volume, and mute gate remain unchanged.
 
 The eight SMK layers receive MIDI from the
 [SMK-25 Pad Layers](../smk25-pad-layers/README.md) service. Performance data
@@ -84,6 +93,7 @@ are disabled to reduce live CPU usage.
 
 ```text
 AR-CH-2 -> AR-CH-2 Output Trim +6 dB --+
+PD-CH-1 -> PD-CH-1 Output Gain 0 to +12 dB --+
 SMK instruments -> SMK Layer Mixer x8 -+
 other instruments ---------------------+
                                          |
