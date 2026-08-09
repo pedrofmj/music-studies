@@ -10,7 +10,7 @@ the midpoint.
 The adapter accumulates those relative steps into an absolute value from 0 to
 127 and emits that value as channel-1 CC119. The encoder click sends CC115 as
 a momentary 127/0 pair; the adapter toggles once on each press and controls a
-stereo audio gate after the LSP mixer. The gate ramps over 10 ms to avoid
+stereo audio gate after the final EQ. The gate ramps over 10 ms to avoid
 clicks. Carla maps CC119 to the LSP mixer's `Output gain`. Fader 9 continues to
 emit CC85, but nothing in the current project consumes it.
 
@@ -27,7 +27,9 @@ Arturia MIDI output
          --> LSP Mixer x8 Stereo:events-in -> Output gain
 
 LSP Mixer x8 Stereo:Output L/R
-  --> Arturia Main Volume Encoder:audio-in-l/r
+  --> SMC-MIX - 8-Band EQ:Input L/R
+      SMC-MIX - 8-Band EQ:Output L/R
+        --> Arturia Main Volume Encoder:audio-in-l/r
       persistent mute state -> 10 ms stereo audio gate
       Arturia Main Volume Encoder:audio-out-l/r
         --> system playback L/R
@@ -50,7 +52,9 @@ The file contains `VOLUME MUTE`, where mute is 0 or 127. A legacy file with
 only the volume remains valid and starts unmuted. The initial volume fallback
 is MIDI value 3, matching the master-gain value saved in the Carla project
 when the adapter was introduced. New encoder movement and mute changes are
-persisted by the service.
+persisted by the service. Whenever `absolute-out` gains a connection, the
+service immediately replays the stored CC119 value so Carla starts at the
+persisted main volume without requiring encoder movement.
 
 ## Installed files
 
@@ -70,7 +74,8 @@ The persistent patchbay snapshot owns these links:
 ```text
 KL Essential 61 mk3 MIDI -> Arturia Main Volume Encoder:relative-in
 Arturia Main Volume Encoder:absolute-out -> LSP Mixer x8 Stereo:events-in
-LSP Mixer x8 Stereo:Output L/R -> Arturia Main Volume Encoder:audio-in-l/r
+LSP Mixer x8 Stereo:Output L/R -> SMC-MIX - 8-Band EQ:Input L/R
+SMC-MIX - 8-Band EQ:Output L/R -> Arturia Main Volume Encoder:audio-in-l/r
 Arturia Main Volume Encoder:audio-out-l/r -> system playback L/R
 ```
 

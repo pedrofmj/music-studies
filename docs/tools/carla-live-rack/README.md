@@ -93,8 +93,10 @@ other instruments ---------------------+
   -> system playback
 ```
 
-The central Arturia encoder still controls LSP output gain through CC119, and
-its click still mutes only the Carla rack through the stereo gate.
+The central Arturia encoder controls LSP output gain through CC119, and its
+click mutes only the Carla rack through the post-EQ stereo gate. The PipeWire
+snapshot stores both encoder MIDI links; the service replays its persisted
+CC119 value whenever `absolute-out` reconnects.
 
 ## Apply
 

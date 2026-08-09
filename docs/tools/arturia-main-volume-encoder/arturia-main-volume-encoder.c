@@ -41,6 +41,7 @@ extern void *jack_port_get_buffer(jack_port_t *, jack_nframes_t);
 extern uint32_t jack_midi_get_event_count(void *);
 extern int jack_midi_event_get(jack_midi_event_t *, void *, uint32_t);
 extern void jack_midi_clear_buffer(void *);
+extern int jack_port_connected(const jack_port_t *);
 extern int jack_midi_event_write(
     void *, jack_nframes_t, const jack_midi_data_t *, size_t
 );
@@ -67,6 +68,7 @@ static jack_port_t *audio_output_right_port;
 static atomic_int volume_value;
 static atomic_int mute_value;
 static atomic_int button_down;
+static int output_connection_count;
 static atomic_uint generation;
 static float audio_gain;
 static float audio_ramp_step;
@@ -92,6 +94,20 @@ static int process_midi(jack_nframes_t frame_count, void *unused)
     input_buffer = jack_port_get_buffer(input_port, frame_count);
     output_buffer = jack_port_get_buffer(output_port, frame_count);
     jack_midi_clear_buffer(output_buffer);
+    {
+        const int connections = jack_port_connected(output_port);
+
+        if (connections > 0 && connections > output_connection_count) {
+            const jack_midi_data_t volume_message[] = {
+                0xb0 | MIDI_CHANNEL, VOLUME_OUTPUT_CC,
+                (jack_midi_data_t)atomic_load(&volume_value),
+            };
+            (void)jack_midi_event_write(
+                output_buffer, 0, volume_message, sizeof(volume_message)
+            );
+        }
+        output_connection_count = connections;
+    }
     event_count = jack_midi_get_event_count(input_buffer);
 
     for (index = 0; index < event_count; ++index) {
@@ -261,6 +277,7 @@ int main(int argc, char **argv)
     atomic_init(&mute_value, initial_mute);
     atomic_init(&button_down, 0);
     atomic_init(&generation, 0);
+    output_connection_count = -1;
 
     signal(SIGINT, stop_running);
     signal(SIGTERM, stop_running);
