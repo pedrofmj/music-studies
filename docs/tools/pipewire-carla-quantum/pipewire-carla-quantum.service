@@ -1,0 +1,12 @@
+[Unit]
+Description=Use the tested PipeWire quantum for the Carla live rack
+After=pipewire.service
+PartOf=pipewire.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/pw-metadata -n settings 0 clock.force-quantum 2048
+RemainAfterExit=yes
+
+[Install]
+WantedBy=pipewire.service

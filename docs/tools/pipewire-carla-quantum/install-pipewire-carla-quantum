@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+readonly SOURCE="${SCRIPT_DIR}/pipewire-carla-quantum.service"
+readonly TARGET="${HOME}/.config/systemd/user/pipewire-carla-quantum.service"
+
+mkdir -p "$(dirname -- "$TARGET")"
+cp "$SOURCE" "$TARGET"
+systemctl --user daemon-reload
+systemctl --user enable --now pipewire-carla-quantum.service

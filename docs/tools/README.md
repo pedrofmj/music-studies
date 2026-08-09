@@ -11,6 +11,8 @@ documentation together so it can be understood or replaced independently.
   master-volume control while leaving fader 9 available for an instrument.
 - [SMK-25 Pad Layers](smk25-pad-layers/README.md) provides eight independently
   latchable Carla instrument layers with per-knob volume and Play/Stop recall.
+- [PipeWire Carla Quantum](pipewire-carla-quantum/README.md) persists the tested
+  2048-frame performance setting for the Carla live rack on `airstar`.
 
 ## Future direction
 
