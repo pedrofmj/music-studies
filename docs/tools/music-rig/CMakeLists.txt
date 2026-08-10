@@ -350,6 +350,27 @@ if(BUILD_TESTING)
             music_rig_windows_generation_adoption
             PROPERTIES TIMEOUT 10
         )
+
+        add_executable(music_rig_windows_ipc_roundtrip_test
+            tests/windows-ipc-roundtrip-test.c
+        )
+        target_link_libraries(music_rig_windows_ipc_roundtrip_test
+            PRIVATE
+                music_rig_core
+                Advapi32
+        )
+        target_compile_options(
+            music_rig_windows_ipc_roundtrip_test
+            PRIVATE ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+        add_test(
+            NAME music_rig_windows_ipc_roundtrip
+            COMMAND music_rig_windows_ipc_roundtrip_test
+        )
+        set_tests_properties(
+            music_rig_windows_ipc_roundtrip
+            PROPERTIES TIMEOUT 10
+        )
     endif()
 
 endif()

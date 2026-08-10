@@ -99,7 +99,9 @@ benchmarks.
   all nine configured tests in
   [run 31391585787](https://github.com/pedrofmj/music-studies/actions/runs/31391585787).
 - ✅ Prove portable versioned frames and Linux `SOCK_SEQPACKET` round trips.
-- ⬜ Prove the same golden frames through the Windows candidate transport.
+- 🟡 Prove the same golden frames through the Windows candidate transport. A
+  current-user-only message-mode named-pipe test and reference artifact bundle
+  are implemented; hosted and `beanstar` runs remain pending.
 - 🟡 Prove `json-c` availability and footprint on Linux and Windows. Linux
   passes with 0.17; Windows remains pending.
 - ✅ Reject platform headers and symbols from the portable core.
@@ -114,7 +116,8 @@ benchmarks.
   initial read-only hardware, OS, and media-driver inventory are recorded in
   [WINDOWS-REFERENCE.md](../../tools/music-rig/WINDOWS-REFERENCE.md).
 - 🟡 Evaluate local named pipes in message mode as the Windows IPC candidate;
-  the round-trip proof and final decision remain pending.
+  the explicit-ACL implementation is ready, while hosted and physical
+  round-trip proof and the final decision remain pending.
 - ✅ Decide whether native PipeWire graph control can wait until Milestone 6.
   [ADR 0001](architecture-decisions/0001-pipewire-graph-control-deferral.md)
   defers mutation; pre-Milestone-6 control-only switches require an empty graph

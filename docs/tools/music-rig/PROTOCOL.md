@@ -47,7 +47,9 @@ oversized-message rejection.
 ## Windows Candidate
 
 The candidate Windows transport is a local named pipe in message mode with an
-explicit ACL. It can preserve the request/response message boundary while the
-portable encoder remains unchanged. The choice is provisional until the same
-golden frames and round-trip tests pass on the selected Windows reference
-machine.
+explicit current-user-only ACL and remote clients rejected. It can preserve the
+request/response message boundary while the portable encoder remains unchanged.
+The native test sends the shared request and response golden frames before
+running 1,000 measured round trips. The choice remains provisional until that
+test passes in hosted CI and from a verified artifact on the selected Windows
+reference machine.

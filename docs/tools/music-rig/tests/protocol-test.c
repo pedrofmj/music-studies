@@ -1,22 +1,8 @@
 #include "music_rig/protocol.h"
+#include "protocol-golden.h"
 
 #include <stdio.h>
 #include <string.h>
-
-static const uint8_t REQUEST_GOLDEN[MUSIC_RIG_PROTOCOL_REQUEST_SIZE] = {
-    0x4d, 0x52, 0x49, 0x47, 0x01, 0x00, 0x00, 0x00,
-    0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x49, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x29, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
-
-static const uint8_t RESPONSE_GOLDEN[MUSIC_RIG_PROTOCOL_RESPONSE_SIZE] = {
-    0x4d, 0x52, 0x49, 0x47, 0x01, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x49, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x29, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x29, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
 
 static int test_request(void)
 {
@@ -34,7 +20,11 @@ static int test_request(void)
             encoded,
             sizeof(encoded)
         ) != MUSIC_RIG_RESULT_OK ||
-        memcmp(encoded, REQUEST_GOLDEN, sizeof(encoded)) != 0 ||
+        memcmp(
+            encoded,
+            MUSIC_RIG_PROTOCOL_REQUEST_GOLDEN,
+            sizeof(encoded)
+        ) != 0 ||
         music_rig_protocol_decode_request(
             encoded,
             sizeof(encoded),
@@ -78,7 +68,11 @@ static int test_response(void)
             encoded,
             sizeof(encoded)
         ) != MUSIC_RIG_RESULT_OK ||
-        memcmp(encoded, RESPONSE_GOLDEN, sizeof(encoded)) != 0 ||
+        memcmp(
+            encoded,
+            MUSIC_RIG_PROTOCOL_RESPONSE_GOLDEN,
+            sizeof(encoded)
+        ) != 0 ||
         music_rig_protocol_decode_response(
             encoded,
             sizeof(encoded),

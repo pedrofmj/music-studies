@@ -48,3 +48,47 @@ jobs:
         run: >-
           ctest --test-dir build/music-rig -C Release
           --output-on-failure
+
+      - name: Stage Windows reference bundle
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $bundle = 'build/music-rig/windows-reference-bundle'
+          New-Item -ItemType Directory -Force -Path $bundle | Out-Null
+          $sourceFiles = @(
+            'build/music-rig/Release/music_rig_protocol_test.exe',
+            'build/music-rig/Release/music_rig_windows_generation_adoption_test.exe',
+            'build/music-rig/Release/music_rig_windows_ipc_roundtrip_test.exe'
+          )
+          foreach ($sourceFile in $sourceFiles) {
+            Copy-Item -LiteralPath $sourceFile -Destination $bundle
+          }
+          $artifacts = @(
+            Get-ChildItem -LiteralPath $bundle -File | ForEach-Object {
+              $hash = Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName
+              [ordered]@{
+                name = $_.Name
+                bytes = $_.Length
+                sha256 = $hash.Hash.ToLowerInvariant()
+              }
+            }
+          )
+          [ordered]@{
+            schema = 'music-studies/windows-reference-bundle/v1'
+            commit = $env:GITHUB_SHA
+            runner_image = $env:ImageOS
+            runner_image_version = $env:ImageVersion
+            created_at = (Get-Date).ToUniversalTime().ToString('o')
+            artifacts = $artifacts
+          } | ConvertTo-Json -Depth 4 |
+            Set-Content -Encoding utf8NoBOM -LiteralPath "$bundle/manifest.json"
+
+      - name: Upload Windows reference bundle
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v7
+        with:
+          name: music-rig-windows-reference-${{ github.sha }}
+          path: build/music-rig/windows-reference-bundle
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
