@@ -33,9 +33,9 @@ ctest --test-dir /tmp/music-rig-build --output-on-failure
 ~~~
 
 The same C sources and CMake project are intended for Linux and Windows. The
-current milestone still needs a Windows build runner, a selected Windows IPC
-transport, and the `json-c` dependency proof before its portability gate is
-complete.
+Linux `json-c` dependency proof now passes. The portability gate still needs a
+Windows build runner, a selected Windows IPC transport, and the equivalent
+Windows `json-c` proof.
 
 ## Atomic Generation Spike
 
@@ -54,6 +54,26 @@ and does not create a daemon, service, runtime socket file, or persistent state.
 
 See [PROTOCOL.md](PROTOCOL.md) for the frame contract and Windows named-pipe
 candidate boundary.
+
+## Optional JSON Dependency Spike
+
+Normal builds do not discover or link `json-c`. Enable the isolated Linux
+dependency probe explicitly:
+
+~~~bash
+cmake -S docs/tools/music-rig -B /tmp/music-rig-build-json-c -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DMUSIC_RIG_ENABLE_JSON_C_SPIKE=ON
+cmake --build /tmp/music-rig-build-json-c
+ctest --test-dir /tmp/music-rig-build-json-c --output-on-failure
+ctest --test-dir /tmp/music-rig-build-json-c -V \
+  -R '^music_rig_json_c_spike$'
+~~~
+
+The probe validates a compiled-runtime-shaped fixture 10,000 times and reports
+parse time, peak process RSS, executable size, and linked-library size. See
+[JSON-PARSING.md](JSON-PARSING.md) for the provisional dependency boundary and
+[benchmarks/json-c-linux.json](benchmarks/json-c-linux.json) for the evidence.
 
 ## Read-Only Airstar Baseline
 

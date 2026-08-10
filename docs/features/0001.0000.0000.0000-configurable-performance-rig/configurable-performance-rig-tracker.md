@@ -34,12 +34,18 @@ Documents:
 | --- | --- |
 | GCC isolated suite | ✅ 8/8 passed |
 | Clang isolated suite | ✅ 8/8 passed |
+| GCC with Linux JSON probe | ✅ 9/9 passed |
+| Clang with Linux JSON probe | ✅ 9/9 passed |
+| Linux JSON parse fixture | ✅ 10,000 iterations, zero failures |
+| Linux JSON average parse | ✅ GCC 10,858 ns; Clang 15,268 ns |
+| Linux JSON linkage | ✅ Default CLI has no `json-c` dependency |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
 | Live graph or service changes | ✅ None |
 
-IPC timing is a local Milestone 0 spike, not a production-daemon benchmark.
+IPC and JSON timings are local Milestone 0 spikes, not production-daemon
+benchmarks.
 
 ## Milestone Summary
 
@@ -76,7 +82,8 @@ IPC timing is a local Milestone 0 spike, not a production-daemon benchmark.
 - ⬜ Build and test the same core and CLI on Windows.
 - ✅ Prove portable versioned frames and Linux `SOCK_SEQPACKET` round trips.
 - ⬜ Prove the same golden frames through the Windows candidate transport.
-- ⬜ Prove `json-c` availability and footprint on Linux and Windows.
+- 🟡 Prove `json-c` availability and footprint on Linux and Windows. Linux
+  passes with 0.17; Windows remains pending.
 - ✅ Reject platform headers and symbols from the portable core.
 - ✅ Prove lock-free generation publication and synthetic callback adoption.
 - ⬜ Prove generation adoption on the Windows reference build.
@@ -88,7 +95,8 @@ IPC timing is a local Milestone 0 spike, not a production-daemon benchmark.
   the round-trip proof and final decision remain pending.
 - ⬜ Decide whether native PipeWire graph control can wait until Milestone 6.
 - ⬜ Record the supported Carla live-control and prepared-engine boundary.
-- ⬜ Write the remaining Milestone 0 architecture decision records.
+- 🟡 Write the remaining Milestone 0 architecture decision records. IPC and
+  provisional JSON parsing boundaries are recorded.
 - ⬜ Confirm or revise CPU, memory, latency, and xrun thresholds.
 
 ## Milestone 1: Schemas And Current Profile Extraction

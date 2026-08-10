@@ -1,4 +1,6 @@
-# Airstar Baseline Benchmarks
+# Music Rig Benchmarks
+
+## Airstar Baseline
 
 The baseline collector observes the protected Airstar setup without changing
 services, files, audio links, MIDI links, metadata, or application state.
@@ -33,3 +35,12 @@ docs/tools/music-rig/benchmarks/capture-airstar-baseline --print-observer
 An incomplete report is still written for diagnosis, but the command returns a
 failure until the project checksum, plugin and connection counts, graph counts,
 services, quantum, and sample-rate checks pass.
+
+## JSON-C Linux Dependency
+
+[json-c-linux.json](json-c-linux.json) records the Linux package, binary,
+process-memory, and parse-time measurements for the opt-in dependency probe.
+The result proves only the Linux half of the portability gate; Windows remains
+pending.
+
+See [../JSON-PARSING.md](../JSON-PARSING.md) for the decision boundary and

@@ -21,8 +21,10 @@ Completed Milestone 0 work:
 - audited read-only Airstar collector with machine-readable and Markdown output;
 - graph-difference diagnostics that identify unexpected and missing endpoints;
 - lock-free immutable-generation publication with synthetic callback adoption;
+- portable versioned frames with a measured Linux `SOCK_SEQPACKET` round trip;
   and
-- portable versioned frames with a measured Linux `SOCK_SEQPACKET` round trip.
+- opt-in `json-c` 0.17 Linux build, parse-cost, process-RSS, and binary-footprint
+  proof with no dependency in the default CLI.
 
 The Airstar observation matches the protected Carla checksum, 49 plugins, 111
 project connections, all protected graph links, 2048-frame quantum, 48 kHz
@@ -32,10 +34,10 @@ live graph also contains the diagnostic link
 observed but not removed or added to the protected baseline.
 
 Open Milestone 0 gates include the existing helper self-tests, a clean
-transient-free Airstar capture, repeatable startup transcript, the JSON
-dependency spike, Windows reference build and IPC proof, and the
-remaining backend boundary decisions. No experimental runtime is installed or
-connected to the live rig.
+transient-free Airstar capture, repeatable startup transcript, the Windows
+`json-c` proof, Windows reference build and IPC proof, and the remaining
+backend boundary decisions. No experimental runtime is installed or connected
+to the live rig.
 
 ## Objective
 

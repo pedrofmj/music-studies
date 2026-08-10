@@ -1,0 +1,58 @@
+{
+  "schema": "music-studies/json-c-dependency-report/v1",
+  "captured_date": "2026-08-10",
+  "machine": {
+    "hostname": "centralstar",
+    "platform": "linux",
+    "kernel": "7.0.0-28-generic",
+    "architecture": "x86_64"
+  },
+  "dependency": {
+    "name": "json-c",
+    "version": "0.17",
+    "development_package": "libjson-c-dev 0.17-1build1",
+    "runtime_package": "libjson-c5 0.17-1build1",
+    "development_package_installed_size_bytes": 311296,
+    "runtime_package_installed_size_bytes": 103424,
+    "shared_library_bytes": 76168,
+    "static_library_bytes": 166386
+  },
+  "fixture": {
+    "path": "tests/fixtures/compiled-runtime-minimal.json",
+    "schema": "music-studies/compiled-performance-rig/v1",
+    "bytes": 1206,
+    "device_profiles": 5,
+    "mappings": 8
+  },
+  "build": {
+    "cmake_option": "MUSIC_RIG_ENABLE_JSON_C_SPIKE",
+    "default_enabled": false,
+    "default_cli_links_json_c": false
+  },
+  "runs": [
+    {
+      "compiler": "GNU",
+      "compiler_version": "13.3.0",
+      "parse_iterations": 10000,
+      "elapsed_ns": 108589153,
+      "average_parse_ns": 10858,
+      "peak_process_rss_bytes": 2748416,
+      "executable_bytes": 17384,
+      "failures": 0
+    },
+    {
+      "compiler": "Clang",
+      "compiler_version": "18.1.3",
+      "parse_iterations": 10000,
+      "elapsed_ns": 152680749,
+      "average_parse_ns": 15268,
+      "peak_process_rss_bytes": 2813952,
+      "executable_bytes": 17520,
+      "failures": 0
+    }
+  ],
+  "gate": {
+    "linux": "pass",
+    "windows": "pending"
+  }
+}

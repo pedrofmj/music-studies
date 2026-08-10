@@ -1,0 +1,23 @@
+{
+  "schema": "music-studies/compiled-performance-rig/v1",
+  "definition_fingerprint": "sha256:fixture",
+  "generation": 1,
+  "active_rig_profile": "full-live-rack",
+  "device_profiles": [
+    {"slot": "arturia-main", "profile": "multi-instrument-rack", "readiness": "control-only"},
+    {"slot": "smk25-main", "profile": "ambient-pad-layers", "readiness": "control-only"},
+    {"slot": "smc-mixer-main", "profile": "eight-band-eq", "readiness": "control-only"},
+    {"slot": "smc-pad-main", "profile": "drum-set", "readiness": "control-only"},
+    {"slot": "smc-pad-pocket", "profile": "drum-set", "readiness": "control-only"}
+  ],
+  "mappings": [
+    {"source": "arturia-main.cc114", "target": "master.volume"},
+    {"source": "arturia-main.cc115", "target": "master.mute"},
+    {"source": "smk25-main.pad1", "target": "smk-layer.1.enabled"},
+    {"source": "smk25-main.knob1", "target": "smk-layer.1.volume"},
+    {"source": "smc-mixer-main.fader1", "target": "equalizer.band.63hz.gain"},
+    {"source": "smc-mixer-main.fader8", "target": "equalizer.band.12khz.gain"},
+    {"source": "smc-pad-main.note36", "target": "drums.kick"},
+    {"source": "smc-pad-pocket.note38", "target": "drums.snare"}
+  ]
+}

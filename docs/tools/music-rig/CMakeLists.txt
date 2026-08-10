@@ -3,6 +3,11 @@ cmake_minimum_required(VERSION 3.20)
 project(music_rig VERSION 0.1.0 LANGUAGES C)
 
 include(CTest)
+option(
+    MUSIC_RIG_ENABLE_JSON_C_SPIKE
+    "Build the optional json-c dependency and footprint probe"
+    OFF
+)
 
 add_library(music_rig_core STATIC
     runtime/core/music_rig_core.c
@@ -80,6 +85,43 @@ if(BUILD_TESTING)
         NAME music_rig_cli_version
         COMMAND $<TARGET_FILE:music-rig> --version
     )
+    if(MUSIC_RIG_ENABLE_JSON_C_SPIKE)
+        if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
+            message(FATAL_ERROR
+                "The current json-c footprint harness supports Linux only"
+            )
+        endif()
+        find_package(json-c CONFIG REQUIRED)
+        add_executable(music_rig_json_c_spike
+            tests/linux-json-c-spike.c
+        )
+        target_compile_features(music_rig_json_c_spike PRIVATE c_std_17)
+        set_target_properties(music_rig_json_c_spike PROPERTIES
+            C_EXTENSIONS OFF
+        )
+        target_link_libraries(music_rig_json_c_spike PRIVATE json-c::json-c)
+        target_compile_definitions(music_rig_json_c_spike PRIVATE
+            MUSIC_RIG_COMPILER_ID="${CMAKE_C_COMPILER_ID}"
+            MUSIC_RIG_COMPILER_VERSION="${CMAKE_C_COMPILER_VERSION}"
+            MUSIC_RIG_JSON_C_LIBRARY_PATH="$<TARGET_FILE:json-c::json-c>"
+        )
+        target_compile_options(music_rig_json_c_spike PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+        add_test(
+            NAME music_rig_json_c_spike
+            COMMAND music_rig_json_c_spike
+                "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-runtime-minimal.json"
+        )
+        set_tests_properties(
+            music_rig_json_c_spike
+            PROPERTIES TIMEOUT 30
+        )
+    endif()
+
     if(UNIX)
         find_package(Threads REQUIRED)
         add_executable(music_rig_generation_adoption_test
