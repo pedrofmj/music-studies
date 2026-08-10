@@ -395,6 +395,28 @@ if(BUILD_TESTING)
             music_rig_windows_ipc_roundtrip
             PROPERTIES TIMEOUT 10
         )
+
+        add_executable(music_rig_windows_resource_measurement_test
+            tests/windows-resource-measurement-test.c
+        )
+        target_link_libraries(
+            music_rig_windows_resource_measurement_test
+            PRIVATE Psapi
+        )
+        target_compile_options(
+            music_rig_windows_resource_measurement_test
+            PRIVATE ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+        add_test(
+            NAME music_rig_windows_resource_measurement
+            COMMAND music_rig_windows_resource_measurement_test
+                --self-test
+                $<TARGET_FILE:music-rig>
+        )
+        set_tests_properties(
+            music_rig_windows_resource_measurement
+            PROPERTIES TIMEOUT 10
+        )
     endif()
 
 endif()

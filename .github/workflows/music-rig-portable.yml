@@ -79,9 +79,11 @@ jobs:
           $bundle = 'build/music-rig/windows-reference-bundle'
           New-Item -ItemType Directory -Force -Path $bundle | Out-Null
           $sourceFiles = @(
+            'build/music-rig/Release/music-rig.exe',
             'build/music-rig/Release/music_rig_protocol_test.exe',
             'build/music-rig/Release/music_rig_windows_generation_adoption_test.exe',
-            'build/music-rig/Release/music_rig_windows_ipc_roundtrip_test.exe'
+            'build/music-rig/Release/music_rig_windows_ipc_roundtrip_test.exe',
+            'build/music-rig/Release/music_rig_windows_resource_measurement_test.exe'
           )
           foreach ($sourceFile in $sourceFiles) {
             Copy-Item -LiteralPath $sourceFile -Destination $bundle
