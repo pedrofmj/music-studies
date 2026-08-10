@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - .github/workflows/music-rig-portable.yml
+      - .gitattributes
       - docs/tools/music-rig/**
   pull_request:
     paths:
       - .github/workflows/music-rig-portable.yml
+      - .gitattributes
       - docs/tools/music-rig/**
   workflow_dispatch:
 
@@ -109,7 +111,8 @@ jobs:
             -LiteralPath 'build/music-rig-json-c/vcpkg_installed/x64-windows-static-md/share/json-c/copyright' `
             -Destination "$bundle/json-c-LICENSE.txt"
           $vcpkgVersion = (
-            & "$env:VCPKG_INSTALLATION_ROOT/vcpkg.exe" version | Out-String
+            & "$env:VCPKG_INSTALLATION_ROOT/vcpkg.exe" version |
+              Select-Object -First 1
           ).Trim()
           $artifacts = @(
             Get-ChildItem -LiteralPath $bundle -File | ForEach-Object {
