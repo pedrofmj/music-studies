@@ -40,7 +40,7 @@ Documents:
 | Arturia offline parity | ✅ MIDI, state, replay, and stereo ramp passed |
 | SMK-25 offline parity | ✅ Self-test, config, and JACK guard passed |
 | Startup contract | ✅ Protected authority and read-only boundaries pass |
-| Live startup transcript | 🟡 Planned; operator execution not performed |
+| Live startup transcript | ✅ [Passing operator run](../../tools/music-rig/benchmarks/current-rack-startup-2026-08-10.md); five controllers, zero validation failures |
 | Switch benchmark contract | ✅ Valid fixture plus 13 negative semantic cases |
 | Acceptance thresholds | ✅ Selected; platform measurements remain future gates |
 | Windows hosted build | ✅ [Windows 2025 MSVC run](https://github.com/pedrofmj/music-studies/actions/runs/31414189191), 10/10 default and 11/11 JSON-enabled passed |
@@ -68,7 +68,7 @@ benchmarks.
 
 | Milestone | State | Exit gate |
 | --- | --- | --- |
-| 0. Baseline and technical gates | 🟡 | Technical spikes and reference evidence incomplete |
+| 0. Baseline and technical gates | 🟡 | Windows reference resource evidence incomplete |
 | 1. Schemas and current profile extraction | ⬜ | Not started |
 | 2. Deterministic compiler and parity | ⬜ | Not started |
 | 3. Runtime, CLI, and shadow mode | ⬜ | Not started |
@@ -94,9 +94,11 @@ benchmarks.
   verified afterward without changing a service or protected artifact.
 - ✅ Exercise and record the Arturia and SMK helper
   [offline tests](../../tools/music-rig/HELPER-OFFLINE-TESTS.md).
-- 🟡 Record the repeatable current-rack startup and validation transcript.
-  The deterministic [planned transcript](../../tools/music-rig/CURRENT-RACK-STARTUP.md)
-  passes drift checks; operator-controlled live evidence remains.
+- ✅ Record the repeatable current-rack startup and validation transcript. The
+  deterministic [planned transcript](../../tools/music-rig/CURRENT-RACK-STARTUP.md)
+  and [2026-08-10 operator run](../../tools/music-rig/benchmarks/current-rack-startup-2026-08-10.md)
+  pass source, installed-rack, hardware, launch, graph, musical, and stability
+  checks.
 
 ### Performance And Runtime
 
@@ -123,6 +125,9 @@ benchmarks.
 - ✅ Prove generation adoption on the Windows reference build. The
   hash-verified native artifact completed 9,999 publications on `beanstar`,
   remained lock-free, and recorded a 200 ns maximum control commit.
+- 🟡 Record reliable Windows short-process and 60-second zero-event daemon
+  resource measurements on `beanstar`, including working set, idle CPU,
+  threads, handles, shutdown, and cleanup.
 
 ### Architecture Decisions
 

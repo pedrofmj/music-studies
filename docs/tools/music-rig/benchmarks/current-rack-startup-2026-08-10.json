@@ -1,0 +1,126 @@
+{
+  "schema": "music-studies/current-rack-startup-result/v1",
+  "result": "pass",
+  "rig": "pedro-performance-rig",
+  "rig_profile": "full-live-rack",
+  "reference_host": "airstar",
+  "operator": "pedro.ferreira",
+  "source_commit": "93d776517259f960aee3da3f8224d34110075746",
+  "execution": {
+    "live_sequence_started_at": "2026-08-10T16:24:40-03:00",
+    "carla_started_at": "2026-08-10T16:26:27-03:00",
+    "completed_at": "2026-08-10T16:38:34-03:00"
+  },
+  "contract": {
+    "path": "docs/tools/music-rig/current-rack-startup.json",
+    "sha256": "9fdc39c2411ac1d1148438f226154ecf39859fb0739adcd2183ad47355bc67b3",
+    "planned_transcript_path": "docs/tools/music-rig/CURRENT-RACK-STARTUP.md",
+    "planned_transcript_sha256": "0cdc8065fc75b00f011b0fd59061010eba0b38decaeffa2ca96a8379fb500ac5"
+  },
+  "validation_inputs": {
+    "setup_manifest_sha256": "3af1bb063239dc47a425ea3df109a260fea4dff98a0e645380f1d6e33b7275d6",
+    "protected_baseline_sha256": "8d3465d9578523e005f2a76c266680573c09b5b519e0b1537d0070b8695b784e",
+    "installed_validator_sha256": "37845f1128f98121bfa197778fdcae96d48c430ff3b7f0ce7712972640d621df"
+  },
+  "phases": [
+    {
+      "id": "repository-preflight",
+      "result": "pass",
+      "evidence": {
+        "protected_baseline_checks": 30,
+        "protected_baseline_failures": 0,
+        "restore_preview_only": true,
+        "restore_applied": false
+      }
+    },
+    {
+      "id": "installed-readiness",
+      "result": "pass",
+      "evidence": {
+        "command": "validate-airstar-live-setup --fast",
+        "validation_failures": 0,
+        "executed_on_reference_host": true,
+        "temporary_bundle_hash_verified": true,
+        "temporary_bundle_cleanup": "pass"
+      }
+    },
+    {
+      "id": "hardware-and-launch",
+      "result": "pass",
+      "evidence": {
+        "arturia_usb_controllers": 1,
+        "mvave_usb_controllers": 4,
+        "protected_hardware_presets": "operator-confirmed",
+        "previous_carla_and_bridges_stopped": true,
+        "launcher": "~/bin/carla-pedro-project",
+        "launch": "operator-controlled",
+        "loaded_plugins": 49,
+        "load_confirmation": "operator-confirmed"
+      }
+    },
+    {
+      "id": "post-start-validation",
+      "result": "pass",
+      "evidence": {
+        "command": "validate-airstar-live-setup --live --fast",
+        "validation_failures": 0,
+        "carla_running": true,
+        "stable_services_active": 4,
+        "pipewire_quantum_frames": 2048,
+        "live_patchbay_total": 117,
+        "live_patchbay_present": 117,
+        "live_patchbay_would_restore": 0,
+        "live_patchbay_unresolved": 0
+      }
+    },
+    {
+      "id": "musical-acceptance",
+      "result": "pass",
+      "evidence": {
+        "arturia_controls": "operator-confirmed-pass",
+        "smk25_layers": "operator-confirmed-pass",
+        "smc_mixer_equalizer": "operator-confirmed-pass",
+        "smc_pad_drums": "operator-confirmed-pass",
+        "smc_pad_pocket_drums": "operator-confirmed-pass",
+        "normal_play_seconds_minimum": 120,
+        "audible_stability": "operator-confirmed-pass",
+        "reported_dropouts": 0,
+        "reported_stuck_notes": 0,
+        "reported_unintended_routes": 0,
+        "reported_clicks": 0
+      }
+    }
+  ],
+  "final_observation": {
+    "captured_at": "2026-08-10T16:38:34-03:00",
+    "pipewire_error_total": 0,
+    "service_restarts": {
+      "arturia-main-volume-encoder.service": 0,
+      "smk25-pad-layers.service": 0,
+      "pipewire-carla-quantum.service": 0,
+      "pipewire-patchbay-watch.service": 0
+    },
+    "protected_links_missing": 0,
+    "diagnostic_link": {
+      "output": "PD-CH-1 Gain Map:events-out",
+      "input": "smc-pad-gain-verify:input",
+      "present_after_test": true,
+      "part_of_protected_baseline": false
+    }
+  },
+  "safety": {
+    "protected_artifacts_changed": false,
+    "validation_changed_graph": false,
+    "services_changed": false,
+    "automatic_restore_used": false,
+    "operator_actions": [
+      "closed the existing Carla process",
+      "launched the protected Carla rack",
+      "exercised normal controller controls"
+    ],
+    "final_live_state": "protected rack running; pre-test diagnostic link present"
+  },
+  "gate": {
+    "current_rack_startup_transcript": "pass"
+  }
+}

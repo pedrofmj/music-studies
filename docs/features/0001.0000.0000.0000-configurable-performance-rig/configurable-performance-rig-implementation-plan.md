@@ -28,8 +28,11 @@ Completed Milestone 0 work:
   MSVC suite, and hash-verified `beanstar` parse and footprint proof;
 - repeatable offline parity tests for the protected Arturia and SMK-25 helpers,
   with no service, JACK-client, graph, or production-state activation;
-- a versioned current-rack startup contract plus deterministic planned
-  transcript with authority-drift and read-only-boundary checks;
+- a versioned current-rack startup contract, deterministic planned transcript,
+  and passing
+  [operator execution](../../tools/music-rig/benchmarks/current-rack-startup-2026-08-10.md)
+  with authority-drift, read-only-boundary, hardware, musical, and stability
+  checks;
 - a portable versioned switch-benchmark result contract that separates commit,
   real-time adoption, resources, and stability across idle, normal-performance,
   and high-MIDI-load scenarios; and
@@ -64,9 +67,9 @@ that the exact diagnostic link was again present, every protected link remained
 present, and no service changed. The diagnostic link is not part of the
 protected baseline.
 
-Open Milestone 0 gates include operator-recorded startup transcript evidence
-and remaining resource evidence on the selected `beanstar` Windows reference
-machine. No experimental runtime is installed or connected to the live rig.
+The remaining open Milestone 0 gate is reliable resource evidence on the
+selected `beanstar` Windows reference machine. No experimental runtime is
+installed or connected to the live rig.
 
 ## Objective
 

@@ -36,6 +36,16 @@ An incomplete report is still written for diagnosis, but the command returns a
 failure until the project checksum, plugin and connection counts, graph counts,
 services, quantum, and sample-rate checks pass.
 
+## Current Rack Startup
+
+[current-rack-startup-2026-08-10.json](current-rack-startup-2026-08-10.json)
+and
+[current-rack-startup-2026-08-10.md](current-rack-startup-2026-08-10.md)
+record the passing operator-controlled startup and musical-acceptance run.
+The result binds the planned contract and validation inputs by SHA-256, records
+all five controller checks, and confirms zero PipeWire errors, service
+restarts, missing protected links, or Patchbay repairs.
+
 ## JSON-C Dependency
 
 [json-c-linux.json](json-c-linux.json) records the Linux package, binary,
