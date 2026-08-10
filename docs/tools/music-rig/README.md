@@ -33,9 +33,13 @@ ctest --test-dir /tmp/music-rig-build --output-on-failure
 ~~~
 
 The same C sources and CMake project are intended for Linux and Windows. The
-Linux `json-c` dependency proof now passes. The portability gate still needs a
-Windows build runner, a selected Windows IPC transport, and the equivalent
-Windows `json-c` proof.
+Linux `json-c` dependency proof passes, and a hosted Windows workflow is
+defined. The first Windows run, selected Windows IPC transport, and equivalent
+Windows `json-c` proof remain pending.
+
+The [Windows build contract](WINDOWS-BUILD.md) defines the hosted MSVC proof,
+native reproduction commands, and the boundary between CI portability and a
+physical audio reference machine.
 
 The portable-core guard rejects platform headers and backend names without
 case-sensitive gaps. Its self-test proves that PipeWire and Carla references

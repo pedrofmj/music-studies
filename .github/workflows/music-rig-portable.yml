@@ -1,0 +1,50 @@
+name: Music Rig Portable Core
+
+on:
+  push:
+    paths:
+      - .github/workflows/music-rig-portable.yml
+      - docs/tools/music-rig/**
+  pull_request:
+    paths:
+      - .github/workflows/music-rig-portable.yml
+      - docs/tools/music-rig/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: music-rig-portable-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable-core:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux GCC
+            os: ubuntu-24.04
+          - name: Windows MSVC
+            os: windows-2025
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Configure portable core
+        run: >-
+          cmake -S docs/tools/music-rig -B build/music-rig
+          -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build portable core and tests
+        run: cmake --build build/music-rig --config Release
+
+      - name: Run portable contract tests
+        run: >-
+          ctest --test-dir build/music-rig -C Release
+          --output-on-failure

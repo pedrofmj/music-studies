@@ -28,8 +28,17 @@ add_executable(music-rig
 target_link_libraries(music-rig PRIVATE music_rig_core)
 
 if(MSVC)
-    target_compile_options(music_rig_core PRIVATE /W4 /WX)
-    target_compile_options(music-rig PRIVATE /W4 /WX)
+    set(MUSIC_RIG_MSVC_COMPILE_OPTIONS
+        /W4
+        /WX
+        /experimental:c11atomics
+    )
+    target_compile_options(music_rig_core PRIVATE
+        ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+    )
+    target_compile_options(music-rig PRIVATE
+        ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+    )
 else()
     target_compile_options(music_rig_core PRIVATE
         -Wall
@@ -56,8 +65,12 @@ if(BUILD_TESTING)
     target_link_libraries(music_rig_protocol_test PRIVATE music_rig_core)
 
     if(MSVC)
-        target_compile_options(music_rig_core_test PRIVATE /W4 /WX)
-        target_compile_options(music_rig_protocol_test PRIVATE /W4 /WX)
+        target_compile_options(music_rig_core_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+        target_compile_options(music_rig_protocol_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
     else()
         target_compile_options(music_rig_core_test PRIVATE
             -Wall
@@ -317,6 +330,25 @@ if(BUILD_TESTING)
             COMMAND "${CMAKE_COMMAND}"
                 "-DOBSERVER=${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/airstar-read-only-observer"
                 -P "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/tests/check-observer-safety.cmake"
+        )
+    elseif(WIN32)
+        add_executable(music_rig_windows_generation_adoption_test
+            tests/windows-generation-adoption-test.c
+        )
+        target_link_libraries(music_rig_windows_generation_adoption_test
+            PRIVATE music_rig_core
+        )
+        target_compile_options(
+            music_rig_windows_generation_adoption_test
+            PRIVATE ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+        add_test(
+            NAME music_rig_windows_generation_adoption
+            COMMAND music_rig_windows_generation_adoption_test
+        )
+        set_tests_properties(
+            music_rig_windows_generation_adoption
+            PROPERTIES TIMEOUT 10
         )
     endif()
 
