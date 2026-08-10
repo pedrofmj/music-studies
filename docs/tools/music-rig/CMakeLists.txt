@@ -253,6 +253,19 @@ if(BUILD_TESTING)
                 PROPERTIES TIMEOUT 10
             )
 
+            find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter)
+            add_test(
+                NAME music_rig_current_rack_startup_contract
+                COMMAND "${Python3_EXECUTABLE}"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/generate-current-rack-startup-transcript"
+                    --check-document
+                    "${CMAKE_CURRENT_SOURCE_DIR}/CURRENT-RACK-STARTUP.md"
+            )
+            set_tests_properties(
+                music_rig_current_rack_startup_contract
+                PROPERTIES TIMEOUT 10
+            )
+
         endif()
         add_test(
             NAME music_rig_airstar_baseline_fixture

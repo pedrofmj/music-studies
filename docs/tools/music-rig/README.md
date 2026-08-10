@@ -86,6 +86,23 @@ No test starts a service or opens a live JACK client. See
 [HELPER-OFFLINE-TESTS.md](HELPER-OFFLINE-TESTS.md) for covered behavior,
 reproduction, and the remaining explicit live-hardware checks.
 
+## Planned Current-Rack Startup
+
+[CURRENT-RACK-STARTUP.md](CURRENT-RACK-STARTUP.md) is a deterministic,
+not-yet-executed startup and validation transcript for the protected rack. Its
+commands, safety classifications, expected counts, service list, hardware list,
+launcher, and recovery policy come from
+[current-rack-startup.json](current-rack-startup.json).
+
+Check or regenerate the planned document without executing any transcript step:
+
+~~~bash
+docs/tools/music-rig/generate-current-rack-startup-transcript --check-document \
+  docs/tools/music-rig/CURRENT-RACK-STARTUP.md
+~~~
+
+Carla launch and musical acceptance remain explicit operator-only phases.
+
 ## Read-Only Airstar Baseline
 
 The Milestone 0 collector observes the protected rack without changing remote

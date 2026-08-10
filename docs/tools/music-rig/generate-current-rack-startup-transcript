@@ -1,0 +1,436 @@
+#!/usr/bin/env python3
+"""Validate and render the protected current-rack startup transcript."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+import textwrap
+from pathlib import Path
+from typing import Any
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parents[2]
+CONTRACT_PATH = SCRIPT_DIR / "current-rack-startup.json"
+SETUP_PATH = REPO_ROOT / "docs/tools/airstar-live-setup/setup.json"
+BASELINE_PATH = REPO_ROOT / "docs/tools/airstar-live-setup/protected-baseline.json"
+DESKTOP_PATH = REPO_ROOT / "bin/carla-pedro-project.desktop"
+LAUNCHER_PATH = REPO_ROOT / "bin/carla-pedro-project"
+VALIDATOR_PATH = (
+    REPO_ROOT / "docs/tools/airstar-live-setup/validate-airstar-live-setup"
+)
+
+READ_ONLY_EXECUTION = {"may-automate-read-only", "operator-read-only"}
+REQUIRED_PHASES = {
+    "repository-preflight",
+    "installed-readiness",
+    "hardware-and-launch",
+    "post-start-validation",
+    "musical-acceptance",
+}
+
+
+class ContractError(RuntimeError):
+    """Raised when the startup contract drifts from protected authority."""
+
+
+def load_json(path: Path) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise ContractError(f"Cannot load {path}: {error}") from error
+    if not isinstance(value, dict):
+        raise ContractError(f"Expected a JSON object in {path}")
+    return value
+
+
+def require(condition: bool, message: str) -> None:
+    if not condition:
+        raise ContractError(message)
+
+
+def step_by_id(contract: dict[str, Any], step_id: str) -> dict[str, Any]:
+    for phase in contract["phases"]:
+        for step in phase["steps"]:
+            if step["id"] == step_id:
+                return step
+    raise ContractError(f"Missing startup step: {step_id}")
+
+
+def validate_contract(
+    contract: dict[str, Any],
+    setup: dict[str, Any],
+    baseline: dict[str, Any],
+) -> None:
+    require(
+        contract.get("schema")
+        == "music-studies/current-rack-startup-contract/v1",
+        "Unsupported startup contract schema",
+    )
+    require(
+        contract.get("status") == "planned-not-executed",
+        "The checked-in transcript must remain planned and unexecuted",
+    )
+    authority = contract.get("authority", {})
+    require(authority.get("production_default") is True, "Production default lost")
+    require(
+        authority.get("setup_manifest")
+        == "docs/tools/airstar-live-setup/setup.json",
+        "Startup contract points to the wrong setup manifest",
+    )
+    require(
+        authority.get("protected_baseline")
+        == "docs/tools/airstar-live-setup/protected-baseline.json",
+        "Startup contract points to the wrong protected baseline",
+    )
+    require(
+        contract.get("reference_host")
+        == setup["reference_host"]["hostname"]
+        == "airstar",
+        "Reference host drift",
+    )
+
+    expected = contract["expected"]
+    baseline_expected = baseline["expected"]
+    checks = {
+        "carla_plugins": setup["carla"]["plugins"],
+        "carla_project_connections": setup["carla"][
+            "project_patchbay_connections"
+        ],
+        "deployment_graph_links": setup["patchbay"]["deployment_links"],
+        "pipewire_quantum_frames": setup["carla"]["pipewire_quantum"],
+    }
+    for key, actual in checks.items():
+        require(expected.get(key) == actual, f"Setup count drift: {key}")
+        require(expected.get(key) == baseline_expected[key], f"Baseline drift: {key}")
+
+    services = [item["name"] for item in setup["services"]]
+    hardware = [item["model"] for item in setup["hardware"]]
+    require(expected.get("services") == services, "Protected service order drift")
+    require(
+        baseline_expected["services"] == len(services),
+        "Protected service count drift",
+    )
+    require(expected.get("hardware_models") == hardware, "Hardware model drift")
+
+    launcher = contract["launcher"]
+    require(
+        launcher["repository_path"] == "bin/carla-pedro-project",
+        "Launcher repository path drift",
+    )
+    require(
+        launcher["project_target"] == setup["paths"]["project_target"],
+        "Launcher project target drift",
+    )
+    require(LAUNCHER_PATH.is_file(), "Protected launcher source is missing")
+    desktop_exec = next(
+        (
+            line.partition("=")[2]
+            for line in DESKTOP_PATH.read_text(encoding="utf-8").splitlines()
+            if line.startswith("Exec=")
+        ),
+        None,
+    )
+    require(desktop_exec == launcher["desktop_exec"], "Desktop launcher drift")
+    launcher_text = LAUNCHER_PATH.read_text(encoding="utf-8")
+    require(
+        setup["paths"]["project_target"] in launcher_text,
+        "Launcher no longer defaults to the protected project",
+    )
+
+    phases = contract.get("phases")
+    require(isinstance(phases, list) and phases, "Startup phases are missing")
+    phase_ids = [phase.get("id") for phase in phases]
+    require(len(phase_ids) == len(set(phase_ids)), "Duplicate startup phase ID")
+    require(set(phase_ids) == REQUIRED_PHASES, "Startup phase set drift")
+
+    step_ids: list[str] = []
+    for phase in phases:
+        execution = phase.get("execution")
+        require(
+            execution in READ_ONLY_EXECUTION | {"operator-only"},
+            f"Unknown execution policy in {phase.get('id')}",
+        )
+        steps = phase.get("steps")
+        require(isinstance(steps, list) and steps, f"Empty phase: {phase.get('id')}")
+        for step in steps:
+            step_id = step.get("id")
+            require(isinstance(step_id, str) and step_id, "Step ID is missing")
+            step_ids.append(step_id)
+            require(
+                isinstance(step.get("mutates_live_state"), bool),
+                f"Mutation classification missing: {step_id}",
+            )
+            require(
+                bool(step.get("command")) != bool(step.get("action")),
+                f"Step must have exactly one command or action: {step_id}",
+            )
+            if execution in READ_ONLY_EXECUTION:
+                require(
+                    step["mutates_live_state"] is False,
+                    f"Read-only phase contains mutation: {step_id}",
+                )
+                command = step.get("command", "")
+                require(" --apply" not in command, f"Apply command automated: {step_id}")
+                require(
+                    not re.search(
+                        r"systemctl(?:\s+--user)?\s+"
+                        r"(?:start|stop|restart|enable|disable)",
+                        command,
+                    ),
+                    f"Service mutation automated: {step_id}",
+                )
+    require(len(step_ids) == len(set(step_ids)), "Duplicate startup step ID")
+
+    require(
+        step_by_id(contract, "launch-protected-rack")["command"]
+        == launcher["installed_command"],
+        "Operator launcher command drift",
+    )
+    require(
+        step_by_id(contract, "validate-live-rack")["command"]
+        == (
+            "docs/tools/airstar-live-setup/"
+            "validate-airstar-live-setup --live --fast"
+        ),
+        "Live validator command drift",
+    )
+
+    validator_text = VALIDATOR_PATH.read_text(encoding="utf-8")
+    require(
+        '"$patchbay_tool" --check-and-restore --dry-run' in validator_text,
+        "Live validator no longer keeps Patchbay validation dry-run",
+    )
+    require(
+        not re.search(
+            r"systemctl(?:\s+--user)?\s+"
+            r"(?:start|stop|restart|enable|disable)",
+            validator_text,
+        ),
+        "Live validator gained a service mutation",
+    )
+
+    failure = contract["failure_policy"]
+    require(failure.get("automatic_restore") is False, "Automatic restore enabled")
+    require(
+        failure.get("restore_preview_command")
+        == "docs/tools/airstar-live-setup/restore-protected-baseline",
+        "Restore preview command drift",
+    )
+    require(
+        failure.get("restore_apply_command") == baseline["restore"]["command"],
+        "Restore apply command drift",
+    )
+    require(
+        baseline["restore"]["preview_is_default"] is True,
+        "Protected restore is no longer preview-first",
+    )
+    require(
+        baseline["restore"]["requires_carla_stopped"] is True,
+        "Protected restore no longer requires Carla stopped",
+    )
+
+
+def render_bullet(label: str, value: str, *, code: bool = False) -> list[str]:
+    prefix = f"   - {label}: "
+    rendered_value = f"`{value}`" if code else value
+    return textwrap.wrap(
+        rendered_value,
+        width=88,
+        initial_indent=prefix,
+        subsequent_indent=" " * len(prefix),
+        break_long_words=False,
+        break_on_hyphens=False,
+    )
+
+
+def render_step(step: dict[str, Any], number: int) -> list[str]:
+    detail_label = "Command" if "command" in step else "Operator action"
+    detail = step.get("command", step.get("action"))
+    mutation = "yes, operator-controlled" if step["mutates_live_state"] else "no"
+    return [
+        f"{number}. **{step['title']}**",
+        "",
+        *render_bullet(
+            detail_label,
+            detail,
+            code=detail_label == "Command",
+        ),
+        *render_bullet("Mutates live state", mutation),
+        *render_bullet("Expected", step["expected"]),
+        "   - Result: ⬜ NOT RUN",
+        "   - Evidence: NOT RECORDED",
+        "",
+    ]
+
+
+def render_document(contract: dict[str, Any]) -> str:
+    expected = contract["expected"]
+    lines = [
+        "# Current Rack Startup And Validation Transcript",
+        "",
+        "Status: **PLANNED - NOT EXECUTED**",
+        "",
+        f"Rig: `{contract['rig']}`",
+        "",
+        f"Rig Profile: `{contract['rig_profile']}`",
+        "",
+        f"Reference host: `{contract['reference_host']}`",
+        "",
+        "This deterministic transcript is generated from",
+        "[current-rack-startup.json](current-rack-startup.json) and checked",
+        "against the protected setup manifest. Generating or checking this document",
+        "does not run any listed command.",
+        "",
+        "## Safety Lock",
+        "",
+        "- The protected single rig remains the production default.",
+        "- Only explicitly classified read-only checks may be automated.",
+        "- Controller connection, Carla launch, and musical checks are operator-only.",
+        "- No failure triggers an automatic restore.",
+        "- Restore remains preview-only unless the operator explicitly uses `--apply`",
+        "  with Carla stopped and a timestamped backup.",
+        "",
+        "## Expected Authority",
+        "",
+        "| Item | Expected |",
+        "| --- | --- |",
+        f"| Carla plugins | {expected['carla_plugins']} |",
+        (
+            "| Carla project connections | "
+            f"{expected['carla_project_connections']} |"
+        ),
+        f"| Deployment graph links | {expected['deployment_graph_links']} |",
+        f"| PipeWire quantum | {expected['pipewire_quantum_frames']} frames |",
+        f"| Services | {len(expected['services'])} |",
+        f"| Controllers | {len(expected['hardware_models'])} |",
+        "",
+        "Expected services:",
+        "",
+    ]
+    lines.extend(f"- `{service}`" for service in expected["services"])
+    lines.extend(["", "Expected controller models:", ""])
+    lines.extend(f"- {model}" for model in expected["hardware_models"])
+    lines.extend(
+        [
+            "",
+            "## Execution Record",
+            "",
+            "| Field | Recorded value |",
+            "| --- | --- |",
+            "| Operator | NOT RECORDED |",
+            "| Started at | NOT RECORDED |",
+            "| Completed at | NOT RECORDED |",
+            "| Hostname | NOT RECORDED |",
+            "| Commit | NOT RECORDED |",
+            "| Final result | ⬜ NOT RUN |",
+            "",
+        ]
+    )
+
+    for phase_number, phase in enumerate(contract["phases"], start=1):
+        lines.extend(
+            [
+                f"## Phase {phase_number}: {phase['title']}",
+                "",
+                f"Execution policy: `{phase['execution']}`",
+                "",
+            ]
+        )
+        for step_number, step in enumerate(phase["steps"], start=1):
+            lines.extend(render_step(step, step_number))
+
+    failure = contract["failure_policy"]
+    lines.extend(
+        [
+            "## Failure Policy",
+            "",
+            "On any failed or ambiguous check:",
+            "",
+            "1. Stop new experimental work and preserve this transcript.",
+            "2. Do not attempt an automatic graph repair or restore.",
+            f"3. Preview recovery with `{failure['restore_preview_command']}`.",
+            "4. Apply recovery only after every recorded prerequisite is satisfied.",
+            "",
+            "Restore apply prerequisites:",
+            "",
+        ]
+    )
+    lines.extend(f"- {item}" for item in failure["apply_requires"])
+    lines.extend(
+        [
+            "",
+            f"Explicit restore command: `{failure['restore_apply_command']}`",
+            "",
+            "## Evidence Status",
+            "",
+            "The procedure and its safety contract are ready. Live startup evidence has",
+            "not been captured. After an operator-controlled run, retain a dated copy",
+            "under `docs/tools/music-rig/benchmarks/` and update the feature tracker",
+            "only from the recorded results.",
+            "",
+            "Generated by `docs/tools/music-rig/generate-current-rack-startup-transcript`.",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Validate or render the current-rack startup transcript."
+    )
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        "--check",
+        action="store_true",
+        help="validate the startup contract without rendering it",
+    )
+    group.add_argument(
+        "--check-document",
+        type=Path,
+        metavar="PATH",
+        help="validate the contract and require PATH to match rendered output",
+    )
+    group.add_argument(
+        "--output",
+        type=Path,
+        metavar="PATH",
+        help="write the deterministic planned transcript to PATH",
+    )
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    try:
+        contract = load_json(CONTRACT_PATH)
+        setup = load_json(SETUP_PATH)
+        baseline = load_json(BASELINE_PATH)
+        validate_contract(contract, setup, baseline)
+        rendered = render_document(contract)
+
+        if args.check_document is not None:
+            actual = args.check_document.read_text(encoding="utf-8")
+            require(
+                actual == rendered,
+                f"Generated transcript drift: {args.check_document}",
+            )
+            print("Startup contract and transcript: OK")
+        elif args.check:
+            print("Startup contract: OK")
+        elif args.output is not None:
+            args.output.write_text(rendered, encoding="utf-8")
+            print(f"Rendered startup transcript: {args.output}")
+        else:
+            sys.stdout.write(rendered)
+    except (ContractError, OSError) as error:
+        print(f"Startup contract validation failed: {error}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

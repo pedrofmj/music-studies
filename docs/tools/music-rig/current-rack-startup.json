@@ -1,0 +1,171 @@
+{
+  "schema": "music-studies/current-rack-startup-contract/v1",
+  "status": "planned-not-executed",
+  "rig": "pedro-performance-rig",
+  "rig_profile": "full-live-rack",
+  "authority": {
+    "setup_manifest": "docs/tools/airstar-live-setup/setup.json",
+    "protected_baseline": "docs/tools/airstar-live-setup/protected-baseline.json",
+    "production_default": true
+  },
+  "reference_host": "airstar",
+  "launcher": {
+    "repository_path": "bin/carla-pedro-project",
+    "installed_command": "~/bin/carla-pedro-project",
+    "desktop_exec": "carla-pedro-project",
+    "project_target": "/c/music/carla/pedro.uproject"
+  },
+  "expected": {
+    "carla_plugins": 49,
+    "carla_project_connections": 111,
+    "deployment_graph_links": 115,
+    "services": [
+      "arturia-main-volume-encoder.service",
+      "smk25-pad-layers.service",
+      "pipewire-carla-quantum.service",
+      "pipewire-patchbay-watch.service"
+    ],
+    "pipewire_quantum_frames": 2048,
+    "hardware_models": [
+      "KeyLab Essential 61 mk3",
+      "M-VAVE SMK-25",
+      "M-VAVE SMC-Mixer",
+      "M-VAVE SMC-PAD",
+      "M-VAVE SMC-PAD Pocket"
+    ]
+  },
+  "phases": [
+    {
+      "id": "repository-preflight",
+      "title": "Repository Preflight",
+      "execution": "may-automate-read-only",
+      "steps": [
+        {
+          "id": "verify-protected-sources",
+          "title": "Verify protected source artifacts",
+          "command": "docs/tools/airstar-live-setup/verify-protected-baseline",
+          "mutates_live_state": false,
+          "expected": "Protected baseline verified: 30 checks, 0 failures"
+        },
+        {
+          "id": "preview-restore",
+          "title": "Preview the recovery path",
+          "command": "docs/tools/airstar-live-setup/restore-protected-baseline",
+          "mutates_live_state": false,
+          "expected": "Preview only; no restore action is applied"
+        }
+      ]
+    },
+    {
+      "id": "installed-readiness",
+      "title": "Installed Readiness On Airstar",
+      "execution": "operator-read-only",
+      "steps": [
+        {
+          "id": "validate-installed-rack",
+          "title": "Validate installed files, assets, and services",
+          "command": "docs/tools/airstar-live-setup/validate-airstar-live-setup --fast",
+          "mutates_live_state": false,
+          "expected": "Validation complete: 0 failures"
+        }
+      ]
+    },
+    {
+      "id": "hardware-and-launch",
+      "title": "Hardware Connection And Rack Launch",
+      "execution": "operator-only",
+      "steps": [
+        {
+          "id": "connect-five-controllers",
+          "title": "Connect all five controllers before launching Carla",
+          "action": "Connect the Arturia, SMK-25, SMC-Mixer, SMC-PAD, and SMC-PAD Pocket and confirm their protected hardware presets.",
+          "mutates_live_state": true,
+          "expected": "One Arturia and four M-VAVE controllers are present"
+        },
+        {
+          "id": "launch-protected-rack",
+          "title": "Launch the protected Carla rack once",
+          "command": "~/bin/carla-pedro-project",
+          "mutates_live_state": true,
+          "expected": "Carla opens /c/music/carla/pedro.uproject and finishes loading 49 plugins"
+        }
+      ]
+    },
+    {
+      "id": "post-start-validation",
+      "title": "Post-Start Read-Only Validation",
+      "execution": "operator-read-only",
+      "steps": [
+        {
+          "id": "validate-live-rack",
+          "title": "Validate controllers, Carla, services, quantum, and graph",
+          "command": "docs/tools/airstar-live-setup/validate-airstar-live-setup --live --fast",
+          "mutates_live_state": false,
+          "expected": "Validation complete: 0 failures; Patchbay check remains dry-run"
+        }
+      ]
+    },
+    {
+      "id": "musical-acceptance",
+      "title": "Operator Musical Acceptance",
+      "execution": "operator-only",
+      "steps": [
+        {
+          "id": "arturia-controls",
+          "title": "Verify Arturia rack controls",
+          "action": "Play keys, move the central CC114 encoder, and press/release CC115 once; confirm volume tracking and click-free stereo mute.",
+          "mutates_live_state": true,
+          "expected": "Instruments play; rack volume and mute respond without an audible click"
+        },
+        {
+          "id": "smk25-layers",
+          "title": "Verify SMK-25 layers",
+          "action": "Toggle one Side-A layer, play and release a chord, then use Stop and Play.",
+          "mutates_live_state": true,
+          "expected": "Layer latch, chord replacement, pause, and resume match the protected behavior"
+        },
+        {
+          "id": "smc-mixer-eq",
+          "title": "Verify SMC-Mixer equalizer",
+          "action": "Move faders 1 through 8 one at a time.",
+          "mutates_live_state": true,
+          "expected": "Only the corresponding protected equalizer band changes"
+        },
+        {
+          "id": "smc-pad-main",
+          "title": "Verify SMC-PAD drums",
+          "action": "Play representative kick, snare, and cymbal pads.",
+          "mutates_live_state": true,
+          "expected": "The protected drum instrument responds at the expected level"
+        },
+        {
+          "id": "smc-pad-pocket",
+          "title": "Verify SMC-PAD Pocket drums",
+          "action": "Play representative kick, snare, and cymbal pads.",
+          "mutates_live_state": true,
+          "expected": "The protected drum instrument responds independently at the expected level"
+        },
+        {
+          "id": "audio-stability",
+          "title": "Verify audible stability",
+          "action": "Play the rack normally for at least two minutes while exercising the five controllers.",
+          "mutates_live_state": true,
+          "expected": "No dropout, stuck note, unintended route, or audible click is observed"
+        }
+      ]
+    }
+  ],
+  "failure_policy": {
+    "automatic_restore": false,
+    "preserve_transcript": true,
+    "stop_new_experiments": true,
+    "restore_preview_command": "docs/tools/airstar-live-setup/restore-protected-baseline",
+    "restore_apply_command": "docs/tools/airstar-live-setup/restore-protected-baseline --apply",
+    "apply_requires": [
+      "explicit operator approval",
+      "Carla stopped",
+      "timestamped backup",
+      "passing protected-source verification"
+    ]
+  }
+}

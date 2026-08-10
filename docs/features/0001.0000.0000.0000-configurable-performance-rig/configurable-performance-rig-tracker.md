@@ -32,12 +32,14 @@ Documents:
 
 | Check | Result |
 | --- | --- |
-| GCC isolated suite | ✅ 12/12 passed |
-| Clang isolated suite | ✅ 12/12 passed |
-| GCC with Linux JSON probe | ✅ 13/13 passed |
-| Clang with Linux JSON probe | ✅ 13/13 passed |
+| GCC isolated suite | ✅ 13/13 passed |
+| Clang isolated suite | ✅ 13/13 passed |
+| GCC with Linux JSON probe | ✅ 14/14 passed |
+| Clang with Linux JSON probe | ✅ 14/14 passed |
 | Arturia offline parity | ✅ MIDI, state, replay, and stereo ramp passed |
 | SMK-25 offline parity | ✅ Self-test, config, and JACK guard passed |
+| Startup contract | ✅ Protected authority and read-only boundaries pass |
+| Live startup transcript | 🟡 Planned; operator execution not performed |
 | Linux JSON parse fixture | ✅ 10,000 iterations, zero failures |
 | Linux JSON average parse | ✅ GCC 10,858 ns; Clang 15,268 ns |
 | Linux JSON linkage | ✅ Default CLI has no `json-c` dependency |
@@ -75,7 +77,9 @@ benchmarks.
   link but also observes one `smc-pad-gain-verify` diagnostic link.
 - ✅ Exercise and record the Arturia and SMK helper
   [offline tests](../../tools/music-rig/HELPER-OFFLINE-TESTS.md).
-- ⬜ Record the repeatable current-rack startup and validation transcript.
+- 🟡 Record the repeatable current-rack startup and validation transcript.
+  The deterministic [planned transcript](../../tools/music-rig/CURRENT-RACK-STARTUP.md)
+  passes drift checks; operator-controlled live evidence remains.
 
 ### Performance And Runtime
 
