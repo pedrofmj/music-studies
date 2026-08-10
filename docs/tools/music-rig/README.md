@@ -33,9 +33,9 @@ ctest --test-dir /tmp/music-rig-build --output-on-failure
 ~~~
 
 The same C sources and CMake project are intended for Linux and Windows. The
-Linux `json-c` dependency proof passes, and a hosted Windows workflow is
-defined. The first Windows run, selected Windows IPC transport, and equivalent
-Windows `json-c` proof remain pending.
+Linux `json-c` dependency proof and hosted Windows workflow pass. `beanstar` is
+the selected [physical Windows reference machine](WINDOWS-REFERENCE.md); the
+Windows IPC round trip and equivalent Windows `json-c` proof remain pending.
 
 The [Windows build contract](WINDOWS-BUILD.md) defines the hosted MSVC proof,
 native reproduction commands, and the boundary between CI portability and a

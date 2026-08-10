@@ -1,7 +1,7 @@
 # Windows Portable Build
 
-Status: hosted Windows proof passed; a physical audio reference machine is not
-yet selected.
+Status: hosted Windows proof passed; `beanstar` is the selected physical
+Windows reference machine, with audio and MIDI certification still pending.
 
 ## Scope
 
@@ -68,11 +68,12 @@ A passing hosted workflow proves:
 
 It does not close these Milestone 0 gates:
 
-- select the physical Windows reference machine;
 - prove the named-pipe round trip on that machine;
 - prove the optional `json-c` build and footprint there; or
 - select the Windows audio, MIDI, plugin-host, and service backends.
 
 The workflow run URL and pinned runner label are recorded with each accepted
-hosted proof. The physical reference-machine evidence will additionally record
-the exact Windows build, hardware, drivers, and backend versions.
+hosted proof. The selected physical machine and its initial read-only inventory
+are recorded in [WINDOWS-REFERENCE.md](WINDOWS-REFERENCE.md). Each physical run
+additionally records the exact Windows build, artifact commit and hash,
+hardware, drivers, and applicable backend versions.

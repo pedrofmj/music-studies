@@ -44,6 +44,7 @@ Documents:
 | Switch benchmark contract | ✅ Valid fixture plus 13 negative semantic cases |
 | Acceptance thresholds | ✅ Selected; platform measurements remain future gates |
 | Windows hosted build | ✅ [Windows 2025 MSVC run](https://github.com/pedrofmj/music-studies/actions/runs/31391585787), 9/9 passed |
+| Windows reference machine | ✅ `beanstar` selected and [inventoried](../../tools/music-rig/WINDOWS-REFERENCE.md) |
 | Portable backend boundary | ✅ PipeWire and Carla names rejected from core |
 | Linux JSON parse fixture | ✅ 10,000 iterations, zero failures |
 | Linux JSON average parse | ✅ GCC 10,858 ns; Clang 15,268 ns |
@@ -109,7 +110,9 @@ benchmarks.
 
 ### Architecture Decisions
 
-- ⬜ Select and record the Windows reference machine.
+- ✅ Select and record the Windows reference machine. `beanstar` and its
+  initial read-only hardware, OS, and media-driver inventory are recorded in
+  [WINDOWS-REFERENCE.md](../../tools/music-rig/WINDOWS-REFERENCE.md).
 - 🟡 Evaluate local named pipes in message mode as the Windows IPC candidate;
   the round-trip proof and final decision remain pending.
 - ✅ Decide whether native PipeWire graph control can wait until Milestone 6.
