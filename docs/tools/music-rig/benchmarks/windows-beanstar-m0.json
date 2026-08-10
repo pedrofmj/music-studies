@@ -1,0 +1,109 @@
+{
+  "schema": "music-studies/windows-reference-run/v1",
+  "captured_at": "2026-08-10T14:59:14.6883221Z",
+  "source_commit": "4e9a4546057872ed291ae79c394f83913bdb9bd5",
+  "reference_machine": {
+    "hostname": "BEANSTAR",
+    "manufacturer": "LENOVO",
+    "product": "Legion 5 15IMH05H",
+    "machine_type": "82CF",
+    "cpu": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+    "physical_cores": 6,
+    "logical_processors": 12,
+    "memory_bytes": 17083187200,
+    "operating_system": "Microsoft Windows 11 Pro",
+    "architecture": "64-bit",
+    "display_version": "25H2",
+    "version": "10.0.26200",
+    "revision": 8875
+  },
+  "hosted_build": {
+    "workflow_run": 31399835507,
+    "workflow_url": "https://github.com/pedrofmj/music-studies/actions/runs/31399835507",
+    "windows_job": 93491745995,
+    "windows_job_url": "https://github.com/pedrofmj/music-studies/actions/runs/31399835507/job/93491745995",
+    "runner_image": "windows-2025-vs2026",
+    "runner_image_version": "20260803.193.1",
+    "compiler": "MSVC 19.51.36252.0",
+    "tests_passed": 10,
+    "tests_failed": 0
+  },
+  "artifact": {
+    "id": 9067155619,
+    "name": "music-rig-windows-reference-4e9a4546057872ed291ae79c394f83913bdb9bd5",
+    "archive_sha256_from_uploader": "05685b0508608fe33603b0fb6a1855670dba2a41ce2cd70aebe924e620efd802",
+    "manifest_created_at": "2026-08-10T14:45:28.2212137Z",
+    "files": [
+      {
+        "name": "music_rig_protocol_test.exe",
+        "bytes": 13312,
+        "sha256": "cd978ff3a227a0e90f04e737422a4d69f113b06b8fc7c1a2251cd18b8ff872af"
+      },
+      {
+        "name": "music_rig_windows_generation_adoption_test.exe",
+        "bytes": 11776,
+        "sha256": "6b4dde53722c9b9c74e26ec9597a12b9e012a914a13dff5c60ecc83907a789f9"
+      },
+      {
+        "name": "music_rig_windows_ipc_roundtrip_test.exe",
+        "bytes": 17408,
+        "sha256": "4a3612edcd860fb8b729cf7dcccb8d1ed443dabdbce07ef33d4c601b508515dd"
+      }
+    ],
+    "local_manifest_match": true,
+    "reference_machine_manifest_match": true
+  },
+  "transfer": {
+    "transport": "key-authenticated OpenSSH and SCP",
+    "temporary_directory": "user TEMP/music-rig-reference-31399835507",
+    "repository_copied_to_reference_machine": false,
+    "service_installed": false
+  },
+  "results": {
+    "portable_protocol_golden_frames": {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    "generation_adoption": {
+      "exit_code": 0,
+      "schema": "music-studies/generation-publication-spike/v1",
+      "adapter": "windows-synthetic-callback",
+      "iterations": 9999,
+      "atomic_pointer_lock_free": true,
+      "maximum_control_commit_ns": 200,
+      "failures": 0
+    },
+    "ipc_round_trip": {
+      "exit_code": 0,
+      "schema": "music-studies/ipc-round-trip-spike/v1",
+      "transport": "windows-named-pipe-message",
+      "security": "current-user-only",
+      "round_trips": 1000,
+      "p50_ns": 8000,
+      "p95_ns": 12000,
+      "p99_ns": 17400,
+      "maximum_ns": 62100,
+      "golden_frames": true,
+      "failures": 0
+    }
+  },
+  "launcher_observation": {
+    "clock": "System.Diagnostics.Stopwatch",
+    "protocol_wall_time_ms": 59.211,
+    "generation_wall_time_ms": 51.132,
+    "ipc_wall_time_ms": 54.736,
+    "peak_working_set_bytes": null,
+    "note": "The short-lived processes exited before the wrapper exposed a peak working-set sample; platform resource certification remains a later gate."
+  },
+  "cleanup": {
+    "temporary_directory_removed": true,
+    "remaining_test_processes": 0,
+    "remaining_test_pipes": 0
+  },
+  "scope": {
+    "synthetic_only": true,
+    "audio_or_midi_apis_opened": false,
+    "audio_or_midi_routes_changed": false,
+    "live_rig_changes": false
+  }
+}

@@ -1,7 +1,8 @@
 # Windows Reference Machine: Beanstar
 
-Status: selected for physical Windows portability and IPC evidence. Audio,
-MIDI, plugin-host, and performance certification remain pending.
+Status: selected; physical portable protocol, generation-adoption, and Windows
+named-pipe IPC evidence pass. Audio, MIDI, plugin-host, and complete performance
+certification remain pending.
 
 ## Role
 
@@ -76,10 +77,15 @@ then, named-pipe and other platform proofs remain synthetic and output-free.
 
 ## Next Evidence
 
-1. Build and review the Windows named-pipe message-mode round-trip test.
-2. Transfer only its versioned artifact bundle to `beanstar`.
-3. Verify the artifact hash, run the portable golden frames and repeated
-   round trips, record timing and resource evidence, and remove the bundle.
-4. Repeat the native generation-adoption test on the same machine.
-5. Inventory and select the Windows audio, MIDI, plugin-host, and service
+The first native bundle passed on 2026-08-10. Its manifest matched locally and
+on `beanstar`; the protocol fixture, generation adoption, and 1,000 named-pipe
+round trips passed; and cleanup left no bundle directory, process, or pipe. See
+[windows-beanstar-m0.json](benchmarks/windows-beanstar-m0.json).
+
+Remaining reference evidence:
+
+1. Prove the optional `json-c` build and footprint on Windows.
+2. Inventory and select the Windows audio, MIDI, plugin-host, and service
    backends before any hardware certification claim.
+3. Add short-process and daemon resource measurement that reliably samples
+   Windows working set and idle CPU.

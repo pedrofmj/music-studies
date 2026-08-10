@@ -1,7 +1,7 @@
 # Music Rig IPC Protocol
 
-Status: Milestone 0 transport and framing spike. This is not yet the complete
-runtime command contract.
+Status: Milestone 0 framing contract with Linux `SOCK_SEQPACKET` and Windows
+named pipes selected. This is not yet the complete runtime command contract.
 
 ## Portable Frame
 
@@ -44,12 +44,13 @@ Before a real daemon is introduced, the adapter must add a runtime-directory
 socket path, peer credential checks, permissions, bounded timeouts, and explicit
 oversized-message rejection.
 
-## Windows Candidate
+## Windows Transport
 
-The candidate Windows transport is a local named pipe in message mode with an
+The selected Windows transport is a local named pipe in message mode with an
 explicit current-user-only ACL and remote clients rejected. It can preserve the
 request/response message boundary while the portable encoder remains unchanged.
 The native test sends the shared request and response golden frames before
-running 1,000 measured round trips. The choice remains provisional until that
-test passes in hosted CI and from a verified artifact on the selected Windows
-reference machine.
+running 1,000 measured round trips. It passes in hosted MSVC CI and from a
+hash-verified artifact on `beanstar`; the accepted transport decision and
+production requirements are recorded in
+[ADR 0004](../../features/0001.0000.0000.0000-configurable-performance-rig/architecture-decisions/0004-windows-local-ipc-named-pipes.md).

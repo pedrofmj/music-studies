@@ -46,6 +46,14 @@ pending.
 See [../JSON-PARSING.md](../JSON-PARSING.md) for the decision boundary and
 evidence interpretation.
 
+## Windows Reference Evidence
+
+[windows-beanstar-m0.json](windows-beanstar-m0.json) records the selected
+physical Windows machine, hosted artifact provenance and hashes, native
+generation-adoption result, named-pipe golden-frame round trips, and cleanup
+evidence. It is a synthetic portability and IPC result, not audio or MIDI
+certification.
+
 ## Portable Switch Benchmark Contract
 
 [SWITCH-BENCHMARK-CONTRACT.md](SWITCH-BENCHMARK-CONTRACT.md) defines the shared

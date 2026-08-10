@@ -43,8 +43,10 @@ Documents:
 | Live startup transcript | 🟡 Planned; operator execution not performed |
 | Switch benchmark contract | ✅ Valid fixture plus 13 negative semantic cases |
 | Acceptance thresholds | ✅ Selected; platform measurements remain future gates |
-| Windows hosted build | ✅ [Windows 2025 MSVC run](https://github.com/pedrofmj/music-studies/actions/runs/31391585787), 9/9 passed |
+| Windows hosted build | ✅ [Windows 2025 MSVC run](https://github.com/pedrofmj/music-studies/actions/runs/31399835507), 10/10 passed |
 | Windows reference machine | ✅ `beanstar` selected and [inventoried](../../tools/music-rig/WINDOWS-REFERENCE.md) |
+| Windows generation adoption | ✅ 9,999 publications; 200 ns maximum commit on `beanstar` |
+| Windows named-pipe round trips | ✅ 1,000 requests; p99 17,400 ns; zero failures on `beanstar` |
 | Portable backend boundary | ✅ PipeWire and Carla names rejected from core |
 | Linux JSON parse fixture | ✅ 10,000 iterations, zero failures |
 | Linux JSON average parse | ✅ GCC 10,858 ns; Clang 15,268 ns |
@@ -96,28 +98,29 @@ benchmarks.
 - ✅ Build the minimal portable C17 core and CLI on Linux.
 - ✅ Build and test the same core and CLI on Windows. The pinned Windows 2025
   [hosted workflow](../../../.github/workflows/music-rig-portable.yml) passed
-  all nine configured tests in
-  [run 31391585787](https://github.com/pedrofmj/music-studies/actions/runs/31391585787).
+  all ten configured tests in
+  [run 31399835507](https://github.com/pedrofmj/music-studies/actions/runs/31399835507).
 - ✅ Prove portable versioned frames and Linux `SOCK_SEQPACKET` round trips.
-- 🟡 Prove the same golden frames through the Windows candidate transport. A
-  current-user-only message-mode named-pipe test and reference artifact bundle
-  are implemented; hosted and `beanstar` runs remain pending.
+- ✅ Prove the same golden frames through the Windows candidate transport. The
+  hosted test and hash-verified `beanstar` artifact pass 1,000 message-mode
+  round trips with zero failures and a 17,400 ns p99.
 - 🟡 Prove `json-c` availability and footprint on Linux and Windows. Linux
   passes with 0.17; Windows remains pending.
 - ✅ Reject platform headers and symbols from the portable core.
 - ✅ Prove lock-free generation publication and synthetic callback adoption.
-- 🟡 Prove generation adoption on the Windows reference build. The native
-  synthetic callback passes hosted Windows CI; the physical reference-machine
-  run remains.
+- ✅ Prove generation adoption on the Windows reference build. The
+  hash-verified native artifact completed 9,999 publications on `beanstar`,
+  remained lock-free, and recorded a 200 ns maximum control commit.
 
 ### Architecture Decisions
 
 - ✅ Select and record the Windows reference machine. `beanstar` and its
   initial read-only hardware, OS, and media-driver inventory are recorded in
   [WINDOWS-REFERENCE.md](../../tools/music-rig/WINDOWS-REFERENCE.md).
-- 🟡 Evaluate local named pipes in message mode as the Windows IPC candidate;
-  the explicit-ACL implementation is ready, while hosted and physical
-  round-trip proof and the final decision remain pending.
+- ✅ Select local named pipes in message mode as the Windows IPC transport.
+  Hosted and physical golden-frame round trips pass; explicit ACL, remote
+  rejection, timeout, and production-rights requirements are recorded in
+  [ADR 0004](architecture-decisions/0004-windows-local-ipc-named-pipes.md).
 - ✅ Decide whether native PipeWire graph control can wait until Milestone 6.
   [ADR 0001](architecture-decisions/0001-pipewire-graph-control-deferral.md)
   defers mutation; pre-Milestone-6 control-only switches require an empty graph

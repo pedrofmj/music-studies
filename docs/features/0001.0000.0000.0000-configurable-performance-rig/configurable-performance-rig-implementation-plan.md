@@ -57,9 +57,9 @@ observed but not removed or added to the protected baseline.
 
 Open Milestone 0 gates include a clean transient-free Airstar capture,
 operator-recorded startup transcript evidence, the Windows `json-c` proof,
-physical validation on the selected `beanstar` Windows reference machine, its
-named-pipe IPC proof, and the Windows backend decision. No experimental runtime
-is installed or connected to the live rig.
+remaining resource evidence on the selected `beanstar` Windows reference
+machine, and the Windows backend decision. No experimental runtime is installed
+or connected to the live rig.
 
 ## Objective
 

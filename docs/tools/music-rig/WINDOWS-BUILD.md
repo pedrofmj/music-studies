@@ -51,9 +51,16 @@ The first pinned Windows proof passed on 2026-08-10:
 - companion Linux GCC job: passed from the same commit and workflow.
 
 The Windows test set covers the core, protocol golden frames, portability guard
-and its self-test, CLI version, three benchmark-contract checks, and native
-generation adoption. The hosted runner is repeatable build evidence, not a
-performance benchmark or hardware certification result.
+and its self-test, CLI version, three benchmark-contract checks, native
+generation adoption, and the named-pipe transport. The hosted runner is
+repeatable build evidence, not an audio benchmark or hardware certification
+result.
+
+The named-pipe implementation first passed on commit
+`4e9a4546057872ed291ae79c394f83913bdb9bd5` in
+[run 31399835507](https://github.com/pedrofmj/music-studies/actions/runs/31399835507),
+where all ten Windows tests passed and the job published a hash-manifested
+reference bundle.
 
 ## Evidence Boundary
 
@@ -68,7 +75,6 @@ A passing hosted workflow proves:
 
 It does not close these Milestone 0 gates:
 
-- prove the named-pipe round trip on that machine;
 - prove the optional `json-c` build and footprint there; or
 - select the Windows audio, MIDI, plugin-host, and service backends.
 
@@ -77,3 +83,7 @@ hosted proof. The selected physical machine and its initial read-only inventory
 are recorded in [WINDOWS-REFERENCE.md](WINDOWS-REFERENCE.md). Each physical run
 additionally records the exact Windows build, artifact commit and hash,
 hardware, drivers, and applicable backend versions.
+
+The named-pipe and generation-adoption bundle passed on `beanstar`; the full
+artifact, timing, and cleanup evidence is in
+[benchmarks/windows-beanstar-m0.json](benchmarks/windows-beanstar-m0.json).
