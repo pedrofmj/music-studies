@@ -9,6 +9,7 @@ Documents:
 - [Feature proposal](configurable-performance-rig.md)
 - [Proposta de funcionalidade (pt-BR)](configurable-performance-rig.pt-BR.md)
 - [Implementation plan](configurable-performance-rig-implementation-plan.md)
+- [Architecture decisions](architecture-decisions/README.md)
 
 ## Status Key
 
@@ -32,15 +33,16 @@ Documents:
 
 | Check | Result |
 | --- | --- |
-| GCC isolated suite | ✅ 16/16 passed |
-| Clang isolated suite | ✅ 16/16 passed |
-| GCC with Linux JSON probe | ✅ 17/17 passed |
-| Clang with Linux JSON probe | ✅ 17/17 passed |
+| GCC isolated suite | ✅ 17/17 passed |
+| Clang isolated suite | ✅ 17/17 passed |
+| GCC with Linux JSON probe | ✅ 18/18 passed |
+| Clang with Linux JSON probe | ✅ 18/18 passed |
 | Arturia offline parity | ✅ MIDI, state, replay, and stereo ramp passed |
 | SMK-25 offline parity | ✅ Self-test, config, and JACK guard passed |
 | Startup contract | ✅ Protected authority and read-only boundaries pass |
 | Live startup transcript | 🟡 Planned; operator execution not performed |
 | Switch benchmark contract | ✅ Valid fixture plus 11 negative semantic cases |
+| Portable backend boundary | ✅ PipeWire and Carla names rejected from core |
 | Linux JSON parse fixture | ✅ 10,000 iterations, zero failures |
 | Linux JSON average parse | ✅ GCC 10,858 ns; Clang 15,268 ns |
 | Linux JSON linkage | ✅ Default CLI has no `json-c` dependency |
@@ -103,10 +105,14 @@ benchmarks.
 - ⬜ Select and record the Windows reference machine.
 - 🟡 Evaluate local named pipes in message mode as the Windows IPC candidate;
   the round-trip proof and final decision remain pending.
-- ⬜ Decide whether native PipeWire graph control can wait until Milestone 6.
+- ✅ Decide whether native PipeWire graph control can wait until Milestone 6.
+  [ADR 0001](architecture-decisions/0001-pipewire-graph-control-deferral.md)
+  defers mutation; pre-Milestone-6 control-only switches require an empty graph
+  delta.
 - ⬜ Record the supported Carla live-control and prepared-engine boundary.
-- 🟡 Write the remaining Milestone 0 architecture decision records. IPC and
-  provisional JSON parsing boundaries are recorded.
+- 🟡 Write the remaining Milestone 0 architecture decision records. IPC,
+  provisional JSON parsing, and PipeWire deferral boundaries are recorded;
+  Carla and the Windows backend remain.
 - ⬜ Confirm or revise CPU, memory, latency, and xrun thresholds.
 
 ## Milestone 1: Schemas And Current Profile Extraction

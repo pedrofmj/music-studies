@@ -25,12 +25,16 @@ Completed Milestone 0 work:
 - opt-in `json-c` 0.17 Linux build, parse-cost, process-RSS, and binary-footprint
   proof with no dependency in the default CLI;
 - repeatable offline parity tests for the protected Arturia and SMK-25 helpers,
-  with no service, JACK-client, graph, or production-state activation; and
+  with no service, JACK-client, graph, or production-state activation;
 - a versioned current-rack startup contract plus deterministic planned
-  transcript with authority-drift and read-only-boundary checks; and
+  transcript with authority-drift and read-only-boundary checks;
 - a portable versioned switch-benchmark result contract that separates commit,
   real-time adoption, resources, and stability across idle, normal-performance,
-  and high-MIDI-load scenarios.
+  and high-MIDI-load scenarios; and
+- an accepted
+  [PipeWire graph-control decision](architecture-decisions/0001-pipewire-graph-control-deferral.md)
+  that requires an empty graph delta for every pre-Milestone-6 control-only
+  switch.
 
 The Airstar observation matches the protected Carla checksum, 49 plugins, 111
 project connections, all protected graph links, 2048-frame quantum, 48 kHz

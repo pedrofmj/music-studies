@@ -17,7 +17,8 @@ set(FORBIDDEN_TOKENS
     "sys/socket.h"
     "sys/un.h"
     "jack/"
-    "pipewire/"
+    "pipewire"
+    "carla"
     "systemd/"
     "pthread_"
     "jack_"
@@ -27,8 +28,9 @@ set(FORBIDDEN_TOKENS
 
 foreach(CORE_FILE IN LISTS CORE_FILES)
     file(READ "${CORE_FILE}" CONTENTS)
+    string(TOLOWER "${CONTENTS}" NORMALIZED_CONTENTS)
     foreach(FORBIDDEN_TOKEN IN LISTS FORBIDDEN_TOKENS)
-        string(FIND "${CONTENTS}" "${FORBIDDEN_TOKEN}" TOKEN_INDEX)
+        string(FIND "${NORMALIZED_CONTENTS}" "${FORBIDDEN_TOKEN}" TOKEN_INDEX)
         if(NOT TOKEN_INDEX EQUAL -1)
             message(FATAL_ERROR
                 "Portable core file ${CORE_FILE} contains forbidden token "

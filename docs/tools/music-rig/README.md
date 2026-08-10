@@ -37,6 +37,11 @@ Linux `json-c` dependency proof now passes. The portability gate still needs a
 Windows build runner, a selected Windows IPC transport, and the equivalent
 Windows `json-c` proof.
 
+The portable-core guard rejects platform headers and backend names without
+case-sensitive gaps. Its self-test proves that PipeWire and Carla references
+fail while neutral portable C passes. Backend adapters remain outside the core
+library.
+
 ## Atomic Generation Spike
 
 The portable core publishes immutable mapping generations through lock-free

@@ -82,6 +82,17 @@ if(BUILD_TESTING)
             -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-portable-core.cmake"
     )
     add_test(
+        NAME music_rig_core_portability_guard_self_test
+        COMMAND "${CMAKE_COMMAND}"
+            "-DCHECK_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/tests/check-portable-core.cmake"
+            "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/portable-core-guard-self-test"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-portable-core-guard.cmake"
+    )
+    set_tests_properties(
+        music_rig_core_portability_guard_self_test
+        PROPERTIES TIMEOUT 10
+    )
+    add_test(
         NAME music_rig_cli_version
         COMMAND $<TARGET_FILE:music-rig> --version
     )
