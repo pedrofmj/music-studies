@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.music-studies.dev/performance-rig/v1/rig-profile.schema.json",
+  "title": "Performance Rig v1 Rig Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "id",
+    "display_name",
+    "device_profiles",
+    "readiness",
+    "takeover_policy",
+    "state_policy",
+    "required_capabilities",
+    "ownership",
+    "preparation",
+    "switch_safety"
+  ],
+  "properties": {
+    "schema": {
+      "$ref": "common.schema.json#/$defs/schema_version"
+    },
+    "kind": {
+      "const": "rig-profile"
+    },
+    "id": {
+      "$ref": "common.schema.json#/$defs/identifier"
+    },
+    "display_name": {
+      "$ref": "common.schema.json#/$defs/display_name"
+    },
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "device_profiles": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "$ref": "common.schema.json#/$defs/identifier"
+      },
+      "additionalProperties": {
+        "$ref": "common.schema.json#/$defs/identifier"
+      }
+    },
+    "readiness": {
+      "$ref": "common.schema.json#/$defs/readiness_class"
+    },
+    "takeover_policy": {
+      "$ref": "common.schema.json#/$defs/takeover_policy"
+    },
+    "state_policy": {
+      "$ref": "common.schema.json#/$defs/state_policy"
+    },
+    "required_capabilities": {
+      "$ref": "common.schema.json#/$defs/semantic_identifier_array"
+    },
+    "ownership": {
+      "$ref": "common.schema.json#/$defs/ownership_claims"
+    },
+    "preparation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pinned_capabilities"
+      ],
+      "properties": {
+        "pinned_capabilities": {
+          "$ref": "common.schema.json#/$defs/semantic_identifier_array"
+        },
+        "memory_ceiling_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "shared_resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "engines": {
+          "$ref": "common.schema.json#/$defs/semantic_identifier_array"
+        },
+        "effects": {
+          "$ref": "common.schema.json#/$defs/semantic_identifier_array"
+        },
+        "routes": {
+          "$ref": "common.schema.json#/$defs/semantic_identifier_array"
+        }
+      }
+    },
+    "initial_state": {
+      "$ref": "common.schema.json#/$defs/state_map"
+    },
+    "switch_safety": {
+      "$ref": "common.schema.json#/$defs/switch_safety"
+    }
+  }
+}

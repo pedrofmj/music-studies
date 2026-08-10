@@ -1,0 +1,49 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "rig-profile",
+  "id": "fixture-live",
+  "display_name": "Fixture Live",
+  "device_profiles": {
+    "fixture-controller": "fixture-role"
+  },
+  "readiness": "control-only",
+  "takeover_policy": {
+    "default": "ignore-until-moved",
+    "volume": "pickup"
+  },
+  "state_policy": "persist",
+  "required_capabilities": [
+    "midi.input",
+    "parameter.master.volume"
+  ],
+  "ownership": [
+    {
+      "kind": "route",
+      "target": "route.main-output",
+      "mode": "exclusive"
+    }
+  ],
+  "preparation": {
+    "pinned_capabilities": [
+      "engine.fixture"
+    ],
+    "memory_ceiling_bytes": 50000000
+  },
+  "shared_resources": {
+    "engines": [
+      "engine.fixture"
+    ],
+    "effects": [],
+    "routes": [
+      "route.main-output"
+    ]
+  },
+  "initial_state": {
+    "master.volume": 0.75
+  },
+  "switch_safety": {
+    "on_failure": "retain-active",
+    "rollback": "required",
+    "transition": "preserve"
+  }
+}

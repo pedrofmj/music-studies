@@ -1,0 +1,2 @@
+# Offline authoring and test dependency; never loaded by music-rig or music-rigd.
+jsonschema==4.23.0

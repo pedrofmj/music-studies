@@ -33,8 +33,8 @@ Documents:
 
 | Check | Result |
 | --- | --- |
-| GCC isolated suite | ✅ 17/17 passed |
-| Clang isolated suite | ✅ 17/17 passed |
+| GCC isolated suite | ✅ 18/18 passed |
+| Clang isolated suite | ✅ 18/18 passed |
 | GCC with Linux JSON probe | ✅ 18/18 passed |
 | Clang with Linux JSON probe | ✅ 18/18 passed |
 | Arturia offline parity | ✅ MIDI, state, replay, and stereo ramp passed |
@@ -59,6 +59,7 @@ Documents:
 | Windows short-process resources | ✅ `music-rig --version`: 1,970,176-byte observed peak working set, 23 handles, 1 thread, clean exit |
 | Windows 60-second idle resources | ✅ 60.259 s, 0.000000% measured child CPU, 3,670,016-byte observed peak working set, 65 handles, 4 threads, zero events |
 | Windows resource cleanup | ✅ Zero remaining test processes; temporary directory removed and independently confirmed |
+| Portable profile schemas | ✅ Six Draft 2020-12 schemas; five valid and five invalid fixtures pass |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -72,7 +73,7 @@ benchmarks.
 | Milestone | State | Exit gate |
 | --- | --- | --- |
 | 0. Baseline and technical gates | ✅ | Baseline reproducible and technical gates passed |
-| 1. Schemas and current profile extraction | ⬜ | Not started |
+| 1. Schemas and current profile extraction | 🟡 | Schema foundation passes; current-profile extraction remains |
 | 2. Deterministic compiler and parity | ⬜ | Not started |
 | 3. Runtime, CLI, and shadow mode | ⬜ | Not started |
 | 4. Control-only switching | ⬜ | Not started |
@@ -162,14 +163,22 @@ benchmarks.
 
 ## Milestone 1: Schemas And Current Profile Extraction
 
-- ⬜ Add versioned Rig, Rig Profile, Device Profile, Hardware Preset, trigger,
-  common, and platform-binding schemas.
-- ⬜ Define stable device slots and ordered physical selectors.
+- ✅ Add the six versioned Rig, Rig Profile, Device Profile, Hardware Preset,
+  Switch Trigger, and common schemas. The offline
+  [validator](../../tools/music-rig/validate-performance-rig.py) checks each
+  Draft 2020-12 schema and ten positive/negative fixtures on the default CTest
+  path without activating any runtime component.
+- 🟡 Define stable device slots and ordered physical selectors. The portable
+  selector contract is present; extraction of the five concrete slots remains.
 - ⬜ Extract the five current Device Profiles and their Hardware Presets.
 - ⬜ Add the `full-live-rack` Rig Profile.
-- ⬜ Model ownership, semantic capabilities, readiness, and takeover policies.
+- 🟡 Model ownership, semantic capabilities, readiness, and takeover policies.
+  Their strict shared types are present; current-profile claims remain to be
+  extracted and checked across documents.
 - ⬜ Add Linux bindings and Windows contract fixtures.
-- ⬜ Add schema, reference, collision, ownership, and ambiguity tests.
+- 🟡 Add schema, reference, collision, ownership, and ambiguity tests. Schema
+  structure and portability-negative coverage pass; cross-document semantic
+  checks remain.
 
 ## Milestone 2: Deterministic Compiler And Parity
 

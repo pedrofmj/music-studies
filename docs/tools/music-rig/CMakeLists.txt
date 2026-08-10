@@ -111,6 +111,20 @@ if(BUILD_TESTING)
     )
 
     find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter)
+    set(MUSIC_RIG_PROFILE_SCHEMA_VALIDATOR
+        "${CMAKE_CURRENT_SOURCE_DIR}/validate-performance-rig.py"
+    )
+    add_test(
+        NAME music_rig_profile_schema_self_test
+        COMMAND "${Python3_EXECUTABLE}"
+            "${MUSIC_RIG_PROFILE_SCHEMA_VALIDATOR}"
+            --self-test
+    )
+    set_tests_properties(
+        music_rig_profile_schema_self_test
+        PROPERTIES TIMEOUT 10
+    )
+
     set(MUSIC_RIG_SWITCH_BENCHMARK_VALIDATOR
         "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/validate-switch-benchmark"
     )

@@ -1,0 +1,310 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.music-studies.dev/performance-rig/v1/common.schema.json",
+  "title": "Performance Rig v1 common definitions",
+  "$defs": {
+    "schema_version": {
+      "const": "music-studies/performance-rig/v1"
+    },
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "semantic_identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$"
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "identifier_array": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/identifier"
+      },
+      "uniqueItems": true
+    },
+    "semantic_identifier_array": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/semantic_identifier"
+      },
+      "uniqueItems": true
+    },
+    "platform": {
+      "enum": [
+        "linux",
+        "windows",
+        "macos"
+      ]
+    },
+    "readiness_class": {
+      "enum": [
+        "control-only",
+        "prepared",
+        "cold"
+      ]
+    },
+    "takeover_mode": {
+      "enum": [
+        "jump",
+        "pickup",
+        "scaled-pickup",
+        "ignore-until-moved"
+      ]
+    },
+    "takeover_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default",
+        "volume"
+      ],
+      "properties": {
+        "default": {
+          "$ref": "#/$defs/takeover_mode"
+        },
+        "volume": {
+          "enum": [
+            "pickup",
+            "scaled-pickup",
+            "ignore-until-moved"
+          ]
+        }
+      }
+    },
+    "state_policy": {
+      "enum": [
+        "persist",
+        "reset-to-authored",
+        "follow-engine"
+      ]
+    },
+    "selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "value",
+        "required"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "model",
+            "endpoint-purpose",
+            "semantic-alias",
+            "local-discriminator",
+            "usb-id"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "midi_event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "channel",
+        "number"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "cc",
+            "note",
+            "program-change"
+          ]
+        },
+        "channel": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16
+        },
+        "number": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 127
+        },
+        "edge": {
+          "enum": [
+            "any",
+            "change",
+            "press",
+            "release"
+          ]
+        }
+      }
+    },
+    "transform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "direct",
+            "scale",
+            "toggle",
+            "relative"
+          ]
+        },
+        "input_min": {
+          "type": "number"
+        },
+        "input_max": {
+          "type": "number"
+        },
+        "output_min": {
+          "type": "number"
+        },
+        "output_max": {
+          "type": "number"
+        },
+        "relative_encoding": {
+          "enum": [
+            "binary-offset",
+            "sign-magnitude",
+            "twos-complement"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "scale"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "input_min",
+              "input_max",
+              "output_min",
+              "output_max"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "relative"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "relative_encoding"
+            ]
+          }
+        }
+      ]
+    },
+    "ownership_claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "target",
+        "mode"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "midi-event",
+            "semantic-control",
+            "parameter",
+            "helper",
+            "engine",
+            "effect",
+            "port",
+            "route",
+            "state-key",
+            "feedback"
+          ]
+        },
+        "target": {
+          "$ref": "#/$defs/semantic_identifier"
+        },
+        "mode": {
+          "enum": [
+            "exclusive",
+            "shared-event-destination",
+            "read-only"
+          ]
+        }
+      }
+    },
+    "ownership_claims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ownership_claim"
+      },
+      "uniqueItems": true
+    },
+    "state_value": {
+      "type": [
+        "boolean",
+        "number",
+        "string",
+        "null"
+      ]
+    },
+    "state_map": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/semantic_identifier"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/state_value"
+      }
+    },
+    "switch_safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "on_failure",
+        "rollback"
+      ],
+      "properties": {
+        "on_failure": {
+          "const": "retain-active"
+        },
+        "rollback": {
+          "const": "required"
+        },
+        "transition": {
+          "enum": [
+            "preserve",
+            "ramp",
+            "crossfade"
+          ]
+        }
+      }
+    }
+  }
+}

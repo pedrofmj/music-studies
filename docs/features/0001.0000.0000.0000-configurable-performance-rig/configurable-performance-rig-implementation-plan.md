@@ -2,8 +2,8 @@
 
 Language: **English**
 
-Status: Milestone 0 complete; Milestone 1 is next. The protected single-rig
-deployment remains the production default.
+Status: Milestone 1 in progress. The protected single-rig deployment remains
+the production default.
 
 Related documents:
 
@@ -75,6 +75,16 @@ All Milestone 0 baseline and technical gates pass. No experimental runtime is
 installed or connected to the live rig. Windows audio, MIDI, plugin-host,
 lifecycle, and production-runtime certification remain explicitly deferred to
 Milestone 7.
+
+Milestone 1 schema work now includes six strict Draft 2020-12 schemas for the
+Rig, Rig Profile, Device Profile, Hardware Preset, Switch Triggers, and shared
+types under
+[`src/performance-rigs/pedro-performance-rig`](../../../src/performance-rigs/pedro-performance-rig/).
+The portable contract covers stable-slot selectors, semantic capabilities,
+ownership modes, readiness, takeover, state, raw hardware MIDI, switch safety,
+and future MIDI management operations. A pinned authoring-only validator checks
+all schemas plus five valid and five invalid fixtures on Linux and Windows.
+No runtime or deployment path consumes these authored documents yet.
 
 ## Objective
 

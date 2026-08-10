@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.music-studies.dev/performance-rig/v1/device-profile.schema.json",
+  "title": "Performance Rig v1 Device Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "id",
+    "display_name",
+    "slot",
+    "compatible_models",
+    "hardware_preset",
+    "required_endpoints",
+    "required_capabilities",
+    "readiness",
+    "takeover_policy",
+    "state_policy",
+    "mappings",
+    "ownership",
+    "dependencies",
+    "switch_safety"
+  ],
+  "properties": {
+    "schema": {
+      "$ref": "common.schema.json#/$defs/schema_version"
+    },
+    "kind": {
+      "const": "device-profile"
+    },
+    "id": {
+      "$ref": "common.schema.json#/$defs/identifier"
+    },
+    "display_name": {
+      "$ref": "common.schema.json#/$defs/display_name"
+    },
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "slot": {
+      "$ref": "common.schema.json#/$defs/identifier"
+    },
+    "compatible_models": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+      }
+    },
+    "hardware_preset": {
+      "$ref": "common.schema.json#/$defs/identifier"
+    },
+    "required_endpoints": {
+      "$ref": "common.schema.json#/$defs/semantic_identifier_array",
+      "minItems": 1
+    },
+    "required_capabilities": {
+      "$ref": "common.schema.json#/$defs/semantic_identifier_array"
+    },
+    "readiness": {
+      "$ref": "common.schema.json#/$defs/readiness_class"
+    },
+    "takeover_policy": {
+      "$ref": "common.schema.json#/$defs/takeover_policy"
+    },
+    "state_policy": {
+      "$ref": "common.schema.json#/$defs/state_policy"
+    },
+    "mappings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/mapping"
+      }
+    },
+    "ownership": {
+      "$ref": "common.schema.json#/$defs/ownership_claims"
+    },
+    "dependencies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engines",
+        "effects",
+        "routes",
+        "helpers",
+        "assets"
+      ],
+      "properties": {
+        "engines": {
+          "$ref": "common.schema.json#/$defs/semantic_identifier_array"
+        },
+        "effects": {
+          "$ref": "common.schema.json#/$defs/semantic_identifier_array"
+        },
+        "routes": {
+          "$ref": "common.schema.json#/$defs/semantic_identifier_array"
+        },
+        "helpers": {
+          "$ref": "common.schema.json#/$defs/semantic_identifier_array"
+        },
+        "assets": {
+          "$ref": "common.schema.json#/$defs/semantic_identifier_array"
+        }
+      }
+    },
+    "default_state": {
+      "$ref": "common.schema.json#/$defs/state_map"
+    },
+    "switch_safety": {
+      "$ref": "common.schema.json#/$defs/switch_safety"
+    }
+  },
+  "$defs": {
+    "mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source_control",
+        "target"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/identifier"
+        },
+        "source_control": {
+          "$ref": "common.schema.json#/$defs/identifier"
+        },
+        "target": {
+          "$ref": "common.schema.json#/$defs/semantic_identifier"
+        },
+        "transform": {
+          "$ref": "common.schema.json#/$defs/transform"
+        },
+        "takeover": {
+          "$ref": "common.schema.json#/$defs/takeover_mode"
+        }
+      }
+    }
+  }
+}

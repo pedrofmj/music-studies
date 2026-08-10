@@ -2,9 +2,9 @@
 
 This directory contains the Configurable Performance Rig implementation.
 
-Status: Milestone 0 technical gates complete with a portable core and CLI
-skeleton. It does not install a service, read or write runtime state, connect
-to MIDI or audio, or modify the stable Carla/PipeWire setup.
+Status: Milestone 1 schema extraction in progress, with Milestone 0 technical
+gates complete. It does not install a service, read or write runtime state,
+connect to MIDI or audio, or modify the stable Carla/PipeWire setup.
 
 ## Safety Boundary
 
@@ -22,11 +22,16 @@ Both commands above are read-only. Restoration requires an explicit
 
 ## Build And Test
 
-Build outside the repository working tree:
+Install the pinned authoring-only schema validator and build outside the
+repository working tree:
 
 ~~~bash
+python3 -m venv /tmp/music-rig-schema-venv
+/tmp/music-rig-schema-venv/bin/python -m pip install \
+  -r docs/tools/music-rig/requirements-schema.txt
 cmake -S docs/tools/music-rig -B /tmp/music-rig-build -G Ninja \
-  -DCMAKE_BUILD_TYPE=Release
+  -DCMAKE_BUILD_TYPE=Release \
+  -DPython3_EXECUTABLE=/tmp/music-rig-schema-venv/bin/python
 cmake --build /tmp/music-rig-build
 ctest --test-dir /tmp/music-rig-build --output-on-failure
 /tmp/music-rig-build/music-rig --version
@@ -50,6 +55,22 @@ samples the short CLI process and a 60-second synthetic event-waiting daemon,
 including working set, CPU, threads, handles, shutdown, and cleanup. It opens
 no audio or MIDI API and does not certify the future production daemon or live
 Windows backends.
+
+## Portable Profile Schemas
+
+The six strict Draft 2020-12 schemas under
+[`src/performance-rigs/pedro-performance-rig`](../../../src/performance-rigs/pedro-performance-rig/)
+define the portable v1 authoring boundary. The default CTest suite validates
+the schemas themselves and five positive plus five negative document fixtures.
+The Python `jsonschema` dependency is used only by authoring and tests; neither
+the C CLI nor the future resident runtime loads it.
+
+Run the validator directly:
+
+~~~bash
+/tmp/music-rig-schema-venv/bin/python \
+  docs/tools/music-rig/validate-performance-rig.py --self-test
+~~~
 
 The portable-core guard rejects platform headers and backend names without
 case-sensitive gaps. Its self-test proves that PipeWire and Carla references

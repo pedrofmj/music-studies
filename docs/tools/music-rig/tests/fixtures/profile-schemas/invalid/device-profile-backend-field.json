@@ -1,0 +1,35 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "device-profile",
+  "id": "fixture-role",
+  "display_name": "Fixture Role",
+  "slot": "fixture-controller",
+  "compatible_models": [
+    "Fixture Controller Model"
+  ],
+  "hardware_preset": "fixture-preset",
+  "required_endpoints": [
+    "midi.performance-input"
+  ],
+  "required_capabilities": [],
+  "readiness": "control-only",
+  "takeover_policy": {
+    "default": "ignore-until-moved",
+    "volume": "pickup"
+  },
+  "state_policy": "persist",
+  "mappings": [],
+  "ownership": [],
+  "dependencies": {
+    "engines": [],
+    "effects": [],
+    "routes": [],
+    "helpers": [],
+    "assets": []
+  },
+  "switch_safety": {
+    "on_failure": "retain-active",
+    "rollback": "required"
+  },
+  "carla_parameter": 17
+}

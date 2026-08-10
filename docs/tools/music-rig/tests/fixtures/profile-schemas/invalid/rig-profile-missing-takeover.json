@@ -1,0 +1,20 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "rig-profile",
+  "id": "fixture-live",
+  "display_name": "Fixture Live",
+  "device_profiles": {
+    "fixture-controller": "fixture-role"
+  },
+  "readiness": "control-only",
+  "state_policy": "persist",
+  "required_capabilities": [],
+  "ownership": [],
+  "preparation": {
+    "pinned_capabilities": []
+  },
+  "switch_safety": {
+    "on_failure": "retain-active",
+    "rollback": "required"
+  }
+}

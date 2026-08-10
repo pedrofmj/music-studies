@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.music-studies.dev/performance-rig/v1/hardware-preset.schema.json",
+  "title": "Performance Rig v1 Hardware Preset",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "id",
+    "display_name",
+    "device_models",
+    "controls"
+  ],
+  "properties": {
+    "schema": {
+      "$ref": "common.schema.json#/$defs/schema_version"
+    },
+    "kind": {
+      "const": "hardware-preset"
+    },
+    "id": {
+      "$ref": "common.schema.json#/$defs/identifier"
+    },
+    "display_name": {
+      "$ref": "common.schema.json#/$defs/display_name"
+    },
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "device_models": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+      }
+    },
+    "preset_slot": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "configuration_tool": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "controls": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/control"
+      }
+    }
+  },
+  "$defs": {
+    "control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "physical_control",
+        "behavior",
+        "message"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/identifier"
+        },
+        "physical_control": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "behavior": {
+          "enum": [
+            "absolute",
+            "relative",
+            "momentary",
+            "toggle"
+          ]
+        },
+        "message": {
+          "$ref": "common.schema.json#/$defs/midi_event"
+        },
+        "off_value": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 127
+        },
+        "on_value": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 127
+        },
+        "relative_encoding": {
+          "enum": [
+            "binary-offset",
+            "sign-magnitude",
+            "twos-complement"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "behavior": {
+                "const": "relative"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "relative_encoding"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "behavior": {
+                "const": "toggle"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "off_value",
+              "on_value"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

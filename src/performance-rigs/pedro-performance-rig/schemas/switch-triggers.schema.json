@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.music-studies.dev/performance-rig/v1/switch-triggers.schema.json",
+  "title": "Performance Rig v1 Switch Triggers",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "id",
+    "rig",
+    "layer",
+    "triggers"
+  ],
+  "properties": {
+    "schema": {
+      "$ref": "common.schema.json#/$defs/schema_version"
+    },
+    "kind": {
+      "const": "switch-triggers"
+    },
+    "id": {
+      "$ref": "common.schema.json#/$defs/identifier"
+    },
+    "rig": {
+      "$ref": "common.schema.json#/$defs/identifier"
+    },
+    "layer": {
+      "const": "management"
+    },
+    "triggers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/trigger"
+      }
+    }
+  },
+  "$defs": {
+    "trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source_slot",
+        "event",
+        "operation",
+        "consume",
+        "debounce_ms",
+        "maximum_readiness"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/identifier"
+        },
+        "source_slot": {
+          "$ref": "common.schema.json#/$defs/identifier"
+        },
+        "event": {
+          "allOf": [
+            {
+              "$ref": "common.schema.json#/$defs/midi_event"
+            },
+            {
+              "required": [
+                "edge"
+              ]
+            }
+          ]
+        },
+        "operation": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/activate_rig_profile"
+            },
+            {
+              "$ref": "#/$defs/activate_device_profile"
+            },
+            {
+              "$ref": "#/$defs/reset_device_profile"
+            }
+          ]
+        },
+        "consume": {
+          "type": "boolean"
+        },
+        "debounce_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5000
+        },
+        "maximum_readiness": {
+          "enum": [
+            "control-only",
+            "prepared"
+          ]
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "activate_rig_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "rig_profile"
+      ],
+      "properties": {
+        "type": {
+          "const": "activate-rig-profile"
+        },
+        "rig_profile": {
+          "$ref": "common.schema.json#/$defs/identifier"
+        }
+      }
+    },
+    "activate_device_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "slot",
+        "device_profile"
+      ],
+      "properties": {
+        "type": {
+          "const": "activate-device-profile"
+        },
+        "slot": {
+          "$ref": "common.schema.json#/$defs/identifier"
+        },
+        "device_profile": {
+          "$ref": "common.schema.json#/$defs/identifier"
+        }
+      }
+    },
+    "reset_device_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "slot"
+      ],
+      "properties": {
+        "type": {
+          "const": "reset-device-profile"
+        },
+        "slot": {
+          "$ref": "common.schema.json#/$defs/identifier"
+        }
+      }
+    }
+  }
+}

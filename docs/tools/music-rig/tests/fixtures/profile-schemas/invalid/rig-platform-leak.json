@@ -1,0 +1,46 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "performance-rig",
+  "id": "fixture-rig",
+  "display_name": "Fixture Rig",
+  "default_rig_profile": "fixture-live",
+  "device_slots": [
+    {
+      "id": "fixture-controller",
+      "display_name": "Fixture Controller",
+      "compatible_models": [
+        "Fixture Controller Model"
+      ],
+      "required_endpoints": [
+        "midi.performance-input"
+      ],
+      "selectors": [
+        {
+          "kind": "model",
+          "value": "Fixture Controller Model",
+          "required": true
+        },
+        {
+          "kind": "endpoint-purpose",
+          "value": "performance-input",
+          "required": true
+        }
+      ],
+      "available_device_profiles": [
+        "fixture-role"
+      ],
+      "pipewire_alias": "backend-specific-name"
+    }
+  ],
+  "rig_profiles": [
+    "fixture-live"
+  ],
+  "hardware_presets": [
+    "fixture-preset"
+  ],
+  "switch_triggers": "fixture-triggers",
+  "required_platforms": [
+    "linux",
+    "windows"
+  ]
+}

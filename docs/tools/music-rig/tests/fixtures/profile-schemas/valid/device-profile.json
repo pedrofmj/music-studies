@@ -1,0 +1,62 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "device-profile",
+  "id": "fixture-role",
+  "display_name": "Fixture Role",
+  "slot": "fixture-controller",
+  "compatible_models": [
+    "Fixture Controller Model"
+  ],
+  "hardware_preset": "fixture-preset",
+  "required_endpoints": [
+    "midi.performance-input"
+  ],
+  "required_capabilities": [
+    "parameter.master.volume"
+  ],
+  "readiness": "control-only",
+  "takeover_policy": {
+    "default": "ignore-until-moved",
+    "volume": "pickup"
+  },
+  "state_policy": "persist",
+  "mappings": [
+    {
+      "id": "master-fader",
+      "source_control": "fader-1",
+      "target": "master.volume",
+      "transform": {
+        "type": "scale",
+        "input_min": 0,
+        "input_max": 127,
+        "output_min": 0,
+        "output_max": 1
+      },
+      "takeover": "pickup"
+    }
+  ],
+  "ownership": [
+    {
+      "kind": "parameter",
+      "target": "master.volume",
+      "mode": "exclusive"
+    }
+  ],
+  "dependencies": {
+    "engines": [
+      "engine.fixture"
+    ],
+    "effects": [],
+    "routes": [],
+    "helpers": [],
+    "assets": []
+  },
+  "default_state": {
+    "master.volume": 0.75
+  },
+  "switch_safety": {
+    "on_failure": "retain-active",
+    "rollback": "required",
+    "transition": "preserve"
+  }
+}

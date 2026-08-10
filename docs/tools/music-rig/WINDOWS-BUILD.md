@@ -29,8 +29,12 @@ From a Visual Studio 2022 version 17.5 or newer developer PowerShell with CMake
 and Python available:
 
 ```powershell
+py -m venv $env:TEMP\music-rig-schema-venv
+& $env:TEMP\music-rig-schema-venv\Scripts\python.exe -m pip install `
+  -r docs/tools/music-rig/requirements-schema.txt
 cmake -S docs/tools/music-rig -B build/music-rig `
-  -DCMAKE_BUILD_TYPE=Release
+  -DCMAKE_BUILD_TYPE=Release `
+  -DPython3_EXECUTABLE=$env:TEMP\music-rig-schema-venv\Scripts\python.exe
 cmake --build build/music-rig --config Release
 ctest --test-dir build/music-rig -C Release --output-on-failure
 ```
@@ -38,7 +42,9 @@ ctest --test-dir build/music-rig -C Release --output-on-failure
 No service is installed and no audio or MIDI API is opened. The default build
 does not discover or link `json-c`. CMake enables MSVC's
 `/experimental:c11atomics` option explicitly; the tests then require pointer
-atomics to report lock-free behavior at runtime.
+atomics to report lock-free behavior at runtime. The pinned Python
+`jsonschema` package is an offline authoring/test dependency and is not linked
+or loaded by the C CLI or runtime.
 
 ## Hosted Evidence
 

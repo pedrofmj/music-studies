@@ -1,0 +1,59 @@
+{
+  "cases": [
+    {
+      "path": "valid/rig.json",
+      "kind": "performance-rig",
+      "valid": true
+    },
+    {
+      "path": "valid/rig-profile.json",
+      "kind": "rig-profile",
+      "valid": true
+    },
+    {
+      "path": "valid/device-profile.json",
+      "kind": "device-profile",
+      "valid": true
+    },
+    {
+      "path": "valid/hardware-preset.json",
+      "kind": "hardware-preset",
+      "valid": true
+    },
+    {
+      "path": "valid/switch-triggers.json",
+      "kind": "switch-triggers",
+      "valid": true
+    },
+    {
+      "path": "invalid/rig-platform-leak.json",
+      "kind": "performance-rig",
+      "valid": false,
+      "expected_error": "pipewire_alias"
+    },
+    {
+      "path": "invalid/rig-profile-missing-takeover.json",
+      "kind": "rig-profile",
+      "valid": false,
+      "expected_error": "takeover_policy"
+    },
+    {
+      "path": "invalid/device-profile-backend-field.json",
+      "kind": "device-profile",
+      "valid": false,
+      "expected_error": "carla_parameter"
+    },
+    {
+      "path": "invalid/hardware-preset-midi-range.json",
+      "kind": "hardware-preset",
+      "valid": false,
+      "expected_error": "less than the minimum"
+    },
+    {
+      "path": "invalid/switch-triggers-cold-midi.json",
+      "kind": "switch-triggers",
+      "valid": false,
+      "expected_error": "cold"
+    }
+  ]
+}
