@@ -4,13 +4,16 @@ This repository stores structured study material for instruments, MIDI
 controllers, live setup, sound design, and reproducible practice workflows.
 
 The proposed Configurable Performance Rig
-([English](docs/features/configurable-performance-rig.md),
-[Português (Brasil)](docs/features/configurable-performance-rig.pt-BR.md))
+([English](docs/features/0001.0000.0000.0000-configurable-performance-rig/configurable-performance-rig.md),
+[Português (Brasil)](docs/features/0001.0000.0000.0000-configurable-performance-rig/configurable-performance-rig.pt-BR.md))
 defines the next-step concepts for global and per-device profiles,
 low-latency CLI switching, and future MIDI-triggered profile changes. The
-[implementation plan](docs/features/configurable-performance-rig-implementation-plan.md)
+[implementation plan](docs/features/0001.0000.0000.0000-configurable-performance-rig/configurable-performance-rig-implementation-plan.md)
 defines the architecture, milestones, validation gates, multiplatform
 delivery, deployment, and rollback.
+
+Progress is maintained in the feature's
+[visual tracker](docs/features/0001.0000.0000.0000-configurable-performance-rig/configurable-performance-rig-tracker.md).
 
 ## Current Collections
 

@@ -3,6 +3,8 @@
 Idioma: [English](configurable-performance-rig.md) | **Português (Brasil)**
 
 Implementação: [Plano de Implementação (English)](configurable-performance-rig-implementation-plan.md)
+Acompanhamento: [Tracker de Implementação](configurable-performance-rig-tracker.md)
+
 
 Status: proposta para revisão; este documento não implica implementação.
 

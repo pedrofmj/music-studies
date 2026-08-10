@@ -45,6 +45,16 @@ publications, verifies monotonic real-time adoption, rejects stale generation
 IDs, and enforces the 20 ms control-commit ceiling. It is an isolated process
 and has no audio, MIDI, graph, service, or state adapter.
 
+## Versioned IPC Spike
+
+The portable core encodes fixed-size protocol frames explicitly in little-endian
+order. The Linux test performs 1,000 local `SOCK_SEQPACKET` request/response
+round trips and enforces a 20 ms p99 ceiling. It uses an unnamed `socketpair`
+and does not create a daemon, service, runtime socket file, or persistent state.
+
+See [PROTOCOL.md](PROTOCOL.md) for the frame contract and Windows named-pipe
+candidate boundary.
+
 ## Read-Only Airstar Baseline
 
 The Milestone 0 collector observes the protected rack without changing remote
