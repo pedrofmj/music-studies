@@ -56,6 +56,9 @@ Documents:
 | Windows JSON packaging | ✅ Pinned vcpkg static archive, MIT license, and no `json-c` runtime DLL |
 | Windows backend capability inventory | ✅ Read-only `beanstar` MIDI service, ASIO, Carla, and lifecycle snapshot recorded |
 | Windows adapter baseline | ✅ WinMM, host-owned ASIO/WASAPI, Carla x64, Known Folders, QPC, and per-user Task Scheduler selected |
+| Windows short-process resources | ✅ `music-rig --version`: 1,970,176-byte observed peak working set, 23 handles, 1 thread, clean exit |
+| Windows 60-second idle resources | ✅ 60.259 s, 0.000000% measured child CPU, 3,670,016-byte observed peak working set, 65 handles, 4 threads, zero events |
+| Windows resource cleanup | ✅ Zero remaining test processes; temporary directory removed and independently confirmed |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -68,7 +71,7 @@ benchmarks.
 
 | Milestone | State | Exit gate |
 | --- | --- | --- |
-| 0. Baseline and technical gates | 🟡 | Windows reference resource evidence incomplete |
+| 0. Baseline and technical gates | ✅ | Baseline reproducible and technical gates passed |
 | 1. Schemas and current profile extraction | ⬜ | Not started |
 | 2. Deterministic compiler and parity | ⬜ | Not started |
 | 3. Runtime, CLI, and shadow mode | ⬜ | Not started |
@@ -125,9 +128,11 @@ benchmarks.
 - ✅ Prove generation adoption on the Windows reference build. The
   hash-verified native artifact completed 9,999 publications on `beanstar`,
   remained lock-free, and recorded a 200 ns maximum control commit.
-- 🟡 Record reliable Windows short-process and 60-second zero-event daemon
-  resource measurements on `beanstar`, including working set, idle CPU,
-  threads, handles, shutdown, and cleanup.
+- ✅ Record reliable Windows short-process and 60-second zero-event synthetic
+  daemon resource measurements on `beanstar`, including working set, idle CPU,
+  threads, handles, shutdown, and cleanup. The hash-verified
+  [physical result](../../tools/music-rig/benchmarks/windows-resource-beanstar.json)
+  passed every gate and left no process or temporary directory behind.
 
 ### Architecture Decisions
 

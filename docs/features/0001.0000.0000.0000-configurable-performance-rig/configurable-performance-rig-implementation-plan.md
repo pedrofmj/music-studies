@@ -2,8 +2,8 @@
 
 Language: **English**
 
-Status: Milestone 0 in progress; the protected single-rig deployment remains
-the production default.
+Status: Milestone 0 complete; Milestone 1 is next. The protected single-rig
+deployment remains the production default.
 
 Related documents:
 
@@ -55,7 +55,11 @@ Completed Milestone 0 work:
 - an accepted
   [Windows adapter baseline](architecture-decisions/0006-windows-platform-adapter-baseline.md)
   for native paths/state, per-user lifecycle, QPC timing, WinMM MIDI 1.0,
-  plugin-host-owned ASIO/WASAPI, and out-of-process Carla.
+  plugin-host-owned ASIO/WASAPI, and out-of-process Carla; and
+- a hash-verified native `beanstar`
+  [resource run](../../tools/music-rig/benchmarks/windows-resource-beanstar.json)
+  covering the short CLI process and a 60-second zero-event synthetic daemon,
+  including working set, idle CPU, threads, handles, shutdown, and cleanup.
 
 The Airstar observation matches the protected Carla checksum, 49 plugins, 111
 project connections, all protected graph links, 2048-frame quantum, 48 kHz
@@ -67,9 +71,10 @@ that the exact diagnostic link was again present, every protected link remained
 present, and no service changed. The diagnostic link is not part of the
 protected baseline.
 
-The remaining open Milestone 0 gate is reliable resource evidence on the
-selected `beanstar` Windows reference machine. No experimental runtime is
-installed or connected to the live rig.
+All Milestone 0 baseline and technical gates pass. No experimental runtime is
+installed or connected to the live rig. Windows audio, MIDI, plugin-host,
+lifecycle, and production-runtime certification remain explicitly deferred to
+Milestone 7.
 
 ## Objective
 
@@ -628,6 +633,9 @@ reported as those two values, not as a 20 ms end-to-end switch.
 - Prove an atomic mapping-pointer swap observed from a synthetic JACK callback.
 - Prove the equivalent generation-adoption interface with a mock Windows
   real-time adapter.
+- Record reliable Windows short-process and 60-second zero-event synthetic
+  daemon resource measurements, including working set, CPU, threads, handles,
+  shutdown, and cleanup.
 - Decide whether native PipeWire graph control can be deferred to Milestone 6
   without blocking control-only profiles.
 - Investigate the supported Carla live-control boundary for parameter changes,
@@ -640,6 +648,7 @@ reported as those two values, not as a 20 ms end-to-end switch.
 - preview-by-default restore command with timestamped pre-restore backups;
 - documented restore rehearsal procedure;
 - machine-readable baseline JSON;
+- hash-verified Windows short-process and zero-event resource evidence;
 - short architecture decision records for JSON parsing, portable core
   boundaries, Linux/Windows IPC, real-time generation publication, PipeWire
   control, Windows backend selection, and plugin-host control; and

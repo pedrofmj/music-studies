@@ -1,9 +1,9 @@
 # Windows Reference Machine: Beanstar
 
 Status: selected; physical portable protocol, generation-adoption, Windows
-named-pipe IPC, and JSON dependency evidence pass. The Windows adapter baseline
-is selected; audio, MIDI, plugin-host, lifecycle, and complete performance
-certification remain pending.
+named-pipe IPC, JSON dependency, and Milestone 0 process-resource evidence
+pass. The Windows adapter baseline is selected; audio, MIDI, plugin-host,
+lifecycle, and complete performance certification remain pending.
 
 ## Role
 
@@ -96,7 +96,7 @@ Any test that needs a real audio or MIDI device is a separately approved live
 operation with a preflight, bounded rollback, and post-test validation. Until
 then, named-pipe and other platform proofs remain synthetic and output-free.
 
-## Next Evidence
+## Recorded Evidence
 
 The first native bundle passed on 2026-08-10. Its manifest matched locally and
 on `beanstar`; the protocol fixture, generation adoption, and 1,000 named-pipe
@@ -109,11 +109,22 @@ fixture, static library, license, probe, and unlinked baseline hashes matched on
 bundle directory or process. See
 [json-c-windows.json](benchmarks/json-c-windows.json).
 
+The native resource bundle passed on 2026-08-10. The 60.259-second zero-event
+window recorded zero control requests, zero MIDI events, 0 ns of child CPU time
+(0.000000% of one core in this observation), a 3,670,016-byte maximum observed
+working set, 65 maximum handles, and four maximum threads. The short
+`music-rig --version` process was sampled successfully. Both the runner and an
+independent post-run query confirmed zero remaining processes and removal of
+the temporary directory. See
+[windows-resource-beanstar.json](benchmarks/windows-resource-beanstar.json).
+
 Remaining reference evidence:
 
 1. Inventory the five MIDI controllers and selected external audio interface
    with their exact drivers before opening any endpoint.
 2. Install and certify the selected ASIO/WASAPI, Carla, MIDI, and per-user
    lifecycle adapters only through separately approved live tests.
-3. Add short-process and daemon resource measurement that reliably samples
-   Windows working set and idle CPU.
+
+These remaining items belong to Windows platform and live-adapter
+certification; they do not reopen the completed synthetic Milestone 0 resource
+gate.

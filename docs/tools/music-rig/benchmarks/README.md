@@ -66,11 +66,25 @@ generation-adoption result, named-pipe golden-frame round trips, and cleanup
 evidence. It is a synthetic portability and IPC result, not audio or MIDI
 certification.
 
+[windows-resource-beanstar.json](windows-resource-beanstar.json) records the
+hash-verified native short-process and 60-second zero-event resource run. The
+short `music-rig --version` process and synthetic event-waiting daemon report
+working set, CPU, threads, handles, exit status, and cleanup. The runner opened
+no audio or MIDI API. A separate post-run query confirmed that its temporary
+directory and processes were absent after the run.
+
 [windows-backend-capabilities.json](windows-backend-capabilities.json) records
 the later read-only MIDI service and compatibility mapping, ASIO registration,
 Carla/package, Task Scheduler, and upstream candidate snapshot used by the
 Windows adapter decision. It enumerated or opened no media endpoint and made no
 machine change.
+
+Reproduce the physical resource run only with a reviewed, hash-verified hosted
+bundle in a new directory below the current user's Windows TEMP directory. The
+wrapper is [run-windows-resource-reference.ps1](run-windows-resource-reference.ps1).
+It refuses pre-existing test processes, enforces the physical thresholds, and
+removes its temporary directory in a `finally` block. This is synthetic runtime
+resource evidence, not audio, MIDI, or production-daemon certification.
 
 ## Portable Switch Benchmark Contract
 

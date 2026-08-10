@@ -2,9 +2,9 @@
 
 This directory contains the Configurable Performance Rig implementation.
 
-Status: Milestone 0 portable core and CLI skeleton. It does not install a
-service, read or write runtime state, connect to MIDI or audio, or modify the
-stable Carla/PipeWire setup.
+Status: Milestone 0 technical gates complete with a portable core and CLI
+skeleton. It does not install a service, read or write runtime state, connect
+to MIDI or audio, or modify the stable Carla/PipeWire setup.
 
 ## Safety Boundary
 
@@ -36,13 +36,20 @@ The same C sources and CMake project are intended for Linux and Windows. The
 Linux and Windows `json-c` dependency proofs and hosted Windows workflow pass.
 `beanstar` is the selected
 [physical Windows reference machine](WINDOWS-REFERENCE.md), where the native
-generation, named-pipe IPC, and JSON footprint proofs pass. The
+generation, named-pipe IPC, JSON footprint, and native process-resource proofs
+pass. The
 [Windows adapter baseline](../../features/0001.0000.0000.0000-configurable-performance-rig/architecture-decisions/0006-windows-platform-adapter-baseline.md)
 is selected without installing or activating it.
 
 The [Windows build contract](WINDOWS-BUILD.md) defines the hosted MSVC proof,
 native reproduction commands, and the boundary between CI portability and a
 physical audio reference machine.
+
+The [physical Windows resource result](benchmarks/windows-resource-beanstar.json)
+samples the short CLI process and a 60-second synthetic event-waiting daemon,
+including working set, CPU, threads, handles, shutdown, and cleanup. It opens
+no audio or MIDI API and does not certify the future production daemon or live
+Windows backends.
 
 The portable-core guard rejects platform headers and backend names without
 case-sensitive gaps. Its self-test proves that PipeWire and Carla references

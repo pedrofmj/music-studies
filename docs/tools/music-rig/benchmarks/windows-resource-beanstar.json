@@ -1,0 +1,122 @@
+{
+  "schema": "music-studies/windows-resource-reference-run/v1",
+  "captured_at": "2026-08-10T20:05:44.1242287Z",
+  "completed_at": "2026-08-10T20:06:45.4717214Z",
+  "source_commit": "0cf3cef1024f1b481319cd26ccc1e2a29e01e750",
+  "reference_machine": {
+    "hostname": "BEANSTAR",
+    "operating_system": "Microsoft Windows 11 Pro",
+    "version": "10.0.26200",
+    "architecture": "64-bit"
+  },
+  "hosted_build": {
+    "workflow_run": 31426839419,
+    "workflow_url": "https://github.com/pedrofmj/music-studies/actions/runs/31426839419",
+    "artifact_id": 9077537553,
+    "artifact_name": "music-rig-windows-reference-0cf3cef1024f1b481319cd26ccc1e2a29e01e750",
+    "runner_image": "win25-vs2026",
+    "runner_image_version": "20260803.193.1"
+  },
+  "artifacts": {
+    "probe": {
+      "name": "music_rig_windows_resource_measurement_test.exe",
+      "bytes": 18432,
+      "sha256": "dfe4165b65b9c011c4bbd606d32fc98a3b22f63d9161fc756382184d587e2240"
+    },
+    "cli": {
+      "name": "music-rig.exe",
+      "bytes": 10240,
+      "sha256": "612e95eac13e03f111ca280b219633507c3ccc6f183f2e09668a3e403a12cd8c"
+    },
+    "runner": {
+      "name": "run-windows-resource-reference.ps1",
+      "sha256": "e1c9571115726fbd7b10bcb3843267f971f2899b90f35475084edf056b93de4a"
+    },
+    "hashes_verified_on_reference_machine": true
+  },
+  "preflight": {
+    "existing_probe_processes": 0,
+    "existing_cli_processes": 0
+  },
+  "measurement": {
+    "schema": "music-studies/windows-resource-measurement/v1",
+    "measurement_kind": "physical-reference",
+    "clock": "QueryPerformanceCounter",
+    "short_process": {
+      "target": "music-rig --version",
+      "wall_time_ns": 77080800,
+      "cpu_time_ns": 15625000,
+      "working_set_start_bytes": 1970176,
+      "working_set_peak_observed_bytes": 1970176,
+      "working_set_lifetime_peak_bytes": 4648960,
+      "handles_start": 23,
+      "handles_peak": 23,
+      "threads_start": 1,
+      "threads_peak": 1,
+      "samples": 3,
+      "exit_code": 0
+    },
+    "idle_daemon": {
+      "adapter": "windows-event-wait-synthetic-daemon",
+      "wait_primitive": "WaitForSingleObject-event-timeout",
+      "requested_zero_event_duration_ms": 60000,
+      "observed_duration_ns": 60259216700,
+      "control_requests": 0,
+      "midi_events": 0,
+      "cpu_time_ns": 0,
+      "cpu_one_core_percent": 0.000000,
+      "working_set_start_bytes": 3670016,
+      "working_set_peak_observed_bytes": 3670016,
+      "working_set_lifetime_peak_bytes": 4182016,
+      "handles_start": 65,
+      "handles_peak": 65,
+      "threads_start": 4,
+      "threads_peak": 4,
+      "samples": 211,
+      "exit_code": 0
+    },
+    "thresholds": {
+      "physical_gates_enforced": true,
+      "idle_cpu_one_core_percent_max_exclusive": 0.5,
+      "idle_working_set_bytes_max_exclusive": 50000000
+    },
+    "evaluation": {
+      "short_process_pass": true,
+      "idle_duration_pass": true,
+      "idle_cpu_pass": true,
+      "idle_working_set_pass": true,
+      "zero_activity_pass": true,
+      "cleanup_pass": true,
+      "passed": true
+    },
+    "scope": {
+      "synthetic_only": true,
+      "audio_or_midi_apis_opened": false,
+      "audio_or_midi_routes_changed": false,
+      "service_installed": false,
+      "live_rig_changes": false
+    }
+  },
+  "cleanup": {
+    "remaining_probe_processes": 0,
+    "remaining_cli_processes": 0,
+    "temporary_directory_removed": true
+  },
+  "independent_post_cleanup": {
+    "temporary_directory_exists": false,
+    "remaining_probe_processes": 0,
+    "remaining_cli_processes": 0
+  },
+  "scope": {
+    "repository_copied_to_reference_machine": false,
+    "temporary_files_only": true,
+    "audio_or_midi_apis_opened": false,
+    "audio_or_midi_routes_changed": false,
+    "services_changed": false,
+    "startup_entries_changed": false,
+    "live_rig_changes": false
+  },
+  "gate": {
+    "milestone_0_windows_resources": "pass"
+  }
+}

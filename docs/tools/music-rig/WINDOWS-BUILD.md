@@ -6,8 +6,9 @@ Windows reference machine, with audio and MIDI certification still pending.
 ## Scope
 
 The portable C17 core, CLI, protocol golden frames, portability guard,
-benchmark contracts, and synthetic Windows generation-adoption adapter run in
-the `Music Rig Portable Core` GitHub Actions workflow.
+benchmark contracts, synthetic Windows generation-adoption adapter, and native
+Windows resource probe run in the `Music Rig Portable Core` GitHub Actions
+workflow.
 
 The workflow pins the operating-system label to `windows-2025` instead of using
 the moving `windows-latest` alias. GitHub documents this as an x64 hosted
@@ -69,6 +70,12 @@ The default build passed 10/10 tests; the pinned vcpkg build passed 11/11 and
 published the static library, license, exact fixture, probe, and unlinked
 baseline CLI in the reference bundle.
 
+The native Windows resource probe and its mechanics self-test passed on commit
+`0cf3cef1024f1b481319cd26ccc1e2a29e01e750` in
+[run 31426839419](https://github.com/pedrofmj/music-studies/actions/runs/31426839419).
+The workflow staged both the probe and `music-rig.exe` in the hash-manifested
+reference bundle used for the physical `beanstar` run.
+
 ## Evidence Boundary
 
 A passing hosted workflow proves:
@@ -97,3 +104,7 @@ The optional JSON build and physical footprint result is in
 [benchmarks/json-c-windows.json](benchmarks/json-c-windows.json).
 The read-only backend capability snapshot is in
 [benchmarks/windows-backend-capabilities.json](benchmarks/windows-backend-capabilities.json).
+The native short-process and 60-second synthetic idle-daemon result is in
+[benchmarks/windows-resource-beanstar.json](benchmarks/windows-resource-beanstar.json).
+It closes the Milestone 0 Windows resource gate without opening audio or MIDI
+APIs; production daemon and live-backend performance remain later gates.
