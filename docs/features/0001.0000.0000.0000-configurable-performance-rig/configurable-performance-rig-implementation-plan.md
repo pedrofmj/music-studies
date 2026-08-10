@@ -80,11 +80,13 @@ Milestone 1 schema work now includes six strict Draft 2020-12 schemas for the
 Rig, Rig Profile, Device Profile, Hardware Preset, Switch Triggers, and shared
 types under
 [`src/performance-rigs/pedro-performance-rig`](../../../src/performance-rigs/pedro-performance-rig/).
-The portable contract covers stable-slot selectors, semantic capabilities,
-ownership modes, readiness, takeover, state, raw hardware MIDI, switch safety,
-and future MIDI management operations. A pinned authoring-only validator checks
-all schemas plus five valid and five invalid fixtures on Linux and Windows.
-No runtime or deployment path consumes these authored documents yet.
+The portable contract and authored `rig.json` cover the five stable device
+slots, ordered physical selectors, semantic capabilities, ownership modes,
+readiness, takeover, state, raw hardware MIDI, switch safety, and future MIDI
+management operations. A pinned authoring-only validator checks all schemas,
+five valid and eight invalid fixtures, and the concrete rig catalogue on Linux
+and Windows. No runtime or deployment path consumes these authored documents
+yet.
 
 ## Objective
 

@@ -120,8 +120,16 @@ if(BUILD_TESTING)
             "${MUSIC_RIG_PROFILE_SCHEMA_VALIDATOR}"
             --self-test
     )
+    add_test(
+        NAME music_rig_current_rig_schema
+        COMMAND "${Python3_EXECUTABLE}"
+            "${MUSIC_RIG_PROFILE_SCHEMA_VALIDATOR}"
+            --validate
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../../src/performance-rigs/pedro-performance-rig/rig.json"
+    )
     set_tests_properties(
         music_rig_profile_schema_self_test
+        music_rig_current_rig_schema
         PROPERTIES TIMEOUT 10
     )
 

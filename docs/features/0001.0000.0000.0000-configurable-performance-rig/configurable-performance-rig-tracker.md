@@ -166,10 +166,12 @@ benchmarks.
 - ✅ Add the six versioned Rig, Rig Profile, Device Profile, Hardware Preset,
   Switch Trigger, and common schemas. The offline
   [validator](../../tools/music-rig/validate-performance-rig.py) checks each
-  Draft 2020-12 schema and ten positive/negative fixtures on the default CTest
-  path without activating any runtime component.
-- 🟡 Define stable device slots and ordered physical selectors. The portable
-  selector contract is present; extraction of the five concrete slots remains.
+  Draft 2020-12 schema and thirteen positive/negative fixtures on the default
+  CTest path without activating any runtime component.
+- ✅ Define stable device slots and ordered physical selectors. The authored
+  [rig catalogue](../../../src/performance-rigs/pedro-performance-rig/rig.json)
+  records all five current controllers, required endpoint purposes, unique
+  semantic aliases and local discriminators, and optional USB evidence.
 - ⬜ Extract the five current Device Profiles and their Hardware Presets.
 - ⬜ Add the `full-live-rack` Rig Profile.
 - 🟡 Model ownership, semantic capabilities, readiness, and takeover policies.
@@ -177,8 +179,9 @@ benchmarks.
   extracted and checked across documents.
 - ⬜ Add Linux bindings and Windows contract fixtures.
 - 🟡 Add schema, reference, collision, ownership, and ambiguity tests. Schema
-  structure and portability-negative coverage pass; cross-document semantic
-  checks remain.
+  structure, portability-negative coverage, selector order, required endpoint
+  coverage, and shared USB ambiguity checks pass; cross-document references,
+  MIDI collisions, and ownership checks remain.
 
 ## Milestone 2: Deterministic Compiler And Parity
 

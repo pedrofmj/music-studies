@@ -61,9 +61,12 @@ Windows backends.
 The six strict Draft 2020-12 schemas under
 [`src/performance-rigs/pedro-performance-rig`](../../../src/performance-rigs/pedro-performance-rig/)
 define the portable v1 authoring boundary. The default CTest suite validates
-the schemas themselves and five positive plus five negative document fixtures.
-The Python `jsonschema` dependency is used only by authoring and tests; neither
-the C CLI nor the future resident runtime loads it.
+the schemas themselves, five positive plus eight negative document fixtures,
+and the authored five-slot `rig.json` catalogue. Semantic checks enforce
+selector order, required model and endpoint coverage, unique aliases and local
+discriminators, optional USB evidence, and unambiguous shared USB IDs. The
+Python `jsonschema` dependency is used only by authoring and tests; neither the
+C CLI nor the future resident runtime loads it.
 
 Run the validator directly:
 

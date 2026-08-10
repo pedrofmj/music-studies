@@ -5,7 +5,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
+from collections import defaultdict
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
@@ -54,6 +56,18 @@ SCHEMA_FILE_BY_KIND = {
 EXPECTED_SCHEMA_FILES = frozenset(
     ["common.schema.json"] + list(SCHEMA_FILE_BY_KIND.values())
 )
+SELECTOR_ORDER = {
+    "model": 0,
+    "semantic-alias": 1,
+    "endpoint-purpose": 2,
+    "local-discriminator": 3,
+    "usb-id": 4,
+}
+IDENTIFIER_PATTERN = re.compile(r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$")
+SEMANTIC_IDENTIFIER_PATTERN = re.compile(
+    r"^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$"
+)
+USB_ID_PATTERN = re.compile(r"^[0-9a-f]{4}:[0-9a-f]{4}$")
 
 
 def load_json(path: Path) -> Any:
@@ -106,6 +120,144 @@ def error_path(parts: Iterable[Any]) -> str:
     return rendered
 
 
+def validate_rig_slot_semantics(document: Mapping[str, Any]) -> List[str]:
+    """Validate selector relationships that JSON Schema cannot express."""
+    errors = []
+    slot_ids = set()
+    semantic_alias_slots: Dict[str, str] = {}
+    local_discriminator_slots: Dict[str, str] = {}
+    usb_id_slots: Dict[str, List[Tuple[str, List[Mapping[str, Any]]]]] = (
+        defaultdict(list)
+    )
+
+    for slot_index, slot in enumerate(document["device_slots"]):
+        slot_path = f"$.device_slots[{slot_index}]"
+        slot_id = slot["id"]
+        if slot_id in slot_ids:
+            errors.append(f"{slot_path}.id: duplicate device slot ID {slot_id!r}")
+        slot_ids.add(slot_id)
+
+        selectors = slot["selectors"]
+        selector_keys = set()
+        previous_rank = -1
+        required_models = set()
+        required_endpoint_selectors = set()
+
+        for selector_index, selector in enumerate(selectors):
+            selector_path = f"{slot_path}.selectors[{selector_index}]"
+            selector_kind = selector["kind"]
+            selector_value = selector["value"]
+            selector_required = selector["required"]
+            selector_key = (selector_kind, selector_value)
+
+            if selector_key in selector_keys:
+                errors.append(
+                    f"{selector_path}: duplicate selector {selector_kind!r} "
+                    f"with value {selector_value!r}"
+                )
+            selector_keys.add(selector_key)
+
+            selector_rank = SELECTOR_ORDER[selector_kind]
+            if selector_rank < previous_rank:
+                errors.append(
+                    f"{selector_path}: selector order must be model, "
+                    "semantic-alias, endpoint-purpose, local-discriminator, "
+                    "then usb-id"
+                )
+            previous_rank = selector_rank
+
+            if selector_kind == "model" and selector_required:
+                required_models.add(selector_value)
+            elif selector_kind == "endpoint-purpose":
+                if not SEMANTIC_IDENTIFIER_PATTERN.fullmatch(selector_value):
+                    errors.append(
+                        f"{selector_path}.value: endpoint purpose must be a "
+                        "semantic identifier"
+                    )
+                if selector_required:
+                    required_endpoint_selectors.add(selector_value)
+            elif selector_kind == "semantic-alias":
+                if not SEMANTIC_IDENTIFIER_PATTERN.fullmatch(selector_value):
+                    errors.append(
+                        f"{selector_path}.value: semantic alias must be a "
+                        "semantic identifier"
+                    )
+                previous_slot = semantic_alias_slots.get(selector_value)
+                if previous_slot is not None and previous_slot != slot_id:
+                    errors.append(
+                        f"{selector_path}.value: semantic alias "
+                        f"{selector_value!r} is already used by slot "
+                        f"{previous_slot!r}"
+                    )
+                semantic_alias_slots[selector_value] = slot_id
+            elif selector_kind == "local-discriminator":
+                if not IDENTIFIER_PATTERN.fullmatch(selector_value):
+                    errors.append(
+                        f"{selector_path}.value: local discriminator must be "
+                        "an identifier"
+                    )
+                if selector_required:
+                    errors.append(
+                        f"{selector_path}.required: local discriminator must "
+                        "be optional"
+                    )
+                previous_slot = local_discriminator_slots.get(selector_value)
+                if previous_slot is not None and previous_slot != slot_id:
+                    errors.append(
+                        f"{selector_path}.value: local discriminator "
+                        f"{selector_value!r} is already used by slot "
+                        f"{previous_slot!r}"
+                    )
+                local_discriminator_slots[selector_value] = slot_id
+            elif selector_kind == "usb-id":
+                if not USB_ID_PATTERN.fullmatch(selector_value):
+                    errors.append(
+                        f"{selector_path}.value: USB ID must use lower-case "
+                        "hhhh:hhhh notation"
+                    )
+                if selector_required:
+                    errors.append(
+                        f"{selector_path}.required: USB ID must be optional"
+                    )
+                usb_id_slots[selector_value].append((slot_id, selectors))
+
+        if not required_models.intersection(slot["compatible_models"]):
+            errors.append(
+                f"{slot_path}.selectors: a required model selector must match "
+                "compatible_models"
+            )
+
+        for endpoint in slot["required_endpoints"]:
+            if endpoint not in required_endpoint_selectors:
+                errors.append(
+                    f"{slot_path}.selectors: required endpoint {endpoint!r} "
+                    "must have a matching required endpoint-purpose selector"
+                )
+
+    for usb_id, slot_entries in usb_id_slots.items():
+        affected_slot_ids = {slot_id for slot_id, _ in slot_entries}
+        if len(affected_slot_ids) < 2:
+            continue
+        for slot_id, selectors in slot_entries:
+            has_required_alias = any(
+                selector["kind"] == "semantic-alias" and selector["required"]
+                for selector in selectors
+            )
+            has_optional_local_discriminator = any(
+                selector["kind"] == "local-discriminator"
+                and not selector["required"]
+                for selector in selectors
+            )
+            if not has_required_alias or not has_optional_local_discriminator:
+                errors.append(
+                    f"$.device_slots: shared USB ID {usb_id!r} requires slot "
+                    f"{slot_id!r} to have a required semantic alias and an "
+                    "optional local discriminator"
+                )
+
+    return errors
+
+
 def validate_document(
     document: Any,
     schemas: Mapping[str, Mapping[str, Any]],
@@ -123,9 +275,12 @@ def validate_document(
         validator.iter_errors(document),
         key=lambda item: tuple(str(part) for part in item.absolute_path),
     )
-    return kind, [
+    formatted_errors = [
         f"{error_path(error.absolute_path)}: {error.message}" for error in errors
     ]
+    if not formatted_errors and kind == "performance-rig":
+        formatted_errors.extend(validate_rig_slot_semantics(document))
+    return kind, formatted_errors
 
 
 def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:

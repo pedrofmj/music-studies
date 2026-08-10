@@ -1,0 +1,80 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "performance-rig",
+  "id": "shared-usb-fixture",
+  "display_name": "Shared USB Fixture",
+  "default_rig_profile": "fixture-live",
+  "device_slots": [
+    {
+      "id": "fixture-controller-a",
+      "display_name": "Fixture Controller A",
+      "compatible_models": [
+        "Fixture Controller A"
+      ],
+      "required_endpoints": [
+        "midi.performance-input"
+      ],
+      "selectors": [
+        {
+          "kind": "model",
+          "value": "Fixture Controller A",
+          "required": true
+        },
+        {
+          "kind": "endpoint-purpose",
+          "value": "midi.performance-input",
+          "required": true
+        },
+        {
+          "kind": "usb-id",
+          "value": "4353:4b4d",
+          "required": false
+        }
+      ],
+      "available_device_profiles": [
+        "fixture-role"
+      ]
+    },
+    {
+      "id": "fixture-controller-b",
+      "display_name": "Fixture Controller B",
+      "compatible_models": [
+        "Fixture Controller B"
+      ],
+      "required_endpoints": [
+        "midi.control-input"
+      ],
+      "selectors": [
+        {
+          "kind": "model",
+          "value": "Fixture Controller B",
+          "required": true
+        },
+        {
+          "kind": "endpoint-purpose",
+          "value": "midi.control-input",
+          "required": true
+        },
+        {
+          "kind": "usb-id",
+          "value": "4353:4b4d",
+          "required": false
+        }
+      ],
+      "available_device_profiles": [
+        "fixture-role"
+      ]
+    }
+  ],
+  "rig_profiles": [
+    "fixture-live"
+  ],
+  "hardware_presets": [
+    "fixture-preset"
+  ],
+  "switch_triggers": "fixture-triggers",
+  "required_platforms": [
+    "linux",
+    "windows"
+  ]
+}

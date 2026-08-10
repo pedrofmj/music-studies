@@ -1,10 +1,9 @@
 {
   "schema": "music-studies/performance-rig/v1",
   "kind": "performance-rig",
-  "id": "fixture-rig",
-  "display_name": "Fixture Rig",
+  "id": "uncovered-endpoint-fixture",
+  "display_name": "Uncovered Endpoint Fixture",
   "default_rig_profile": "fixture-live",
-  "fallback_rig_profile": "fixture-live",
   "device_slots": [
     {
       "id": "fixture-controller",
@@ -13,7 +12,7 @@
         "Fixture Controller Model"
       ],
       "required_endpoints": [
-        "midi.performance-input"
+        "midi.transport-input"
       ],
       "selectors": [
         {
@@ -25,17 +24,11 @@
           "kind": "endpoint-purpose",
           "value": "midi.performance-input",
           "required": true
-        },
-        {
-          "kind": "local-discriminator",
-          "value": "fixture-controller",
-          "required": false
         }
       ],
       "available_device_profiles": [
         "fixture-role"
-      ],
-      "required": true
+      ]
     }
   ],
   "rig_profiles": [

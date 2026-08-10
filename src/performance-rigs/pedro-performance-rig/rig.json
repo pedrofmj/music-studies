@@ -1,0 +1,237 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "performance-rig",
+  "id": "pedro-performance-rig",
+  "display_name": "Pedro Performance Rig",
+  "description": "Portable catalogue for the current five-controller performance setup.",
+  "default_rig_profile": "full-live-rack",
+  "fallback_rig_profile": "full-live-rack",
+  "device_slots": [
+    {
+      "id": "arturia-main",
+      "display_name": "Arturia Main",
+      "compatible_models": [
+        "KeyLab Essential 61 mk3"
+      ],
+      "required_endpoints": [
+        "midi.performance-input"
+      ],
+      "selectors": [
+        {
+          "kind": "model",
+          "value": "KeyLab Essential 61 mk3",
+          "required": true
+        },
+        {
+          "kind": "semantic-alias",
+          "value": "device.arturia-main",
+          "required": true
+        },
+        {
+          "kind": "endpoint-purpose",
+          "value": "midi.performance-input",
+          "required": true
+        },
+        {
+          "kind": "local-discriminator",
+          "value": "arturia-main",
+          "required": false
+        },
+        {
+          "kind": "usb-id",
+          "value": "1c75:028c",
+          "required": false
+        }
+      ],
+      "available_device_profiles": [
+        "multi-instrument-rack"
+      ],
+      "required": true
+    },
+    {
+      "id": "smk25-main",
+      "display_name": "SMK-25 Main",
+      "compatible_models": [
+        "M-VAVE SMK-25"
+      ],
+      "required_endpoints": [
+        "midi.performance-input",
+        "midi.transport-input"
+      ],
+      "selectors": [
+        {
+          "kind": "model",
+          "value": "M-VAVE SMK-25",
+          "required": true
+        },
+        {
+          "kind": "semantic-alias",
+          "value": "device.smk25-main",
+          "required": true
+        },
+        {
+          "kind": "endpoint-purpose",
+          "value": "midi.performance-input",
+          "required": true
+        },
+        {
+          "kind": "endpoint-purpose",
+          "value": "midi.transport-input",
+          "required": true
+        },
+        {
+          "kind": "local-discriminator",
+          "value": "smk25-main",
+          "required": false
+        },
+        {
+          "kind": "usb-id",
+          "value": "4353:4b4d",
+          "required": false
+        }
+      ],
+      "available_device_profiles": [
+        "ambient-pad-layers"
+      ],
+      "required": true
+    },
+    {
+      "id": "smc-mixer-main",
+      "display_name": "SMC-Mixer Main",
+      "compatible_models": [
+        "M-VAVE SMC-Mixer"
+      ],
+      "required_endpoints": [
+        "midi.control-input"
+      ],
+      "selectors": [
+        {
+          "kind": "model",
+          "value": "M-VAVE SMC-Mixer",
+          "required": true
+        },
+        {
+          "kind": "semantic-alias",
+          "value": "device.smc-mixer-main",
+          "required": true
+        },
+        {
+          "kind": "endpoint-purpose",
+          "value": "midi.control-input",
+          "required": true
+        },
+        {
+          "kind": "local-discriminator",
+          "value": "smc-mixer-main",
+          "required": false
+        },
+        {
+          "kind": "usb-id",
+          "value": "4353:4b4d",
+          "required": false
+        }
+      ],
+      "available_device_profiles": [
+        "eight-band-eq"
+      ],
+      "required": true
+    },
+    {
+      "id": "smc-pad-main",
+      "display_name": "SMC-PAD Main",
+      "compatible_models": [
+        "M-VAVE SMC-PAD"
+      ],
+      "required_endpoints": [
+        "midi.performance-input"
+      ],
+      "selectors": [
+        {
+          "kind": "model",
+          "value": "M-VAVE SMC-PAD",
+          "required": true
+        },
+        {
+          "kind": "semantic-alias",
+          "value": "device.smc-pad-main",
+          "required": true
+        },
+        {
+          "kind": "endpoint-purpose",
+          "value": "midi.performance-input",
+          "required": true
+        },
+        {
+          "kind": "local-discriminator",
+          "value": "smc-pad-main",
+          "required": false
+        },
+        {
+          "kind": "usb-id",
+          "value": "4353:4b4d",
+          "required": false
+        }
+      ],
+      "available_device_profiles": [
+        "drum-set"
+      ],
+      "required": true
+    },
+    {
+      "id": "smc-pad-pocket",
+      "display_name": "SMC-PAD Pocket",
+      "compatible_models": [
+        "M-VAVE SMC-PAD Pocket"
+      ],
+      "required_endpoints": [
+        "midi.performance-input"
+      ],
+      "selectors": [
+        {
+          "kind": "model",
+          "value": "M-VAVE SMC-PAD Pocket",
+          "required": true
+        },
+        {
+          "kind": "semantic-alias",
+          "value": "device.smc-pad-pocket",
+          "required": true
+        },
+        {
+          "kind": "endpoint-purpose",
+          "value": "midi.performance-input",
+          "required": true
+        },
+        {
+          "kind": "local-discriminator",
+          "value": "smc-pad-pocket",
+          "required": false
+        },
+        {
+          "kind": "usb-id",
+          "value": "4353:4b4d",
+          "required": false
+        }
+      ],
+      "available_device_profiles": [
+        "drum-set"
+      ],
+      "required": true
+    }
+  ],
+  "rig_profiles": [
+    "full-live-rack"
+  ],
+  "hardware_presets": [
+    "arturia-current-rack",
+    "smk25-current-pad-layers",
+    "smc-mixer-current-cc",
+    "smc-pad-current-notes",
+    "smc-pad-pocket-current-notes"
+  ],
+  "switch_triggers": "performance-switch-triggers",
+  "required_platforms": [
+    "linux",
+    "windows"
+  ]
+}

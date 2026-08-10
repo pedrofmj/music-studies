@@ -32,6 +32,24 @@
       "expected_error": "pipewire_alias"
     },
     {
+      "path": "invalid/rig-selector-order.json",
+      "kind": "performance-rig",
+      "valid": false,
+      "expected_error": "selector order"
+    },
+    {
+      "path": "invalid/rig-required-endpoint-uncovered.json",
+      "kind": "performance-rig",
+      "valid": false,
+      "expected_error": "required endpoint"
+    },
+    {
+      "path": "invalid/rig-shared-usb-ambiguous.json",
+      "kind": "performance-rig",
+      "valid": false,
+      "expected_error": "shared USB ID"
+    },
+    {
       "path": "invalid/rig-profile-missing-takeover.json",
       "kind": "rig-profile",
       "valid": false,
