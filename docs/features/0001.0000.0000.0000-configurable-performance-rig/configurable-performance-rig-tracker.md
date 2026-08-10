@@ -43,7 +43,7 @@ Documents:
 | Live startup transcript | 🟡 Planned; operator execution not performed |
 | Switch benchmark contract | ✅ Valid fixture plus 13 negative semantic cases |
 | Acceptance thresholds | ✅ Selected; platform measurements remain future gates |
-| Windows hosted build | 🟡 Workflow and native adoption test added; first run pending |
+| Windows hosted build | ✅ [Windows 2025 MSVC run](https://github.com/pedrofmj/music-studies/actions/runs/31391585787), 9/9 passed |
 | Portable backend boundary | ✅ PipeWire and Carla names rejected from core |
 | Linux JSON parse fixture | ✅ 10,000 iterations, zero failures |
 | Linux JSON average parse | ✅ GCC 10,858 ns; Clang 15,268 ns |
@@ -93,17 +93,19 @@ benchmarks.
   enforces distinct commit/adoption measurements, three load scenarios,
   percentiles, resource separation, stability deltas, and raw-evidence rules.
 - ✅ Build the minimal portable C17 core and CLI on Linux.
-- 🟡 Build and test the same core and CLI on Windows. The pinned Windows 2025
-  [hosted workflow](../../../.github/workflows/music-rig-portable.yml) is
-  implemented; its first remote run remains pending.
+- ✅ Build and test the same core and CLI on Windows. The pinned Windows 2025
+  [hosted workflow](../../../.github/workflows/music-rig-portable.yml) passed
+  all nine configured tests in
+  [run 31391585787](https://github.com/pedrofmj/music-studies/actions/runs/31391585787).
 - ✅ Prove portable versioned frames and Linux `SOCK_SEQPACKET` round trips.
 - ⬜ Prove the same golden frames through the Windows candidate transport.
 - 🟡 Prove `json-c` availability and footprint on Linux and Windows. Linux
   passes with 0.17; Windows remains pending.
 - ✅ Reject platform headers and symbols from the portable core.
 - ✅ Prove lock-free generation publication and synthetic callback adoption.
-- 🟡 Prove generation adoption on Windows. A native synthetic callback test is
-  implemented for hosted CI; the physical reference-machine run remains.
+- 🟡 Prove generation adoption on the Windows reference build. The native
+  synthetic callback passes hosted Windows CI; the physical reference-machine
+  run remains.
 
 ### Architecture Decisions
 

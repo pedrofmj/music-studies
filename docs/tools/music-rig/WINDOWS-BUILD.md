@@ -1,6 +1,6 @@
 # Windows Portable Build
 
-Status: hosted Windows proof added; a physical audio reference machine is not
+Status: hosted Windows proof passed; a physical audio reference machine is not
 yet selected.
 
 ## Scope
@@ -39,6 +39,22 @@ does not discover or link `json-c`. CMake enables MSVC's
 `/experimental:c11atomics` option explicitly; the tests then require pointer
 atomics to report lock-free behavior at runtime.
 
+## Hosted Evidence
+
+The first pinned Windows proof passed on 2026-08-10:
+
+- commit: `280147a20e8d4edd8663fbfd0a27420699f8f768`;
+- workflow: [run 31391585787](https://github.com/pedrofmj/music-studies/actions/runs/31391585787);
+- runner label: `windows-2025` on x64;
+- compiler job: [Windows MSVC](https://github.com/pedrofmj/music-studies/actions/runs/31391585787/job/93464356027);
+- result: configure, build, and all nine configured CTest entries passed; and
+- companion Linux GCC job: passed from the same commit and workflow.
+
+The Windows test set covers the core, protocol golden frames, portability guard
+and its self-test, CLI version, three benchmark-contract checks, and native
+generation adoption. The hosted runner is repeatable build evidence, not a
+performance benchmark or hardware certification result.
+
 ## Evidence Boundary
 
 A passing hosted workflow proves:
@@ -57,5 +73,6 @@ It does not close these Milestone 0 gates:
 - prove the optional `json-c` build and footprint there; or
 - select the Windows audio, MIDI, plugin-host, and service backends.
 
-Workflow run URLs and the runner image version must be recorded in the tracker
-before the hosted build item is marked complete.
+The workflow run URL and pinned runner label are recorded with each accepted
+hosted proof. The physical reference-machine evidence will additionally record
+the exact Windows build, hardware, drivers, and backend versions.
