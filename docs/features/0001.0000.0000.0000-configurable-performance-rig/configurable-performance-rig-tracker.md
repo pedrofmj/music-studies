@@ -43,7 +43,7 @@ Documents:
 | Live startup transcript | 🟡 Planned; operator execution not performed |
 | Switch benchmark contract | ✅ Valid fixture plus 13 negative semantic cases |
 | Acceptance thresholds | ✅ Selected; platform measurements remain future gates |
-| Windows hosted build | ✅ [Windows 2025 MSVC run](https://github.com/pedrofmj/music-studies/actions/runs/31399835507), 10/10 passed |
+| Windows hosted build | ✅ [Windows 2025 MSVC run](https://github.com/pedrofmj/music-studies/actions/runs/31414189191), 10/10 default and 11/11 JSON-enabled passed |
 | Windows reference machine | ✅ `beanstar` selected and [inventoried](../../tools/music-rig/WINDOWS-REFERENCE.md) |
 | Windows generation adoption | ✅ 9,999 publications; 200 ns maximum commit on `beanstar` |
 | Windows named-pipe round trips | ✅ 1,000 requests; p99 17,400 ns; zero failures on `beanstar` |
@@ -51,6 +51,9 @@ Documents:
 | Linux JSON parse fixture | ✅ 10,000 iterations, zero failures |
 | Linux JSON average parse | ✅ GCC 10,858 ns; Clang 15,268 ns |
 | Linux JSON linkage | ✅ Default CLI has no `json-c` dependency |
+| Windows JSON parse fixture | ✅ 10,000 iterations; 16,051 ns average; zero failures on `beanstar` |
+| Windows JSON footprint | ✅ 5,500,928-byte peak process working set; 26,112-byte static-link executable delta |
+| Windows JSON packaging | ✅ Pinned vcpkg static archive, MIT license, and no `json-c` runtime DLL |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -104,9 +107,11 @@ benchmarks.
 - ✅ Prove the same golden frames through the Windows candidate transport. The
   hosted test and hash-verified `beanstar` artifact pass 1,000 message-mode
   round trips with zero failures and a 17,400 ns p99.
-- 🟡 Prove `json-c` availability and footprint on Linux and Windows. Linux
-  passes with 0.17. The Windows 0.18 static probe and pinned vcpkg package path
-  are implemented; hosted and `beanstar` evidence remain pending.
+- ✅ Prove `json-c` availability and footprint on Linux and Windows. Linux 0.17
+  and Windows 0.18 pass the same fixture. The pinned static Windows bundle
+  passed hosted MSVC tests and the hash-verified `beanstar` footprint probe;
+  [ADR 0005](architecture-decisions/0005-json-c-control-plane-parsing.md)
+  accepts the control-plane-only boundary.
 - ✅ Reject platform headers and symbols from the portable core.
 - ✅ Prove lock-free generation publication and synthetic callback adoption.
 - ✅ Prove generation adoption on the Windows reference build. The
@@ -130,9 +135,9 @@ benchmarks.
   [ADR 0002](architecture-decisions/0002-carla-control-and-prepared-engine-boundary.md)
   keeps early switches on loaded engines and moves lifecycle, state, project,
   and patchbay work to preparation in Milestone 6.
-- 🟡 Write the remaining Milestone 0 architecture decision records. IPC,
-  provisional JSON parsing, PipeWire, Carla, and performance-threshold
-  boundaries are recorded; the Windows backend remains.
+- 🟡 Write the remaining Milestone 0 architecture decision records. IPC, JSON
+  parsing, PipeWire, Carla, and performance-threshold boundaries are accepted;
+  the Windows backend remains.
 - ✅ Confirm CPU, memory, latency, and xrun thresholds.
   [ADR 0003](architecture-decisions/0003-performance-acceptance-thresholds.md)
   accepts the portable ceilings and separates selection from later platform

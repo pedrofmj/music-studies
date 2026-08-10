@@ -33,10 +33,10 @@ ctest --test-dir /tmp/music-rig-build --output-on-failure
 ~~~
 
 The same C sources and CMake project are intended for Linux and Windows. The
-Linux `json-c` dependency proof and hosted Windows workflow pass. `beanstar` is
-the selected [physical Windows reference machine](WINDOWS-REFERENCE.md), where
-the native generation and named-pipe IPC proofs pass. The equivalent Windows
-`json-c` proof remains pending.
+Linux and Windows `json-c` dependency proofs and hosted Windows workflow pass.
+`beanstar` is the selected
+[physical Windows reference machine](WINDOWS-REFERENCE.md), where the native
+generation, named-pipe IPC, and JSON footprint proofs pass.
 
 The [Windows build contract](WINDOWS-BUILD.md) defines the hosted MSVC proof,
 native reproduction commands, and the boundary between CI portability and a
@@ -93,9 +93,10 @@ The probe validates a compiled-runtime-shaped fixture 10,000 times and reports
 parse time, peak process memory, executable size, and linked-library footprint.
 Linux uses the installed shared library; the opt-in Windows CI build uses the
 pinned [vcpkg manifest](vcpkg.json) and a static `json-c` library. See
-[JSON-PARSING.md](JSON-PARSING.md) for the provisional dependency boundary and
-[benchmarks/json-c-linux.json](benchmarks/json-c-linux.json) for the accepted
-Linux half of the evidence.
+[JSON-PARSING.md](JSON-PARSING.md) for the accepted dependency boundary and
+[benchmarks/json-c-linux.json](benchmarks/json-c-linux.json) and
+[benchmarks/json-c-windows.json](benchmarks/json-c-windows.json) for the raw
+platform evidence.
 
 ## Protected Helper Offline Tests
 

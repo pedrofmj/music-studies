@@ -62,6 +62,13 @@ The named-pipe implementation first passed on commit
 where all ten Windows tests passed and the job published a hash-manifested
 reference bundle.
 
+The opt-in Windows `json-c` proof passed on commit
+`6c07e7a3e8ae208a067f0f1e8eb0527f525a154f` in
+[run 31414189191](https://github.com/pedrofmj/music-studies/actions/runs/31414189191).
+The default build passed 10/10 tests; the pinned vcpkg build passed 11/11 and
+published the static library, license, exact fixture, probe, and unlinked
+baseline CLI in the reference bundle.
+
 ## Evidence Boundary
 
 A passing hosted workflow proves:
@@ -73,10 +80,8 @@ A passing hosted workflow proves:
 - the benchmark contract validator behaves identically; and
 - a native Windows thread observes lock-free immutable-generation publication.
 
-It does not close these Milestone 0 gates:
-
-- prove the optional `json-c` build and footprint there; or
-- select the Windows audio, MIDI, plugin-host, and service backends.
+It does not select or certify the Windows audio, MIDI, plugin-host, and service
+backends.
 
 The workflow run URL and pinned runner label are recorded with each accepted
 hosted proof. The selected physical machine and its initial read-only inventory
@@ -87,3 +92,5 @@ hardware, drivers, and applicable backend versions.
 The named-pipe and generation-adoption bundle passed on `beanstar`; the full
 artifact, timing, and cleanup evidence is in
 [benchmarks/windows-beanstar-m0.json](benchmarks/windows-beanstar-m0.json).
+The optional JSON build and physical footprint result is in
+[benchmarks/json-c-windows.json](benchmarks/json-c-windows.json).

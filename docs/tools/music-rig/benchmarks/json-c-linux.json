@@ -53,6 +53,6 @@
   ],
   "gate": {
     "linux": "pass",
-    "windows": "pending"
+    "windows": "pass"
   }
 }

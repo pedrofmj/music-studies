@@ -36,12 +36,14 @@ An incomplete report is still written for diagnosis, but the command returns a
 failure until the project checksum, plugin and connection counts, graph counts,
 services, quantum, and sample-rate checks pass.
 
-## JSON-C Linux Dependency
+## JSON-C Dependency
 
 [json-c-linux.json](json-c-linux.json) records the Linux package, binary,
 process-memory, and parse-time measurements for the opt-in dependency probe.
-The result proves only the Linux half of the portability gate; Windows remains
-pending.
+[json-c-windows.json](json-c-windows.json) records the pinned vcpkg package,
+hosted build, static archive and license, exact cross-platform fixture, physical
+`beanstar` parse and footprint measurements, hash verification, and cleanup.
+Both halves of the dependency gate pass.
 
 See [../JSON-PARSING.md](../JSON-PARSING.md) for the decision boundary and
 evidence interpretation.

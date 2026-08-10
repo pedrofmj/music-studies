@@ -1,8 +1,8 @@
 # Windows Reference Machine: Beanstar
 
-Status: selected; physical portable protocol, generation-adoption, and Windows
-named-pipe IPC evidence pass. Audio, MIDI, plugin-host, and complete performance
-certification remain pending.
+Status: selected; physical portable protocol, generation-adoption, Windows
+named-pipe IPC, and JSON dependency evidence pass. Audio, MIDI, plugin-host,
+and complete performance certification remain pending.
 
 ## Role
 
@@ -82,10 +82,15 @@ on `beanstar`; the protocol fixture, generation adoption, and 1,000 named-pipe
 round trips passed; and cleanup left no bundle directory, process, or pipe. See
 [windows-beanstar-m0.json](benchmarks/windows-beanstar-m0.json).
 
+The pinned `json-c` 0.18 bundle also passed on 2026-08-10. The exact Linux
+fixture, static library, license, probe, and unlinked baseline hashes matched on
+`beanstar`; 10,000 parses completed with zero failures; and cleanup left no
+bundle directory or process. See
+[json-c-windows.json](benchmarks/json-c-windows.json).
+
 Remaining reference evidence:
 
-1. Prove the optional `json-c` build and footprint on Windows.
-2. Inventory and select the Windows audio, MIDI, plugin-host, and service
+1. Inventory and select the Windows audio, MIDI, plugin-host, and service
    backends before any hardware certification claim.
-3. Add short-process and daemon resource measurement that reliably samples
+2. Add short-process and daemon resource measurement that reliably samples
    Windows working set and idle CPU.

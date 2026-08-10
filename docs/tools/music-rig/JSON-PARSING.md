@@ -1,13 +1,13 @@
 # JSON Parsing Boundary
 
-Status: Provisional Milestone 0 decision. Linux is proven; Windows remains an
-exit gate.
+Status: Accepted Milestone 0 decision. Linux and Windows dependency proofs
+pass.
 
 ## Decision
 
-Use `json-c` 0.17 or newer as the initial control-plane JSON parser candidate.
-The dependency is not locked until the same build, fixture, and packaging proof
-passes on the Windows reference machine.
+Use `json-c` 0.17 or newer as the control-plane JSON parser. The accepted
+architecture decision is
+[ADR 0005](../../features/0001.0000.0000.0000-configurable-performance-rig/architecture-decisions/0005-json-c-control-plane-parsing.md).
 
 JSON work stays outside real-time paths. Definition loading, schema validation,
 and compilation happen during startup, reload, or transaction preparation. The
@@ -40,7 +40,7 @@ These timings are dependency evidence, not switch-latency results.
 The raw evidence is in
 [benchmarks/json-c-linux.json](benchmarks/json-c-linux.json).
 
-## Reproduction
+## Linux Reproduction
 
 ~~~bash
 cmake -S docs/tools/music-rig -B /tmp/music-rig-build-json-c -G Ninja \
@@ -55,7 +55,7 @@ ctest --test-dir /tmp/music-rig-build-json-c -V \
 The probe rejects headers or a loaded runtime older than 0.17. The option is
 off by default, so a normal build neither discovers nor links `json-c`.
 
-## Windows Gate
+## Windows Evidence
 
 The selected repeatable package path is a
 [vcpkg manifest](vcpkg.json) pinned to the signed `2026.04.27` registry release
@@ -64,18 +64,39 @@ commit `56bb2411609227288b70117ead2c47585ba07713`. That baseline supplies
 `x64-windows-static-md` triplet: `json-c` is static while the MSVC runtime stays
 dynamic and consistent with the existing project build.
 
-The CI reference bundle includes the probe, same fixture, unlinked baseline
-CLI, static archive, and MIT license text. Nothing is installed on `beanstar`.
+The pinned build and physical proof passed on 2026-08-10:
 
-Before this decision becomes final, the Windows reference build must:
+- [workflow run 31414189191](https://github.com/pedrofmj/music-studies/actions/runs/31414189191)
+  passed 10/10 default tests and 11/11 JSON-enabled tests with MSVC;
+- the same 1,206-byte fixture used on Linux matched exactly on Windows;
+- 10,000 parse-and-validation iterations on `beanstar` averaged 16,051 ns with
+  zero failures;
+- the complete probe process peaked at 5,500,928 bytes of working set;
+- the 36,352-byte probe was 26,112 bytes larger than the 10,240-byte unlinked
+  CLI built in the same configuration;
+- the bundle contained the 649,278-byte static archive and its 2,205-byte MIT
+  license file, and no `json-c` runtime DLL was imported; and
+- local and `beanstar` hashes matched before execution. No dependency, service,
+  repository, audio, or MIDI component was installed or opened, and the
+  temporary bundle was removed.
 
-- obtain `json-c` 0.17 or newer through the selected repeatable package path;
-- compile an equivalent Windows measurement target and parse the same fixture
-  with the same validation contract;
-- record executable, library, process-memory, and parse-time evidence;
-- confirm static-library packaging, dynamic MSVC runtime compatibility, and
-  license attribution; and
-- leave the portable core and wire protocol unchanged.
+Peak working set is the whole short-lived probe process, not incremental parser
+memory. These timings remain dependency evidence, not switch-latency results.
+The raw evidence is in
+[benchmarks/json-c-windows.json](benchmarks/json-c-windows.json).
 
-Failure on Windows reopens the parser choice before product runtime code adopts
-this dependency.
+## Windows Reproduction
+
+From a Visual Studio developer PowerShell with vcpkg available:
+
+```powershell
+cmake -S docs/tools/music-rig -B build/music-rig-json-c `
+  "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" `
+  -DVCPKG_TARGET_TRIPLET=x64-windows-static-md `
+  -DMUSIC_RIG_ENABLE_JSON_C_SPIKE=ON
+cmake --build build/music-rig-json-c --config Release
+ctest --test-dir build/music-rig-json-c -C Release --output-on-failure
+```
+
+The probe and dependency remain opt-in. A version or package-path change must
+repeat the build, exact-fixture, linkage, license, and footprint checks.

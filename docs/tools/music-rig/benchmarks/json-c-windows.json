@@ -1,0 +1,173 @@
+{
+  "schema": "music-studies/json-c-dependency-report/v1",
+  "captured_at": "2026-08-10T17:41:09.7769478Z",
+  "source_commit": "6c07e7a3e8ae208a067f0f1e8eb0527f525a154f",
+  "reference_machine": {
+    "hostname": "BEANSTAR",
+    "manufacturer": "LENOVO",
+    "machine_type": "82CF",
+    "cpu": "Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz",
+    "memory_bytes": 17083187200,
+    "operating_system": "Microsoft Windows 11 Pro",
+    "version": "10.0.26200",
+    "build": "26200",
+    "architecture": "64-bit"
+  },
+  "dependency": {
+    "name": "json-c",
+    "version": "0.18",
+    "port_version": "0.18-20240915",
+    "package_manager": "vcpkg",
+    "vcpkg_tool_version": "2026-07-27-98d7cb0cf1f4686a3e43aa5672b6230c1d56bce8",
+    "vcpkg_registry_baseline": "56bb2411609227288b70117ead2c47585ba07713",
+    "triplet": "x64-windows-static-md",
+    "linkage": "static-vcpkg",
+    "static_library_bytes": 649278,
+    "static_library_sha256": "18ad2d4ccfcaa0e22016e05d6a9f69f5ccd27ae5fc8d5496a1b4be9fa745343c",
+    "license": "MIT",
+    "license_file_bytes": 2205,
+    "license_file_sha256": "74c1e6ca5eba76b54d0ad00d4815c8315c1b3bc45ff99de61d103dc92486284c"
+  },
+  "fixture": {
+    "path": "tests/fixtures/compiled-runtime-minimal.json",
+    "schema": "music-studies/compiled-performance-rig/v1",
+    "bytes": 1206,
+    "sha256": "65a1fca91f56e053a4b9bad19d1196e3b1190e26432119e817763dd5e6baef5a",
+    "exact_linux_source_match": true,
+    "device_profiles": 5,
+    "mappings": 8
+  },
+  "build": {
+    "cmake_option": "MUSIC_RIG_ENABLE_JSON_C_SPIKE",
+    "default_enabled": false,
+    "default_cli_links_json_c": false,
+    "compiler": "MSVC",
+    "compiler_version": "19.51.36252.0"
+  },
+  "hosted_build": {
+    "workflow_run": 31414189191,
+    "workflow_url": "https://github.com/pedrofmj/music-studies/actions/runs/31414189191",
+    "windows_job": 93539160577,
+    "windows_job_url": "https://github.com/pedrofmj/music-studies/actions/runs/31414189191/job/93539160577",
+    "runner_image": "win25-vs2026",
+    "runner_image_version": "20260803.193.1",
+    "default_tests_passed": 10,
+    "json_enabled_tests_passed": 11,
+    "tests_failed": 0
+  },
+  "artifact": {
+    "id": 9072788853,
+    "name": "music-rig-windows-reference-6c07e7a3e8ae208a067f0f1e8eb0527f525a154f",
+    "archive_bytes": 745017,
+    "archive_sha256_from_uploader": "b98614c9dbcecffd6f28dd16a7047a2ac297e8f7b8c7f36d543b9ef30d6fe4bc",
+    "manifest_created_at": "2026-08-10T17:29:50.2632705Z",
+    "manifest_bytes": 1900,
+    "manifest_sha256": "e4b2d1f8175c7b9861ac0adfa8a2f4bab017f759940e0ac054ffe670fc27a0e2",
+    "manifest_file_count": 8,
+    "local_manifest_match": true,
+    "reference_machine_manifest_match": true,
+    "files": [
+      {
+        "name": "compiled-runtime-minimal.json",
+        "bytes": 1206,
+        "sha256": "65a1fca91f56e053a4b9bad19d1196e3b1190e26432119e817763dd5e6baef5a"
+      },
+      {
+        "name": "json-c-LICENSE.txt",
+        "bytes": 2205,
+        "sha256": "74c1e6ca5eba76b54d0ad00d4815c8315c1b3bc45ff99de61d103dc92486284c"
+      },
+      {
+        "name": "json-c-static.lib",
+        "bytes": 649278,
+        "sha256": "18ad2d4ccfcaa0e22016e05d6a9f69f5ccd27ae5fc8d5496a1b4be9fa745343c"
+      },
+      {
+        "name": "music_rig_json_c_spike.exe",
+        "bytes": 36352,
+        "sha256": "0bc0b28e25e8a8aac2ff5c7d32dae48d512005e992a37f433c0352be13980564"
+      },
+      {
+        "name": "music-rig-json-c-baseline.exe",
+        "bytes": 10240,
+        "sha256": "f2f39ecdc65f24c1f6221595659c0530042ced3f4de80e488d6709ff9e43b779"
+      },
+      {
+        "name": "music_rig_protocol_test.exe",
+        "bytes": 13312,
+        "sha256": "a1a0e11495d03688b05a0febae5ac8ec499ad3638d2967de7e36c55fc42e8074"
+      },
+      {
+        "name": "music_rig_windows_generation_adoption_test.exe",
+        "bytes": 11776,
+        "sha256": "d799dc5410f90448695fc611c5dca65a49c9337c8e99f491890d4bc2015a5476"
+      },
+      {
+        "name": "music_rig_windows_ipc_roundtrip_test.exe",
+        "bytes": 17408,
+        "sha256": "7e70ddda55487fa37c92ce746a2235724ef7030dde9f1932a73a26e74fa9df10"
+      }
+    ]
+  },
+  "run": {
+    "started_at": "2026-08-10T17:41:09.7769478Z",
+    "finished_at": "2026-08-10T17:41:11.8120529Z",
+    "command": "music_rig_json_c_spike.exe compiled-runtime-minimal.json music-rig-json-c-baseline.exe",
+    "exit_code": 0,
+    "schema": "music-studies/json-c-dependency-spike/v1",
+    "platform": "windows",
+    "architecture": "x86_64",
+    "input_bytes": 1206,
+    "parse_iterations": 10000,
+    "elapsed_ns": 160517100,
+    "average_parse_ns": 16051,
+    "peak_process_working_set_bytes": 5500928,
+    "executable_bytes": 36352,
+    "baseline_executable_bytes": 10240,
+    "static_link_delta_bytes": 26112,
+    "failures": 0
+  },
+  "baseline_cli": {
+    "command": "music-rig-json-c-baseline.exe --version",
+    "exit_code": 0,
+    "output": "music-rig 0.1.0 protocol 1 profile-schema 1"
+  },
+  "dynamic_import_audit": {
+    "json_c_runtime_dll": false,
+    "imports": [
+      "KERNEL32.dll",
+      "ADVAPI32.dll",
+      "VCRUNTIME140.dll",
+      "api-ms-win-crt-heap-l1-1-0.dll",
+      "api-ms-win-crt-stdio-l1-1-0.dll",
+      "api-ms-win-crt-string-l1-1-0.dll",
+      "api-ms-win-crt-runtime-l1-1-0.dll",
+      "api-ms-win-crt-convert-l1-1-0.dll",
+      "api-ms-win-crt-locale-l1-1-0.dll",
+      "api-ms-win-crt-time-l1-1-0.dll",
+      "api-ms-win-crt-math-l1-1-0.dll"
+    ]
+  },
+  "transfer": {
+    "transport": "key-authenticated OpenSSH and SCP",
+    "temporary_directory": "user TEMP/music-rig-reference-31414189191",
+    "repository_copied_to_reference_machine": false,
+    "dependency_installed_on_reference_machine": false,
+    "service_installed": false
+  },
+  "cleanup": {
+    "temporary_directory_removed": true,
+    "remaining_test_processes": 0
+  },
+  "gate": {
+    "linux": "pass",
+    "windows": "pass",
+    "decision": "accepted-control-plane-only"
+  },
+  "scope": {
+    "synthetic_only": true,
+    "audio_or_midi_apis_opened": false,
+    "audio_or_midi_routes_changed": false,
+    "live_rig_changes": false
+  }
+}

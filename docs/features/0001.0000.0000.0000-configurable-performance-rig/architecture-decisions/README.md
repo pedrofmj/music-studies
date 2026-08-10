@@ -12,6 +12,12 @@ This directory contains short, implementation-binding decisions for feature
 - [ADR 0003: Performance Acceptance Thresholds](0003-performance-acceptance-thresholds.md)
   is accepted. It fixes the portable timing, daemon-resource, and zero-failure
   stability gates and requires a separate no-event idle observation.
+- [ADR 0004: Windows Local IPC Uses Named Pipes](0004-windows-local-ipc-named-pipes.md)
+  is accepted. Windows uses local message-mode named pipes with explicit local
+  access, deadline, and cleanup requirements.
+- [ADR 0005: JSON-C For Control-Plane Parsing](0005-json-c-control-plane-parsing.md)
+  is accepted. Linux and Windows use `json-c` only while preparing immutable
+  runtime generations; real-time callbacks never parse JSON.
 
 Accepted records constrain later schemas, compiler output, runtime behavior,
 tests, and deployment. A decision may be superseded only by another recorded

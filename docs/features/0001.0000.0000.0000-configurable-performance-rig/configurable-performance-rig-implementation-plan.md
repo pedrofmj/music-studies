@@ -24,6 +24,8 @@ Completed Milestone 0 work:
 - portable versioned frames with a measured Linux `SOCK_SEQPACKET` round trip;
 - opt-in `json-c` 0.17 Linux build, parse-cost, process-RSS, and binary-footprint
   proof with no dependency in the default CLI;
+- pinned `json-c` 0.18 Windows static build, license and linkage audit, hosted
+  MSVC suite, and hash-verified `beanstar` parse and footprint proof;
 - repeatable offline parity tests for the protected Arturia and SMK-25 helpers,
   with no service, JACK-client, graph, or production-state activation;
 - a versioned current-rack startup contract plus deterministic planned
@@ -56,10 +58,9 @@ live graph also contains the diagnostic link
 observed but not removed or added to the protected baseline.
 
 Open Milestone 0 gates include a clean transient-free Airstar capture,
-operator-recorded startup transcript evidence, the Windows `json-c` proof,
-remaining resource evidence on the selected `beanstar` Windows reference
-machine, and the Windows backend decision. No experimental runtime is installed
-or connected to the live rig.
+operator-recorded startup transcript evidence, remaining resource evidence on
+the selected `beanstar` Windows reference machine, and the Windows backend
+decision. No experimental runtime is installed or connected to the live rig.
 
 ## Objective
 
