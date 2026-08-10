@@ -1,0 +1,157 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../../.." && pwd)"
+readonly BASELINE="${SCRIPT_DIR}/protected-baseline.json"
+readonly SETUP="${SCRIPT_DIR}/setup.json"
+
+quiet=false
+failures=0
+passes=0
+
+usage() {
+    printf '%s\n' \
+        "Usage: $(basename "$0") [--quiet]" \
+        "" \
+        "Verify the protected single-rig source artifacts without changing the" \
+        "machine, services, audio graph, MIDI graph, or repository."
+}
+
+pass() {
+    ((passes += 1))
+    if [[ $quiet == false ]]; then
+        printf 'PASS  %s\n' "$*"
+    fi
+}
+
+fail() {
+    ((failures += 1))
+    printf 'FAIL  %s\n' "$*" >&2
+}
+
+while (($#)); do
+    case $1 in
+        --quiet)
+            quiet=true
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            printf 'Unknown option: %s\n' "$1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
+
+for command in jq sha256sum; do
+    if ! command -v "$command" >/dev/null 2>&1; then
+        printf 'Required command not found: %s\n' "$command" >&2
+        exit 2
+    fi
+done
+
+if jq -e '
+    .schema == "music-studies/protected-live-rig-baseline/v1"
+    and .status == "protected-production-default"
+    and .activation_policy.remains_default == true
+    and .activation_policy.experimental_runtime_enabled_by_default == false
+    and .activation_policy.explicit_promotion_required == true
+    and (.protected_files | length) > 0
+    and (([.protected_files[].path] | length)
+        == ([.protected_files[].path] | unique | length))
+    and all(.protected_files[];
+        ((.path | type) == "string")
+        and (.sha256 | test("^[0-9a-f]{64}$")))
+' "$BASELINE" >/dev/null; then
+    pass "protected baseline schema and activation policy"
+else
+    fail "invalid protected baseline manifest: $BASELINE"
+fi
+
+while IFS=$'\t' read -r relative expected_hash; do
+    case $relative in
+        /*|../*|*/../*|*/..)
+            fail "unsafe protected path: $relative"
+            continue
+            ;;
+    esac
+
+    target="$REPO_ROOT/$relative"
+    if [[ ! -f $target ]]; then
+        fail "protected artifact is missing: $relative"
+        continue
+    fi
+
+    actual_hash=$(sha256sum "$target")
+    actual_hash=${actual_hash%% *}
+    if [[ $actual_hash == "$expected_hash" ]]; then
+        pass "protected artifact $relative"
+    else
+        fail "protected artifact changed: $relative"
+    fi
+done < <(jq -r '.protected_files[] | [.path, .sha256] | @tsv' "$BASELINE")
+
+plugins=$(jq -r '.expected.carla_plugins' "$BASELINE")
+project_connections=$(jq -r '.expected.carla_project_connections' "$BASELINE")
+raw_links=$(jq -r '.expected.raw_graph_links' "$BASELINE")
+midi_links=$(jq -r '.expected.midi_graph_links' "$BASELINE")
+deployment_links=$(jq -r '.expected.deployment_graph_links' "$BASELINE")
+services=$(jq -r '.expected.services' "$BASELINE")
+quantum=$(jq -r '.expected.pipewire_quantum_frames' "$BASELINE")
+
+if jq -e \
+    --argjson plugins "$plugins" \
+    --argjson project_connections "$project_connections" \
+    --argjson raw_links "$raw_links" \
+    --argjson midi_links "$midi_links" \
+    --argjson deployment_links "$deployment_links" \
+    --argjson services "$services" \
+    --argjson quantum "$quantum" '
+        .schema == "music-studies/pedro-live-setup/v1"
+        and .carla.plugins == $plugins
+        and .carla.project_patchbay_connections == $project_connections
+        and .patchbay.raw_links == $raw_links
+        and .patchbay.midi_links == $midi_links
+        and .patchbay.deployment_links == $deployment_links
+        and (.services | length) == $services
+        and .carla.pipewire_quantum == $quantum
+    ' "$SETUP" >/dev/null; then
+    pass "setup manifest matches protected structural counts"
+else
+    fail "setup manifest does not match protected structural counts"
+fi
+
+check_snapshot() {
+    local relative=$1
+    local scope=$2
+    local expected_links=$3
+    local target="$REPO_ROOT/$relative"
+
+    if jq -e --arg scope "$scope" --argjson links "$expected_links" '
+        .schema == "https://music-studies.local/schemas/pipewire-patchbay/v1"
+        and .scope == $scope
+        and (.links | length) == $links
+    ' "$target" >/dev/null; then
+        pass "$scope graph contains $expected_links links"
+    else
+        fail "$scope graph does not contain $expected_links links"
+    fi
+}
+
+check_snapshot "src/midi-setup/airstar-patchbay.json" "all" "$raw_links"
+check_snapshot "src/midi-setup/airstar-midi-patchbay.json" "midi-only" "$midi_links"
+check_snapshot "src/midi-setup/pedro-live-rack-patchbay.json" \
+    "pedro-live-rack" "$deployment_links"
+
+if ((failures > 0)); then
+    printf 'Protected baseline verification failed: %d failure(s), %d pass(es)\n' \
+        "$failures" "$passes" >&2
+    exit 1
+fi
+
+printf 'Protected baseline verified: %d checks, 0 failures\n' "$passes"

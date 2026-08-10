@@ -6,15 +6,15 @@
 | --- | --- |
 | Host | airstar, Ubuntu 24.04.4 LTS, x86_64 |
 | Audio/MIDI | PipeWire 1.0.5, WirePlumber 0.4.17, PipeWire Pulse |
-| Host | Carla Flatpak 2.5.10, studio.kx.carla |
+| Plugin host | Carla Flatpak 2.5.10, studio.kx.carla |
 | Project | /c/music/carla/pedro.uproject |
-| Rack structure | 47 uniquely named plugins, 16 native SF2 slots, 106 Carla project connections |
-| Saved graph | 112 raw links; 110 performance-owned deployment links; 64 MIDI links |
+| Rack structure | 49 uniquely named plugins, 16 native SF2 slots, 111 Carla project connections |
+| Saved graph | 117 raw links; 115 performance-owned deployment links; 67 MIDI links |
 | Quantum | 2048 frames, persisted by pipewire-carla-quantum.service |
 | Output | Tiger Lake Speaker + Headphones through the rack EQ and Arturia gate |
 
 The project stored in Git and the deployed project had SHA-256
-e3e748cda372c044e86679589f4061bb8633ac361939859b9322fdd0d262bf91
+48ea4f777c68ebd39105902739258795edfa96fefd8820b62fb31d4efe329974
 at capture.
 
 ## Controllers

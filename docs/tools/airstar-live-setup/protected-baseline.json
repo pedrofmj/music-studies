@@ -1,0 +1,134 @@
+{
+  "schema": "music-studies/protected-live-rig-baseline/v1",
+  "id": "airstar-single-rig-2026-08-09",
+  "status": "protected-production-default",
+  "description": "Known-good single-rig setup used for rehearsals, studio work, and live performance.",
+  "captured_at": "2026-08-09T15:03:55-03:00",
+  "source_commit": "c2e1911406f942a9da0a9f91c65eae8a32148e28",
+  "reference_host": {
+    "hostname": "airstar",
+    "platform": "linux",
+    "architecture": "x86_64"
+  },
+  "expected": {
+    "carla_plugins": 49,
+    "carla_project_connections": 111,
+    "raw_graph_links": 117,
+    "midi_graph_links": 67,
+    "deployment_graph_links": 115,
+    "services": 4,
+    "pipewire_quantum_frames": 2048
+  },
+  "activation_policy": {
+    "remains_default": true,
+    "experimental_runtime_enabled_by_default": false,
+    "explicit_promotion_required": true
+  },
+  "protected_files": [
+    {
+      "path": "docs/tools/airstar-live-setup/setup.json",
+      "sha256": "3af1bb063239dc47a425ea3df109a260fea4dff98a0e645380f1d6e33b7275d6"
+    },
+    {
+      "path": "docs/tools/airstar-live-setup/install-airstar-live-setup",
+      "sha256": "c584bfc23e05b7cdb458cf95b1705ddab2dbde4e610a24ab11ffefa4e1533ac4"
+    },
+    {
+      "path": "docs/tools/airstar-live-setup/validate-airstar-live-setup",
+      "sha256": "37845f1128f98121bfa197778fdcae96d48c430ff3b7f0ce7712972640d621df"
+    },
+    {
+      "path": "docs/tools/airstar-live-setup/materialize-carla-project.py",
+      "sha256": "5282b4c724eadd4053c28ed8317f69f03c0c8e9f11e1d42149f8ae5364a671ba"
+    },
+    {
+      "path": "docs/tools/airstar-live-setup/materialize-patchbay.py",
+      "sha256": "6adc2dac50b33510d20f4d88980fccef6f17bb7ac4a3a643aed92f592b1ffd5f"
+    },
+    {
+      "path": "docs/tools/airstar-live-setup/controller-profiles.md",
+      "sha256": "6a0f71a443fa20ef787e8f8f324ec3eff1b92d44f4cd905c64aa9fc664a700f1"
+    },
+    {
+      "path": "src/audio-software/carla/projects/pedro-live-rack/pedro.uproject",
+      "sha256": "48ea4f777c68ebd39105902739258795edfa96fefd8820b62fb31d4efe329974"
+    },
+    {
+      "path": "src/audio-software/carla/projects/pedro-live-rack/project.json",
+      "sha256": "2677eacef274486d0e9626a5f61fb8f589d6eea87d44ca788062f8610ee4032e"
+    },
+    {
+      "path": "src/midi-setup/airstar-patchbay.json",
+      "sha256": "7f055a94ca98b945d7dc7372bd4e88246c26ade74a45beff217460eb75dbece1"
+    },
+    {
+      "path": "src/midi-setup/airstar-midi-patchbay.json",
+      "sha256": "8bf1bfdc156fa26583fe8a96142a1a550111b945ca2a91e7fd2b94462e2b305c"
+    },
+    {
+      "path": "src/midi-setup/pedro-live-rack-patchbay.json",
+      "sha256": "f6170a4c49579711033ed0379d4a7426f4ee15d1f441adbbbfedb358d016b429"
+    },
+    {
+      "path": "bin/carla-pedro-project",
+      "sha256": "2b53f43620b0805be65b713ed325652762b2b1beb7a14eb84c78ded1f8d3f0a3"
+    },
+    {
+      "path": "bin/carla-pedro-project.desktop",
+      "sha256": "77777a240b2efb354e61c43f18e8ba03e2e881688f499ef9e2cfd63eddbba953"
+    },
+    {
+      "path": "bin/pipewire-patchbay-json",
+      "sha256": "0cd42fcefcf21766682ef7973eb3166f054fa03a6f21e1b8c00ab87eae3b68b4"
+    },
+    {
+      "path": "bin/pipewire-patchbay-refresh",
+      "sha256": "c6af8cb32cd6d03c8b78054c517d2c95d2218b983ba0c1664cd90bd88ef85142"
+    },
+    {
+      "path": "bin/pipewire-patchbay-watch.service",
+      "sha256": "37523959de830f9049389f69a0bb4bf72820773f0af122990f86fc4dcf112f82"
+    },
+    {
+      "path": "docs/tools/arturia-main-volume-encoder/arturia-main-volume-encoder.c",
+      "sha256": "d54b2145bec2b31f7e2f5ccffba43299de4b9af69f673f9c08e74bce49887964"
+    },
+    {
+      "path": "docs/tools/arturia-main-volume-encoder/arturia-main-volume-encoder.service",
+      "sha256": "b0e53cc5b467269106cfa357af8c42eb0c5ad340565b64ff7c5493a0333de701"
+    },
+    {
+      "path": "docs/tools/arturia-main-volume-encoder/install-arturia-main-volume-encoder",
+      "sha256": "1d5281a3e319e8e87a46b7858fdfff7917329050320503fcdcdcd94db6c7f9f6"
+    },
+    {
+      "path": "docs/tools/smk25-pad-layers/smk25-pad-layers.c",
+      "sha256": "68ed1a7ac6940d720bb63a43e3cfea3dff97f9ee63c604778977e733a5cd2293"
+    },
+    {
+      "path": "docs/tools/smk25-pad-layers/smk25-pad-layers.conf",
+      "sha256": "893e630794b844124c6117d641e929dea1d08102634d0afc6f487572efa92eeb"
+    },
+    {
+      "path": "docs/tools/smk25-pad-layers/smk25-pad-layers.service",
+      "sha256": "5d0c6ad00e620173b95a22f58475fcea38491e778a00e641b43592afc5c7e335"
+    },
+    {
+      "path": "docs/tools/smk25-pad-layers/install-smk25-pad-layers",
+      "sha256": "063633b58111877005cef4cdc7d9051a81aed95c861c7a7fc34a4a6ff1ad45c8"
+    },
+    {
+      "path": "docs/tools/pipewire-carla-quantum/pipewire-carla-quantum.service",
+      "sha256": "175d06ba071d602e8d21460c4932937dc7cbc1e1da31555dcf1fbdeb94ab2044"
+    },
+    {
+      "path": "docs/tools/pipewire-carla-quantum/install-pipewire-carla-quantum",
+      "sha256": "0065074dff993ee1932654a46fdca501984a1457136f31fe1bf0797bf81c64e7"
+    }
+  ],
+  "restore": {
+    "command": "docs/tools/airstar-live-setup/restore-protected-baseline --apply",
+    "preview_is_default": true,
+    "requires_carla_stopped": true
+  }
+}

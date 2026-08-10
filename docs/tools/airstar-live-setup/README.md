@@ -5,11 +5,46 @@ performance rack. It combines the versioned project, controller mappings,
 PipeWire graph, helper services, operating-system dependencies, and external
 asset fingerprints into one installable definition.
 
+## Protected Production Baseline
+
+The versioned single-rig setup is the production default while Configurable
+Performance Rig development is in progress. Experimental code does not replace
+its project, Patchbay snapshot, services, controller helpers, startup command,
+or state.
+
+Verify the protected source artifacts at any time. This command is read-only:
+
+~~~bash
+docs/tools/airstar-live-setup/verify-protected-baseline
+~~~
+
+Preview the recovery procedure, also without changing anything:
+
+~~~bash
+docs/tools/airstar-live-setup/restore-protected-baseline
+~~~
+
+Only an intentional recovery uses:
+
+~~~bash
+docs/tools/airstar-live-setup/restore-protected-baseline --apply
+~~~
+
+The apply operation requires Carla to be closed, saves timestamped copies of the
+currently deployed project, graph snapshot, configuration, and service evidence,
+then reinstalls the protected setup. It does not launch Carla automatically.
+
 ## Owned By Git
 
 - setup.json is the machine-readable source of truth for the Ubuntu baseline,
   packages, hardware roles, controller messages, assets, Carla structure,
   services, quantum, and graph checksums.
+- protected-baseline.json identifies and fingerprints every artifact required
+  to restore the production single-rig setup.
+- verify-protected-baseline validates those source artifacts without touching
+  the installed machine.
+- restore-protected-baseline previews or explicitly restores the protected
+  deployment while preserving pre-restore evidence.
 - install-airstar-live-setup installs packages, Carla, the project, launchers,
   helper services, performance quantum, and the saved graph.
 - validate-airstar-live-setup checks the installed machine and optionally its
@@ -109,14 +144,16 @@ Save the Carla project and refresh its live Patchbay first. From this repository
 run:
 
 ~~~bash
-docs/tools/airstar-live-setup/capture-from-airstar
+docs/tools/airstar-live-setup/capture-from-airstar --update-protected-baseline
 ~~~
 
 The command fetches /c/music/carla/pedro.uproject, exports the full and
 MIDI-only live graphs, rebuilds the curated deployment graph, validates the
-48-plugin/109-connection contract, and updates checksums. Review and commit the
-result. If the rack gains or loses plugins, deliberately update the manifest
-and validators rather than bypassing the structural check.
+49-plugin/111-connection contract, and updates checksums. The required flag
+exists because this operation replaces protected artifacts; it is not used for
+experiments or diagnostics. Review and commit the result, then deliberately
+update the protected-baseline fingerprints. If the rack gains or loses plugins,
+update the manifest and validators rather than bypassing the structural check.
 
 ## Windows Boundary
 

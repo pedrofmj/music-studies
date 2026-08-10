@@ -10,6 +10,25 @@ readonly MIDI_SNAPSHOT="${REPO_ROOT}/src/midi-setup/airstar-midi-patchbay.json"
 readonly DEPLOYMENT_SNAPSHOT="${REPO_ROOT}/src/midi-setup/pedro-live-rack-patchbay.json"
 readonly PROJECT="${REPO_ROOT}/src/audio-software/carla/projects/pedro-live-rack/pedro.uproject"
 
+usage() {
+    printf '%s\n' \
+        "Usage: $(basename "$0") --update-protected-baseline [HOST] [PROJECT]" \
+        "" \
+        "Replace the versioned stable-rig project and graph after an intentional" \
+        "change. This is not a diagnostic or experimental capture command."
+}
+
+if [[ ${1-} == --help || ${1-} == -h ]]; then
+    usage
+    exit 0
+fi
+
+if [[ ${1-} != --update-protected-baseline ]]; then
+    usage >&2
+    exit 2
+fi
+shift
+
 host=${1:-pedro.ferreira@airstar}
 remote_project=${2:-/c/music/carla/pedro.uproject}
 temporary=$(mktemp -d)

@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+readonly MANIFEST="${SCRIPT_DIR}/setup.json"
+readonly INSTALLER="${SCRIPT_DIR}/install-airstar-live-setup"
+readonly VERIFIER="${SCRIPT_DIR}/verify-protected-baseline"
+
+apply=false
+full_check=false
+soundfont_root="${HOME}/Flash/PED/MIDI/Pack de Timbres/Library"
+project_target="/c/music/carla/pedro.uproject"
+
+usage() {
+    printf '%s\n' \
+        "Usage: $(basename "$0") [OPTIONS]" \
+        "" \
+        "Verify and restore the protected single-rig Airstar setup." \
+        "Without --apply this command is a read-only preview." \
+        "" \
+        "  --apply                Perform the restore after verification and backup" \
+        "  --fast                 Skip large asset hashes (the default)" \
+        "  --full-check           Hash every large external asset after restore" \
+        "  --soundfont-root PATH  Override the standard SoundFont library root" \
+        "  --project PATH         Override /c/music/carla/pedro.uproject"
+}
+
+while (($#)); do
+    case $1 in
+        --apply)
+            apply=true
+            ;;
+        --fast)
+            full_check=false
+            ;;
+        --full-check)
+            full_check=true
+            ;;
+        --soundfont-root)
+            [[ -n ${2-} ]] || {
+                printf '%s\n' "--soundfont-root requires a path" >&2
+                exit 2
+            }
+            soundfont_root=$2
+            shift
+            ;;
+        --project)
+            [[ -n ${2-} ]] || {
+                printf '%s\n' "--project requires a path" >&2
+                exit 2
+            }
+            project_target=$2
+            shift
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            printf 'Unknown option: %s\n' "$1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
+
+for command in cp date jq mkdir pgrep sha256sum systemctl; do
+    if ! command -v "$command" >/dev/null 2>&1; then
+        printf 'Required command not found: %s\n' "$command" >&2
+        exit 2
+    fi
+done
+
+"$VERIFIER"
+
+snapshot_target="$HOME/$(jq -r '.paths.patchbay_snapshot' "$MANIFEST")"
+launcher_config="$HOME/.config/pedro-live-rack.conf"
+backup_root="$HOME/.local/state/pedro-live-rack/protected-restore-backups"
+
+if [[ $apply == false ]]; then
+    printf '%s\n' \
+        "" \
+        "PREVIEW ONLY: no files, services, audio links, or MIDI links were changed." \
+        "Restore source: protected and verified" \
+        "Project target: $project_target" \
+        "Patchbay target: $snapshot_target" \
+        "Backups will be stored below: $backup_root" \
+        "" \
+        "Close Carla, then apply only when restoration is required:" \
+        "  $0 --apply"
+    exit 0
+fi
+
+if pgrep -f '/app/share/carla/carla' >/dev/null 2>&1; then
+    printf '%s\n' \
+        "Carla is running. No changes were made." \
+        "Close Carla and rerun the restore command." >&2
+    exit 1
+fi
+
+timestamp=$(date +%Y%m%dT%H%M%S)
+backup_dir="$backup_root/$timestamp"
+mkdir -p "$backup_dir"
+
+backup_file() {
+    local source=$1
+    local name=$2
+
+    if [[ -e $source ]]; then
+        cp -a "$source" "$backup_dir/$name"
+    fi
+}
+
+backup_file "$project_target" "deployed-project.uproject"
+backup_file "$snapshot_target" "deployed-patchbay.json"
+backup_file "$launcher_config" "pedro-live-rack.conf"
+
+service_evidence="$backup_dir/user-services.txt"
+: > "$service_evidence"
+while IFS= read -r service; do
+    enabled=not-found
+    active=inactive
+    if systemctl --user is-enabled --quiet "$service" 2>/dev/null; then
+        enabled=enabled
+    elif systemctl --user cat "$service" >/dev/null 2>&1; then
+        enabled=disabled
+    fi
+    if systemctl --user is-active --quiet "$service" 2>/dev/null; then
+        active=active
+    fi
+    printf '%s enabled=%s active=%s\n' "$service" "$enabled" "$active" \
+        >> "$service_evidence"
+
+    unit="$HOME/.config/systemd/user/$service"
+    if [[ -f $unit ]]; then
+        cp -a "$unit" "$backup_dir/$service"
+    fi
+done < <(
+    jq -r '.services[].name' "$MANIFEST"
+    printf '%s\n' music-rigd.service
+)
+
+hash_evidence="$backup_dir/deployed-file-hashes.txt"
+: > "$hash_evidence"
+for target in "$project_target" "$snapshot_target" "$launcher_config"; do
+    if [[ -f $target ]]; then
+        sha256sum "$target" >> "$hash_evidence"
+    fi
+done
+
+if systemctl --user cat music-rigd.service >/dev/null 2>&1; then
+    systemctl --user disable --now music-rigd.service
+fi
+
+installer_options=(
+    --skip-packages
+    --replace-snapshot
+    --soundfont-root "$soundfont_root"
+    --project "$project_target"
+)
+if [[ $full_check == true ]]; then
+    installer_options+=(--full-check)
+else
+    installer_options+=(--fast)
+fi
+
+"$INSTALLER" "${installer_options[@]}"
+
+printf '%s\n' \
+    "" \
+    "Protected single-rig files and services were restored." \
+    "Pre-restore backup: $backup_dir" \
+    "Launch the stable rack:" \
+    "  $HOME/bin/carla-pedro-project" \
+    "After all plugins load, run the read-only live validation:" \
+    "  $SCRIPT_DIR/validate-airstar-live-setup --live --fast"

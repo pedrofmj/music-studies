@@ -2,7 +2,8 @@
 
 Language: **English**
 
-Status: proposed execution plan; implementation has not started.
+Status: Milestone 0 in progress; the protected single-rig deployment remains
+the production default.
 
 Related documents:
 
@@ -21,7 +22,7 @@ The completed system must:
 - support independently selectable Device Profiles;
 - switch global and device profiles through the `music-rig` CLI;
 - support future MIDI-triggered switching through the same runtime operation;
-- preserve the existing machine-transfer and validation workflows; and
+- preserve the existing machine-transfer and validation workflows;
 - run the same authored Rig/Profile definitions and CLI contract on multiple
   operating systems through portable core code and platform adapters;
 - meet measured latency, CPU, memory, and audio-stability requirements.
@@ -53,6 +54,35 @@ and profile schemas must be portable from their first version; only platform
 adapters and bindings may differ. macOS is a later adapter target and must not
 require redesigning those contracts.
 
+## Protected Stable Baseline
+
+The current single-rig setup is the protected production baseline. New profile
+functionality is additive and experimental until it passes its milestone exit
+gate and is explicitly promoted. Ordinary development, compilation, tests, and
+installation must not edit or replace the protected Carla project, Patchbay
+snapshots, controller helpers, services, quantum configuration, or Hardware
+Preset documentation.
+
+The repository maintains a machine-readable protected-baseline manifest with
+checksums for every artifact required to rebuild the current setup. A read-only
+verification command must pass before any experiment. A separate restore
+command must:
+
+1. refuse to proceed while Carla is running;
+2. verify every protected source artifact before changing the machine;
+3. back up the current deployed project, graph snapshot, configuration, and
+   service evidence;
+4. stop and disable only the experimental runtime;
+5. reinstall the protected project, helpers, services, graph snapshot, and
+   quantum; and
+6. finish with the existing validator and instructions for the live check.
+
+The restore command is preview-only unless an explicit apply flag is present.
+No milestone may make the experimental runtime the default startup path until
+the protected restore has been rehearsed successfully and the user explicitly
+approves promotion. The protected artifacts may change only as a separate,
+intentional stable-rig update.
+
 ## Non-Negotiable Invariants
 
 1. The current `full-live-rack` behavior remains installable and recoverable at
@@ -76,6 +106,15 @@ require redesigning those contracts.
 12. A platform that cannot satisfy a profile fails before activation and reports
     every unresolved capability; it never applies a silent substitute or partial
     downgrade.
+13. The protected single-rig project, graph, services, and startup command remain
+    the default until explicit promotion.
+14. Experimental services, ports, state, and installed files use separate names
+    and locations and are disabled by default.
+15. No automated test may mutate the live graph. A live mutation requires an
+    explicit operator action, a current backup, a passing restore preflight, and
+    a milestone procedure that names every expected change.
+16. A rollback path must exist and be tested before the corresponding live
+    ownership cutover is attempted.
 
 ## Current Baseline
 
@@ -509,6 +548,10 @@ reported as those two values, not as a 20 ms end-to-end switch.
 
 ### Tasks
 
+- Record the current setup as an immutable protected-baseline manifest.
+- Add a read-only protected-baseline verifier.
+- Add a preview-by-default one-command restore path for the current setup.
+- Document the explicit opt-in boundary for every future live experiment.
 - Capture a fresh project, full graph, MIDI graph, deployment graph, packages,
   services, sample rate, quantum, CPU, memory, and xrun baseline from `airstar`.
 - Exercise and record the existing Arturia and SMK self-tests.
@@ -532,6 +575,9 @@ reported as those two values, not as a 20 ms end-to-end switch.
 ### Deliverables
 
 - baseline report under `docs/tools/music-rig/benchmarks/baseline-airstar.md`;
+- protected-baseline manifest and checksum verification report;
+- preview-by-default restore command with timestamped pre-restore backups;
+- documented restore rehearsal procedure;
 - machine-readable baseline JSON;
 - short architecture decision records for JSON parsing, portable core
   boundaries, Linux/Windows IPC, real-time generation publication, PipeWire
@@ -544,7 +590,11 @@ No schema or runtime merge proceeds until the baseline is reproducible and the
 control-plane spike demonstrates that the selected C and IPC design can meet the
 20 ms commit target with substantial margin. The portable core, CLI skeleton,
 protocol types, and JSON dependency must compile on Linux and Windows before
-Linux live adapters are allowed to shape public core interfaces.
+Linux live adapters are allowed to shape public core interfaces. The protected
+artifact verifier must pass, the restore command must pass its non-mutating
+tests, and the current setup must remain the default; a production restore
+rehearsal is required before the first live ownership cutover, not during this
+read-only milestone.
 
 ## Milestone 1: Schemas And Current Profile Extraction
 
@@ -954,6 +1004,11 @@ perception.
 
 ## Deployment Strategy
 
+Every stage is opt-in. The protected single-rig startup remains unchanged, and
+no general installer enables an experimental service or replaces a stable
+artifact. Before Stage C or any later ownership change, the restore preflight,
+backup, and rehearsal gate must already have passed.
+
 ### Stage A: Definitions Only
 
 Install no new service. Compile and compare the current profile with the legacy
@@ -1026,6 +1081,7 @@ evidence.
 
 | Risk | Mitigation | Gate |
 | --- | --- | --- |
+| Experimental development disrupts the production single rig | Protected artifact ledger, separate disabled-by-default namespace, read-only tests, explicit activation, and restore-before-cutover gate | Every milestone |
 | Carla cannot change required objects quickly or transactionally | Prove the control boundary in Milestone 0; constrain early profiles to the current loaded graph | M0, M6 |
 | Current 2048 quantum obscures latency claims | Measure commit and JACK adoption separately | Every benchmark |
 | Instant switching conflicts with memory limits | Explicit readiness classes, pinning, memory ceiling, deterministic eviction | M6 |

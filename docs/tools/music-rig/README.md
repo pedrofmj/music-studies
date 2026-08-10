@@ -1,0 +1,38 @@
+# Music Rig Runtime
+
+This directory contains the Configurable Performance Rig implementation.
+
+Status: Milestone 0 portable core and CLI skeleton. It does not install a
+service, read or write runtime state, connect to MIDI or audio, or modify the
+stable Carla/PipeWire setup.
+
+## Safety Boundary
+
+The current single-rig deployment remains the production default. Code in this
+directory uses separate names and has no installation or activation target.
+Before later live experiments, verify the protected setup:
+
+~~~bash
+docs/tools/airstar-live-setup/verify-protected-baseline
+docs/tools/airstar-live-setup/restore-protected-baseline
+~~~
+
+Both commands above are read-only. Restoration requires an explicit
+`restore-protected-baseline --apply`.
+
+## Build And Test
+
+Build outside the repository working tree:
+
+~~~bash
+cmake -S docs/tools/music-rig -B /tmp/music-rig-build -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release
+cmake --build /tmp/music-rig-build
+ctest --test-dir /tmp/music-rig-build --output-on-failure
+/tmp/music-rig-build/music-rig --version
+~~~
+
+The same C sources and CMake project are intended for Linux and Windows. The
+current milestone still needs a Windows build runner, a selected Windows IPC
+transport, and the `json-c` dependency proof before its portability gate is
+complete.

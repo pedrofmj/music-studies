@@ -15,6 +15,21 @@
 docs/tools/airstar-live-setup/validate-airstar-live-setup --live --fast
 ~~~
 
+## Configurable Rig Development
+
+The normal startup above remains the production workflow. Experimental
+Performance Rig services and profiles stay disabled unless a milestone
+procedure explicitly enables them.
+
+Before any experiment, run the read-only protection check:
+
+~~~bash
+docs/tools/airstar-live-setup/verify-protected-baseline
+docs/tools/airstar-live-setup/restore-protected-baseline
+~~~
+
+The second command is only a preview unless `--apply` is supplied.
+
 ## Intentional Routing Changes
 
 After changing a live connection and confirming audio:
@@ -37,7 +52,7 @@ To inspect restoration without changing links:
 Save the Carla project, refresh the live snapshot, then run locally:
 
 ~~~bash
-docs/tools/airstar-live-setup/capture-from-airstar
+docs/tools/airstar-live-setup/capture-from-airstar --update-protected-baseline
 ~~~
 
 Review the project, raw snapshot, MIDI snapshot, deployment snapshot,
@@ -67,6 +82,22 @@ the incomplete graph authoritative.
 If Carla is unresponsive, close it and relaunch the project through
 ~/bin/carla-pedro-project. The helper services and event watcher can remain
 running; their named ports will reconnect when Carla returns.
+
+To restore the complete protected single-rig deployment, first preview the
+operation:
+
+~~~bash
+docs/tools/airstar-live-setup/restore-protected-baseline
+~~~
+
+Close Carla and apply the restore only when recovery is required:
+
+~~~bash
+docs/tools/airstar-live-setup/restore-protected-baseline --apply
+~~~
+
+The command keeps timestamped pre-restore evidence and does not launch Carla.
+After restoration, use the normal startup and live validation procedure.
 
 Before manual project replacement, keep a timestamped backup:
 

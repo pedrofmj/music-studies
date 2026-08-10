@@ -6,8 +6,13 @@ documentation together so it can be understood or replaced independently.
 
 ## Current tools
 
-- [Airstar Live Setup Deployment](airstar-live-setup/README.md) installs and validates the complete Ubuntu Carla rack, controller services, external assets, and PipeWire graph from a versioned manifest.
-- [Carla Live Rack](carla-live-rack/README.md) defines the 48-plugin instrument, mixer, EQ, and controller layout.
+- [Airstar Live Setup Deployment](airstar-live-setup/README.md) installs,
+  validates, verifies, and restores the protected Ubuntu Carla rack, controller
+  services, external assets, and PipeWire graph from versioned manifests.
+- [Music Rig Runtime](music-rig/README.md) contains the isolated Milestone 0
+  portable core and CLI skeleton; it has no installer or live graph access.
+- [Carla Live Rack](carla-live-rack/README.md) defines the 49-plugin instrument,
+  mixer, EQ, and controller layout.
 - [Arturia Main Volume Encoder](arturia-main-volume-encoder/README.md) converts
   the KeyLab Essential central knob's relative MIDI messages into an absolute
   master-volume control while leaving fader 9 available for an instrument.
@@ -18,8 +23,8 @@ documentation together so it can be understood or replaced independently.
 
 ## Future direction
 
-The current tools are pragmatic host-specific implementations. They do not yet
-depend on Echora or Galaxy.
+The existing live tools are pragmatic host-specific implementations. They do
+not yet depend on Echora or Galaxy.
 
 When those ecosystems and their SDKs are ready for this use case, these tools
 should migrate behind portable SDK abstractions for:
