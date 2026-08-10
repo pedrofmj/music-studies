@@ -1,6 +1,6 @@
 {
-  "schema": "music-studies/switch-benchmark-contract/v1",
-  "result_schema": "music-studies/switch-benchmark-result/v1",
+  "schema": "music-studies/switch-benchmark-contract/v2",
+  "result_schema": "music-studies/switch-benchmark-result/v2",
   "time_unit": "nanoseconds",
   "minimum_iterations_per_scenario": 1000,
   "required_scenarios": [
@@ -8,6 +8,13 @@
     "normal-performance",
     "high-midi-load"
   ],
+  "idle_observation": {
+    "minimum_duration_ns": 60000000000,
+    "required_zero_counts": [
+      "control_requests",
+      "midi_events"
+    ]
+  },
   "clock": {
     "required_properties": [
       "monotonic",

@@ -81,12 +81,12 @@ def require_exact_keys(
 
 def validate_contract(contract: dict[str, Any]) -> None:
     require(
-        contract.get("schema") == "music-studies/switch-benchmark-contract/v1",
+        contract.get("schema") == "music-studies/switch-benchmark-contract/v2",
         "Unsupported benchmark contract schema",
     )
     require(
         contract.get("result_schema")
-        == "music-studies/switch-benchmark-result/v1",
+        == "music-studies/switch-benchmark-result/v2",
         "Unsupported benchmark result schema",
     )
     require(contract.get("time_unit") == "nanoseconds", "Time unit drift")
@@ -98,6 +98,17 @@ def validate_contract(contract: dict[str, Any]) -> None:
         contract.get("required_scenarios")
         == ["idle", "normal-performance", "high-midi-load"],
         "Required scenario set or order drift",
+    )
+    idle_observation = require_object(
+        contract.get("idle_observation"), "idle observation contract"
+    )
+    require(
+        idle_observation
+        == {
+            "minimum_duration_ns": 60000000000,
+            "required_zero_counts": ["control_requests", "midi_events"],
+        },
+        "Idle observation contract drift",
     )
 
     clock = require_object(contract.get("clock"), "clock contract")
@@ -396,6 +407,70 @@ def validate_result(result: dict[str, Any], contract: dict[str, Any]) -> None:
     )
     require(thresholds == expected_thresholds, "Result threshold values drift")
 
+    idle = require_object(result.get("idle_observation"), "idle_observation")
+    require_exact_keys(
+        idle,
+        {
+            "wall_time_ns",
+            "control_requests",
+            "midi_events",
+            "daemon_cpu_time_ns",
+            "daemon_cpu_one_core_percent",
+            "daemon_wakeups",
+            "daemon_rss_start_bytes",
+            "daemon_rss_peak_bytes",
+            "evaluation",
+        },
+        "idle_observation",
+    )
+    idle_wall_time = require_integer(
+        idle["wall_time_ns"],
+        "idle_observation.wall_time_ns",
+        contract["idle_observation"]["minimum_duration_ns"],
+    )
+    for name in contract["idle_observation"]["required_zero_counts"]:
+        require_integer(idle[name], f"idle_observation.{name}")
+        require(idle[name] == 0, f"idle_observation.{name} must be zero")
+    idle_cpu_time = require_integer(
+        idle["daemon_cpu_time_ns"], "idle_observation.daemon_cpu_time_ns"
+    )
+    idle_cpu_percent = require_number(
+        idle["daemon_cpu_one_core_percent"],
+        "idle_observation.daemon_cpu_one_core_percent",
+    )
+    require_integer(idle["daemon_wakeups"], "idle_observation.daemon_wakeups")
+    idle_rss_start = require_integer(
+        idle["daemon_rss_start_bytes"], "idle_observation.daemon_rss_start_bytes"
+    )
+    idle_rss_peak = require_integer(
+        idle["daemon_rss_peak_bytes"], "idle_observation.daemon_rss_peak_bytes"
+    )
+    calculated_idle_cpu_percent = idle_cpu_time / idle_wall_time * 100.0
+    require(
+        math.isclose(
+            idle_cpu_percent,
+            calculated_idle_cpu_percent,
+            abs_tol=0.000001,
+        ),
+        "idle_observation daemon CPU percentage is inconsistent",
+    )
+    require(
+        idle_rss_peak >= idle_rss_start,
+        "idle_observation peak RSS is below start RSS",
+    )
+    idle_resource_pass = (
+        idle_cpu_percent
+        < thresholds["idle_daemon_cpu_one_core_percent_max_exclusive"]
+        and idle_rss_peak < thresholds["daemon_rss_bytes_max_exclusive"]
+    )
+    idle_evaluation = require_object(
+        idle["evaluation"], "idle_observation.evaluation"
+    )
+    require(
+        idle_evaluation == {"resource_pass": idle_resource_pass},
+        "idle_observation evaluation does not match measurements",
+    )
+
     scenarios = result.get("scenarios")
     require(isinstance(scenarios, list), "scenarios must be an array")
     scenario_ids = [
@@ -481,13 +556,6 @@ def validate_result(result: dict[str, Any], contract: dict[str, Any]) -> None:
         resource_pass = (
             resources["daemon_rss_peak_bytes"]
             < thresholds["daemon_rss_bytes_max_exclusive"]
-            and (
-                scenario_id != "idle"
-                or cpu_percent
-                < thresholds[
-                    "idle_daemon_cpu_one_core_percent_max_exclusive"
-                ]
-            )
         )
 
         stability = require_object(
@@ -565,15 +633,30 @@ def validate_result(result: dict[str, Any], contract: dict[str, Any]) -> None:
     require(
         campaign_evaluation
         == {
+            "idle_resource_pass": idle_resource_pass,
             "scenarios_passed": passed_count,
             "scenarios_failed": len(scenario_passes) - passed_count,
-            "passed": all(scenario_passes),
+            "passed": idle_resource_pass and all(scenario_passes),
         },
         "Campaign evaluation does not match scenarios",
     )
 
 
 def run_self_test(contract: dict[str, Any]) -> None:
+    def mark_scenario_failed(
+        campaign: dict[str, Any], scenario_index: int, gate: str
+    ) -> None:
+        campaign["scenarios"][scenario_index]["evaluation"].update(
+            {gate: False, "passed": False}
+        )
+        campaign["evaluation"].update(
+            {
+                "scenarios_passed": 2,
+                "scenarios_failed": 1,
+                "passed": False,
+            }
+        )
+
     fixture = load_json(FIXTURE_PATH)
     validate_result(fixture, contract)
 
@@ -602,17 +685,68 @@ def run_self_test(contract: dict[str, Any]) -> None:
         {"p95": 21000000, "p99": 22000000, "maximum": 23000000}
     )
     failed_timing["effective_adoption_latency_ns"]["maximum"] = 23000000
-    failed_campaign["scenarios"][0]["evaluation"].update(
-        {"timing_pass": False, "passed": False}
-    )
-    failed_campaign["evaluation"] = {
-        "scenarios_passed": 2,
-        "scenarios_failed": 1,
-        "passed": False,
-    }
+    mark_scenario_failed(failed_campaign, 0, "timing_pass")
     validate_result(failed_campaign, contract)
 
+    failed_idle = copy.deepcopy(fixture)
+    failed_idle["idle_observation"].update(
+        {
+            "daemon_cpu_time_ns": 300000000,
+            "daemon_cpu_one_core_percent": 0.5,
+            "evaluation": {"resource_pass": False},
+        }
+    )
+    failed_idle["evaluation"].update(
+        {"idle_resource_pass": False, "passed": False}
+    )
+    validate_result(failed_idle, contract)
+
+    failed_adoption = copy.deepcopy(fixture)
+    failed_adoption_timing = failed_adoption["scenarios"][0]["timing"]
+    failed_adoption_timing["commit_to_adoption_latency_ns"]["maximum"] = (
+        47666668
+    )
+    failed_adoption_timing["effective_adoption_latency_ns"]["maximum"] = (
+        47666668
+    )
+    mark_scenario_failed(failed_adoption, 0, "timing_pass")
+    validate_result(failed_adoption, contract)
+
+    failed_prepared = copy.deepcopy(prepared)
+    failed_prepared_summary = failed_prepared["scenarios"][0]["timing"]
+    failed_prepared_summary["prepared_audio_commit_latency_ns"].update(
+        {"p95": 100000001, "p99": 100000001, "maximum": 100000001}
+    )
+    mark_scenario_failed(failed_prepared, 0, "timing_pass")
+    validate_result(failed_prepared, contract)
+
+    failed_rss = copy.deepcopy(fixture)
+    failed_rss["scenarios"][0]["resources"]["daemon_rss_peak_bytes"] = 50000000
+    mark_scenario_failed(failed_rss, 0, "resource_pass")
+    validate_result(failed_rss, contract)
+
+    failed_stability = copy.deepcopy(fixture)
+    failed_stability["scenarios"][0]["stability"]["xruns"].update(
+        {"after": 3, "attributable": 1}
+    )
+    mark_scenario_failed(failed_stability, 0, "stability_pass")
+    validate_result(failed_stability, contract)
+
     mutations: list[tuple[str, Callable[[dict[str, Any]], None], str]] = [
+        (
+            "idle observation duration",
+            lambda value: value["idle_observation"].__setitem__(
+                "wall_time_ns", 59999999999
+            ),
+            "at least 60000000000",
+        ),
+        (
+            "idle observation activity",
+            lambda value: value["idle_observation"].__setitem__(
+                "midi_events", 1
+            ),
+            "midi_events must be zero",
+        ),
         (
             "iteration floor",
             lambda value: value["definition"].__setitem__(
@@ -746,7 +880,7 @@ def main() -> int:
             print(f"Switch benchmark result: OK ({args.validate})")
         elif args.self_test:
             run_self_test(contract)
-            print("Switch benchmark validator self-test: OK (11 negative cases)")
+            print("Switch benchmark validator self-test: OK (13 negative cases)")
         else:
             print("Switch benchmark contract: OK")
     except ValidationError as error:

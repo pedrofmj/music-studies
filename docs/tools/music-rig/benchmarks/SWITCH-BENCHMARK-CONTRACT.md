@@ -6,8 +6,11 @@ a synthetic contract fixture, not performance evidence.
 The machine-readable authority is
 [switch-benchmark-contract.json](switch-benchmark-contract.json). Linux and
 Windows benchmark launchers must emit the same
-`music-studies/switch-benchmark-result/v1` campaign shape and preserve their raw
+`music-studies/switch-benchmark-result/v2` campaign shape and preserve their raw
 samples separately.
+
+Version 2 adds the required no-event resource observation. No production
+measurement used version 1; only its synthetic contract fixture existed.
 
 This tooling is offline. Validation reads JSON files only; it does not start a
 service, open an audio or MIDI client, launch Carla, or change a graph.
@@ -27,6 +30,12 @@ fingerprints.
 
 The scenario set and order are fixed so that reports cannot omit the expensive
 condition while still presenting a passing campaign.
+
+`idle` means switching with no competing musical-event load. It is not the
+daemon-idle CPU measurement because it still performs 1,000 switches. Every
+campaign also contains a separate observation of at least 60 seconds with zero
+control requests and zero MIDI events. The less-than-0.5%-of-one-core idle CPU
+gate is evaluated only from that no-event window.
 
 ## Timing Boundaries
 
@@ -78,8 +87,9 @@ or MIDI API names beyond the clock identity needed to interpret measurements.
 
 Every scenario records wall time, daemon CPU time, one-core CPU percentage,
 wakeups, start and peak daemon RSS, prepared-resource memory, and plugin-host
-memory. Daemon memory remains separate from plugins, samples, Carla, and other
-prepared engines.
+memory. The separate no-event observation records its duration, zero activity
+counts, daemon CPU, wakeups, and start and peak daemon RSS. Daemon memory
+remains separate from plugins, samples, Carla, and other prepared engines.
 
 Xruns, audible dropouts, and deadline errors each record cumulative `before`,
 `after`, and attributable values. The validator requires:
@@ -93,16 +103,18 @@ failures and prevents new failures from being hidden.
 
 ## Default Gates
 
-These are the current portable acceptance defaults, pending reference-machine
-confirmation:
+These are the accepted portable acceptance defaults. Passing them still
+requires measurement on each reference machine; the synthetic fixture is not
+performance evidence. The rationale and revision policy are recorded in
+[ADR 0003](../../features/0001.0000.0000.0000-configurable-performance-rig/architecture-decisions/0003-performance-acceptance-thresholds.md).
 
 | Gate | Default |
 | --- | ---: |
 | Control commit p95 | at most 20,000,000 ns |
 | Prepared-audio commit p95 | at most 100,000,000 ns |
 | Adoption margin after one processing period | 5,000,000 ns |
-| Idle daemon CPU | less than 0.5% of one core |
-| Daemon RSS | less than 50,000,000 bytes |
+| Idle daemon CPU | less than 0.5% of one core over a 60-second zero-event window |
+| Daemon RSS | less than 50,000,000 bytes in the idle window and every switch scenario |
 | Attributable xruns | 0 |
 | Attributable audio dropouts | 0 |
 | Attributable deadline errors | 0 |

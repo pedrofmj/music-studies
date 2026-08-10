@@ -1,6 +1,6 @@
 {
-  "schema": "music-studies/switch-benchmark-result/v1",
-  "contract_schema": "music-studies/switch-benchmark-contract/v1",
+  "schema": "music-studies/switch-benchmark-result/v2",
+  "contract_schema": "music-studies/switch-benchmark-contract/v2",
   "result_kind": "contract-fixture",
   "benchmark_id": "control-only-device-switch",
   "run_id": "fixture-linux-control-only",
@@ -44,6 +44,19 @@
     "attributable_deadline_errors_max": 0,
     "idle_daemon_cpu_one_core_percent_max_exclusive": 0.5,
     "daemon_rss_bytes_max_exclusive": 50000000
+  },
+  "idle_observation": {
+    "wall_time_ns": 60000000000,
+    "control_requests": 0,
+    "midi_events": 0,
+    "daemon_cpu_time_ns": 180000000,
+    "daemon_cpu_one_core_percent": 0.3,
+    "daemon_wakeups": 120,
+    "daemon_rss_start_bytes": 12582912,
+    "daemon_rss_peak_bytes": 13631488,
+    "evaluation": {
+      "resource_pass": true
+    }
   },
   "scenarios": [
     {
@@ -238,6 +251,7 @@
     "reason": "Synthetic contract fixture; this file is not performance evidence"
   },
   "evaluation": {
+    "idle_resource_pass": true,
     "scenarios_passed": 3,
     "scenarios_failed": 0,
     "passed": true

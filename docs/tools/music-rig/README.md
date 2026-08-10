@@ -55,9 +55,9 @@ and has no audio, MIDI, graph, service, or state adapter.
 The versioned [switch benchmark contract](benchmarks/SWITCH-BENCHMARK-CONTRACT.md)
 defines identical Linux and Windows result fields for commit, real-time
 adoption, resources, and audio-stability counters. CTest validates the contract,
-a complete synthetic campaign, and eleven negative semantic cases using only the
-Python standard library. The fixture is not performance evidence and no test
-connects to the live rack.
+a complete synthetic campaign, threshold-boundary failures, and thirteen
+negative semantic cases using only the Python standard library. The fixture is
+not performance evidence and no test connects to the live rack.
 
 ## Versioned IPC Spike
 

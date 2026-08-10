@@ -41,7 +41,8 @@ Documents:
 | SMK-25 offline parity | ✅ Self-test, config, and JACK guard passed |
 | Startup contract | ✅ Protected authority and read-only boundaries pass |
 | Live startup transcript | 🟡 Planned; operator execution not performed |
-| Switch benchmark contract | ✅ Valid fixture plus 11 negative semantic cases |
+| Switch benchmark contract | ✅ Valid fixture plus 13 negative semantic cases |
+| Acceptance thresholds | ✅ Selected; platform measurements remain future gates |
 | Portable backend boundary | ✅ PipeWire and Carla names rejected from core |
 | Linux JSON parse fixture | ✅ 10,000 iterations, zero failures |
 | Linux JSON average parse | ✅ GCC 10,858 ns; Clang 15,268 ns |
@@ -114,9 +115,12 @@ benchmarks.
   keeps early switches on loaded engines and moves lifecycle, state, project,
   and patchbay work to preparation in Milestone 6.
 - 🟡 Write the remaining Milestone 0 architecture decision records. IPC,
-  provisional JSON parsing, and PipeWire deferral boundaries are recorded;
-  the Windows backend remains.
-- ⬜ Confirm or revise CPU, memory, latency, and xrun thresholds.
+  provisional JSON parsing, PipeWire, Carla, and performance-threshold
+  boundaries are recorded; the Windows backend remains.
+- ✅ Confirm CPU, memory, latency, and xrun thresholds.
+  [ADR 0003](architecture-decisions/0003-performance-acceptance-thresholds.md)
+  accepts the portable ceilings and separates selection from later platform
+  certification. Idle CPU now requires a 60-second zero-event observation.
 
 ## Milestone 1: Schemas And Current Profile Extraction
 
