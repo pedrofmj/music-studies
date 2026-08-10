@@ -1,0 +1,106 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "hardware-preset",
+  "id": "smc-mixer-current-cc",
+  "display_name": "SMC-Mixer Current CC",
+  "description": "Verified channel-1 CC assignments for the eight current equalizer faders.",
+  "device_models": [
+    "M-VAVE SMC-Mixer"
+  ],
+  "verification": {
+    "status": "verified",
+    "source_refs": [
+      "protected-setup.controller-profile.smc-mixer"
+    ]
+  },
+  "controls": [
+    {
+      "id": "fader-1",
+      "physical_control": "Fader 1",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 40,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "fader-2",
+      "physical_control": "Fader 2",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 41,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "fader-3",
+      "physical_control": "Fader 3",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 42,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "fader-4",
+      "physical_control": "Fader 4",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 43,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "fader-5",
+      "physical_control": "Fader 5",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 44,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "fader-6",
+      "physical_control": "Fader 6",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 45,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "fader-7",
+      "physical_control": "Fader 7",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 46,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "fader-8",
+      "physical_control": "Fader 8",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 47,
+        "edge": "change"
+      }
+    }
+  ]
+}

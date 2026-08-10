@@ -166,13 +166,17 @@ benchmarks.
 - ✅ Add the six versioned Rig, Rig Profile, Device Profile, Hardware Preset,
   Switch Trigger, and common schemas. The offline
   [validator](../../tools/music-rig/validate-performance-rig.py) checks each
-  Draft 2020-12 schema and thirteen positive/negative fixtures on the default
+  Draft 2020-12 schema and fourteen positive/negative fixtures on the default
   CTest path without activating any runtime component.
 - ✅ Define stable device slots and ordered physical selectors. The authored
   [rig catalogue](../../../src/performance-rigs/pedro-performance-rig/rig.json)
   records all five current controllers, required endpoint purposes, unique
   semantic aliases and local discriminators, and optional USB evidence.
-- ⬜ Extract the five current Device Profiles and their Hardware Presets.
+- 🟡 Extract the current Hardware Presets. All five
+  [preset documents](../../../src/performance-rigs/pedro-performance-rig/hardware-presets/)
+  resolve from the Rig catalogue. Arturia, SMK-25, and SMC-Mixer are verified;
+  SMC-PAD and Pocket remain partial until every pad message is captured.
+- ⬜ Extract the five current Device Profiles.
 - ⬜ Add the `full-live-rack` Rig Profile.
 - 🟡 Model ownership, semantic capabilities, readiness, and takeover policies.
   Their strict shared types are present; current-profile claims remain to be
@@ -180,8 +184,9 @@ benchmarks.
 - ⬜ Add Linux bindings and Windows contract fixtures.
 - 🟡 Add schema, reference, collision, ownership, and ambiguity tests. Schema
   structure, portability-negative coverage, selector order, required endpoint
-  coverage, and shared USB ambiguity checks pass; cross-document references,
-  MIDI collisions, and ownership checks remain.
+  coverage, shared USB ambiguity, Hardware Preset references, control IDs, and
+  per-preset MIDI collision checks pass; Device Profile references,
+  cross-profile MIDI collisions, and ownership checks remain.
 
 ## Milestone 2: Deterministic Compiler And Parity
 

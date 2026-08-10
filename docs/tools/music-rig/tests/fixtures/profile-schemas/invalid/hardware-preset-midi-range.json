@@ -6,6 +6,12 @@
   "device_models": [
     "Fixture Controller Model"
   ],
+  "verification": {
+    "status": "verified",
+    "source_refs": [
+      "fixture.observation"
+    ]
+  },
   "controls": [
     {
       "id": "fader-1",

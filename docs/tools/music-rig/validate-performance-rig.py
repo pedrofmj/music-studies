@@ -10,7 +10,7 @@ import sys
 from collections import defaultdict
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 try:
     from jsonschema import Draft202012Validator
@@ -118,6 +118,14 @@ def error_path(parts: Iterable[Any]) -> str:
         else:
             rendered += f".{part}"
     return rendered
+
+
+def leaf_validation_errors(error: Any) -> Iterable[Any]:
+    if error.context:
+        for nested_error in error.context:
+            yield from leaf_validation_errors(nested_error)
+    else:
+        yield error
 
 
 def validate_rig_slot_semantics(document: Mapping[str, Any]) -> List[str]:
@@ -258,6 +266,73 @@ def validate_rig_slot_semantics(document: Mapping[str, Any]) -> List[str]:
     return errors
 
 
+def is_wildcard_note_stream(message: Mapping[str, Any]) -> bool:
+    return message.get("channel") == "any" and message.get("number") == "any"
+
+
+def validate_hardware_preset_semantics(
+    document: Mapping[str, Any],
+) -> List[str]:
+    """Validate control identities and evidence constraints within a preset."""
+    errors = []
+    control_ids = set()
+    message_controls: Dict[Tuple[Any, Any, Any], str] = {}
+    verification_status = document["verification"]["status"]
+
+    for control_index, control in enumerate(document["controls"]):
+        control_path = f"$.controls[{control_index}]"
+        control_id = control["id"]
+        if control_id in control_ids:
+            errors.append(
+                f"{control_path}.id: duplicate hardware control ID {control_id!r}"
+            )
+        control_ids.add(control_id)
+
+        message = control["message"]
+        message_key = (
+            message["type"],
+            message["channel"],
+            message["number"],
+        )
+        previous_control = message_controls.get(message_key)
+        if previous_control is not None and previous_control != control_id:
+            errors.append(
+                f"{control_path}.message: MIDI message collides with control "
+                f"{previous_control!r}"
+            )
+        message_controls[message_key] = control_id
+
+        wildcard = is_wildcard_note_stream(message)
+        if verification_status == "verified" and wildcard:
+            errors.append(
+                f"{control_path}.message: verified preset cannot contain "
+                "wildcard note evidence"
+            )
+        if wildcard and control["behavior"] != "momentary":
+            errors.append(
+                f"{control_path}.behavior: wildcard note stream must be "
+                "momentary"
+            )
+        if control["behavior"] == "relative" and message["type"] != "cc":
+            errors.append(
+                f"{control_path}.message: relative control must emit CC"
+            )
+
+        has_off_value = "off_value" in control
+        has_on_value = "on_value" in control
+        if has_off_value != has_on_value:
+            errors.append(
+                f"{control_path}: off_value and on_value must be specified "
+                "together"
+            )
+        elif has_off_value and control["off_value"] == control["on_value"]:
+            errors.append(
+                f"{control_path}: off_value and on_value must differ"
+            )
+
+    return errors
+
+
 def validate_document(
     document: Any,
     schemas: Mapping[str, Mapping[str, Any]],
@@ -272,7 +347,11 @@ def validate_document(
     schema = schemas[SCHEMA_FILE_BY_KIND[kind]]
     validator = Draft202012Validator(schema, registry=registry)
     errors = sorted(
-        validator.iter_errors(document),
+        (
+            leaf_error
+            for error in validator.iter_errors(document)
+            for leaf_error in leaf_validation_errors(error)
+        ),
         key=lambda item: tuple(str(part) for part in item.absolute_path),
     )
     formatted_errors = [
@@ -280,7 +359,243 @@ def validate_document(
     ]
     if not formatted_errors and kind == "performance-rig":
         formatted_errors.extend(validate_rig_slot_semantics(document))
+    elif not formatted_errors and kind == "hardware-preset":
+        formatted_errors.extend(validate_hardware_preset_semantics(document))
     return kind, formatted_errors
+
+
+def validate_hardware_catalogue_documents(
+    rig: Mapping[str, Any],
+    preset_entries: Sequence[Tuple[Path, Mapping[str, Any]]],
+) -> Tuple[List[str], int, int]:
+    """Cross-check the Rig's Hardware Preset catalogue and device models."""
+    errors = []
+    preset_by_id: Dict[str, Tuple[Path, Mapping[str, Any]]] = {}
+    verified_count = 0
+    partial_count = 0
+
+    for path, preset in preset_entries:
+        preset_id = preset["id"]
+        previous = preset_by_id.get(preset_id)
+        if previous is not None:
+            errors.append(
+                f"{path}: duplicate hardware preset ID {preset_id!r}; "
+                f"already defined by {previous[0]}"
+            )
+        else:
+            preset_by_id[preset_id] = (path, preset)
+        if path.stem != preset_id:
+            errors.append(
+                f"{path}: file name must match hardware preset ID {preset_id!r}"
+            )
+
+        verification_status = preset["verification"]["status"]
+        if verification_status == "verified":
+            verified_count += 1
+        else:
+            partial_count += 1
+
+        matching_slots = [
+            slot["id"]
+            for slot in rig["device_slots"]
+            if set(preset["device_models"]).intersection(slot["compatible_models"])
+        ]
+        if not matching_slots:
+            errors.append(
+                f"{path}: device_models do not match any Rig device slot"
+            )
+
+    expected_ids = set(rig["hardware_presets"])
+    actual_ids = set(preset_by_id)
+    for preset_id in sorted(expected_ids - actual_ids):
+        errors.append(
+            f"rig.json: unresolved hardware preset {preset_id!r}"
+        )
+    for preset_id in sorted(actual_ids - expected_ids):
+        errors.append(
+            f"{preset_by_id[preset_id][0]}: hardware preset {preset_id!r} "
+            "is not declared by rig.json"
+        )
+
+    for slot in rig["device_slots"]:
+        if not slot.get("required", True):
+            continue
+        has_compatible_preset = any(
+            set(preset["device_models"]).intersection(slot["compatible_models"])
+            for _, preset in preset_entries
+        )
+        if not has_compatible_preset:
+            errors.append(
+                f"rig.json: required slot {slot['id']!r} has no compatible "
+                "hardware preset"
+            )
+
+    return errors, verified_count, partial_count
+
+
+def validate_hardware_catalogue(
+    rig_root: Path,
+    schemas: Mapping[str, Mapping[str, Any]],
+    registry: Registry,
+) -> Tuple[List[str], int, int]:
+    rig_path = rig_root / "rig.json"
+    rig = load_json(rig_path)
+    rig_kind, rig_errors = validate_document(rig, schemas, registry)
+    errors = [f"{rig_path}: {error}" for error in rig_errors]
+    if rig_kind != "performance-rig":
+        errors.append(f"{rig_path}: expected a performance-rig document")
+
+    preset_entries = []
+    for preset_path in sorted((rig_root / "hardware-presets").glob("*.json")):
+        preset = load_json(preset_path)
+        preset_kind, preset_errors = validate_document(preset, schemas, registry)
+        errors.extend(f"{preset_path}: {error}" for error in preset_errors)
+        if preset_kind != "hardware-preset":
+            errors.append(f"{preset_path}: expected a hardware-preset document")
+        if not preset_errors and preset_kind == "hardware-preset":
+            preset_entries.append((preset_path, preset))
+
+    if errors:
+        return errors, 0, 0
+    semantic_errors, verified_count, partial_count = (
+        validate_hardware_catalogue_documents(rig, preset_entries)
+    )
+    return semantic_errors, verified_count, partial_count
+
+
+def control_signature(control: Mapping[str, Any]) -> Mapping[str, Any]:
+    message = control["message"]
+    signature = {
+        "behavior": control["behavior"],
+        "type": message["type"],
+        "channel": message["channel"],
+        "number": message["number"],
+    }
+    for field in ("off_value", "on_value", "relative_encoding"):
+        if field in control:
+            signature[field] = control[field]
+    return signature
+
+
+def expected_current_control_signatures(
+    setup: Mapping[str, Any],
+) -> Mapping[str, Mapping[str, Mapping[str, Any]]]:
+    controller_profile = setup["controller_profile"]
+    arturia = controller_profile["arturia"]
+    smk25 = controller_profile["smk25"]
+    mixer = controller_profile["smc_mixer"]
+
+    expected: Dict[str, Dict[str, Mapping[str, Any]]] = {
+        "arturia-current-rack": {},
+        "smk25-current-pad-layers": {},
+        "smc-mixer-current-cc": {},
+    }
+    for index, cc_number in enumerate(arturia["fader_ccs"], start=1):
+        expected["arturia-current-rack"][f"fader-{index}"] = {
+            "behavior": "absolute",
+            "type": "cc",
+            "channel": arturia["channel"],
+            "number": cc_number,
+        }
+    for index, cc_number in enumerate(arturia["instrument_knob_ccs"], start=1):
+        expected["arturia-current-rack"][f"knob-{index}"] = {
+            "behavior": "absolute",
+            "type": "cc",
+            "channel": arturia["channel"],
+            "number": cc_number,
+        }
+    expected["arturia-current-rack"]["central-encoder"] = {
+        "behavior": "relative",
+        "type": "cc",
+        "channel": arturia["channel"],
+        "number": arturia["central_encoder"]["input_cc"],
+        "relative_encoding": "binary-offset",
+    }
+    expected["arturia-current-rack"]["central-click"] = {
+        "behavior": "momentary",
+        "type": "cc",
+        "channel": arturia["channel"],
+        "number": arturia["central_click"]["cc"],
+        "off_value": 0,
+        "on_value": 127,
+    }
+
+    for index, cc_number in enumerate(smk25["knobs"]["ccs"], start=1):
+        expected["smk25-current-pad-layers"][f"knob-{index}"] = {
+            "behavior": "absolute",
+            "type": "cc",
+            "channel": smk25["knobs"]["channel"],
+            "number": cc_number,
+        }
+    for index, (cc_number, channel) in enumerate(
+        zip(smk25["side_a_pads"]["ccs"], smk25["side_a_pads"]["channels"]),
+        start=1,
+    ):
+        expected["smk25-current-pad-layers"][f"side-a-pad-{index}"] = {
+            "behavior": "toggle",
+            "type": "cc",
+            "channel": channel,
+            "number": cc_number,
+            "off_value": smk25["side_a_pads"]["off_value"],
+            "on_value": smk25["side_a_pads"]["on_value"],
+        }
+    for control_id, note_field in (
+        ("transport-stop", "stop_note"),
+        ("transport-play", "play_note"),
+    ):
+        expected["smk25-current-pad-layers"][control_id] = {
+            "behavior": "momentary",
+            "type": "note",
+            "channel": smk25["transport"]["channel"],
+            "number": smk25["transport"][note_field],
+        }
+
+    for index, cc_number in enumerate(mixer["fader_ccs"], start=1):
+        expected["smc-mixer-current-cc"][f"fader-{index}"] = {
+            "behavior": "absolute",
+            "type": "cc",
+            "channel": mixer["channel"],
+            "number": cc_number,
+        }
+    return expected
+
+
+def validate_current_hardware_extraction(
+    rig_root: Path,
+    setup_path: Path,
+) -> List[str]:
+    """Compare fully verified presets with the protected structured evidence."""
+    setup = load_json(setup_path)
+    expected_by_preset = expected_current_control_signatures(setup)
+    errors = []
+
+    for preset_id, expected_controls in expected_by_preset.items():
+        preset_path = rig_root / "hardware-presets" / f"{preset_id}.json"
+        preset = load_json(preset_path)
+        if preset["verification"]["status"] != "verified":
+            errors.append(
+                f"{preset_path}: protected extraction must remain verified"
+            )
+        actual_controls = {
+            control["id"]: control_signature(control)
+            for control in preset["controls"]
+        }
+        if set(actual_controls) != set(expected_controls):
+            errors.append(
+                f"{preset_path}: control ID set differs from protected setup; "
+                f"expected={sorted(expected_controls)} "
+                f"actual={sorted(actual_controls)}"
+            )
+            continue
+        for control_id, expected_signature in expected_controls.items():
+            actual_signature = actual_controls[control_id]
+            if actual_signature != expected_signature:
+                errors.append(
+                    f"{preset_path}: control {control_id!r} differs from "
+                    f"protected setup; expected={expected_signature} "
+                    f"actual={actual_signature}"
+                )
+    return errors
 
 
 def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
@@ -351,6 +666,31 @@ def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
             "invalid fixture kind coverage mismatch: "
             f"{sorted(covered_invalid_kinds)}"
         )
+
+    fixture_rig = load_json(fixture_dir / "valid" / "rig.json")
+    fixture_preset_path = Path("hardware-presets/fixture-preset.json")
+    fixture_preset = load_json(fixture_dir / "valid" / "hardware-preset.json")
+    catalogue_errors, _, _ = validate_hardware_catalogue_documents(
+        fixture_rig,
+        [(fixture_preset_path, fixture_preset)],
+    )
+    if catalogue_errors:
+        failures.append(
+            "valid hardware catalogue failed: "
+            f"{'; '.join(catalogue_errors)}"
+        )
+
+    unresolved_rig = dict(fixture_rig)
+    unresolved_rig["hardware_presets"] = ["missing-preset"]
+    catalogue_errors, _, _ = validate_hardware_catalogue_documents(
+        unresolved_rig,
+        [(fixture_preset_path, fixture_preset)],
+    )
+    if not any("unresolved hardware preset" in error for error in catalogue_errors):
+        failures.append(
+            "invalid hardware catalogue did not reject an unresolved reference"
+        )
+
     if failures:
         for failure in failures:
             print(f"FAIL: {failure}", file=sys.stderr)
@@ -358,7 +698,8 @@ def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
 
     print(
         "Performance Rig schemas: PASS "
-        f"(schemas={len(schemas)}, valid={valid_count}, invalid={invalid_count})"
+        f"(schemas={len(schemas)}, valid={valid_count}, invalid={invalid_count}, "
+        "catalogues=2)"
     )
     return 0
 
@@ -379,6 +720,39 @@ def run_validation(schema_dir: Path, paths: Sequence[Path]) -> int:
     return 1 if failed else 0
 
 
+def run_root_validation(
+    schema_dir: Path,
+    rig_root: Path,
+    authority_setup: Optional[Path],
+) -> int:
+    schemas = load_schemas(schema_dir)
+    registry = build_registry(schemas)
+    errors, verified_count, partial_count = validate_hardware_catalogue(
+        rig_root,
+        schemas,
+        registry,
+    )
+    if errors:
+        for error in errors:
+            print(error, file=sys.stderr)
+        return 1
+    if authority_setup is not None:
+        extraction_errors = validate_current_hardware_extraction(
+            rig_root,
+            authority_setup,
+        )
+        if extraction_errors:
+            for error in extraction_errors:
+                print(error, file=sys.stderr)
+            return 1
+    print(
+        f"{rig_root}: OK (hardware-presets="
+        f"{verified_count + partial_count}, verified={verified_count}, "
+        f"partial={partial_count})"
+    )
+    return 0
+
+
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -393,6 +767,11 @@ def parse_arguments() -> argparse.Namespace:
         default=DEFAULT_FIXTURE_DIR,
         help=argparse.SUPPRESS,
     )
+    parser.add_argument(
+        "--authority-setup",
+        type=Path,
+        help="protected setup.json used for current-preset extraction parity",
+    )
     operation = parser.add_mutually_exclusive_group(required=True)
     operation.add_argument(
         "--self-test",
@@ -406,14 +785,28 @@ def parse_arguments() -> argparse.Namespace:
         metavar="DOCUMENT",
         help="validate one or more authored JSON documents",
     )
+    operation.add_argument(
+        "--validate-root",
+        type=Path,
+        metavar="RIG_ROOT",
+        help="validate the authored Rig and its Hardware Preset catalogue",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     arguments = parse_arguments()
     try:
+        if arguments.authority_setup is not None and not arguments.validate_root:
+            raise ValueError("--authority-setup requires --validate-root")
         if arguments.self_test:
             return run_self_test(arguments.schema_dir, arguments.fixture_dir)
+        if arguments.validate_root:
+            return run_root_validation(
+                arguments.schema_dir,
+                arguments.validate_root,
+                arguments.authority_setup,
+            )
         return run_validation(arguments.schema_dir, arguments.validate)
     except (OSError, ValueError, json.JSONDecodeError) as error:
         print(f"ERROR: {error}", file=sys.stderr)

@@ -1,0 +1,242 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "hardware-preset",
+  "id": "arturia-current-rack",
+  "display_name": "Arturia Current Rack",
+  "description": "Verified channel-1 controls for nine instrument layers plus persistent master volume and rack mute.",
+  "device_models": [
+    "KeyLab Essential 61 mk3"
+  ],
+  "verification": {
+    "status": "verified",
+    "source_refs": [
+      "protected-setup.controller-profile.arturia",
+      "stable-helper.arturia-main-volume-encoder"
+    ]
+  },
+  "controls": [
+    {
+      "id": "fader-1",
+      "physical_control": "Fader 1",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 73,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "fader-2",
+      "physical_control": "Fader 2",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 75,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "fader-3",
+      "physical_control": "Fader 3",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 79,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "fader-4",
+      "physical_control": "Fader 4",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 72,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "fader-5",
+      "physical_control": "Fader 5",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 80,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "fader-6",
+      "physical_control": "Fader 6",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 81,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "fader-7",
+      "physical_control": "Fader 7",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 82,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "fader-8",
+      "physical_control": "Fader 8",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 83,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "fader-9",
+      "physical_control": "Fader 9",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 85,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-1",
+      "physical_control": "Knob 1",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 74,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-2",
+      "physical_control": "Knob 2",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 71,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-3",
+      "physical_control": "Knob 3",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 76,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-4",
+      "physical_control": "Knob 4",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 77,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-5",
+      "physical_control": "Knob 5",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 93,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-6",
+      "physical_control": "Knob 6",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 18,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-7",
+      "physical_control": "Knob 7",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 19,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-8",
+      "physical_control": "Knob 8",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 16,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-9",
+      "physical_control": "Knob 9",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 17,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "central-encoder",
+      "physical_control": "Central encoder",
+      "behavior": "relative",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 114,
+        "edge": "change"
+      },
+      "relative_encoding": "binary-offset"
+    },
+    {
+      "id": "central-click",
+      "physical_control": "Central encoder click",
+      "behavior": "momentary",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 115,
+        "edge": "any"
+      },
+      "off_value": 0,
+      "on_value": 127
+    }
+  ]
+}

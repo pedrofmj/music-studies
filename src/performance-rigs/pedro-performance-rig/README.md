@@ -4,10 +4,10 @@ This directory contains the portable authored definition of the first
 Performance Rig. Schema version `music-studies/performance-rig/v1` uses JSON
 Schema Draft 2020-12.
 
-Current status: schema and stable-slot foundation only. No installer, service,
-runtime, or live audio/MIDI tool reads this directory. The protected
-`setup.json`, Carla project, services, and graph remain the production
-authority until the later parity and cutover gates pass.
+Current status: schema, stable-slot, and Hardware Preset extraction only. No
+installer, service, runtime, or live audio/MIDI tool reads this directory. The
+protected `setup.json`, Carla project, services, and graph remain the
+production authority until the later parity and cutover gates pass.
 
 `rig.json` records the five stable controller slots from the protected rack.
 Each slot orders selectors from model, semantic alias, and endpoint purpose to
@@ -16,9 +16,11 @@ share USB ID `4353:4b4d`, so that ID is supporting evidence and cannot
 distinguish them by itself. Future platform bindings will resolve these
 portable selectors to Linux and Windows device identities.
 
-The profile, preset, and trigger IDs in `rig.json` are planned forward
-references. This slice validates the catalogue and slot relationships; later
-Milestone 1 work will add and cross-check the referenced documents.
+All five Hardware Preset IDs resolve to files in `hardware-presets`. Arturia,
+SMK-25, and SMC-Mixer assignments are verified. SMC-PAD and SMC-PAD Pocket are
+explicitly partial because the protected capture proves their routed note
+streams but does not contain each pad's exact channel and note number. The Rig
+Profile, Device Profile, and trigger IDs remain planned forward references.
 
 The six schemas are:
 
@@ -42,4 +44,7 @@ authoring-only dependency:
 ```bash
 python3 -m pip install -r docs/tools/music-rig/requirements-schema.txt
 python3 docs/tools/music-rig/validate-performance-rig.py --self-test
+python3 docs/tools/music-rig/validate-performance-rig.py \
+  --validate-root src/performance-rigs/pedro-performance-rig \
+  --authority-setup docs/tools/airstar-live-setup/setup.json
 ```

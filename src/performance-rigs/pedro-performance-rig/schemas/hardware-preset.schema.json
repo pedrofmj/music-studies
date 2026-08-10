@@ -10,6 +10,7 @@
     "id",
     "display_name",
     "device_models",
+    "verification",
     "controls"
   ],
   "properties": {
@@ -37,6 +38,9 @@
         "minLength": 1,
         "maxLength": 128
       }
+    },
+    "verification": {
+      "$ref": "#/$defs/verification"
     },
     "preset_slot": {
       "type": "string",
@@ -85,7 +89,7 @@
           ]
         },
         "message": {
-          "$ref": "common.schema.json#/$defs/midi_event"
+          "$ref": "#/$defs/control_message"
         },
         "off_value": {
           "type": "integer",
@@ -133,6 +137,88 @@
               "off_value",
               "on_value"
             ]
+          }
+        }
+      ]
+    },
+    "control_message": {
+      "oneOf": [
+        {
+          "$ref": "common.schema.json#/$defs/midi_event"
+        },
+        {
+          "$ref": "#/$defs/wildcard_note_stream"
+        }
+      ]
+    },
+    "wildcard_note_stream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "channel",
+        "number",
+        "edge"
+      ],
+      "properties": {
+        "type": {
+          "const": "note"
+        },
+        "channel": {
+          "const": "any"
+        },
+        "number": {
+          "const": "any"
+        },
+        "edge": {
+          "const": "any"
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "source_refs"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "verified",
+            "partial"
+          ]
+        },
+        "source_refs": {
+          "$ref": "common.schema.json#/$defs/semantic_identifier_array",
+          "minItems": 1
+        },
+        "limitations": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "common.schema.json#/$defs/description"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "partial"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "limitations"
+            ],
+            "properties": {
+              "limitations": {
+                "minItems": 1
+              }
+            }
           }
         }
       ]

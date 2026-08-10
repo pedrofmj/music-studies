@@ -1,0 +1,56 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "hardware-preset",
+  "id": "smc-pad-current-notes",
+  "display_name": "SMC-PAD Current Notes",
+  "description": "Current drum note stream plus the two measured channel-1 knob assignments. No individual pad note layout is inferred.",
+  "device_models": [
+    "M-VAVE SMC-PAD"
+  ],
+  "verification": {
+    "status": "partial",
+    "source_refs": [
+      "protected-setup.controller-profile.pad-devices",
+      "documented-controller-profile.smc-pad"
+    ],
+    "limitations": [
+      "The protected capture proves normal drum note events but does not record each pad's note number, MIDI channel, preset, or bank.",
+      "Knob 1 channel-1 CC36 and Knob 2 channel-1 CC37 are measured; other assignable controls are not accepted without a raw MIDI capture."
+    ]
+  },
+  "controls": [
+    {
+      "id": "performance-pads",
+      "physical_control": "Performance pads",
+      "behavior": "momentary",
+      "message": {
+        "type": "note",
+        "channel": "any",
+        "number": "any",
+        "edge": "any"
+      }
+    },
+    {
+      "id": "knob-1",
+      "physical_control": "Knob 1",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 36,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-2",
+      "physical_control": "Knob 2",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 37,
+        "edge": "change"
+      }
+    }
+  ]
+}

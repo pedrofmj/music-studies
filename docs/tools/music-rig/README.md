@@ -61,18 +61,25 @@ Windows backends.
 The six strict Draft 2020-12 schemas under
 [`src/performance-rigs/pedro-performance-rig`](../../../src/performance-rigs/pedro-performance-rig/)
 define the portable v1 authoring boundary. The default CTest suite validates
-the schemas themselves, five positive plus eight negative document fixtures,
-and the authored five-slot `rig.json` catalogue. Semantic checks enforce
+the schemas themselves, five positive plus nine negative document fixtures,
+two positive/negative Hardware Preset catalogue cases, and the authored
+five-slot Rig with all five current Hardware Presets. Semantic checks enforce
 selector order, required model and endpoint coverage, unique aliases and local
-discriminators, optional USB evidence, and unambiguous shared USB IDs. The
-Python `jsonschema` dependency is used only by authoring and tests; neither the
-C CLI nor the future resident runtime loads it.
+discriminators, optional USB evidence, unambiguous shared USB IDs, unique
+hardware controls and messages, evidence status, and resolved preset IDs. The
+Python `jsonschema` dependency is used only by authoring and tests; neither
+the C CLI nor the future resident runtime loads it.
 
 Run the validator directly:
 
 ~~~bash
 /tmp/music-rig-schema-venv/bin/python \
   docs/tools/music-rig/validate-performance-rig.py --self-test
+
+/tmp/music-rig-schema-venv/bin/python \
+  docs/tools/music-rig/validate-performance-rig.py \
+  --validate-root src/performance-rigs/pedro-performance-rig \
+  --authority-setup docs/tools/airstar-live-setup/setup.json
 ~~~
 
 The portable-core guard rejects platform headers and backend names without

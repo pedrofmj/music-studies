@@ -1,0 +1,234 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "hardware-preset",
+  "id": "smk25-current-pad-layers",
+  "display_name": "SMK-25 Current Pad Layers",
+  "description": "Verified CubeSuite assignments for eight layer-volume knobs, eight latching layer pads, and MCP Stop and Play.",
+  "device_models": [
+    "M-VAVE SMK-25"
+  ],
+  "verification": {
+    "status": "verified",
+    "source_refs": [
+      "protected-setup.controller-profile.smk25",
+      "stable-helper.smk25-pad-layers"
+    ]
+  },
+  "configuration_tool": "CubeSuite",
+  "controls": [
+    {
+      "id": "knob-1",
+      "physical_control": "Knob 1",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 20,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-2",
+      "physical_control": "Knob 2",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 21,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-3",
+      "physical_control": "Knob 3",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 22,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-4",
+      "physical_control": "Knob 4",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 23,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-5",
+      "physical_control": "Knob 5",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 24,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-6",
+      "physical_control": "Knob 6",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 25,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-7",
+      "physical_control": "Knob 7",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 26,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "knob-8",
+      "physical_control": "Knob 8",
+      "behavior": "absolute",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 27,
+        "edge": "change"
+      }
+    },
+    {
+      "id": "side-a-pad-1",
+      "physical_control": "Side-A Pad 1",
+      "behavior": "toggle",
+      "message": {
+        "type": "cc",
+        "channel": 1,
+        "number": 40,
+        "edge": "change"
+      },
+      "off_value": 0,
+      "on_value": 127
+    },
+    {
+      "id": "side-a-pad-2",
+      "physical_control": "Side-A Pad 2",
+      "behavior": "toggle",
+      "message": {
+        "type": "cc",
+        "channel": 2,
+        "number": 41,
+        "edge": "change"
+      },
+      "off_value": 0,
+      "on_value": 127
+    },
+    {
+      "id": "side-a-pad-3",
+      "physical_control": "Side-A Pad 3",
+      "behavior": "toggle",
+      "message": {
+        "type": "cc",
+        "channel": 3,
+        "number": 42,
+        "edge": "change"
+      },
+      "off_value": 0,
+      "on_value": 127
+    },
+    {
+      "id": "side-a-pad-4",
+      "physical_control": "Side-A Pad 4",
+      "behavior": "toggle",
+      "message": {
+        "type": "cc",
+        "channel": 4,
+        "number": 43,
+        "edge": "change"
+      },
+      "off_value": 0,
+      "on_value": 127
+    },
+    {
+      "id": "side-a-pad-5",
+      "physical_control": "Side-A Pad 5",
+      "behavior": "toggle",
+      "message": {
+        "type": "cc",
+        "channel": 5,
+        "number": 36,
+        "edge": "change"
+      },
+      "off_value": 0,
+      "on_value": 127
+    },
+    {
+      "id": "side-a-pad-6",
+      "physical_control": "Side-A Pad 6",
+      "behavior": "toggle",
+      "message": {
+        "type": "cc",
+        "channel": 6,
+        "number": 37,
+        "edge": "change"
+      },
+      "off_value": 0,
+      "on_value": 127
+    },
+    {
+      "id": "side-a-pad-7",
+      "physical_control": "Side-A Pad 7",
+      "behavior": "toggle",
+      "message": {
+        "type": "cc",
+        "channel": 7,
+        "number": 38,
+        "edge": "change"
+      },
+      "off_value": 0,
+      "on_value": 127
+    },
+    {
+      "id": "side-a-pad-8",
+      "physical_control": "Side-A Pad 8",
+      "behavior": "toggle",
+      "message": {
+        "type": "cc",
+        "channel": 8,
+        "number": 39,
+        "edge": "change"
+      },
+      "off_value": 0,
+      "on_value": 127
+    },
+    {
+      "id": "transport-stop",
+      "physical_control": "Stop button",
+      "behavior": "momentary",
+      "message": {
+        "type": "note",
+        "channel": 1,
+        "number": 93,
+        "edge": "any"
+      }
+    },
+    {
+      "id": "transport-play",
+      "physical_control": "Play button",
+      "behavior": "momentary",
+      "message": {
+        "type": "note",
+        "channel": 1,
+        "number": 94,
+        "edge": "any"
+      }
+    }
+  ]
+}

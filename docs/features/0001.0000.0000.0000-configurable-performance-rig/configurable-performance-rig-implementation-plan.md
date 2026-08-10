@@ -83,10 +83,13 @@ types under
 The portable contract and authored `rig.json` cover the five stable device
 slots, ordered physical selectors, semantic capabilities, ownership modes,
 readiness, takeover, state, raw hardware MIDI, switch safety, and future MIDI
-management operations. A pinned authoring-only validator checks all schemas,
-five valid and eight invalid fixtures, and the concrete rig catalogue on Linux
-and Windows. No runtime or deployment path consumes these authored documents
-yet.
+management operations. All five current Hardware Presets are authored:
+Arturia, SMK-25, and SMC-Mixer are verified; SMC-PAD and SMC-PAD Pocket remain
+explicitly partial until their individual pad messages are captured. A pinned
+authoring-only validator checks all schemas, five valid and nine invalid
+fixtures, positive and negative catalogue semantics, and the concrete Rig
+catalogue on Linux and Windows. No runtime or deployment path consumes these
+authored documents yet.
 
 ## Objective
 

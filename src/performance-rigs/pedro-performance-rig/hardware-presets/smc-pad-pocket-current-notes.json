@@ -1,0 +1,33 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "hardware-preset",
+  "id": "smc-pad-pocket-current-notes",
+  "display_name": "SMC-PAD Pocket Current Notes",
+  "description": "Current drum note stream from the Pocket Master endpoint. No individual pad note layout is inferred.",
+  "device_models": [
+    "M-VAVE SMC-PAD Pocket"
+  ],
+  "verification": {
+    "status": "partial",
+    "source_refs": [
+      "protected-setup.controller-profile.pad-devices",
+      "documented-controller-profile.smc-pad-pocket"
+    ],
+    "limitations": [
+      "The protected capture proves normal drum note events but does not record each pad's note number, MIDI channel, preset, or bank."
+    ]
+  },
+  "controls": [
+    {
+      "id": "performance-pads",
+      "physical_control": "Performance pads",
+      "behavior": "momentary",
+      "message": {
+        "type": "note",
+        "channel": "any",
+        "number": "any",
+        "edge": "any"
+      }
+    }
+  ]
+}

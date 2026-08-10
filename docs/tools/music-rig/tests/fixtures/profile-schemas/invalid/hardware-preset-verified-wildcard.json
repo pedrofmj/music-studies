@@ -1,0 +1,28 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "hardware-preset",
+  "id": "verified-wildcard-fixture",
+  "display_name": "Verified Wildcard Fixture",
+  "device_models": [
+    "Fixture Pad Controller"
+  ],
+  "verification": {
+    "status": "verified",
+    "source_refs": [
+      "fixture.observation"
+    ]
+  },
+  "controls": [
+    {
+      "id": "performance-pads",
+      "physical_control": "Performance pads",
+      "behavior": "momentary",
+      "message": {
+        "type": "note",
+        "channel": "any",
+        "number": "any",
+        "edge": "any"
+      }
+    }
+  ]
+}
