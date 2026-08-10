@@ -109,10 +109,13 @@ benchmarks.
   [ADR 0001](architecture-decisions/0001-pipewire-graph-control-deferral.md)
   defers mutation; pre-Milestone-6 control-only switches require an empty graph
   delta.
-- ⬜ Record the supported Carla live-control and prepared-engine boundary.
+- ✅ Record the supported Carla live-control and prepared-engine boundary.
+  [ADR 0002](architecture-decisions/0002-carla-control-and-prepared-engine-boundary.md)
+  keeps early switches on loaded engines and moves lifecycle, state, project,
+  and patchbay work to preparation in Milestone 6.
 - 🟡 Write the remaining Milestone 0 architecture decision records. IPC,
   provisional JSON parsing, and PipeWire deferral boundaries are recorded;
-  Carla and the Windows backend remain.
+  the Windows backend remains.
 - ⬜ Confirm or revise CPU, memory, latency, and xrun thresholds.
 
 ## Milestone 1: Schemas And Current Profile Extraction

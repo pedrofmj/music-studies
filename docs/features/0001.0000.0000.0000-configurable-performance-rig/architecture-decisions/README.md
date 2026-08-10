@@ -6,6 +6,9 @@ This directory contains short, implementation-binding decisions for feature
 - [ADR 0001: Defer Native PipeWire Graph Control](0001-pipewire-graph-control-deferral.md)
   is accepted. Native PipeWire graph mutation starts no earlier than Milestone
   6.
+- [ADR 0002: Carla Control And Prepared-Engine Boundary](0002-carla-control-and-prepared-engine-boundary.md)
+  is accepted. Early switches reuse loaded engines through certified controls;
+  lifecycle, state-load, project, and patchbay operations require preparation.
 
 Accepted records constrain later schemas, compiler output, runtime behavior,
 tests, and deployment. A decision may be superseded only by another recorded

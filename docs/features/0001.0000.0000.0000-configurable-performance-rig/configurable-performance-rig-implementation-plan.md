@@ -34,7 +34,12 @@ Completed Milestone 0 work:
 - an accepted
   [PipeWire graph-control decision](architecture-decisions/0001-pipewire-graph-control-deferral.md)
   that requires an empty graph delta for every pre-Milestone-6 control-only
-  switch.
+  switch; and
+- an accepted
+  [Carla control decision](architecture-decisions/0002-carla-control-and-prepared-engine-boundary.md)
+  that limits early switching to certified controls on loaded engines and
+  reserves plugin lifecycle, state, project, and patchbay operations for
+  prepared execution.
 
 The Airstar observation matches the protected Carla checksum, 49 plugins, 111
 project connections, all protected graph links, 2048-frame quantum, 48 kHz
@@ -45,8 +50,9 @@ observed but not removed or added to the protected baseline.
 
 Open Milestone 0 gates include a clean transient-free Airstar capture,
 operator-recorded startup transcript evidence, the Windows `json-c` proof,
-Windows reference build and IPC proof, and the remaining backend boundary
-decisions. No experimental runtime is installed or connected to the live rig.
+Windows reference build and IPC proof, the Windows backend decision, and
+benchmark-threshold confirmation. No experimental runtime is installed or
+connected to the live rig.
 
 ## Objective
 
