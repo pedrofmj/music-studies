@@ -1,0 +1,89 @@
+{
+  "schema": "music-studies/switch-benchmark-contract/v1",
+  "result_schema": "music-studies/switch-benchmark-result/v1",
+  "time_unit": "nanoseconds",
+  "minimum_iterations_per_scenario": 1000,
+  "required_scenarios": [
+    "idle",
+    "normal-performance",
+    "high-midi-load"
+  ],
+  "clock": {
+    "required_properties": [
+      "monotonic",
+      "highest-resolution"
+    ],
+    "platform_names": {
+      "linux": "CLOCK_MONOTONIC_RAW",
+      "windows": "QueryPerformanceCounter"
+    }
+  },
+  "timing_metrics": {
+    "control_commit_latency_ns": {
+      "start": "request-received",
+      "end": "generation-published",
+      "required_for": [
+        "control-only",
+        "prepared-audio"
+      ]
+    },
+    "effective_adoption_latency_ns": {
+      "start": "request-received",
+      "end": "first-realtime-cycle-using-generation",
+      "required_for": [
+        "control-only",
+        "prepared-audio"
+      ]
+    },
+    "commit_to_adoption_latency_ns": {
+      "start": "generation-published",
+      "end": "first-realtime-cycle-using-generation",
+      "required_for": [
+        "control-only",
+        "prepared-audio"
+      ],
+      "maximum_formula": "processing_period_ns + adoption_after_commit_margin_ns"
+    },
+    "prepared_audio_commit_latency_ns": {
+      "start": "request-received",
+      "end": "audible-graph-commit-complete",
+      "required_for": [
+        "prepared-audio"
+      ]
+    }
+  },
+  "percentile_method": "nearest-rank-successful-samples",
+  "required_summary_fields": [
+    "sample_count",
+    "failure_count",
+    "p50",
+    "p95",
+    "p99",
+    "maximum"
+  ],
+  "resource_metrics": [
+    "wall_time_ns",
+    "daemon_cpu_time_ns",
+    "daemon_cpu_one_core_percent",
+    "daemon_wakeups",
+    "daemon_rss_start_bytes",
+    "daemon_rss_peak_bytes",
+    "prepared_resource_memory_peak_bytes",
+    "plugin_host_memory_peak_bytes"
+  ],
+  "stability_counters": [
+    "xruns",
+    "audio_dropouts",
+    "deadline_errors"
+  ],
+  "default_thresholds": {
+    "control_commit_p95_max_ns": 20000000,
+    "prepared_audio_commit_p95_max_ns": 100000000,
+    "adoption_after_commit_margin_ns": 5000000,
+    "attributable_xruns_max": 0,
+    "attributable_audio_dropouts_max": 0,
+    "attributable_deadline_errors_max": 0,
+    "idle_daemon_cpu_one_core_percent_max_exclusive": 0.5,
+    "daemon_rss_bytes_max_exclusive": 50000000
+  }
+}

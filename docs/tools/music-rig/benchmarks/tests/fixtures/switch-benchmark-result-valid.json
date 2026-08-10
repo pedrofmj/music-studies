@@ -1,0 +1,245 @@
+{
+  "schema": "music-studies/switch-benchmark-result/v1",
+  "contract_schema": "music-studies/switch-benchmark-contract/v1",
+  "result_kind": "contract-fixture",
+  "benchmark_id": "control-only-device-switch",
+  "run_id": "fixture-linux-control-only",
+  "created_at_utc": "2026-08-10T00:00:00Z",
+  "platform": {
+    "os": "linux",
+    "architecture": "x86_64",
+    "reference_machine_id": "fixture-linux",
+    "clock": {
+      "name": "CLOCK_MONOTONIC_RAW",
+      "monotonic": true,
+      "highest_resolution": true,
+      "resolution_ns": 1
+    }
+  },
+  "fingerprints": {
+    "benchmark_definition": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "compiled_definition": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "machine_definition": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+  },
+  "definition": {
+    "switch_kind": "control-only",
+    "rig": "pedro-performance-rig",
+    "device": "smc-mixer-main",
+    "profiles": [
+      "eight-band-eq",
+      "multilevel-volume"
+    ],
+    "iterations_per_scenario": 1000,
+    "sample_rate_hz": 48000,
+    "processing_period_frames": 2048,
+    "processing_period_ns": 42666667
+  },
+  "thresholds": {
+    "control_commit_p95_max_ns": 20000000,
+    "prepared_audio_commit_p95_max_ns": 100000000,
+    "adoption_after_commit_margin_ns": 5000000,
+    "adoption_after_commit_max_ns": 47666667,
+    "attributable_xruns_max": 0,
+    "attributable_audio_dropouts_max": 0,
+    "attributable_deadline_errors_max": 0,
+    "idle_daemon_cpu_one_core_percent_max_exclusive": 0.5,
+    "daemon_rss_bytes_max_exclusive": 50000000
+  },
+  "scenarios": [
+    {
+      "id": "idle",
+      "timing": {
+        "control_commit_latency_ns": {
+          "sample_count": 1000,
+          "failure_count": 0,
+          "p50": 25000,
+          "p95": 45000,
+          "p99": 60000,
+          "maximum": 80000
+        },
+        "effective_adoption_latency_ns": {
+          "sample_count": 1000,
+          "failure_count": 0,
+          "p50": 1025000,
+          "p95": 1545000,
+          "p99": 1810000,
+          "maximum": 2080000
+        },
+        "commit_to_adoption_latency_ns": {
+          "sample_count": 1000,
+          "failure_count": 0,
+          "p50": 1000000,
+          "p95": 1500000,
+          "p99": 1750000,
+          "maximum": 2000000
+        }
+      },
+      "resources": {
+        "wall_time_ns": 10000000000,
+        "daemon_cpu_time_ns": 30000000,
+        "daemon_cpu_one_core_percent": 0.3,
+        "daemon_wakeups": 1200,
+        "daemon_rss_start_bytes": 12582912,
+        "daemon_rss_peak_bytes": 13631488,
+        "prepared_resource_memory_peak_bytes": 0,
+        "plugin_host_memory_peak_bytes": 0
+      },
+      "stability": {
+        "xruns": {
+          "before": 2,
+          "after": 2,
+          "attributable": 0
+        },
+        "audio_dropouts": {
+          "before": 0,
+          "after": 0,
+          "attributable": 0
+        },
+        "deadline_errors": {
+          "before": 0,
+          "after": 0,
+          "attributable": 0
+        }
+      },
+      "evaluation": {
+        "timing_pass": true,
+        "resource_pass": true,
+        "stability_pass": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "normal-performance",
+      "timing": {
+        "control_commit_latency_ns": {
+          "sample_count": 1000,
+          "failure_count": 0,
+          "p50": 40000,
+          "p95": 80000,
+          "p99": 110000,
+          "maximum": 150000
+        },
+        "effective_adoption_latency_ns": {
+          "sample_count": 1000,
+          "failure_count": 0,
+          "p50": 1540000,
+          "p95": 2880000,
+          "p99": 3610000,
+          "maximum": 4150000
+        },
+        "commit_to_adoption_latency_ns": {
+          "sample_count": 1000,
+          "failure_count": 0,
+          "p50": 1500000,
+          "p95": 2800000,
+          "p99": 3500000,
+          "maximum": 4000000
+        }
+      },
+      "resources": {
+        "wall_time_ns": 10000000000,
+        "daemon_cpu_time_ns": 90000000,
+        "daemon_cpu_one_core_percent": 0.9,
+        "daemon_wakeups": 2500,
+        "daemon_rss_start_bytes": 12582912,
+        "daemon_rss_peak_bytes": 14680064,
+        "prepared_resource_memory_peak_bytes": 0,
+        "plugin_host_memory_peak_bytes": 734003200
+      },
+      "stability": {
+        "xruns": {
+          "before": 2,
+          "after": 2,
+          "attributable": 0
+        },
+        "audio_dropouts": {
+          "before": 0,
+          "after": 0,
+          "attributable": 0
+        },
+        "deadline_errors": {
+          "before": 0,
+          "after": 0,
+          "attributable": 0
+        }
+      },
+      "evaluation": {
+        "timing_pass": true,
+        "resource_pass": true,
+        "stability_pass": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "high-midi-load",
+      "timing": {
+        "control_commit_latency_ns": {
+          "sample_count": 1000,
+          "failure_count": 0,
+          "p50": 70000,
+          "p95": 150000,
+          "p99": 220000,
+          "maximum": 300000
+        },
+        "effective_adoption_latency_ns": {
+          "sample_count": 1000,
+          "failure_count": 0,
+          "p50": 2070000,
+          "p95": 4150000,
+          "p99": 5220000,
+          "maximum": 6300000
+        },
+        "commit_to_adoption_latency_ns": {
+          "sample_count": 1000,
+          "failure_count": 0,
+          "p50": 2000000,
+          "p95": 4000000,
+          "p99": 5000000,
+          "maximum": 6000000
+        }
+      },
+      "resources": {
+        "wall_time_ns": 10000000000,
+        "daemon_cpu_time_ns": 180000000,
+        "daemon_cpu_one_core_percent": 1.8,
+        "daemon_wakeups": 4800,
+        "daemon_rss_start_bytes": 12582912,
+        "daemon_rss_peak_bytes": 15728640,
+        "prepared_resource_memory_peak_bytes": 0,
+        "plugin_host_memory_peak_bytes": 734003200
+      },
+      "stability": {
+        "xruns": {
+          "before": 2,
+          "after": 2,
+          "attributable": 0
+        },
+        "audio_dropouts": {
+          "before": 0,
+          "after": 0,
+          "attributable": 0
+        },
+        "deadline_errors": {
+          "before": 0,
+          "after": 0,
+          "attributable": 0
+        }
+      },
+      "evaluation": {
+        "timing_pass": true,
+        "resource_pass": true,
+        "stability_pass": true,
+        "passed": true
+      }
+    }
+  ],
+  "raw_samples": {
+    "retained": false,
+    "reason": "Synthetic contract fixture; this file is not performance evidence"
+  },
+  "evaluation": {
+    "scenarios_passed": 3,
+    "scenarios_failed": 0,
+    "passed": true
+  }
+}

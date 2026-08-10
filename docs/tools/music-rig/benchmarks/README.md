@@ -44,3 +44,19 @@ The result proves only the Linux half of the portability gate; Windows remains
 pending.
 
 See [../JSON-PARSING.md](../JSON-PARSING.md) for the decision boundary and
+evidence interpretation.
+
+## Portable Switch Benchmark Contract
+
+[SWITCH-BENCHMARK-CONTRACT.md](SWITCH-BENCHMARK-CONTRACT.md) defines the shared
+Linux and Windows campaign format, exact timing boundaries, required load
+scenarios, resource separation, stability counters, and raw-evidence rules.
+The machine-readable authority is
+[switch-benchmark-contract.json](switch-benchmark-contract.json).
+
+Validate the contract and its synthetic fixture without touching the live rig:
+
+~~~bash
+docs/tools/music-rig/benchmarks/validate-switch-benchmark --check-contract
+docs/tools/music-rig/benchmarks/validate-switch-benchmark --self-test
+~~~

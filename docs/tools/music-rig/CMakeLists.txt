@@ -85,6 +85,37 @@ if(BUILD_TESTING)
         NAME music_rig_cli_version
         COMMAND $<TARGET_FILE:music-rig> --version
     )
+
+    find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter)
+    set(MUSIC_RIG_SWITCH_BENCHMARK_VALIDATOR
+        "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/validate-switch-benchmark"
+    )
+    add_test(
+        NAME music_rig_switch_benchmark_contract
+        COMMAND "${Python3_EXECUTABLE}"
+            "${MUSIC_RIG_SWITCH_BENCHMARK_VALIDATOR}"
+            --check-contract
+    )
+    add_test(
+        NAME music_rig_switch_benchmark_fixture
+        COMMAND "${Python3_EXECUTABLE}"
+            "${MUSIC_RIG_SWITCH_BENCHMARK_VALIDATOR}"
+            --validate
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/tests/fixtures/switch-benchmark-result-valid.json"
+    )
+    add_test(
+        NAME music_rig_switch_benchmark_validator_self_test
+        COMMAND "${Python3_EXECUTABLE}"
+            "${MUSIC_RIG_SWITCH_BENCHMARK_VALIDATOR}"
+            --self-test
+    )
+    set_tests_properties(
+        music_rig_switch_benchmark_contract
+        music_rig_switch_benchmark_fixture
+        music_rig_switch_benchmark_validator_self_test
+        PROPERTIES TIMEOUT 10
+    )
+
     if(MUSIC_RIG_ENABLE_JSON_C_SPIKE)
         if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
             message(FATAL_ERROR
@@ -253,7 +284,6 @@ if(BUILD_TESTING)
                 PROPERTIES TIMEOUT 10
             )
 
-            find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter)
             add_test(
                 NAME music_rig_current_rack_startup_contract
                 COMMAND "${Python3_EXECUTABLE}"

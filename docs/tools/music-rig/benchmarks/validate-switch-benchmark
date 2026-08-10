@@ -1,0 +1,759 @@
+#!/usr/bin/env python3
+"""Validate the portable switch-benchmark contract and result documents."""
+
+from __future__ import annotations
+
+import argparse
+import copy
+import json
+import math
+import re
+import sys
+from pathlib import Path
+from typing import Any, Callable
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+CONTRACT_PATH = SCRIPT_DIR / "switch-benchmark-contract.json"
+FIXTURE_PATH = (
+    SCRIPT_DIR / "tests/fixtures/switch-benchmark-result-valid.json"
+)
+SHA256_PATTERN = re.compile(r"sha256:[0-9a-f]{64}\Z")
+UTC_PATTERN = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\Z")
+
+
+class ValidationError(RuntimeError):
+    """Raised when a benchmark contract or result is invalid."""
+
+
+def require(condition: bool, message: str) -> None:
+    if not condition:
+        raise ValidationError(message)
+
+
+def load_json(path: Path) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise ValidationError(f"Cannot load {path}: {error}") from error
+    require(isinstance(value, dict), f"Expected a JSON object in {path}")
+    return value
+
+
+def require_object(value: Any, label: str) -> dict[str, Any]:
+    require(isinstance(value, dict), f"{label} must be an object")
+    return value
+
+
+def require_string(value: Any, label: str) -> str:
+    require(isinstance(value, str) and bool(value), f"{label} must be a string")
+    return value
+
+
+def require_integer(value: Any, label: str, minimum: int = 0) -> int:
+    require(
+        isinstance(value, int) and not isinstance(value, bool),
+        f"{label} must be an integer",
+    )
+    require(value >= minimum, f"{label} must be at least {minimum}")
+    return value
+
+
+def require_number(value: Any, label: str, minimum: float = 0.0) -> float:
+    require(
+        isinstance(value, (int, float)) and not isinstance(value, bool),
+        f"{label} must be a number",
+    )
+    number = float(value)
+    require(math.isfinite(number), f"{label} must be finite")
+    require(number >= minimum, f"{label} must be at least {minimum}")
+    return number
+
+
+def require_exact_keys(
+    value: dict[str, Any], expected: set[str], label: str
+) -> None:
+    actual = set(value)
+    missing = sorted(expected - actual)
+    extra = sorted(actual - expected)
+    require(not missing, f"{label} missing fields: {', '.join(missing)}")
+    require(not extra, f"{label} has unknown fields: {', '.join(extra)}")
+
+
+def validate_contract(contract: dict[str, Any]) -> None:
+    require(
+        contract.get("schema") == "music-studies/switch-benchmark-contract/v1",
+        "Unsupported benchmark contract schema",
+    )
+    require(
+        contract.get("result_schema")
+        == "music-studies/switch-benchmark-result/v1",
+        "Unsupported benchmark result schema",
+    )
+    require(contract.get("time_unit") == "nanoseconds", "Time unit drift")
+    require(
+        contract.get("minimum_iterations_per_scenario") == 1000,
+        "Iteration floor drift",
+    )
+    require(
+        contract.get("required_scenarios")
+        == ["idle", "normal-performance", "high-midi-load"],
+        "Required scenario set or order drift",
+    )
+
+    clock = require_object(contract.get("clock"), "clock contract")
+    require(
+        clock.get("required_properties")
+        == ["monotonic", "highest-resolution"],
+        "Clock property drift",
+    )
+    require(
+        clock.get("platform_names")
+        == {
+            "linux": "CLOCK_MONOTONIC_RAW",
+            "windows": "QueryPerformanceCounter",
+        },
+        "Platform clock boundary drift",
+    )
+
+    timing = require_object(
+        contract.get("timing_metrics"), "timing metric contract"
+    )
+    require_exact_keys(
+        timing,
+        {
+            "control_commit_latency_ns",
+            "effective_adoption_latency_ns",
+            "commit_to_adoption_latency_ns",
+            "prepared_audio_commit_latency_ns",
+        },
+        "timing metric contract",
+    )
+    expected_boundaries = {
+        "control_commit_latency_ns": (
+            "request-received",
+            "generation-published",
+        ),
+        "effective_adoption_latency_ns": (
+            "request-received",
+            "first-realtime-cycle-using-generation",
+        ),
+        "commit_to_adoption_latency_ns": (
+            "generation-published",
+            "first-realtime-cycle-using-generation",
+        ),
+        "prepared_audio_commit_latency_ns": (
+            "request-received",
+            "audible-graph-commit-complete",
+        ),
+    }
+    for name, (start, end) in expected_boundaries.items():
+        metric = require_object(timing[name], name)
+        require(
+            metric.get("start") == start and metric.get("end") == end,
+            f"Timing boundary drift: {name}",
+        )
+    for name in (
+        "control_commit_latency_ns",
+        "effective_adoption_latency_ns",
+        "commit_to_adoption_latency_ns",
+    ):
+        require(
+            timing[name].get("required_for")
+            == ["control-only", "prepared-audio"],
+            f"Timing applicability drift: {name}",
+        )
+    require(
+        timing["commit_to_adoption_latency_ns"].get("maximum_formula")
+        == "processing_period_ns + adoption_after_commit_margin_ns",
+        "Adoption threshold formula drift",
+    )
+    require(
+        timing["prepared_audio_commit_latency_ns"].get("required_for")
+        == ["prepared-audio"],
+        "Prepared-audio timing applicability drift",
+    )
+
+    require(
+        contract.get("percentile_method") == "nearest-rank-successful-samples",
+        "Percentile method drift",
+    )
+    require(
+        contract.get("required_summary_fields")
+        == [
+            "sample_count",
+            "failure_count",
+            "p50",
+            "p95",
+            "p99",
+            "maximum",
+        ],
+        "Summary field contract drift",
+    )
+    require(
+        contract.get("resource_metrics")
+        == [
+            "wall_time_ns",
+            "daemon_cpu_time_ns",
+            "daemon_cpu_one_core_percent",
+            "daemon_wakeups",
+            "daemon_rss_start_bytes",
+            "daemon_rss_peak_bytes",
+            "prepared_resource_memory_peak_bytes",
+            "plugin_host_memory_peak_bytes",
+        ],
+        "Resource metric contract drift",
+    )
+    require(
+        contract.get("stability_counters")
+        == ["xruns", "audio_dropouts", "deadline_errors"],
+        "Stability counter contract drift",
+    )
+
+    thresholds = require_object(
+        contract.get("default_thresholds"), "default thresholds"
+    )
+    require(
+        thresholds
+        == {
+            "control_commit_p95_max_ns": 20000000,
+            "prepared_audio_commit_p95_max_ns": 100000000,
+            "adoption_after_commit_margin_ns": 5000000,
+            "attributable_xruns_max": 0,
+            "attributable_audio_dropouts_max": 0,
+            "attributable_deadline_errors_max": 0,
+            "idle_daemon_cpu_one_core_percent_max_exclusive": 0.5,
+            "daemon_rss_bytes_max_exclusive": 50000000,
+        },
+        "Default threshold drift",
+    )
+
+
+def validate_summary(
+    value: Any,
+    label: str,
+    iterations: int,
+    summary_fields: list[str],
+) -> dict[str, int]:
+    summary = require_object(value, label)
+    require_exact_keys(summary, set(summary_fields), label)
+    for field in summary_fields:
+        require_integer(summary[field], f"{label}.{field}")
+    require(
+        summary["sample_count"] == iterations,
+        f"{label}.sample_count must equal iterations_per_scenario",
+    )
+    require(
+        summary["failure_count"] <= summary["sample_count"],
+        f"{label}.failure_count exceeds sample_count",
+    )
+    require(
+        summary["failure_count"] < summary["sample_count"],
+        f"{label} has no successful samples",
+    )
+    ordered = [summary[name] for name in ("p50", "p95", "p99", "maximum")]
+    require(ordered == sorted(ordered), f"{label} percentiles are not ordered")
+    return summary
+
+
+def validate_stability_counter(value: Any, label: str) -> int:
+    counter = require_object(value, label)
+    require_exact_keys(counter, {"before", "after", "attributable"}, label)
+    before = require_integer(counter["before"], f"{label}.before")
+    after = require_integer(counter["after"], f"{label}.after")
+    attributable = require_integer(counter["attributable"], f"{label}.attributable")
+    require(after >= before, f"{label}.after cannot be less than before")
+    require(
+        attributable == after - before,
+        f"{label}.attributable does not equal after minus before",
+    )
+    return attributable
+
+
+def validate_result(result: dict[str, Any], contract: dict[str, Any]) -> None:
+    require(
+        result.get("schema") == contract["result_schema"],
+        "Result schema does not match the contract",
+    )
+    require(
+        result.get("contract_schema") == contract["schema"],
+        "Result contract schema mismatch",
+    )
+    result_kind = result.get("result_kind")
+    require(
+        result_kind in {"contract-fixture", "measurement"},
+        "Unknown result_kind",
+    )
+    require_string(result.get("benchmark_id"), "benchmark_id")
+    require_string(result.get("run_id"), "run_id")
+    created_at = require_string(result.get("created_at_utc"), "created_at_utc")
+    require(
+        bool(UTC_PATTERN.fullmatch(created_at)),
+        "created_at_utc is not canonical UTC",
+    )
+
+    platform = require_object(result.get("platform"), "platform")
+    require_exact_keys(
+        platform,
+        {"os", "architecture", "reference_machine_id", "clock"},
+        "platform",
+    )
+    platform_name = platform.get("os")
+    platform_clocks = contract["clock"]["platform_names"]
+    require(platform_name in platform_clocks, "Unsupported benchmark platform")
+    require_string(platform.get("architecture"), "platform.architecture")
+    require_string(
+        platform.get("reference_machine_id"), "platform.reference_machine_id"
+    )
+    clock = require_object(platform.get("clock"), "platform.clock")
+    require_exact_keys(
+        clock,
+        {"name", "monotonic", "highest_resolution", "resolution_ns"},
+        "platform.clock",
+    )
+    require(
+        clock.get("name") == platform_clocks[platform_name],
+        "Platform clock name mismatch",
+    )
+    require(clock.get("monotonic") is True, "Benchmark clock must be monotonic")
+    require(
+        clock.get("highest_resolution") is True,
+        "Benchmark clock must be highest-resolution",
+    )
+    require_integer(clock.get("resolution_ns"), "platform.clock.resolution_ns", 1)
+
+    fingerprints = require_object(result.get("fingerprints"), "fingerprints")
+    require_exact_keys(
+        fingerprints,
+        {"benchmark_definition", "compiled_definition", "machine_definition"},
+        "fingerprints",
+    )
+    for name, digest in fingerprints.items():
+        require(
+            isinstance(digest, str) and bool(SHA256_PATTERN.fullmatch(digest)),
+            f"fingerprints.{name} must be a canonical SHA-256 digest",
+        )
+
+    definition = require_object(result.get("definition"), "definition")
+    require_exact_keys(
+        definition,
+        {
+            "switch_kind",
+            "rig",
+            "device",
+            "profiles",
+            "iterations_per_scenario",
+            "sample_rate_hz",
+            "processing_period_frames",
+            "processing_period_ns",
+        },
+        "definition",
+    )
+    switch_kind = definition.get("switch_kind")
+    require(
+        switch_kind in {"control-only", "prepared-audio"},
+        "Unknown switch_kind",
+    )
+    require_string(definition.get("rig"), "definition.rig")
+    require_string(definition.get("device"), "definition.device")
+    profiles = definition.get("profiles")
+    require(isinstance(profiles, list), "definition.profiles must be an array")
+    require(len(profiles) >= 2, "definition.profiles needs at least two profiles")
+    require(
+        all(isinstance(item, str) and item for item in profiles),
+        "definition.profiles contains an invalid profile",
+    )
+    require(len(profiles) == len(set(profiles)), "definition.profiles has duplicates")
+    iterations = require_integer(
+        definition.get("iterations_per_scenario"),
+        "definition.iterations_per_scenario",
+        contract["minimum_iterations_per_scenario"],
+    )
+    sample_rate = require_integer(
+        definition.get("sample_rate_hz"), "definition.sample_rate_hz", 1
+    )
+    period_frames = require_integer(
+        definition.get("processing_period_frames"),
+        "definition.processing_period_frames",
+        1,
+    )
+    period_ns = require_integer(
+        definition.get("processing_period_ns"),
+        "definition.processing_period_ns",
+        1,
+    )
+    calculated_period_ns = (
+        period_frames * 1_000_000_000 + sample_rate - 1
+    ) // sample_rate
+    require(
+        period_ns == calculated_period_ns,
+        "definition.processing_period_ns must be the ceiling of frames/sample rate",
+    )
+
+    thresholds = require_object(result.get("thresholds"), "thresholds")
+    expected_thresholds = dict(contract["default_thresholds"])
+    expected_thresholds["adoption_after_commit_max_ns"] = (
+        period_ns + expected_thresholds["adoption_after_commit_margin_ns"]
+    )
+    require(thresholds == expected_thresholds, "Result threshold values drift")
+
+    scenarios = result.get("scenarios")
+    require(isinstance(scenarios, list), "scenarios must be an array")
+    scenario_ids = [
+        require_object(item, "scenario").get("id") for item in scenarios
+    ]
+    require(
+        scenario_ids == contract["required_scenarios"],
+        "Result scenario set or order drift",
+    )
+    required_metrics = {
+        name
+        for name, metric in contract["timing_metrics"].items()
+        if switch_kind in metric["required_for"]
+    }
+    summary_fields = contract["required_summary_fields"]
+    resource_fields = set(contract["resource_metrics"])
+    stability_fields = set(contract["stability_counters"])
+    scenario_passes: list[bool] = []
+
+    for scenario in scenarios:
+        scenario_id = scenario["id"]
+        require_exact_keys(
+            scenario,
+            {"id", "timing", "resources", "stability", "evaluation"},
+            f"scenario {scenario_id}",
+        )
+        timing = require_object(scenario["timing"], f"{scenario_id}.timing")
+        require_exact_keys(timing, required_metrics, f"{scenario_id}.timing")
+        summaries = {
+            name: validate_summary(
+                timing[name],
+                f"{scenario_id}.timing.{name}",
+                iterations,
+                summary_fields,
+            )
+            for name in required_metrics
+        }
+        control = summaries["control_commit_latency_ns"]
+        effective = summaries["effective_adoption_latency_ns"]
+        adoption = summaries["commit_to_adoption_latency_ns"]
+        require(
+            effective["maximum"] >= max(control["maximum"], adoption["maximum"])
+            and effective["maximum"]
+            <= control["maximum"] + adoption["maximum"],
+            f"{scenario_id} effective-adoption maximum is inconsistent",
+        )
+        prepared_audio_pass = (
+            switch_kind != "prepared-audio"
+            or summaries["prepared_audio_commit_latency_ns"]["p95"]
+            <= thresholds["prepared_audio_commit_p95_max_ns"]
+        )
+        timing_pass = (
+            all(summary["failure_count"] == 0 for summary in summaries.values())
+            and control["p95"] <= thresholds["control_commit_p95_max_ns"]
+            and adoption["maximum"]
+            <= thresholds["adoption_after_commit_max_ns"]
+            and prepared_audio_pass
+        )
+
+        resources = require_object(
+            scenario["resources"], f"{scenario_id}.resources"
+        )
+        require_exact_keys(resources, resource_fields, f"{scenario_id}.resources")
+        for name in resource_fields - {"daemon_cpu_one_core_percent"}:
+            require_integer(resources[name], f"{scenario_id}.resources.{name}")
+        cpu_percent = require_number(
+            resources["daemon_cpu_one_core_percent"],
+            f"{scenario_id}.resources.daemon_cpu_one_core_percent",
+        )
+        require(resources["wall_time_ns"] > 0, f"{scenario_id} wall time is zero")
+        calculated_cpu_percent = (
+            resources["daemon_cpu_time_ns"] / resources["wall_time_ns"] * 100.0
+        )
+        require(
+            math.isclose(cpu_percent, calculated_cpu_percent, abs_tol=0.000001),
+            f"{scenario_id} daemon CPU percentage is inconsistent",
+        )
+        require(
+            resources["daemon_rss_peak_bytes"]
+            >= resources["daemon_rss_start_bytes"],
+            f"{scenario_id} daemon peak RSS is below start RSS",
+        )
+        resource_pass = (
+            resources["daemon_rss_peak_bytes"]
+            < thresholds["daemon_rss_bytes_max_exclusive"]
+            and (
+                scenario_id != "idle"
+                or cpu_percent
+                < thresholds[
+                    "idle_daemon_cpu_one_core_percent_max_exclusive"
+                ]
+            )
+        )
+
+        stability = require_object(
+            scenario["stability"], f"{scenario_id}.stability"
+        )
+        require_exact_keys(stability, stability_fields, f"{scenario_id}.stability")
+        attributable = {
+            name: validate_stability_counter(
+                stability[name], f"{scenario_id}.stability.{name}"
+            )
+            for name in stability_fields
+        }
+        stability_pass = (
+            attributable["xruns"] <= thresholds["attributable_xruns_max"]
+            and attributable["audio_dropouts"]
+            <= thresholds["attributable_audio_dropouts_max"]
+            and attributable["deadline_errors"]
+            <= thresholds["attributable_deadline_errors_max"]
+        )
+        passed = timing_pass and resource_pass and stability_pass
+        evaluation = require_object(
+            scenario["evaluation"], f"{scenario_id}.evaluation"
+        )
+        require(
+            evaluation
+            == {
+                "timing_pass": timing_pass,
+                "resource_pass": resource_pass,
+                "stability_pass": stability_pass,
+                "passed": passed,
+            },
+            f"{scenario_id} evaluation does not match measurements",
+        )
+        scenario_passes.append(passed)
+
+    raw_samples = require_object(result.get("raw_samples"), "raw_samples")
+    if result_kind == "contract-fixture":
+        require(
+            raw_samples.get("retained") is False
+            and isinstance(raw_samples.get("reason"), str),
+            "Contract fixture must identify synthetic omitted samples",
+        )
+    else:
+        require_exact_keys(
+            raw_samples,
+            {"retained", "schema", "relative_path", "sha256", "sample_count"},
+            "raw_samples",
+        )
+        require(raw_samples.get("retained") is True, "Raw samples were not retained")
+        require(
+            raw_samples.get("schema")
+            == "music-studies/switch-benchmark-samples/v1",
+            "Raw sample schema mismatch",
+        )
+        relative_path = require_string(
+            raw_samples.get("relative_path"), "raw_samples.relative_path"
+        )
+        require(
+            not relative_path.startswith(("/", "\\"))
+            and not re.match(r"[A-Za-z]:[\\/]", relative_path),
+            "Raw sample path must be portable and relative",
+        )
+        require(
+            isinstance(raw_samples.get("sha256"), str)
+            and bool(SHA256_PATTERN.fullmatch(raw_samples["sha256"])),
+            "Raw sample digest is invalid",
+        )
+        require(
+            raw_samples.get("sample_count") == iterations * len(scenarios),
+            "Raw sample count does not match the campaign",
+        )
+
+    passed_count = sum(scenario_passes)
+    campaign_evaluation = require_object(result.get("evaluation"), "evaluation")
+    require(
+        campaign_evaluation
+        == {
+            "scenarios_passed": passed_count,
+            "scenarios_failed": len(scenario_passes) - passed_count,
+            "passed": all(scenario_passes),
+        },
+        "Campaign evaluation does not match scenarios",
+    )
+
+
+def run_self_test(contract: dict[str, Any]) -> None:
+    fixture = load_json(FIXTURE_PATH)
+    validate_result(fixture, contract)
+
+    measurement = copy.deepcopy(fixture)
+    measurement["result_kind"] = "measurement"
+    measurement["raw_samples"] = {
+        "retained": True,
+        "schema": "music-studies/switch-benchmark-samples/v1",
+        "relative_path": "results/fixture-linux-control-only.samples.json",
+        "sha256": "sha256:" + "3" * 64,
+        "sample_count": 3000,
+    }
+    validate_result(measurement, contract)
+
+    prepared = copy.deepcopy(measurement)
+    prepared["definition"]["switch_kind"] = "prepared-audio"
+    for scenario in prepared["scenarios"]:
+        scenario["timing"]["prepared_audio_commit_latency_ns"] = copy.deepcopy(
+            scenario["timing"]["effective_adoption_latency_ns"]
+        )
+    validate_result(prepared, contract)
+
+    failed_campaign = copy.deepcopy(fixture)
+    failed_timing = failed_campaign["scenarios"][0]["timing"]
+    failed_timing["control_commit_latency_ns"].update(
+        {"p95": 21000000, "p99": 22000000, "maximum": 23000000}
+    )
+    failed_timing["effective_adoption_latency_ns"]["maximum"] = 23000000
+    failed_campaign["scenarios"][0]["evaluation"].update(
+        {"timing_pass": False, "passed": False}
+    )
+    failed_campaign["evaluation"] = {
+        "scenarios_passed": 2,
+        "scenarios_failed": 1,
+        "passed": False,
+    }
+    validate_result(failed_campaign, contract)
+
+    mutations: list[tuple[str, Callable[[dict[str, Any]], None], str]] = [
+        (
+            "iteration floor",
+            lambda value: value["definition"].__setitem__(
+                "iterations_per_scenario", 999
+            ),
+            "at least 1000",
+        ),
+        (
+            "clock boundary",
+            lambda value: value["platform"]["clock"].__setitem__(
+                "name", "CLOCK_MONOTONIC"
+            ),
+            "clock name mismatch",
+        ),
+        (
+            "period calculation",
+            lambda value: value["definition"].__setitem__(
+                "processing_period_ns", 42666666
+            ),
+            "ceiling of frames/sample rate",
+        ),
+        (
+            "threshold formula",
+            lambda value: value["thresholds"].__setitem__(
+                "adoption_after_commit_max_ns", 5000000
+            ),
+            "threshold values drift",
+        ),
+        (
+            "percentile ordering",
+            lambda value: value["scenarios"][0]["timing"]
+            ["control_commit_latency_ns"].__setitem__("p95", 1),
+            "percentiles are not ordered",
+        ),
+        (
+            "resource separation",
+            lambda value: value["scenarios"][0]["resources"].pop(
+                "plugin_host_memory_peak_bytes"
+            ),
+            "missing fields: plugin_host_memory_peak_bytes",
+        ),
+        (
+            "CPU accounting",
+            lambda value: value["scenarios"][0]["resources"].__setitem__(
+                "daemon_cpu_one_core_percent", 0.2
+            ),
+            "CPU percentage is inconsistent",
+        ),
+        (
+            "xrun accounting",
+            lambda value: value["scenarios"][0]["stability"]["xruns"].__setitem__(
+                "after", 3
+            ),
+            "does not equal after minus before",
+        ),
+        (
+            "scenario evaluation",
+            lambda value: value["scenarios"][0]["evaluation"].__setitem__(
+                "passed", False
+            ),
+            "evaluation does not match measurements",
+        ),
+        (
+            "campaign evaluation",
+            lambda value: value["evaluation"].__setitem__(
+                "scenarios_passed", 2
+            ),
+            "Campaign evaluation does not match scenarios",
+        ),
+    ]
+    for label, mutate, expected_message in mutations:
+        invalid = copy.deepcopy(fixture)
+        mutate(invalid)
+        try:
+            validate_result(invalid, contract)
+        except ValidationError as error:
+            require(
+                expected_message.lower() in str(error).lower(),
+                f"Self-test {label} failed for the wrong reason: {error}",
+            )
+        else:
+            raise ValidationError(f"Self-test accepted invalid {label}")
+
+    invalid_samples = copy.deepcopy(measurement)
+    invalid_samples["raw_samples"]["relative_path"] = "C:\\temp\\samples.json"
+    try:
+        validate_result(invalid_samples, contract)
+    except ValidationError as error:
+        require(
+            "portable and relative" in str(error),
+            "Self-test raw sample path failed for the wrong reason: "
+            f"{error}",
+        )
+    else:
+        raise ValidationError(
+            "Self-test accepted an absolute raw sample path"
+        )
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Validate switch-benchmark contracts and result documents."
+    )
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        "--check-contract",
+        action="store_true",
+        help="validate the checked-in benchmark contract",
+    )
+    group.add_argument(
+        "--validate",
+        type=Path,
+        metavar="PATH",
+        help="validate one result document against the contract",
+    )
+    group.add_argument(
+        "--self-test",
+        action="store_true",
+        help="run positive and negative semantic-validator tests",
+    )
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    try:
+        contract = load_json(CONTRACT_PATH)
+        validate_contract(contract)
+        if args.validate is not None:
+            validate_result(load_json(args.validate), contract)
+            print(f"Switch benchmark result: OK ({args.validate})")
+        elif args.self_test:
+            run_self_test(contract)
+            print("Switch benchmark validator self-test: OK (11 negative cases)")
+        else:
+            print("Switch benchmark contract: OK")
+    except ValidationError as error:
+        print(f"Switch benchmark validation failed: {error}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

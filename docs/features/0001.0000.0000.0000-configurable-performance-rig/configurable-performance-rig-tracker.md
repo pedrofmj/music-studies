@@ -32,14 +32,15 @@ Documents:
 
 | Check | Result |
 | --- | --- |
-| GCC isolated suite | ✅ 13/13 passed |
-| Clang isolated suite | ✅ 13/13 passed |
-| GCC with Linux JSON probe | ✅ 14/14 passed |
-| Clang with Linux JSON probe | ✅ 14/14 passed |
+| GCC isolated suite | ✅ 16/16 passed |
+| Clang isolated suite | ✅ 16/16 passed |
+| GCC with Linux JSON probe | ✅ 17/17 passed |
+| Clang with Linux JSON probe | ✅ 17/17 passed |
 | Arturia offline parity | ✅ MIDI, state, replay, and stereo ramp passed |
 | SMK-25 offline parity | ✅ Self-test, config, and JACK guard passed |
 | Startup contract | ✅ Protected authority and read-only boundaries pass |
 | Live startup transcript | 🟡 Planned; operator execution not performed |
+| Switch benchmark contract | ✅ Valid fixture plus 11 negative semantic cases |
 | Linux JSON parse fixture | ✅ 10,000 iterations, zero failures |
 | Linux JSON average parse | ✅ GCC 10,858 ns; Clang 15,268 ns |
 | Linux JSON linkage | ✅ Default CLI has no `json-c` dependency |
@@ -83,8 +84,10 @@ benchmarks.
 
 ### Performance And Runtime
 
-- 🟡 Define benchmark JSON and timing boundaries. Baseline and atomic-generation
-  schemas exist; full load scenarios and percentile reports remain.
+- ✅ Define benchmark JSON output and timing boundaries. The portable
+  [contract](../../tools/music-rig/benchmarks/SWITCH-BENCHMARK-CONTRACT.md)
+  enforces distinct commit/adoption measurements, three load scenarios,
+  percentiles, resource separation, stability deltas, and raw-evidence rules.
 - ✅ Build the minimal portable C17 core and CLI on Linux.
 - ⬜ Build and test the same core and CLI on Windows.
 - ✅ Prove portable versioned frames and Linux `SOCK_SEQPACKET` round trips.

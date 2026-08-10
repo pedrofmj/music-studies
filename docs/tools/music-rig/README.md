@@ -45,6 +45,15 @@ publications, verifies monotonic real-time adoption, rejects stale generation
 IDs, and enforces the 20 ms control-commit ceiling. It is an isolated process
 and has no audio, MIDI, graph, service, or state adapter.
 
+## Switch Benchmark Contract
+
+The versioned [switch benchmark contract](benchmarks/SWITCH-BENCHMARK-CONTRACT.md)
+defines identical Linux and Windows result fields for commit, real-time
+adoption, resources, and audio-stability counters. CTest validates the contract,
+a complete synthetic campaign, and eleven negative semantic cases using only the
+Python standard library. The fixture is not performance evidence and no test
+connects to the live rack.
+
 ## Versioned IPC Spike
 
 The portable core encodes fixed-size protocol frames explicitly in little-endian

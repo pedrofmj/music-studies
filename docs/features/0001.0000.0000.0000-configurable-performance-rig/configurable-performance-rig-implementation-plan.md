@@ -27,7 +27,10 @@ Completed Milestone 0 work:
 - repeatable offline parity tests for the protected Arturia and SMK-25 helpers,
   with no service, JACK-client, graph, or production-state activation; and
 - a versioned current-rack startup contract plus deterministic planned
-  transcript with authority-drift and read-only-boundary checks.
+  transcript with authority-drift and read-only-boundary checks; and
+- a portable versioned switch-benchmark result contract that separates commit,
+  real-time adoption, resources, and stability across idle, normal-performance,
+  and high-MIDI-load scenarios.
 
 The Airstar observation matches the protected Carla checksum, 49 plugins, 111
 project connections, all protected graph links, 2048-frame quantum, 48 kHz
