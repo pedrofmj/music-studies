@@ -67,4 +67,37 @@ if(BUILD_TESTING)
         NAME music_rig_cli_version
         COMMAND $<TARGET_FILE:music-rig> --version
     )
+    if(UNIX)
+        find_package(Threads REQUIRED)
+        add_executable(music_rig_generation_adoption_test
+            tests/generation-adoption-test.c
+        )
+        target_link_libraries(music_rig_generation_adoption_test
+            PRIVATE
+                music_rig_core
+                Threads::Threads
+        )
+        target_compile_options(music_rig_generation_adoption_test PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+        add_test(
+            NAME music_rig_generation_adoption
+            COMMAND music_rig_generation_adoption_test
+        )
+
+        add_test(
+            NAME music_rig_airstar_baseline_fixture
+            COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/tests/test-capture-airstar-baseline"
+        )
+        add_test(
+            NAME music_rig_airstar_observer_safety
+            COMMAND "${CMAKE_COMMAND}"
+                "-DOBSERVER=${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/airstar-read-only-observer"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/tests/check-observer-safety.cmake"
+        )
+    endif()
+
 endif()

@@ -1,0 +1,783 @@
+{
+  "baseline_id": "airstar-single-rig-2026-08-09",
+  "capture_source": "live-read-only-ssh",
+  "captured_at": "2026-08-10T04:45:45-03:00",
+  "comparison": {
+    "midi_graph_links": false,
+    "project_checksum": true,
+    "project_connections": true,
+    "project_plugins": true,
+    "project_unique_plugin_names": true,
+    "quantum": true,
+    "raw_graph_links": false,
+    "sample_rate_available": true,
+    "services_active": true
+  },
+  "expected": {
+    "carla_plugins": 49,
+    "carla_project_connections": 111,
+    "deployment_graph_links": 115,
+    "midi_graph_links": 67,
+    "pipewire_quantum_frames": 2048,
+    "raw_graph_links": 117,
+    "services": 4
+  },
+  "graph_difference": {
+    "available": true,
+    "missing": [],
+    "unexpected": [
+      {
+        "input": "smc-pad-gain-verify:input",
+        "midi": true,
+        "output": "PD-CH-1 Gain Map:events-out"
+      }
+    ]
+  },
+  "observation": {
+    "audio": {
+      "metadata": {
+        "clock.allowed-rates": "[ 48000 ]",
+        "clock.force-quantum": "2048",
+        "clock.force-rate": "0",
+        "clock.max-quantum": "2048",
+        "clock.min-quantum": "32",
+        "clock.quantum": "1024",
+        "clock.rate": "48000",
+        "log.level": "2"
+      },
+      "pw_top": {
+        "error_total": 0,
+        "raw": "S   ID  QUANT   RATE    WAIT    BUSY   W/Q   B/Q  ERR FORMAT           NAME \nC   29      0      0    ---     ---   ---   ---     0                  Dummy-Driver\nC   30      0      0    ---     ---   ---   ---     0                  Freewheel-Driver\nC   42      0      0    ---     ---   ---   ---     0                  Midi-Bridge\nC   93      0      0    ---     ---   ---   ---     0                  v4l2_input.pci-0000_00_14.0-usb-0_6_1.0\nC   85      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_5__sink\nC   95      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_4__sink\nC   96      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_3__sink\nC   97      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__sink\nC   98      0      0    ---     ---   ---   ---     0                  alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__source\nC   99      0      0    ---     ---   ---   ---     0                  alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_6__source\nC  295      0      0    ---     ---   ---   ---     0                  Arturia Main Volume Encoder\nC  575      0      0    ---     ---   ---   ---     0                  SMK25 Pad Layers\nC  329      0      0    ---     ---   ---   ---     0                  Carla\nC  460      0      0    ---     ---   ---   ---     0                  AR-CH-1 - Basic Piano\nC  557      0      0    ---     ---   ---   ---     0                  AR-CH-2 - Nord White Grand Full 24C\nC  525      0      0    ---     ---   ---   ---     0                  AR-CH-3 - Alt Strings\nC  485      0      0    ---     ---   ---   ---     0                  AR-CH-4 - Good Flute\nC  276      0      0    ---     ---   ---   ---     0                  AR-CH-5 - SAX Lirakeys CL\nC  431      0      0    ---     ---   ---   ---     0                  AR-CH-6 - Hammond Organ Fast\nC  533      0      0    ---     ---   ---   ---     0                  AR-CH-7 - Optik Synth\nC  464      0      0    ---     ---   ---   ---     0                  AR-CH-8 - PAD EFEITOS\nC  596      0      0    ---     ---   ---   ---     0                  AR-CH-9 - AtmosferaPAD\nC  277      0      0    ---     ---   ---   ---     0                  PD-CH-1 - Drum Set\nC  314      0      0    ---     ---   ---   ---     0                  SMK-CH-1 - Oceans Worship Pad\nC  400      0      0    ---     ---   ---   ---     0                  SMK-CH-2 - Warm Worship Pad\nC  428      0      0    ---     ---   ---   ---     0                  SMK-CH-3 - Hillsong Pad\nC  203      0      0    ---     ---   ---   ---     0                  SMK-CH-4 - Worship Shimmer\nC  334      0      0    ---     ---   ---   ---     0                  SMK-CH-5 - Cloud Shimmer\nC  322      0      0    ---     ---   ---   ---     0                  SMK-CH-6 - Magic Ambient\nC  387      0      0    ---     ---   ---   ---     0                  SMK-CH-7 - Majesty Pad\nC  328      0      0    ---     ---   ---   ---     0                  SMK-CH-8 - Sanctorium Pad\nC  178      0      0    ---     ---   ---   ---     0                  SMK Layer Mixer x8 Stereo\nC  359      0      0    ---     ---   ---   ---     0                  LSP Mixer x8 Stereo\nC  348      0      0    ---     ---   ---   ---     0                  SMC-MIX - 8-Band EQ\nC  422      0      0    ---     ---   ---   ---     0                  AR-CH-2 Output Trim +6 dB\nC  339      0      0    ---     ---   ---   ---     0                  AR Controls - Sustain Scale\nC  444      0      0    ---     ---   ---   ---     0                  PD Controls - Sustain Scale\nC  500      0      0    ---     ---   ---   ---     0                  AR-CH-2 Volume Map\nC  375      0      0    ---     ---   ---   ---     0                  AR-CH-4 Volume Map\nC  279      0      0    ---     ---   ---   ---     0                  AR-CH-5 Volume Map\nC  561      0      0    ---     ---   ---   ---     0                  AR-CH-6 Volume Map\nC  281      0      0    ---     ---   ---   ---     0                  AR-CH-7 Volume Map\nC  404      0      0    ---     ---   ---   ---     0                  AR-CH-8 Volume Map\nC  502      0      0    ---     ---   ---   ---     0                  AR-CH-9 Volume Map\nC  482      0      0    ---     ---   ---   ---     0                  PD-CH-1 Volume Map\nC  496      0      0    ---     ---   ---   ---     0                  AR-CH-2 Reverb Map\nC  223      0      0    ---     ---   ---   ---     0                  AR-CH-4 Reverb Map\nC  419      0      0    ---     ---   ---   ---     0                  AR-CH-5 Reverb Map\nC  182      0      0    ---     ---   ---   ---     0                  AR-CH-6 Reverb Map\nC  338      0      0    ---     ---   ---   ---     0                  AR-CH-7 Reverb Map\nC  208      0      0    ---     ---   ---   ---     0                  AR-CH-8 Reverb Map\nC  240      0      0    ---     ---   ---   ---     0                  AR-CH-9 Reverb Map\nC  247      0      0    ---     ---   ---   ---     0                  SMC-EQ-1 CC Scale\nC  228      0      0    ---     ---   ---   ---     0                  SMC-EQ-2 CC Scale\nC  250      0      0    ---     ---   ---   ---     0                  SMC-EQ-3 CC Scale\nC  244      0      0    ---     ---   ---   ---     0                  SMC-EQ-4 CC Scale\nC  421      0      0    ---     ---   ---   ---     0                  SMC-EQ-5 CC Scale\nC  587      0      0    ---     ---   ---   ---     0                  SMC-EQ-6 CC Scale\nC  259      0      0    ---     ---   ---   ---     0                  SMC-EQ-7 CC Scale\nC  201      0      0    ---     ---   ---   ---     0                  SMC-EQ-8 CC Scale\nC  396      0      0    ---     ---   ---   ---     0                  PD-CH-1 Output Gain 0 to +12 dB\nC  278      0      0    ---     ---   ---   ---     0                  PD-CH-1 Gain Map\nC  625      0      0    ---     ---   ---   ---     0                  smc-pad-gain-verify\nC  258      0      0    ---     ---   ---   ---     0                  alsa_playback.java"
+      },
+      "quantum_frames": 2048,
+      "sample_rate_hz": 48000
+    },
+    "graph": {
+      "link_inventory": [
+        {
+          "input": "Speaker + Headphones:playback_FL",
+          "midi": false,
+          "output": "ALSA Playback [java]:output_FL"
+        },
+        {
+          "input": "Speaker + Headphones:playback_FR",
+          "midi": false,
+          "output": "ALSA Playback [java]:output_FR"
+        },
+        {
+          "input": "AR-CH-1 - Basic Piano:events-in",
+          "midi": true,
+          "output": "AR Controls - Sustain Scale:events-out"
+        },
+        {
+          "input": "AR-CH-2 Volume Map:events-in",
+          "midi": true,
+          "output": "AR Controls - Sustain Scale:events-out"
+        },
+        {
+          "input": "AR-CH-3 - Alt Strings:events-in",
+          "midi": true,
+          "output": "AR Controls - Sustain Scale:events-out"
+        },
+        {
+          "input": "AR-CH-4 Volume Map:events-in",
+          "midi": true,
+          "output": "AR Controls - Sustain Scale:events-out"
+        },
+        {
+          "input": "AR-CH-5 Volume Map:events-in",
+          "midi": true,
+          "output": "AR Controls - Sustain Scale:events-out"
+        },
+        {
+          "input": "AR-CH-6 Volume Map:events-in",
+          "midi": true,
+          "output": "AR Controls - Sustain Scale:events-out"
+        },
+        {
+          "input": "AR-CH-7 Volume Map:events-in",
+          "midi": true,
+          "output": "AR Controls - Sustain Scale:events-out"
+        },
+        {
+          "input": "AR-CH-8 Volume Map:events-in",
+          "midi": true,
+          "output": "AR Controls - Sustain Scale:events-out"
+        },
+        {
+          "input": "AR-CH-9 Volume Map:events-in",
+          "midi": true,
+          "output": "AR Controls - Sustain Scale:events-out"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input L",
+          "midi": false,
+          "output": "AR-CH-1 - Basic Piano:output_1"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input R",
+          "midi": false,
+          "output": "AR-CH-1 - Basic Piano:output_2"
+        },
+        {
+          "input": "AR-CH-2 Output Trim +6 dB:Input L",
+          "midi": false,
+          "output": "AR-CH-2 - Nord White Grand Full 24C:out-left"
+        },
+        {
+          "input": "AR-CH-2 Output Trim +6 dB:Input R",
+          "midi": false,
+          "output": "AR-CH-2 - Nord White Grand Full 24C:out-right"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input L",
+          "midi": false,
+          "output": "AR-CH-2 Output Trim +6 dB:Output L"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input R",
+          "midi": false,
+          "output": "AR-CH-2 Output Trim +6 dB:Output R"
+        },
+        {
+          "input": "AR-CH-2 - Nord White Grand Full 24C:events-in",
+          "midi": true,
+          "output": "AR-CH-2 Reverb Map:events-out"
+        },
+        {
+          "input": "AR-CH-2 Reverb Map:events-in",
+          "midi": true,
+          "output": "AR-CH-2 Volume Map:events-out"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input L",
+          "midi": false,
+          "output": "AR-CH-3 - Alt Strings:output_1"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input R",
+          "midi": false,
+          "output": "AR-CH-3 - Alt Strings:output_2"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input L",
+          "midi": false,
+          "output": "AR-CH-4 - Good Flute:out-left"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input R",
+          "midi": false,
+          "output": "AR-CH-4 - Good Flute:out-right"
+        },
+        {
+          "input": "AR-CH-4 - Good Flute:events-in",
+          "midi": true,
+          "output": "AR-CH-4 Reverb Map:events-out"
+        },
+        {
+          "input": "AR-CH-4 Reverb Map:events-in",
+          "midi": true,
+          "output": "AR-CH-4 Volume Map:events-out"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input L",
+          "midi": false,
+          "output": "AR-CH-5 - SAX Lirakeys CL:out-left"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input R",
+          "midi": false,
+          "output": "AR-CH-5 - SAX Lirakeys CL:out-right"
+        },
+        {
+          "input": "AR-CH-5 - SAX Lirakeys CL:events-in",
+          "midi": true,
+          "output": "AR-CH-5 Reverb Map:events-out"
+        },
+        {
+          "input": "AR-CH-5 Reverb Map:events-in",
+          "midi": true,
+          "output": "AR-CH-5 Volume Map:events-out"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input L",
+          "midi": false,
+          "output": "AR-CH-6 - Hammond Organ Fast:out-left"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input R",
+          "midi": false,
+          "output": "AR-CH-6 - Hammond Organ Fast:out-right"
+        },
+        {
+          "input": "AR-CH-6 - Hammond Organ Fast:events-in",
+          "midi": true,
+          "output": "AR-CH-6 Reverb Map:events-out"
+        },
+        {
+          "input": "AR-CH-6 Reverb Map:events-in",
+          "midi": true,
+          "output": "AR-CH-6 Volume Map:events-out"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input L",
+          "midi": false,
+          "output": "AR-CH-7 - Optik Synth:out-left"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input R",
+          "midi": false,
+          "output": "AR-CH-7 - Optik Synth:out-right"
+        },
+        {
+          "input": "AR-CH-7 - Optik Synth:events-in",
+          "midi": true,
+          "output": "AR-CH-7 Reverb Map:events-out"
+        },
+        {
+          "input": "AR-CH-7 Reverb Map:events-in",
+          "midi": true,
+          "output": "AR-CH-7 Volume Map:events-out"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input L",
+          "midi": false,
+          "output": "AR-CH-8 - PAD EFEITOS:out-left"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input R",
+          "midi": false,
+          "output": "AR-CH-8 - PAD EFEITOS:out-right"
+        },
+        {
+          "input": "AR-CH-8 - PAD EFEITOS:events-in",
+          "midi": true,
+          "output": "AR-CH-8 Reverb Map:events-out"
+        },
+        {
+          "input": "AR-CH-8 Reverb Map:events-in",
+          "midi": true,
+          "output": "AR-CH-8 Volume Map:events-out"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input L",
+          "midi": false,
+          "output": "AR-CH-9 - AtmosferaPAD:out-left"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input R",
+          "midi": false,
+          "output": "AR-CH-9 - AtmosferaPAD:out-right"
+        },
+        {
+          "input": "AR-CH-9 - AtmosferaPAD:events-in",
+          "midi": true,
+          "output": "AR-CH-9 Reverb Map:events-out"
+        },
+        {
+          "input": "AR-CH-9 Reverb Map:events-in",
+          "midi": true,
+          "output": "AR-CH-9 Volume Map:events-out"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:events-in",
+          "midi": true,
+          "output": "Arturia Main Volume Encoder:absolute-out"
+        },
+        {
+          "input": "Speaker + Headphones:playback_FL",
+          "midi": false,
+          "output": "Arturia Main Volume Encoder:audio-out-l"
+        },
+        {
+          "input": "Speaker + Headphones:playback_FR",
+          "midi": false,
+          "output": "Arturia Main Volume Encoder:audio-out-r"
+        },
+        {
+          "input": "AR Controls - Sustain Scale:events-in",
+          "midi": true,
+          "output": "KL Essential 61 mk3:KL Essential 61 mk3 MIDI"
+        },
+        {
+          "input": "Arturia Main Volume Encoder:relative-in",
+          "midi": true,
+          "output": "KL Essential 61 mk3:KL Essential 61 mk3 MIDI"
+        },
+        {
+          "input": "SMC-MIX - 8-Band EQ:Input L",
+          "midi": false,
+          "output": "LSP Mixer x8 Stereo:Output L"
+        },
+        {
+          "input": "SMC-MIX - 8-Band EQ:Input R",
+          "midi": false,
+          "output": "LSP Mixer x8 Stereo:Output R"
+        },
+        {
+          "input": "PD-CH-1 Volume Map:events-in",
+          "midi": true,
+          "output": "PD Controls - Sustain Scale:events-out"
+        },
+        {
+          "input": "PD-CH-1 Output Gain 0 to +12 dB:Input L",
+          "midi": false,
+          "output": "PD-CH-1 - Drum Set:out-left"
+        },
+        {
+          "input": "PD-CH-1 Output Gain 0 to +12 dB:Input R",
+          "midi": false,
+          "output": "PD-CH-1 - Drum Set:out-right"
+        },
+        {
+          "input": "PD-CH-1 Output Gain 0 to +12 dB:events-in",
+          "midi": true,
+          "output": "PD-CH-1 Gain Map:events-out"
+        },
+        {
+          "input": "smc-pad-gain-verify:input",
+          "midi": true,
+          "output": "PD-CH-1 Gain Map:events-out"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input L",
+          "midi": false,
+          "output": "PD-CH-1 Output Gain 0 to +12 dB:Output L"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input R",
+          "midi": false,
+          "output": "PD-CH-1 Output Gain 0 to +12 dB:Output R"
+        },
+        {
+          "input": "PD-CH-1 - Drum Set:events-in",
+          "midi": true,
+          "output": "PD-CH-1 Volume Map:events-out"
+        },
+        {
+          "input": "SMK25 Pad Layers:midi-in",
+          "midi": true,
+          "output": "SINCO:SINCO "
+        },
+        {
+          "input": "SMC-EQ-1 CC Scale:events-in",
+          "midi": true,
+          "output": "SINCO:SINCO SMC-Mixer-Master"
+        },
+        {
+          "input": "SMC-EQ-2 CC Scale:events-in",
+          "midi": true,
+          "output": "SINCO:SINCO SMC-Mixer-Master"
+        },
+        {
+          "input": "SMC-EQ-3 CC Scale:events-in",
+          "midi": true,
+          "output": "SINCO:SINCO SMC-Mixer-Master"
+        },
+        {
+          "input": "SMC-EQ-4 CC Scale:events-in",
+          "midi": true,
+          "output": "SINCO:SINCO SMC-Mixer-Master"
+        },
+        {
+          "input": "SMC-EQ-5 CC Scale:events-in",
+          "midi": true,
+          "output": "SINCO:SINCO SMC-Mixer-Master"
+        },
+        {
+          "input": "SMC-EQ-6 CC Scale:events-in",
+          "midi": true,
+          "output": "SINCO:SINCO SMC-Mixer-Master"
+        },
+        {
+          "input": "SMC-EQ-7 CC Scale:events-in",
+          "midi": true,
+          "output": "SINCO:SINCO SMC-Mixer-Master"
+        },
+        {
+          "input": "SMC-EQ-8 CC Scale:events-in",
+          "midi": true,
+          "output": "SINCO:SINCO SMC-Mixer-Master"
+        },
+        {
+          "input": "PD Controls - Sustain Scale:events-in",
+          "midi": true,
+          "output": "SINCO:SINCO SMC-PAD Pocket-Master"
+        },
+        {
+          "input": "PD-CH-1 Gain Map:events-in",
+          "midi": true,
+          "output": "SINCO:SINCO SMC-PAD Pocket-Master"
+        },
+        {
+          "input": "PD Controls - Sustain Scale:events-in",
+          "midi": true,
+          "output": "SINCO:SINCO SMC-PAD-Master"
+        },
+        {
+          "input": "PD-CH-1 Gain Map:events-in",
+          "midi": true,
+          "output": "SINCO:SINCO SMC-PAD-Master"
+        },
+        {
+          "input": "SMK25 Pad Layers:midi-in",
+          "midi": true,
+          "output": "SINCO:SINCO SMK25-Master"
+        },
+        {
+          "input": "SMC-MIX - 8-Band EQ:events-in",
+          "midi": true,
+          "output": "SMC-EQ-1 CC Scale:events-out"
+        },
+        {
+          "input": "SMC-MIX - 8-Band EQ:events-in",
+          "midi": true,
+          "output": "SMC-EQ-2 CC Scale:events-out"
+        },
+        {
+          "input": "SMC-MIX - 8-Band EQ:events-in",
+          "midi": true,
+          "output": "SMC-EQ-3 CC Scale:events-out"
+        },
+        {
+          "input": "SMC-MIX - 8-Band EQ:events-in",
+          "midi": true,
+          "output": "SMC-EQ-4 CC Scale:events-out"
+        },
+        {
+          "input": "SMC-MIX - 8-Band EQ:events-in",
+          "midi": true,
+          "output": "SMC-EQ-5 CC Scale:events-out"
+        },
+        {
+          "input": "SMC-MIX - 8-Band EQ:events-in",
+          "midi": true,
+          "output": "SMC-EQ-6 CC Scale:events-out"
+        },
+        {
+          "input": "SMC-MIX - 8-Band EQ:events-in",
+          "midi": true,
+          "output": "SMC-EQ-7 CC Scale:events-out"
+        },
+        {
+          "input": "SMC-MIX - 8-Band EQ:events-in",
+          "midi": true,
+          "output": "SMC-EQ-8 CC Scale:events-out"
+        },
+        {
+          "input": "Arturia Main Volume Encoder:audio-in-l",
+          "midi": false,
+          "output": "SMC-MIX - 8-Band EQ:Output L"
+        },
+        {
+          "input": "Arturia Main Volume Encoder:audio-in-r",
+          "midi": false,
+          "output": "SMC-MIX - 8-Band EQ:Output R"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input L",
+          "midi": false,
+          "output": "SMK Layer Mixer x8 Stereo:Output L"
+        },
+        {
+          "input": "LSP Mixer x8 Stereo:Input R",
+          "midi": false,
+          "output": "SMK Layer Mixer x8 Stereo:Output R"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input left 1",
+          "midi": false,
+          "output": "SMK-CH-1 - Oceans Worship Pad:out-left"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input right 1",
+          "midi": false,
+          "output": "SMK-CH-1 - Oceans Worship Pad:out-right"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input left 2",
+          "midi": false,
+          "output": "SMK-CH-2 - Warm Worship Pad:out-left"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input right 2",
+          "midi": false,
+          "output": "SMK-CH-2 - Warm Worship Pad:out-right"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input left 3",
+          "midi": false,
+          "output": "SMK-CH-3 - Hillsong Pad:out-left"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input right 3",
+          "midi": false,
+          "output": "SMK-CH-3 - Hillsong Pad:out-right"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input left 4",
+          "midi": false,
+          "output": "SMK-CH-4 - Worship Shimmer:out-left"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input right 4",
+          "midi": false,
+          "output": "SMK-CH-4 - Worship Shimmer:out-right"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input left 5",
+          "midi": false,
+          "output": "SMK-CH-5 - Cloud Shimmer:out-left"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input right 5",
+          "midi": false,
+          "output": "SMK-CH-5 - Cloud Shimmer:out-right"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input left 6",
+          "midi": false,
+          "output": "SMK-CH-6 - Magic Ambient:out-left"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input right 6",
+          "midi": false,
+          "output": "SMK-CH-6 - Magic Ambient:out-right"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input left 7",
+          "midi": false,
+          "output": "SMK-CH-7 - Majesty Pad:out-left"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input right 7",
+          "midi": false,
+          "output": "SMK-CH-7 - Majesty Pad:out-right"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input left 8",
+          "midi": false,
+          "output": "SMK-CH-8 - Sanctorium Pad:out-left"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:Audio input right 8",
+          "midi": false,
+          "output": "SMK-CH-8 - Sanctorium Pad:out-right"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-1"
+        },
+        {
+          "input": "SMK-CH-1 - Oceans Worship Pad:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-1"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-2"
+        },
+        {
+          "input": "SMK-CH-2 - Warm Worship Pad:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-2"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-3"
+        },
+        {
+          "input": "SMK-CH-3 - Hillsong Pad:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-3"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-4"
+        },
+        {
+          "input": "SMK-CH-4 - Worship Shimmer:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-4"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-5"
+        },
+        {
+          "input": "SMK-CH-5 - Cloud Shimmer:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-5"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-6"
+        },
+        {
+          "input": "SMK-CH-6 - Magic Ambient:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-6"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-7"
+        },
+        {
+          "input": "SMK-CH-7 - Majesty Pad:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-7"
+        },
+        {
+          "input": "SMK Layer Mixer x8 Stereo:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-8"
+        },
+        {
+          "input": "SMK-CH-8 - Sanctorium Pad:events-in",
+          "midi": true,
+          "output": "SMK25 Pad Layers:layer-8"
+        }
+      ],
+      "links": 118,
+      "midi_links": 68,
+      "midi_ports": 152,
+      "nodes": 64,
+      "ports": 363
+    },
+    "observed_at": "2026-08-10T04:45:45-03:00",
+    "processes": [
+      {
+        "command": "arturia-main-vo",
+        "cpu_percent": 0.3,
+        "elapsed_seconds": 112462,
+        "pid": 2067289,
+        "rss_kib": 9004
+      },
+      {
+        "command": "smk25-pad-layer",
+        "cpu_percent": 0.8,
+        "elapsed_seconds": 112462,
+        "pid": 2067297,
+        "rss_kib": 9160
+      },
+      {
+        "command": "pipewire",
+        "cpu_percent": 1.0,
+        "elapsed_seconds": 158158,
+        "pid": 3851279,
+        "rss_kib": 154140
+      },
+      {
+        "command": "pipewire",
+        "cpu_percent": 0.0,
+        "elapsed_seconds": 158158,
+        "pid": 3851282,
+        "rss_kib": 908
+      },
+      {
+        "command": "wireplumber",
+        "cpu_percent": 0.0,
+        "elapsed_seconds": 158158,
+        "pid": 3851283,
+        "rss_kib": 12892
+      }
+    ],
+    "project": {
+      "exists": true,
+      "path": "/c/music/carla/pedro.uproject",
+      "plugins": 49,
+      "project_connections": 111,
+      "sha256": "48ea4f777c68ebd39105902739258795edfa96fefd8820b62fb31d4efe329974",
+      "size_bytes": 132028,
+      "unique_plugin_names": 49
+    },
+    "safety": {
+      "controls_services": false,
+      "creates_remote_files": false,
+      "mode": "read-only",
+      "mutates_graph": false
+    },
+    "schema": "music-studies/music-rig-airstar-observation/v1",
+    "services": [
+      {
+        "active_state": "active",
+        "cpu_usage_nsec": 425455792000,
+        "load_state": "loaded",
+        "main_pid": 2067289,
+        "memory_current_bytes": 3584000,
+        "name": "arturia-main-volume-encoder.service",
+        "restarts": 0,
+        "sub_state": "running",
+        "unit_file_state": "enabled"
+      },
+      {
+        "active_state": "active",
+        "cpu_usage_nsec": 931830370000,
+        "load_state": "loaded",
+        "main_pid": 2067297,
+        "memory_current_bytes": 3837952,
+        "name": "smk25-pad-layers.service",
+        "restarts": 0,
+        "sub_state": "running",
+        "unit_file_state": "enabled"
+      },
+      {
+        "active_state": "active",
+        "cpu_usage_nsec": 21844000,
+        "load_state": "loaded",
+        "main_pid": 0,
+        "memory_current_bytes": null,
+        "name": "pipewire-carla-quantum.service",
+        "restarts": 0,
+        "sub_state": "exited",
+        "unit_file_state": "enabled"
+      },
+      {
+        "active_state": "active",
+        "cpu_usage_nsec": 36217361094000,
+        "load_state": "loaded",
+        "main_pid": 1733471,
+        "memory_current_bytes": 3352780800,
+        "name": "pipewire-patchbay-watch.service",
+        "restarts": 0,
+        "sub_state": "running",
+        "unit_file_state": "enabled"
+      }
+    ],
+    "software": {
+      "carla_flatpak": "",
+      "pipewire": "Linked with libpipewire 1.0.5",
+      "wireplumber": "Linked with libwireplumber 0.4.17"
+    },
+    "system": {
+      "architecture": "x86_64",
+      "hostname": "airstar",
+      "kernel": "7.0.0-28-generic",
+      "os_id": "ubuntu",
+      "os_pretty_name": "Ubuntu 24.04.4 LTS",
+      "os_version": "24.04"
+    }
+  },
+  "performance": {
+    "pipewire_error_total": 0,
+    "relevant_process_cpu_percent": 2.1,
+    "relevant_process_rss_bytes": 190570496,
+    "service_memory_current_bytes": 3360202752
+  },
+  "protected_source_commit": "c2e1911406f942a9da0a9f91c65eae8a32148e28",
+  "safety": {
+    "controls_services": false,
+    "creates_remote_files": false,
+    "mode": "read-only",
+    "mutates_graph": false
+  },
+  "schema": "music-studies/music-rig-baseline/v1",
+  "status": "incomplete"
+}

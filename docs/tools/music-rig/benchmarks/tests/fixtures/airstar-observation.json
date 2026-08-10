@@ -1,0 +1,113 @@
+{
+  "schema": "music-studies/music-rig-airstar-observation/v1",
+  "safety": {
+    "mode": "read-only",
+    "creates_remote_files": false,
+    "mutates_graph": false,
+    "controls_services": false
+  },
+  "observed_at": "2026-08-09T15:03:55-03:00",
+  "system": {
+    "hostname": "airstar",
+    "architecture": "x86_64",
+    "kernel": "7.0.0-28-generic",
+    "os_id": "ubuntu",
+    "os_version": "24.04",
+    "os_pretty_name": "Ubuntu 24.04.4 LTS"
+  },
+  "software": {
+    "pipewire": "1.0.5",
+    "wireplumber": "0.4.17",
+    "carla_flatpak": "2.5.10"
+  },
+  "audio": {
+    "sample_rate_hz": 48000,
+    "quantum_frames": 2048,
+    "metadata": {
+      "clock.rate": "48000",
+      "clock.force-quantum": "2048"
+    },
+    "pw_top": {
+      "error_total": 0,
+      "raw": "S ID QUANT RATE ERR NAME"
+    }
+  },
+  "graph": {
+    "nodes": 64,
+    "ports": 288,
+    "links": 117,
+    "midi_ports": 71,
+    "midi_links": 67
+  },
+  "project": {
+    "exists": true,
+    "path": "/c/music/carla/pedro.uproject",
+    "sha256": "48ea4f777c68ebd39105902739258795edfa96fefd8820b62fb31d4efe329974",
+    "size_bytes": 132028,
+    "plugins": 49,
+    "unique_plugin_names": 49,
+    "project_connections": 111
+  },
+  "services": [
+    {
+      "name": "arturia-main-volume-encoder.service",
+      "load_state": "loaded",
+      "unit_file_state": "enabled",
+      "active_state": "active",
+      "sub_state": "running",
+      "main_pid": 1001,
+      "memory_current_bytes": 1048576,
+      "cpu_usage_nsec": 1000000,
+      "restarts": 0
+    },
+    {
+      "name": "smk25-pad-layers.service",
+      "load_state": "loaded",
+      "unit_file_state": "enabled",
+      "active_state": "active",
+      "sub_state": "running",
+      "main_pid": 1002,
+      "memory_current_bytes": 1048576,
+      "cpu_usage_nsec": 1000000,
+      "restarts": 0
+    },
+    {
+      "name": "pipewire-carla-quantum.service",
+      "load_state": "loaded",
+      "unit_file_state": "enabled",
+      "active_state": "active",
+      "sub_state": "exited",
+      "main_pid": 0,
+      "memory_current_bytes": null,
+      "cpu_usage_nsec": 1000000,
+      "restarts": 0
+    },
+    {
+      "name": "pipewire-patchbay-watch.service",
+      "load_state": "loaded",
+      "unit_file_state": "enabled",
+      "active_state": "active",
+      "sub_state": "running",
+      "main_pid": 1003,
+      "memory_current_bytes": 1048576,
+      "cpu_usage_nsec": 1000000,
+      "restarts": 0
+    }
+  ],
+  "processes": [
+    {
+      "pid": 2001,
+      "cpu_percent": 12.5,
+      "rss_kib": 524288,
+      "elapsed_seconds": 3600,
+      "command": "carla"
+    },
+    {
+      "pid": 1001,
+      "cpu_percent": 0.1,
+      "rss_kib": 2048,
+      "elapsed_seconds": 3600,
+      "command": "arturia-main"
+    }
+  ]
+}

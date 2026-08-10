@@ -1,0 +1,342 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../../../.." && pwd)"
+readonly OBSERVER="${SCRIPT_DIR}/airstar-read-only-observer"
+readonly PROTECTED_BASELINE="${REPO_ROOT}/docs/tools/airstar-live-setup/protected-baseline.json"
+readonly SETUP="${REPO_ROOT}/docs/tools/airstar-live-setup/setup.json"
+readonly PROTECTED_VERIFIER="${REPO_ROOT}/docs/tools/airstar-live-setup/verify-protected-baseline"
+readonly RAW_SNAPSHOT="${REPO_ROOT}/src/midi-setup/airstar-patchbay.json"
+
+host=pedro.ferreira@airstar
+remote_project=/c/music/carla/pedro.uproject
+input_json=
+output_json="${SCRIPT_DIR}/baseline-airstar.json"
+output_markdown="${SCRIPT_DIR}/baseline-airstar.md"
+
+usage() {
+    printf '%s\n' \
+        "Usage: $(basename "$0") [OPTIONS]" \
+        "" \
+        "Collect and compare the Airstar stable-rig baseline without changing it." \
+        "" \
+        "  --host HOST             SSH host (default: pedro.ferreira@airstar)" \
+        "  --project PATH          Remote Carla project path" \
+        "  --input-json PATH       Render an existing observation without SSH" \
+        "  --output-json PATH      Machine-readable report path" \
+        "  --output-markdown PATH  Markdown report path" \
+        "  --print-observer        Print the audited remote observer and exit"
+}
+
+while (($#)); do
+    case $1 in
+        --host)
+            [[ -n ${2-} ]] || {
+                printf '%s\n' "--host requires a value" >&2
+                exit 2
+            }
+            host=$2
+            shift
+            ;;
+        --project)
+            [[ -n ${2-} ]] || {
+                printf '%s\n' "--project requires a path" >&2
+                exit 2
+            }
+            remote_project=$2
+            shift
+            ;;
+        --input-json)
+            [[ -n ${2-} ]] || {
+                printf '%s\n' "--input-json requires a path" >&2
+                exit 2
+            }
+            input_json=$2
+            shift
+            ;;
+        --output-json)
+            [[ -n ${2-} ]] || {
+                printf '%s\n' "--output-json requires a path" >&2
+                exit 2
+            }
+            output_json=$2
+            shift
+            ;;
+        --output-markdown)
+            [[ -n ${2-} ]] || {
+                printf '%s\n' "--output-markdown requires a path" >&2
+                exit 2
+            }
+            output_markdown=$2
+            shift
+            ;;
+        --print-observer)
+            cat "$OBSERVER"
+            exit 0
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            printf 'Unknown option: %s\n' "$1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
+
+for command in install jq mktemp; do
+    if ! command -v "$command" >/dev/null 2>&1; then
+        printf 'Required command not found: %s\n' "$command" >&2
+        exit 2
+    fi
+done
+
+"$PROTECTED_VERIFIER" --quiet
+
+temporary=$(mktemp -d)
+cleanup() {
+    rm -rf "$temporary"
+}
+trap cleanup EXIT
+
+observation="$input_json"
+capture_source=fixture
+if [[ -z $observation ]]; then
+    command -v ssh >/dev/null 2>&1 || {
+        printf '%s\n' "ssh is required for live observation" >&2
+        exit 2
+    }
+    [[ $host =~ ^[A-Za-z0-9._-]+@[A-Za-z0-9._-]+$ ]] || {
+        printf 'Unsafe SSH host value: %s\n' "$host" >&2
+        exit 2
+    }
+    [[ $remote_project =~ ^/[A-Za-z0-9._/-]+$ ]] || {
+        printf 'Unsafe remote project path: %s\n' "$remote_project" >&2
+        exit 2
+    }
+
+    observation="$temporary/observation.json"
+    ssh -o BatchMode=yes "$host" bash -s -- "$remote_project" \
+        < "$OBSERVER" > "$observation"
+    capture_source=live-read-only-ssh
+fi
+
+jq -e '
+    .schema == "music-studies/music-rig-airstar-observation/v1"
+    and .safety.mode == "read-only"
+    and .safety.creates_remote_files == false
+    and .safety.mutates_graph == false
+    and .safety.controls_services == false
+' "$observation" >/dev/null || {
+    printf 'Invalid or unsafe observation: %s\n' "$observation" >&2
+    exit 1
+}
+
+report_json="$temporary/baseline.json"
+jq -nS \
+    --slurpfile observation "$observation" \
+    --slurpfile protected "$PROTECTED_BASELINE" \
+    --slurpfile setup "$SETUP" \
+    --slurpfile raw_snapshot "$RAW_SNAPSHOT" \
+    --arg capture_source "$capture_source" '
+        $observation[0] as $observed
+        | $protected[0] as $protected
+        | $setup[0] as $setup
+        | (
+            $protected.protected_files[]
+            | select(
+                .path
+                == "src/audio-software/carla/projects/pedro-live-rack/pedro.uproject"
+              )
+            | .sha256
+          ) as $expected_project_sha
+        | ($setup.services | map(.name) | sort) as $expected_services
+        | (
+            $raw_snapshot[0].links
+            | map({
+                output: .output.alias,
+                input: .input.alias,
+                midi: (.kind == "midi")
+              })
+            | sort_by(.output, .input)
+          ) as $expected_links
+        | ($observed.graph.link_inventory // []) as $observed_links
+        | {
+            available: ($observed.graph | has("link_inventory")),
+            unexpected: ($observed_links - $expected_links),
+            missing: ($expected_links - $observed_links)
+          } as $graph_difference
+        | (
+            $observed.services
+            | map(select(.active_state == "active") | .name)
+            | sort
+          ) as $active_services
+        | {
+            project_checksum:
+                ($observed.project.sha256 == $expected_project_sha),
+            project_plugins:
+                ($observed.project.plugins == $protected.expected.carla_plugins),
+            project_unique_plugin_names: (
+                $observed.project.unique_plugin_names
+                == $protected.expected.carla_plugins
+            ),
+            project_connections: (
+                $observed.project.project_connections
+                == $protected.expected.carla_project_connections
+            ),
+            raw_graph_links:
+                ($observed.graph.links == $protected.expected.raw_graph_links),
+            midi_graph_links: (
+                $observed.graph.midi_links
+                == $protected.expected.midi_graph_links
+            ),
+            services_active: ($active_services == $expected_services),
+            quantum: (
+                $observed.audio.quantum_frames
+                == $protected.expected.pipewire_quantum_frames
+            ),
+            sample_rate_available:
+                ($observed.audio.sample_rate_hz != null)
+          } as $comparison
+        | {
+            schema: "music-studies/music-rig-baseline/v1",
+            baseline_id: $protected.id,
+            capture_source: $capture_source,
+            captured_at: $observed.observed_at,
+            protected_source_commit: $protected.source_commit,
+            status: (
+                if ($comparison | to_entries | all(.value))
+                then "complete"
+                else "incomplete"
+                end
+            ),
+            safety: $observed.safety,
+            expected: $protected.expected,
+            comparison: $comparison,
+            graph_difference: $graph_difference,
+            performance: {
+                pipewire_error_total: $observed.audio.pw_top.error_total,
+                relevant_process_cpu_percent: (
+                    [$observed.processes[].cpu_percent] | add // 0
+                ),
+                relevant_process_rss_bytes: (
+                    ([$observed.processes[].rss_kib] | add // 0) * 1024
+                ),
+                service_memory_current_bytes: (
+                    [
+                        $observed.services[].memory_current_bytes
+                        | select(. != null)
+                    ]
+                    | add // 0
+                )
+            },
+            observation: $observed
+          }
+    ' > "$report_json"
+
+report_markdown="$temporary/baseline.md"
+jq -r '
+    def show:
+        if . == null or . == ""
+        then "unavailable"
+        else tostring
+        end;
+    def verdict:
+        if . then "PASS" else "FAIL" end;
+    ([
+        "# Airstar Stable Rig Baseline",
+        "",
+        "Status: **\(.status)**",
+        "",
+        "Capture: \(.capture_source) at \(.captured_at)",
+        "",
+        "The observer is read-only: it creates no remote files, changes no graph",
+        "connections, and controls no services.",
+        "",
+        "## Compatibility",
+        "",
+        "| Check | Expected | Observed | Result |",
+        "| --- | ---: | ---: | --- |",
+        "| Project SHA-256 | protected | \(.observation.project.sha256 | show) | \(.comparison.project_checksum | verdict) |",
+        "| Plugins | \(.expected.carla_plugins) | \(.observation.project.plugins | show) | \(.comparison.project_plugins | verdict) |",
+        "| Unique plugin names | \(.expected.carla_plugins) | \(.observation.project.unique_plugin_names | show) | \(.comparison.project_unique_plugin_names | verdict) |",
+        "| Project connections | \(.expected.carla_project_connections) | \(.observation.project.project_connections | show) | \(.comparison.project_connections | verdict) |",
+        "| Raw graph links | \(.expected.raw_graph_links) | \(.observation.graph.links | show) | \(.comparison.raw_graph_links | verdict) |",
+        "| MIDI graph links | \(.expected.midi_graph_links) | \(.observation.graph.midi_links | show) | \(.comparison.midi_graph_links | verdict) |",
+        "| Quantum | \(.expected.pipewire_quantum_frames) | \(.observation.audio.quantum_frames | show) | \(.comparison.quantum | verdict) |",
+        "| Sample rate | available | \(.observation.audio.sample_rate_hz | show) | \(.comparison.sample_rate_available | verdict) |",
+        "| Stable services | active | \([.observation.services[] | select(.active_state == "active")] | length) | \(.comparison.services_active | verdict) |",
+        "",
+        "## Performance Snapshot",
+        "",
+        "| Metric | Observed |",
+        "| --- | ---: |",
+        "| PipeWire ERR total | \(.performance.pipewire_error_total | show) |",
+        "| Relevant process CPU | \(.performance.relevant_process_cpu_percent | show)% |",
+        "| Relevant process RSS | \(.performance.relevant_process_rss_bytes | show) bytes |",
+        "| Stable service memory | \(.performance.service_memory_current_bytes | show) bytes |"
+    ]
+    + (
+        if .graph_difference.available
+            and (
+                (.graph_difference.unexpected | length) > 0
+                or (.graph_difference.missing | length) > 0
+            )
+        then [
+            "",
+            "## Graph Difference",
+            "",
+            "Unexpected live links:",
+            (
+                if (.graph_difference.unexpected | length) == 0
+                then "- None"
+                else (
+                    .graph_difference.unexpected[]
+                    | "- `\(.output)` -> `\(.input)`"
+                )
+                end
+            ),
+            "",
+            "Missing protected links:",
+            (
+                if (.graph_difference.missing | length) == 0
+                then "- None"
+                else (
+                    .graph_difference.missing[]
+                    | "- `\(.output)` -> `\(.input)`"
+                )
+                end
+            )
+        ]
+        else []
+        end
+    )
+    + [
+        "",
+        "## Services",
+        "",
+        "| Service | Enabled | Active | PID | Restarts |",
+        "| --- | --- | --- | ---: | ---: |",
+        (
+            .observation.services[]
+            | "| \(.name) | \(.unit_file_state | show) | \(.active_state | show)/\(.sub_state | show) | \(.main_pid | show) | \(.restarts | show) |"
+        )
+    ])
+    | .[]
+' "$report_json" > "$report_markdown"
+
+install -D -m 0644 "$report_json" "$output_json"
+install -D -m 0644 "$report_markdown" "$output_markdown"
+
+printf 'Baseline JSON: %s\n' "$output_json"
+printf 'Baseline Markdown: %s\n' "$output_markdown"
+
+if ! jq -e '.status == "complete"' "$report_json" >/dev/null; then
+    printf '%s\n' \
+        "Baseline is incomplete; inspect failed comparisons before continuing." >&2
+    exit 1
+fi

@@ -36,3 +36,23 @@ The same C sources and CMake project are intended for Linux and Windows. The
 current milestone still needs a Windows build runner, a selected Windows IPC
 transport, and the `json-c` dependency proof before its portability gate is
 complete.
+
+## Atomic Generation Spike
+
+The portable core publishes immutable mapping generations through lock-free
+atomic pointers. The synthetic callback test performs 9,999 control-side
+publications, verifies monotonic real-time adoption, rejects stale generation
+IDs, and enforces the 20 ms control-commit ceiling. It is an isolated process
+and has no audio, MIDI, graph, service, or state adapter.
+
+## Read-Only Airstar Baseline
+
+The Milestone 0 collector observes the protected rack without changing remote
+files, services, PipeWire metadata, or graph connections:
+
+~~~bash
+docs/tools/music-rig/benchmarks/capture-airstar-baseline
+~~~
+
+See [benchmarks/README.md](benchmarks/README.md) for the audited remote command
+set and report behavior.

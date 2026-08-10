@@ -10,6 +10,30 @@ Related documents:
 - [Feature Proposal](configurable-performance-rig.md)
 - [Proposta de Funcionalidade (pt-BR)](configurable-performance-rig.pt-BR.md)
 
+## Implementation Checkpoint: 2026-08-10
+
+Completed Milestone 0 work:
+
+- protected-baseline manifest, read-only verifier, preview-first restore path,
+  and guarded stable-capture workflow;
+- isolated portable C17 core and `music-rig --version` CLI skeleton;
+- audited read-only Airstar collector with machine-readable and Markdown output;
+- graph-difference diagnostics that identify unexpected and missing endpoints;
+  and
+- lock-free immutable-generation publication with synthetic callback adoption.
+
+The Airstar observation matches the protected Carla checksum, 49 plugins, 111
+project connections, all protected graph links, 2048-frame quantum, 48 kHz
+rate, and all four stable services. Its report remains `incomplete` because the
+live graph also contains the diagnostic link
+`PD-CH-1 Gain Map:events-out -> smc-pad-gain-verify:input`. That link was
+observed but not removed or added to the protected baseline.
+
+Open Milestone 0 gates include the existing helper self-tests, a clean
+transient-free Airstar capture, repeatable startup transcript, JSON/IPC
+dependency spikes, Windows reference build and transport selection, and the
+remaining backend boundary decisions. No experimental runtime is installed or
+connected to the live rig.
 ## Objective
 
 Implement the Performance Rig model defined by the feature proposal while

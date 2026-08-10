@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+readonly BENCHMARK_DIR="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+readonly FIXTURE="${SCRIPT_DIR}/fixtures/airstar-observation.json"
+
+temporary=$(mktemp -d)
+cleanup() {
+    rm -rf "$temporary"
+}
+trap cleanup EXIT
+
+"${BENCHMARK_DIR}/capture-airstar-baseline" \
+    --input-json "$FIXTURE" \
+    --output-json "$temporary/baseline.json" \
+    --output-markdown "$temporary/baseline.md"
+
+jq -e '
+    .schema == "music-studies/music-rig-baseline/v1"
+    and .status == "complete"
+    and .capture_source == "fixture"
+    and .comparison.project_checksum == true
+    and .comparison.services_active == true
+    and .performance.pipewire_error_total == 0
+' "$temporary/baseline.json" >/dev/null
+
+grep -q '^# Airstar Stable Rig Baseline$' "$temporary/baseline.md"
+grep -q '^Status: \*\*complete\*\*$' "$temporary/baseline.md"

@@ -1,0 +1,339 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCHEMA="music-studies/music-rig-airstar-observation/v1"
+readonly PROJECT="${1:-/c/music/carla/pedro.uproject}"
+readonly SERVICES=(
+    arturia-main-volume-encoder.service
+    smk25-pad-layers.service
+    pipewire-carla-quantum.service
+    pipewire-patchbay-watch.service
+)
+
+for command in awk date flatpak hostname jq pipewire ps pw-dump pw-metadata \
+    pw-top python3 sha256sum stat systemctl tail uname wireplumber; do
+    if ! command -v "$command" >/dev/null 2>&1; then
+        printf 'Required observation command not found: %s\n' "$command" >&2
+        exit 2
+    fi
+done
+
+# Every command below is observational. This script does not accept a shell
+# command, create a remote file, or call a graph/service mutation interface.
+observed_at=$(date --iso-8601=seconds)
+host_name=$(hostname)
+architecture=$(uname -m)
+kernel=$(uname -r)
+
+# shellcheck disable=SC1091
+source /etc/os-release
+os_id=${ID:-unknown}
+os_version=${VERSION_ID:-unknown}
+os_pretty_name=${PRETTY_NAME:-unknown}
+
+pipewire_version=$(pipewire --version 2>/dev/null | tail -n 1 || true)
+wireplumber_version=$(wireplumber --version 2>/dev/null | tail -n 1 || true)
+carla_version=$(flatpak info --show-version studio.kx.carla 2>/dev/null || true)
+
+graph_stats=$(
+    pw-dump | jq '
+        . as $objects
+        | (
+            [
+                $objects[]
+                | select(.type == "PipeWire:Interface:Node")
+                | {
+                    key: (.id | tostring),
+                    value: (.info.props["node.name"] // "unknown-node")
+                  }
+            ]
+            | from_entries
+          ) as $node_name_by_id
+        | [
+            $objects[]
+            | select(.type == "PipeWire:Interface:Port")
+            | {
+                id: (.id | tostring),
+                node_id: (.info.props["node.id"] | tostring),
+                node_name: (
+                    $node_name_by_id[(.info.props["node.id"] | tostring)]
+                    // "unknown-node"
+                ),
+                port_name: (.info.props["port.name"] // "unknown-port"),
+                alias: (
+                    .info.props["port.alias"]
+                    // (
+                        ($node_name_by_id[(.info.props["node.id"] | tostring)]
+                            // "unknown-node")
+                        + ":"
+                        + (.info.props["port.name"] // "unknown-port")
+                    )
+                ),
+                midi: ((.info.props["format.dsp"] // null) == "8 bit raw midi")
+              }
+        ] as $ports
+        | ($ports | map({key: .id, value: .}) | from_entries) as $port_by_id
+        | [
+            $objects[]
+            | select(.type == "PipeWire:Interface:Link")
+            | ((.info["output-port-id"] | tonumber?)
+                // .info["output-port-id"]) as $output_id
+            | ((.info["input-port-id"] | tonumber?)
+                // .info["input-port-id"]) as $input_id
+            | {
+                output_id: ($output_id | tostring),
+                input_id: ($input_id | tostring),
+                output: ($port_by_id[($output_id | tostring)].alias // "unknown"),
+                input: ($port_by_id[($input_id | tostring)].alias // "unknown"),
+                midi: (
+                    ($port_by_id[($output_id | tostring)].midi // false)
+                    or ($port_by_id[($input_id | tostring)].midi // false)
+                )
+              }
+        ] as $links
+        | {
+            nodes: (
+                [$objects[] | select(.type == "PipeWire:Interface:Node")]
+                | length
+            ),
+            ports: ($ports | length),
+            links: ($links | length),
+            midi_ports: ([$ports[] | select(.midi)] | length),
+            midi_links: ([$links[] | select(.midi)] | length),
+            link_inventory: (
+                $links
+                | map({output: .output, input: .input, midi: .midi})
+                | sort_by(.output, .input)
+            )
+          }
+    '
+)
+
+metadata=$(
+    pw-metadata -n settings 2>/dev/null | jq -Rn '
+        [
+            inputs
+            | capture("key:\u0027(?<key>[^\u0027]+)\u0027 value:\u0027(?<value>[^\u0027]*)\u0027")?
+            | {key: .key, value: .value}
+        ]
+        | from_entries
+    '
+)
+
+pw_top_raw=$(pw-top -b -n 1)
+pw_top_error_total=$(
+    awk '
+        NR > 1 && $2 ~ /^[0-9]+$/ && $9 ~ /^[0-9]+$/ {
+            total += $9
+        }
+        END {
+            print total + 0
+        }
+    ' <<< "$pw_top_raw"
+)
+active_driver=$(
+    awk '
+        NR > 1 && $1 == "R" && $3 ~ /^[0-9]+$/ && $4 ~ /^[0-9]+$/ {
+            print $3 " " $4
+            exit
+        }
+    ' <<< "$pw_top_raw"
+)
+active_quantum=${active_driver%% *}
+active_rate=${active_driver#* }
+if [[ -z $active_driver ]]; then
+    active_quantum=
+    active_rate=
+fi
+
+services=$(
+    for service in "${SERVICES[@]}"; do
+        systemctl --user show "$service" --no-pager \
+            --property=LoadState \
+            --property=UnitFileState \
+            --property=ActiveState \
+            --property=SubState \
+            --property=MainPID \
+            --property=MemoryCurrent \
+            --property=CPUUsageNSec \
+            --property=NRestarts |
+            jq -Rn --arg name "$service" '
+                reduce (
+                    inputs
+                    | capture("^(?<key>[^=]+)=(?<value>.*)$")?
+                ) as $item (
+                    {};
+                    .[$item.key] = $item.value
+                )
+                | {
+                    name: $name,
+                    load_state: (.LoadState // "unknown"),
+                    unit_file_state: (.UnitFileState // "unknown"),
+                    active_state: (.ActiveState // "unknown"),
+                    sub_state: (.SubState // "unknown"),
+                    main_pid: ((.MainPID // "0") | tonumber? // 0),
+                    memory_current_bytes:
+                        (((.MemoryCurrent // "") | tonumber?) // null),
+                    cpu_usage_nsec: (
+                        ((.CPUUsageNSec // "") | tonumber?) // null
+                    ),
+                    restarts: ((.NRestarts // "0") | tonumber? // 0)
+                  }
+            '
+    done | jq -s .
+)
+
+processes=$(
+    ps -eo pid=,pcpu=,rss=,etimes=,comm= | jq -Rn '
+        [
+            inputs
+            | capture(
+                "^\\s*(?<pid>[0-9]+)\\s+(?<cpu>[0-9.]+)\\s+"
+                + "(?<rss>[0-9]+)\\s+(?<elapsed>[0-9]+)\\s+"
+                + "(?<command>\\S+)\\s*$"
+              )?
+            | {
+                pid: (.pid | tonumber),
+                cpu_percent: (.cpu | tonumber),
+                rss_kib: (.rss | tonumber),
+                elapsed_seconds: (.elapsed | tonumber),
+                command: .command
+              }
+            | select(
+                .command
+                | test(
+                    "^(carla|carla-bridge.*|arturia-main.*|"
+                    + "smk25-pad.*|pipewire|wireplumber)$";
+                    "i"
+                  )
+              )
+        ]
+    '
+)
+
+project=$(
+    if [[ -f $PROJECT ]]; then
+        project_sha=$(sha256sum "$PROJECT")
+        project_sha=${project_sha%% *}
+        project_size=$(stat -c '%s' "$PROJECT")
+        project_structure=$(
+            python3 -c '
+import json
+import sys
+import xml.etree.ElementTree as ET
+
+root = ET.parse(sys.argv[1]).getroot()
+plugins = root.findall("Plugin")
+connections = root.findall("ExternalPatchbay/Connection")
+names = [item.findtext("Info/Name") or "" for item in plugins]
+print(json.dumps({
+    "plugins": len(plugins),
+    "unique_plugin_names": len(set(names)),
+    "project_connections": len(connections),
+}))
+' "$PROJECT"
+        )
+        jq -n \
+            --arg path "$PROJECT" \
+            --arg sha256 "$project_sha" \
+            --argjson size_bytes "$project_size" \
+            --argjson structure "$project_structure" '
+                {
+                    exists: true,
+                    path: $path,
+                    sha256: $sha256,
+                    size_bytes: $size_bytes
+                }
+                + $structure
+            '
+    else
+        jq -n --arg path "$PROJECT" '
+            {
+                exists: false,
+                path: $path,
+                sha256: null,
+                size_bytes: null,
+                plugins: null,
+                unique_plugin_names: null,
+                project_connections: null
+            }
+        '
+    fi
+)
+
+jq -n \
+    --arg schema "$SCHEMA" \
+    --arg observed_at "$observed_at" \
+    --arg hostname "$host_name" \
+    --arg architecture "$architecture" \
+    --arg kernel "$kernel" \
+    --arg os_id "$os_id" \
+    --arg os_version "$os_version" \
+    --arg os_pretty_name "$os_pretty_name" \
+    --arg pipewire_version "$pipewire_version" \
+    --arg wireplumber_version "$wireplumber_version" \
+    --arg carla_version "$carla_version" \
+    --argjson graph "$graph_stats" \
+    --argjson metadata "$metadata" \
+    --arg active_quantum "$active_quantum" \
+    --arg active_rate "$active_rate" \
+    --argjson pw_top_error_total "$pw_top_error_total" \
+    --arg pw_top_raw "$pw_top_raw" \
+    --argjson services "$services" \
+    --argjson processes "$processes" \
+    --argjson project "$project" '
+        ($active_quantum | tonumber? // null) as $driver_quantum
+        | ($active_rate | tonumber? // null) as $driver_rate
+        | ($metadata["clock.force-quantum"] | tonumber? // null) as $force_quantum
+        | ($metadata["clock.quantum"] | tonumber? // null) as $default_quantum
+        | ($metadata["clock.force-rate"] | tonumber? // null) as $force_rate
+        | ($metadata["clock.rate"] | tonumber? // null) as $default_rate
+        | {
+            schema: $schema,
+            safety: {
+                mode: "read-only",
+                creates_remote_files: false,
+                mutates_graph: false,
+                controls_services: false
+            },
+            observed_at: $observed_at,
+            system: {
+                hostname: $hostname,
+                architecture: $architecture,
+                kernel: $kernel,
+                os_id: $os_id,
+                os_version: $os_version,
+                os_pretty_name: $os_pretty_name
+            },
+            software: {
+                pipewire: $pipewire_version,
+                wireplumber: $wireplumber_version,
+                carla_flatpak: $carla_version
+            },
+            audio: {
+                sample_rate_hz: (
+                    $driver_rate
+                    // (if ($force_rate // 0) > 0
+                        then $force_rate
+                        else $default_rate
+                        end)
+                ),
+                quantum_frames: (
+                    $driver_quantum
+                    // (if ($force_quantum // 0) > 0
+                        then $force_quantum
+                        else $default_quantum
+                        end)
+                ),
+                metadata: $metadata,
+                pw_top: {
+                    error_total: $pw_top_error_total,
+                    raw: $pw_top_raw
+                }
+            },
+            graph: $graph,
+            project: $project,
+            services: $services,
+            processes: $processes
+        }
+    '
