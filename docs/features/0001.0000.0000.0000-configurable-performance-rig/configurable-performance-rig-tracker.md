@@ -86,8 +86,10 @@ benchmarks.
 - ✅ Add the read-only protected-baseline verifier.
 - ✅ Add the preview-first one-command restore path.
 - ✅ Document the explicit opt-in boundary for live experiments.
-- 🟡 Capture the Airstar baseline. The current report matches every protected
-  link but also observes one `smc-pad-gain-verify` diagnostic link.
+- ✅ Capture the Airstar baseline. The recorded report matches every protected
+  link and documents one additional `smc-pad-gain-verify` diagnostic link.
+- 🟡 Recapture a clean transient-free Airstar observation after the diagnostic
+  link is removed through the explicit live-change approval path.
 - ✅ Exercise and record the Arturia and SMK helper
   [offline tests](../../tools/music-rig/HELPER-OFFLINE-TESTS.md).
 - 🟡 Record the repeatable current-rack startup and validation transcript.
