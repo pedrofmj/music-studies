@@ -75,6 +75,17 @@ parse time, peak process RSS, executable size, and linked-library size. See
 [JSON-PARSING.md](JSON-PARSING.md) for the provisional dependency boundary and
 [benchmarks/json-c-linux.json](benchmarks/json-c-linux.json) for the evidence.
 
+## Protected Helper Offline Tests
+
+Linux builds exercise the protected Arturia and SMK-25 helper sources without
+installing or connecting them. The Arturia harness uses process-local JACK
+mocks and temporary buffers; the SMK-25 test links a fail-fast JACK stub and
+runs its built-in `--self-test` and `--check-config` modes.
+
+No test starts a service or opens a live JACK client. See
+[HELPER-OFFLINE-TESTS.md](HELPER-OFFLINE-TESTS.md) for covered behavior,
+reproduction, and the remaining explicit live-hardware checks.
+
 ## Read-Only Airstar Baseline
 
 The Milestone 0 collector observes the protected rack without changing remote

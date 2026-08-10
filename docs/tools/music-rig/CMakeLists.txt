@@ -167,6 +167,92 @@ if(BUILD_TESTING)
                 PROPERTIES TIMEOUT 10
             )
 
+            add_executable(music_rig_arturia_helper_offline_test
+                tests/arturia-main-volume-encoder-offline-test.c
+            )
+            target_compile_features(
+                music_rig_arturia_helper_offline_test
+                PRIVATE c_std_17
+            )
+            set_target_properties(
+                music_rig_arturia_helper_offline_test
+                PROPERTIES C_EXTENSIONS OFF
+            )
+            target_compile_options(
+                music_rig_arturia_helper_offline_test
+                PRIVATE
+                    -Wall
+                    -Wextra
+                    -Wpedantic
+                    -Werror
+            )
+            add_test(
+                NAME music_rig_arturia_helper_offline
+                COMMAND music_rig_arturia_helper_offline_test
+            )
+
+            add_library(music_rig_forbidden_jack STATIC
+                tests/forbid-jack-client.c
+            )
+            target_compile_features(
+                music_rig_forbidden_jack
+                PRIVATE c_std_17
+            )
+            set_target_properties(music_rig_forbidden_jack PROPERTIES
+                C_EXTENSIONS OFF
+            )
+            target_compile_options(music_rig_forbidden_jack PRIVATE
+                -Wall
+                -Wextra
+                -Wpedantic
+                -Werror
+            )
+
+            add_executable(music_rig_smk25_helper
+                ../smk25-pad-layers/smk25-pad-layers.c
+            )
+            target_compile_features(
+                music_rig_smk25_helper
+                PRIVATE c_std_17
+            )
+            set_target_properties(music_rig_smk25_helper PROPERTIES
+                C_EXTENSIONS OFF
+            )
+            target_compile_options(music_rig_smk25_helper PRIVATE
+                -Wall
+                -Wextra
+                -Wpedantic
+                -Werror
+            )
+            target_link_libraries(
+                music_rig_smk25_helper
+                PRIVATE music_rig_forbidden_jack
+            )
+            add_test(
+                NAME music_rig_smk25_helper_self_test
+                COMMAND music_rig_smk25_helper --self-test
+            )
+            add_test(
+                NAME music_rig_smk25_helper_config
+                COMMAND music_rig_smk25_helper --check-config
+                    "${CMAKE_CURRENT_SOURCE_DIR}/../smk25-pad-layers/smk25-pad-layers.conf"
+            )
+            add_test(
+                NAME music_rig_smk25_helper_jack_guard
+                COMMAND "${CMAKE_COMMAND}"
+                    "-DHELPER=$<TARGET_FILE:music_rig_smk25_helper>"
+                    "-DCONFIG=${CMAKE_CURRENT_SOURCE_DIR}/../smk25-pad-layers/smk25-pad-layers.conf"
+                    "-DSTATE=${CMAKE_CURRENT_BINARY_DIR}/smk25-jack-guard-state"
+                    -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-smk25-jack-guard.cmake"
+            )
+            set_tests_properties(
+                music_rig_arturia_helper_offline
+                music_rig_smk25_helper_self_test
+                music_rig_smk25_helper_config
+                music_rig_smk25_helper_jack_guard
+                PROPERTIES TIMEOUT 10
+            )
+
         endif()
         add_test(
             NAME music_rig_airstar_baseline_fixture

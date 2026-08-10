@@ -32,10 +32,12 @@ Documents:
 
 | Check | Result |
 | --- | --- |
-| GCC isolated suite | ✅ 8/8 passed |
-| Clang isolated suite | ✅ 8/8 passed |
-| GCC with Linux JSON probe | ✅ 9/9 passed |
-| Clang with Linux JSON probe | ✅ 9/9 passed |
+| GCC isolated suite | ✅ 12/12 passed |
+| Clang isolated suite | ✅ 12/12 passed |
+| GCC with Linux JSON probe | ✅ 13/13 passed |
+| Clang with Linux JSON probe | ✅ 13/13 passed |
+| Arturia offline parity | ✅ MIDI, state, replay, and stereo ramp passed |
+| SMK-25 offline parity | ✅ Self-test, config, and JACK guard passed |
 | Linux JSON parse fixture | ✅ 10,000 iterations, zero failures |
 | Linux JSON average parse | ✅ GCC 10,858 ns; Clang 15,268 ns |
 | Linux JSON linkage | ✅ Default CLI has no `json-c` dependency |
@@ -71,7 +73,8 @@ benchmarks.
 - ✅ Document the explicit opt-in boundary for live experiments.
 - 🟡 Capture the Airstar baseline. The current report matches every protected
   link but also observes one `smc-pad-gain-verify` diagnostic link.
-- ⬜ Exercise and record the Arturia and SMK helper self-tests.
+- ✅ Exercise and record the Arturia and SMK helper
+  [offline tests](../../tools/music-rig/HELPER-OFFLINE-TESTS.md).
 - ⬜ Record the repeatable current-rack startup and validation transcript.
 
 ### Performance And Runtime
