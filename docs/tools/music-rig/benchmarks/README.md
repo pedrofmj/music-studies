@@ -56,6 +56,12 @@ generation-adoption result, named-pipe golden-frame round trips, and cleanup
 evidence. It is a synthetic portability and IPC result, not audio or MIDI
 certification.
 
+[windows-backend-capabilities.json](windows-backend-capabilities.json) records
+the later read-only MIDI service and compatibility mapping, ASIO registration,
+Carla/package, Task Scheduler, and upstream candidate snapshot used by the
+Windows adapter decision. It enumerated or opened no media endpoint and made no
+machine change.
+
 ## Portable Switch Benchmark Contract
 
 [SWITCH-BENCHMARK-CONTRACT.md](SWITCH-BENCHMARK-CONTRACT.md) defines the shared

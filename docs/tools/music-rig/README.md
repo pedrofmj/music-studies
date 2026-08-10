@@ -36,7 +36,9 @@ The same C sources and CMake project are intended for Linux and Windows. The
 Linux and Windows `json-c` dependency proofs and hosted Windows workflow pass.
 `beanstar` is the selected
 [physical Windows reference machine](WINDOWS-REFERENCE.md), where the native
-generation, named-pipe IPC, and JSON footprint proofs pass.
+generation, named-pipe IPC, and JSON footprint proofs pass. The
+[Windows adapter baseline](../../features/0001.0000.0000.0000-configurable-performance-rig/architecture-decisions/0006-windows-platform-adapter-baseline.md)
+is selected without installing or activating it.
 
 The [Windows build contract](WINDOWS-BUILD.md) defines the hosted MSVC proof,
 native reproduction commands, and the boundary between CI portability and a

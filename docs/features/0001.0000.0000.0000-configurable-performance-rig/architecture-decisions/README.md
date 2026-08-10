@@ -18,6 +18,10 @@ This directory contains short, implementation-binding decisions for feature
 - [ADR 0005: JSON-C For Control-Plane Parsing](0005-json-c-control-plane-parsing.md)
   is accepted. Linux and Windows use `json-c` only while preparing immutable
   runtime generations; real-time callbacks never parse JSON.
+- [ADR 0006: Windows Platform Adapter Baseline](0006-windows-platform-adapter-baseline.md)
+  is accepted for implementation. It selects the native path, lifecycle,
+  clock, MIDI, audio, and plugin-host boundaries while keeping physical Windows
+  certification as a later gate.
 
 Accepted records constrain later schemas, compiler output, runtime behavior,
 tests, and deployment. A decision may be superseded only by another recorded

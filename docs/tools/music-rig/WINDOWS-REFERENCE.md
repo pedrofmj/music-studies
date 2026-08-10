@@ -1,8 +1,9 @@
 # Windows Reference Machine: Beanstar
 
 Status: selected; physical portable protocol, generation-adoption, Windows
-named-pipe IPC, and JSON dependency evidence pass. Audio, MIDI, plugin-host,
-and complete performance certification remain pending.
+named-pipe IPC, and JSON dependency evidence pass. The Windows adapter baseline
+is selected; audio, MIDI, plugin-host, lifecycle, and complete performance
+certification remain pending.
 
 ## Role
 
@@ -52,6 +53,26 @@ inventory observation, not a backend decision. External audio and MIDI devices
 were not part of this capture and must be inventoried again when their gates
 are exercised.
 
+### Backend Capability Snapshot
+
+A second read-only capture at 2026-08-10T18:31:51Z recorded:
+
+| Capability | Recorded value |
+| --- | --- |
+| Windows MIDI service | `MidiSrv` present, stopped, manual/on-demand start |
+| WinMM compatibility | `midi=wdmaud.drv`; `midi1=wdmaud2.drv` |
+| ASIO registration | No 32-bit or 64-bit entries |
+| Carla | No matching installed-package entry |
+| Windows MIDI SDK/tools | No matching installed-package entry |
+| Task Scheduler | Running, automatic start |
+
+No audio or MIDI endpoint was enumerated or opened. No service, process other
+than the read-only PowerShell query, file, registry value, or task was changed.
+The machine-readable snapshot is
+[windows-backend-capabilities.json](benchmarks/windows-backend-capabilities.json).
+The selected implementation boundary is
+[ADR 0006](../../features/0001.0000.0000.0000-configurable-performance-rig/architecture-decisions/0006-windows-platform-adapter-baseline.md).
+
 ## Access And Test Boundary
 
 The reference machine is reached over key-authenticated OpenSSH as the local
@@ -90,7 +111,9 @@ bundle directory or process. See
 
 Remaining reference evidence:
 
-1. Inventory and select the Windows audio, MIDI, plugin-host, and service
-   backends before any hardware certification claim.
-2. Add short-process and daemon resource measurement that reliably samples
+1. Inventory the five MIDI controllers and selected external audio interface
+   with their exact drivers before opening any endpoint.
+2. Install and certify the selected ASIO/WASAPI, Carla, MIDI, and per-user
+   lifecycle adapters only through separately approved live tests.
+3. Add short-process and daemon resource measurement that reliably samples
    Windows working set and idle CPU.

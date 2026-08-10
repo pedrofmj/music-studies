@@ -80,8 +80,9 @@ A passing hosted workflow proves:
 - the benchmark contract validator behaves identically; and
 - a native Windows thread observes lock-free immutable-generation publication.
 
-It does not select or certify the Windows audio, MIDI, plugin-host, and service
-backends.
+It does not certify or exercise the selected Windows audio, MIDI, plugin-host,
+path/state, or lifecycle adapters. Their implementation boundary is recorded in
+[ADR 0006](../../features/0001.0000.0000.0000-configurable-performance-rig/architecture-decisions/0006-windows-platform-adapter-baseline.md).
 
 The workflow run URL and pinned runner label are recorded with each accepted
 hosted proof. The selected physical machine and its initial read-only inventory
@@ -94,3 +95,5 @@ artifact, timing, and cleanup evidence is in
 [benchmarks/windows-beanstar-m0.json](benchmarks/windows-beanstar-m0.json).
 The optional JSON build and physical footprint result is in
 [benchmarks/json-c-windows.json](benchmarks/json-c-windows.json).
+The read-only backend capability snapshot is in
+[benchmarks/windows-backend-capabilities.json](benchmarks/windows-backend-capabilities.json).

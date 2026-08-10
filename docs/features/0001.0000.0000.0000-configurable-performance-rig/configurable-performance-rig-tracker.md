@@ -54,6 +54,8 @@ Documents:
 | Windows JSON parse fixture | ✅ 10,000 iterations; 16,051 ns average; zero failures on `beanstar` |
 | Windows JSON footprint | ✅ 5,500,928-byte peak process working set; 26,112-byte static-link executable delta |
 | Windows JSON packaging | ✅ Pinned vcpkg static archive, MIT license, and no `json-c` runtime DLL |
+| Windows backend capability inventory | ✅ Read-only `beanstar` MIDI service, ASIO, Carla, and lifecycle snapshot recorded |
+| Windows adapter baseline | ✅ WinMM, host-owned ASIO/WASAPI, Carla x64, Known Folders, QPC, and per-user Task Scheduler selected |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -135,9 +137,10 @@ benchmarks.
   [ADR 0002](architecture-decisions/0002-carla-control-and-prepared-engine-boundary.md)
   keeps early switches on loaded engines and moves lifecycle, state, project,
   and patchbay work to preparation in Milestone 6.
-- 🟡 Write the remaining Milestone 0 architecture decision records. IPC, JSON
-  parsing, PipeWire, Carla, and performance-threshold boundaries are accepted;
-  the Windows backend remains.
+- ✅ Write the Milestone 0 architecture decision records. IPC, JSON parsing,
+  PipeWire, Carla, performance thresholds, and the Windows adapter baseline are
+  accepted. [ADR 0006](architecture-decisions/0006-windows-platform-adapter-baseline.md)
+  keeps physical Windows certification in Milestone 7.
 - ✅ Confirm CPU, memory, latency, and xrun thresholds.
   [ADR 0003](architecture-decisions/0003-performance-acceptance-thresholds.md)
   accepts the portable ceilings and separates selection from later platform

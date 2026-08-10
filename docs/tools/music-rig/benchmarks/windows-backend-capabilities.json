@@ -1,0 +1,105 @@
+{
+  "schema": "music-studies/windows-backend-capability-inventory/v1",
+  "captured_at": "2026-08-10T18:31:51.4667898Z",
+  "reference_machine": {
+    "hostname": "BEANSTAR",
+    "operating_system": "Microsoft Windows 11 Pro",
+    "version": "10.0.26200",
+    "architecture": "64-bit",
+    "machine_type": "82CF"
+  },
+  "observation": {
+    "transport": "key-authenticated OpenSSH and read-only PowerShell",
+    "midi_or_audio_endpoints_enumerated": false,
+    "midi_or_audio_endpoints_opened": false,
+    "services_started_or_stopped": false,
+    "processes_started_except_powershell": false,
+    "files_created": false,
+    "machine_mutations": 0
+  },
+  "windows_midi_services": {
+    "service": {
+      "name": "MidiSrv",
+      "present": true,
+      "state": "Stopped",
+      "start_mode": "Manual",
+      "image": "C:\\WINDOWS\\system32\\midisrv.exe",
+      "started_for_capture": false
+    },
+    "compatibility_driver_mappings": [
+      {
+        "registry_value": "midi",
+        "driver": "wdmaud.drv"
+      },
+      {
+        "registry_value": "midi1",
+        "driver": "wdmaud2.drv"
+      }
+    ],
+    "matching_uninstall_entries": [],
+    "direct_sdk_selected": false,
+    "first_adapter": "winmm-midi-1.0"
+  },
+  "asio": {
+    "registry_views_checked": [
+      "HKLM:\\SOFTWARE\\ASIO",
+      "HKLM:\\SOFTWARE\\WOW6432Node\\ASIO"
+    ],
+    "registered_drivers": [],
+    "certification_state": "unavailable"
+  },
+  "plugin_host": {
+    "candidate": "Carla",
+    "matching_uninstall_entries": [],
+    "matching_uninstall_entry_present": false,
+    "portable_installation_search_performed": false,
+    "certification_state": "unavailable"
+  },
+  "task_scheduler": {
+    "service_name": "Schedule",
+    "state": "Running",
+    "start_mode": "Auto",
+    "selected_lifecycle": "per-user-logon-task"
+  },
+  "upstream_snapshot": {
+    "captured_date": "2026-08-10",
+    "windows_midi_services": {
+      "project_url": "https://github.com/microsoft/MIDI",
+      "direct_sdk_release_status": "prerelease",
+      "app_sdk_runtime_release": "rc-4",
+      "app_sdk_runtime_release_name": "App SDK Runtime and Tools Release Candidate 4",
+      "app_sdk_runtime_published_at": "2026-04-12T21:58:40Z",
+      "newest_inbox_api_preview": "inbox-dev-preview-4",
+      "newest_inbox_api_preview_published_at": "2026-08-06T04:32:54Z"
+    },
+    "carla": {
+      "repository": "https://github.com/falkTX/Carla",
+      "version": "2.5.10",
+      "release_url": "https://github.com/falkTX/Carla/releases/tag/v2.5.10",
+      "published_at": "2025-07-31T18:05:01Z",
+      "windows_x64_asset": "Carla-2.5.10-win64.zip",
+      "windows_x64_asset_bytes": 247507775
+    }
+  },
+  "selection": {
+    "ipc": "local-message-mode-named-pipe",
+    "clock": "query-performance-counter",
+    "control_wakeup": "wait-on-address",
+    "paths": "per-user-known-folders-local-app-data",
+    "state_replacement": "same-directory-replace-file",
+    "lifecycle": "non-elevated-per-user-task-scheduler-logon-task",
+    "midi": "winmm-midi-1.0",
+    "direct_midi_services_sdk": "deferred-until-production",
+    "audio_preferred": "plugin-host-owned-native-asio",
+    "audio_measured_fallback": "plugin-host-owned-low-period-wasapi",
+    "plugin_host": "out-of-process-carla-x64-patchbay-vst3"
+  },
+  "gate": {
+    "milestone_0_backend_selection": "pass",
+    "physical_midi": "pending",
+    "physical_audio": "pending",
+    "plugin_host": "pending",
+    "service_lifecycle": "pending",
+    "complete_windows_profile": "pending"
+  }
+}
