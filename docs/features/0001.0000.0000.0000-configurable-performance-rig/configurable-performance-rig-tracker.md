@@ -59,7 +59,7 @@ Documents:
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
-| Live graph or service changes | ✅ None |
+| Authorized live graph test | ✅ Diagnostic link temporarily disconnected, clean capture passed, exact link restored; no service changes |
 
 IPC and JSON timings are local Milestone 0 spikes, not production-daemon
 benchmarks.
@@ -87,9 +87,11 @@ benchmarks.
 - ✅ Add the preview-first one-command restore path.
 - ✅ Document the explicit opt-in boundary for live experiments.
 - ✅ Capture the Airstar baseline. The recorded report matches every protected
-  link and documents one additional `smc-pad-gain-verify` diagnostic link.
-- 🟡 Recapture a clean transient-free Airstar observation after the diagnostic
-  link is removed through the explicit live-change approval path.
+  Carla, graph, audio, and service check with no missing or unexpected links.
+- ✅ Capture a clean transient-free Airstar observation through the explicit
+  live-change approval path. The one diagnostic link was temporarily
+  disconnected, the capture passed, and the exact link was restored and
+  verified afterward without changing a service or protected artifact.
 - ✅ Exercise and record the Arturia and SMK helper
   [offline tests](../../tools/music-rig/HELPER-OFFLINE-TESTS.md).
 - 🟡 Record the repeatable current-rack startup and validation transcript.

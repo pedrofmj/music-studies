@@ -1,15 +1,15 @@
 {
   "baseline_id": "airstar-single-rig-2026-08-09",
   "capture_source": "live-read-only-ssh",
-  "captured_at": "2026-08-10T04:45:45-03:00",
+  "captured_at": "2026-08-10T16:11:35-03:00",
   "comparison": {
-    "midi_graph_links": false,
+    "midi_graph_links": true,
     "project_checksum": true,
     "project_connections": true,
     "project_plugins": true,
     "project_unique_plugin_names": true,
     "quantum": true,
-    "raw_graph_links": false,
+    "raw_graph_links": true,
     "sample_rate_available": true,
     "services_active": true
   },
@@ -25,13 +25,7 @@
   "graph_difference": {
     "available": true,
     "missing": [],
-    "unexpected": [
-      {
-        "input": "smc-pad-gain-verify:input",
-        "midi": true,
-        "output": "PD-CH-1 Gain Map:events-out"
-      }
-    ]
+    "unexpected": []
   },
   "observation": {
     "audio": {
@@ -331,11 +325,6 @@
         },
         {
           "input": "PD-CH-1 Output Gain 0 to +12 dB:events-in",
-          "midi": true,
-          "output": "PD-CH-1 Gain Map:events-out"
-        },
-        {
-          "input": "smc-pad-gain-verify:input",
           "midi": true,
           "output": "PD-CH-1 Gain Map:events-out"
         },
@@ -645,46 +634,46 @@
           "output": "SMK25 Pad Layers:layer-8"
         }
       ],
-      "links": 118,
-      "midi_links": 68,
+      "links": 117,
+      "midi_links": 67,
       "midi_ports": 152,
       "nodes": 64,
       "ports": 363
     },
-    "observed_at": "2026-08-10T04:45:45-03:00",
+    "observed_at": "2026-08-10T16:11:35-03:00",
     "processes": [
       {
         "command": "arturia-main-vo",
         "cpu_percent": 0.3,
-        "elapsed_seconds": 112462,
+        "elapsed_seconds": 153612,
         "pid": 2067289,
         "rss_kib": 9004
       },
       {
         "command": "smk25-pad-layer",
         "cpu_percent": 0.8,
-        "elapsed_seconds": 112462,
+        "elapsed_seconds": 153611,
         "pid": 2067297,
         "rss_kib": 9160
       },
       {
         "command": "pipewire",
-        "cpu_percent": 1.0,
-        "elapsed_seconds": 158158,
+        "cpu_percent": 0.9,
+        "elapsed_seconds": 199307,
         "pid": 3851279,
-        "rss_kib": 154140
+        "rss_kib": 154152
       },
       {
         "command": "pipewire",
         "cpu_percent": 0.0,
-        "elapsed_seconds": 158158,
+        "elapsed_seconds": 199307,
         "pid": 3851282,
         "rss_kib": 908
       },
       {
         "command": "wireplumber",
         "cpu_percent": 0.0,
-        "elapsed_seconds": 158158,
+        "elapsed_seconds": 199307,
         "pid": 3851283,
         "rss_kib": 12892
       }
@@ -708,7 +697,7 @@
     "services": [
       {
         "active_state": "active",
-        "cpu_usage_nsec": 425455792000,
+        "cpu_usage_nsec": 595461203000,
         "load_state": "loaded",
         "main_pid": 2067289,
         "memory_current_bytes": 3584000,
@@ -719,7 +708,7 @@
       },
       {
         "active_state": "active",
-        "cpu_usage_nsec": 931830370000,
+        "cpu_usage_nsec": 1250279750000,
         "load_state": "loaded",
         "main_pid": 2067297,
         "memory_current_bytes": 3837952,
@@ -741,10 +730,10 @@
       },
       {
         "active_state": "active",
-        "cpu_usage_nsec": 36217361094000,
+        "cpu_usage_nsec": 66603076549000,
         "load_state": "loaded",
         "main_pid": 1733471,
-        "memory_current_bytes": 3352780800,
+        "memory_current_bytes": 4413648896,
         "name": "pipewire-patchbay-watch.service",
         "restarts": 0,
         "sub_state": "running",
@@ -767,9 +756,9 @@
   },
   "performance": {
     "pipewire_error_total": 0,
-    "relevant_process_cpu_percent": 2.1,
-    "relevant_process_rss_bytes": 190570496,
-    "service_memory_current_bytes": 3360202752
+    "relevant_process_cpu_percent": 2,
+    "relevant_process_rss_bytes": 190582784,
+    "service_memory_current_bytes": 4421070848
   },
   "protected_source_commit": "c2e1911406f942a9da0a9f91c65eae8a32148e28",
   "safety": {
@@ -779,5 +768,5 @@
     "mutates_graph": false
   },
   "schema": "music-studies/music-rig-baseline/v1",
-  "status": "incomplete"
+  "status": "complete"
 }

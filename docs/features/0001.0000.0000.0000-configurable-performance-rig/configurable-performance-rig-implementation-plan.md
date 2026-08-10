@@ -56,15 +56,17 @@ Completed Milestone 0 work:
 
 The Airstar observation matches the protected Carla checksum, 49 plugins, 111
 project connections, all protected graph links, 2048-frame quantum, 48 kHz
-rate, and all four stable services. Its report remains `incomplete` because the
-live graph also contains the diagnostic link
-`PD-CH-1 Gain Map:events-out -> smc-pad-gain-verify:input`. That link was
-observed but not removed or added to the protected baseline.
+rate, and all four stable services. Its report is `complete`. For that approved
+capture, the diagnostic link
+`PD-CH-1 Gain Map:events-out -> smc-pad-gain-verify:input` was temporarily
+disconnected and then restored. A post-restore read-only observation confirmed
+that the exact diagnostic link was again present, every protected link remained
+present, and no service changed. The diagnostic link is not part of the
+protected baseline.
 
-Open Milestone 0 gates include a clean transient-free Airstar capture,
-operator-recorded startup transcript evidence, remaining resource evidence on
-the selected `beanstar` Windows reference machine. No experimental runtime is
-installed or connected to the live rig.
+Open Milestone 0 gates include operator-recorded startup transcript evidence
+and remaining resource evidence on the selected `beanstar` Windows reference
+machine. No experimental runtime is installed or connected to the live rig.
 
 ## Objective
 

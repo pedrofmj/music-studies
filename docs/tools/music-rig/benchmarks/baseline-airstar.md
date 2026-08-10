@@ -1,8 +1,8 @@
 # Airstar Stable Rig Baseline
 
-Status: **incomplete**
+Status: **complete**
 
-Capture: live-read-only-ssh at 2026-08-10T04:45:45-03:00
+Capture: live-read-only-ssh at 2026-08-10T16:11:35-03:00
 
 The observer is read-only: it creates no remote files, changes no graph
 connections, and controls no services.
@@ -15,8 +15,8 @@ connections, and controls no services.
 | Plugins | 49 | 49 | PASS |
 | Unique plugin names | 49 | 49 | PASS |
 | Project connections | 111 | 111 | PASS |
-| Raw graph links | 117 | 118 | FAIL |
-| MIDI graph links | 67 | 68 | FAIL |
+| Raw graph links | 117 | 117 | PASS |
+| MIDI graph links | 67 | 67 | PASS |
 | Quantum | 2048 | 2048 | PASS |
 | Sample rate | available | 48000 | PASS |
 | Stable services | active | 4 | PASS |
@@ -26,17 +26,9 @@ connections, and controls no services.
 | Metric | Observed |
 | --- | ---: |
 | PipeWire ERR total | 0 |
-| Relevant process CPU | 2.1% |
-| Relevant process RSS | 190570496 bytes |
-| Stable service memory | 3360202752 bytes |
-
-## Graph Difference
-
-Unexpected live links:
-- `PD-CH-1 Gain Map:events-out` -> `smc-pad-gain-verify:input`
-
-Missing protected links:
-- None
+| Relevant process CPU | 2% |
+| Relevant process RSS | 190582784 bytes |
+| Stable service memory | 4421070848 bytes |
 
 ## Services
 
