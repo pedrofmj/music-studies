@@ -49,6 +49,27 @@ jobs:
           ctest --test-dir build/music-rig -C Release
           --output-on-failure
 
+      - name: Configure Windows JSON dependency probe
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          VCPKG_DISABLE_METRICS: 1
+        run: >-
+          cmake -S docs/tools/music-rig -B build/music-rig-json-c
+          "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+          -DVCPKG_TARGET_TRIPLET=x64-windows-static-md
+          -DMUSIC_RIG_ENABLE_JSON_C_SPIKE=ON
+
+      - name: Build Windows JSON dependency probe
+        if: runner.os == 'Windows'
+        run: cmake --build build/music-rig-json-c --config Release
+
+      - name: Run Windows JSON dependency probe
+        if: runner.os == 'Windows'
+        run: >-
+          ctest --test-dir build/music-rig-json-c -C Release
+          --output-on-failure
+
       - name: Stage Windows reference bundle
         if: runner.os == 'Windows'
         shell: pwsh
@@ -63,6 +84,33 @@ jobs:
           foreach ($sourceFile in $sourceFiles) {
             Copy-Item -LiteralPath $sourceFile -Destination $bundle
           }
+          Copy-Item `
+            -LiteralPath 'build/music-rig-json-c/Release/music_rig_json_c_spike.exe' `
+            -Destination $bundle
+          Copy-Item `
+            -LiteralPath 'build/music-rig-json-c/Release/music-rig.exe' `
+            -Destination "$bundle/music-rig-json-c-baseline.exe"
+          Copy-Item `
+            -LiteralPath 'docs/tools/music-rig/tests/fixtures/compiled-runtime-minimal.json' `
+            -Destination $bundle
+          $jsonLibraries = @(
+            Get-ChildItem `
+              -LiteralPath 'build/music-rig-json-c/vcpkg_installed/x64-windows-static-md/lib' `
+              -Filter '*json-c*.lib' `
+              -File
+          )
+          if ($jsonLibraries.Count -ne 1) {
+            throw "Expected one static json-c library, found $($jsonLibraries.Count)"
+          }
+          Copy-Item `
+            -LiteralPath $jsonLibraries[0].FullName `
+            -Destination "$bundle/json-c-static.lib"
+          Copy-Item `
+            -LiteralPath 'build/music-rig-json-c/vcpkg_installed/x64-windows-static-md/share/json-c/copyright' `
+            -Destination "$bundle/json-c-LICENSE.txt"
+          $vcpkgVersion = (
+            & "$env:VCPKG_INSTALLATION_ROOT/vcpkg.exe" version | Out-String
+          ).Trim()
           $artifacts = @(
             Get-ChildItem -LiteralPath $bundle -File | ForEach-Object {
               $hash = Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName
@@ -78,6 +126,10 @@ jobs:
             commit = $env:GITHUB_SHA
             runner_image = $env:ImageOS
             runner_image_version = $env:ImageVersion
+            vcpkg_version = $vcpkgVersion
+            vcpkg_baseline = '56bb2411609227288b70117ead2c47585ba07713'
+            vcpkg_triplet = 'x64-windows-static-md'
+            json_c_port_version = '0.18-20240915'
             created_at = (Get-Date).ToUniversalTime().ToString('o')
             artifacts = $artifacts
           } | ConvertTo-Json -Depth 4 |

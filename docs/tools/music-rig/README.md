@@ -71,8 +71,8 @@ order. The Linux test performs 1,000 local `SOCK_SEQPACKET` request/response
 round trips and enforces a 20 ms p99 ceiling. It uses an unnamed `socketpair`
 and does not create a daemon, service, runtime socket file, or persistent state.
 
-See [PROTOCOL.md](PROTOCOL.md) for the frame contract and Windows named-pipe
-candidate boundary.
+See [PROTOCOL.md](PROTOCOL.md) for the frame contract and selected Windows
+named-pipe boundary.
 
 ## Optional JSON Dependency Spike
 
@@ -90,9 +90,12 @@ ctest --test-dir /tmp/music-rig-build-json-c -V \
 ~~~
 
 The probe validates a compiled-runtime-shaped fixture 10,000 times and reports
-parse time, peak process RSS, executable size, and linked-library size. See
+parse time, peak process memory, executable size, and linked-library footprint.
+Linux uses the installed shared library; the opt-in Windows CI build uses the
+pinned [vcpkg manifest](vcpkg.json) and a static `json-c` library. See
 [JSON-PARSING.md](JSON-PARSING.md) for the provisional dependency boundary and
-[benchmarks/json-c-linux.json](benchmarks/json-c-linux.json) for the evidence.
+[benchmarks/json-c-linux.json](benchmarks/json-c-linux.json) for the accepted
+Linux half of the evidence.
 
 ## Protected Helper Offline Tests
 

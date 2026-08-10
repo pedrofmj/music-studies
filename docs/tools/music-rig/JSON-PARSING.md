@@ -57,13 +57,24 @@ off by default, so a normal build neither discovers nor links `json-c`.
 
 ## Windows Gate
 
+The selected repeatable package path is a
+[vcpkg manifest](vcpkg.json) pinned to the signed `2026.04.27` registry release
+commit `56bb2411609227288b70117ead2c47585ba07713`. That baseline supplies
+`json-c` `0.18-20240915`. The Windows proof uses the
+`x64-windows-static-md` triplet: `json-c` is static while the MSVC runtime stays
+dynamic and consistent with the existing project build.
+
+The CI reference bundle includes the probe, same fixture, unlinked baseline
+CLI, static archive, and MIT license text. Nothing is installed on `beanstar`.
+
 Before this decision becomes final, the Windows reference build must:
 
 - obtain `json-c` 0.17 or newer through the selected repeatable package path;
 - compile an equivalent Windows measurement target and parse the same fixture
   with the same validation contract;
 - record executable, library, process-memory, and parse-time evidence;
-- confirm dynamic-runtime packaging and license attribution; and
+- confirm static-library packaging, dynamic MSVC runtime compatibility, and
+  license attribution; and
 - leave the portable core and wire protocol unchanged.
 
 Failure on Windows reopens the parser choice before product runtime code adopts

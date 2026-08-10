@@ -105,7 +105,8 @@ benchmarks.
   hosted test and hash-verified `beanstar` artifact pass 1,000 message-mode
   round trips with zero failures and a 17,400 ns p99.
 - 🟡 Prove `json-c` availability and footprint on Linux and Windows. Linux
-  passes with 0.17; Windows remains pending.
+  passes with 0.17. The Windows 0.18 static probe and pinned vcpkg package path
+  are implemented; hosted and `beanstar` evidence remain pending.
 - ✅ Reject platform headers and symbols from the portable core.
 - ✅ Prove lock-free generation publication and synthetic callback adoption.
 - ✅ Prove generation adoption on the Windows reference build. The

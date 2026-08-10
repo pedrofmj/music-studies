@@ -141,14 +141,20 @@ if(BUILD_TESTING)
     )
 
     if(MUSIC_RIG_ENABLE_JSON_C_SPIKE)
-        if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT WIN32)
             message(FATAL_ERROR
-                "The current json-c footprint harness supports Linux only"
+                "The json-c footprint harness supports Linux and Windows"
             )
         endif()
         find_package(json-c CONFIG REQUIRED)
-        add_executable(music_rig_json_c_spike
-            tests/linux-json-c-spike.c
+        if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+            set(MUSIC_RIG_JSON_C_SPIKE_SOURCE tests/linux-json-c-spike.c)
+        else()
+            set(MUSIC_RIG_JSON_C_SPIKE_SOURCE tests/windows-json-c-spike.c)
+        endif()
+        add_executable(
+            music_rig_json_c_spike
+            ${MUSIC_RIG_JSON_C_SPIKE_SOURCE}
         )
         target_compile_features(music_rig_json_c_spike PRIVATE c_std_17)
         set_target_properties(music_rig_json_c_spike PROPERTIES
@@ -158,19 +164,37 @@ if(BUILD_TESTING)
         target_compile_definitions(music_rig_json_c_spike PRIVATE
             MUSIC_RIG_COMPILER_ID="${CMAKE_C_COMPILER_ID}"
             MUSIC_RIG_COMPILER_VERSION="${CMAKE_C_COMPILER_VERSION}"
-            MUSIC_RIG_JSON_C_LIBRARY_PATH="$<TARGET_FILE:json-c::json-c>"
         )
-        target_compile_options(music_rig_json_c_spike PRIVATE
-            -Wall
-            -Wextra
-            -Wpedantic
-            -Werror
-        )
-        add_test(
-            NAME music_rig_json_c_spike
-            COMMAND music_rig_json_c_spike
-                "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-runtime-minimal.json"
-        )
+        if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+            target_compile_definitions(music_rig_json_c_spike PRIVATE
+                MUSIC_RIG_JSON_C_LIBRARY_PATH="$<TARGET_FILE:json-c::json-c>"
+            )
+            target_compile_options(music_rig_json_c_spike PRIVATE
+                -Wall
+                -Wextra
+                -Wpedantic
+                -Werror
+            )
+            add_test(
+                NAME music_rig_json_c_spike
+                COMMAND music_rig_json_c_spike
+                    "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-runtime-minimal.json"
+            )
+        else()
+            target_compile_definitions(music_rig_json_c_spike PRIVATE
+                MUSIC_RIG_JSON_C_LINKAGE="static-vcpkg"
+            )
+            target_compile_options(music_rig_json_c_spike PRIVATE
+                ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+            )
+            target_link_libraries(music_rig_json_c_spike PRIVATE Psapi)
+            add_test(
+                NAME music_rig_json_c_spike
+                COMMAND music_rig_json_c_spike
+                    "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-runtime-minimal.json"
+                    $<TARGET_FILE:music-rig>
+            )
+        endif()
         set_tests_properties(
             music_rig_json_c_spike
             PROPERTIES TIMEOUT 30
