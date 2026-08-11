@@ -276,8 +276,10 @@ benchmarks.
   same-directory temporary files. The opt-in daemon can load and report one
   trusted definition through an explicit offline command. Local GCC/Clang pass
   35/35, both optional JSON builds pass 38/38, seven ASan/UBSan boundary tests
-  pass, and the protected baseline remains 30/30. Hosted table evidence is
-  pending. `music-rigd` remains output-suppressed and inert without an explicit
+  pass, and the protected baseline remains 30/30. Hosted
+  [run 31536417870](https://github.com/pedrofmj/music-studies/actions/runs/31536417870)
+  validates the immutable tables on Linux 35/35, Windows 29/29, and Windows JSON
+  32/32. `music-rigd` remains output-suppressed and inert without an explicit
   command. Production XDG/Known Folder selection and the device/MIDI,
   audio/graph, plugin-host, service, and diagnostics adapters remain.
 - ⬜ Implement the complete versioned IPC and CLI read-only/dry-run commands.

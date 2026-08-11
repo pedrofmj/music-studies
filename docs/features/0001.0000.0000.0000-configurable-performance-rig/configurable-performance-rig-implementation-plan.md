@@ -159,8 +159,9 @@ size, and exits with output suppressed and no state path.
 The daemon still rejects a no-argument start and accepts no output-enabled mode.
 Local GCC and Clang pass 35/35, both optional Linux JSON builds pass 38/38, and
 hosted
-[run 31531477956](https://github.com/pedrofmj/music-studies/actions/runs/31531477956)
-passes Linux 35/35, Windows 29/29, and Windows JSON 32/32. No production
+[run 31536417870](https://github.com/pedrofmj/music-studies/actions/runs/31536417870)
+validates the immutable tables on Linux 35/35, Windows 29/29, and Windows JSON
+32/32. No production
 definition/state location, IPC endpoint, device, audio, graph, plugin host,
 service, or live activation path exists yet, and the protected baseline remains
 30/30.
