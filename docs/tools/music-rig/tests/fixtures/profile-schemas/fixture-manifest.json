@@ -11,6 +11,11 @@
       "valid": true
     },
     {
+      "path": "valid/platform-binding.json",
+      "kind": "platform-binding",
+      "valid": true
+    },
+    {
       "path": "valid/device-profile.json",
       "kind": "device-profile",
       "valid": true
@@ -60,6 +65,12 @@
       "kind": "rig-profile",
       "valid": false,
       "expected_error": "duplicate ownership claim"
+    },
+    {
+      "path": "invalid/platform-binding-platform-leak.json",
+      "kind": "platform-binding",
+      "valid": false,
+      "expected_error": "Windows binding contains Linux-specific"
     },
     {
       "path": "invalid/device-profile-backend-field.json",

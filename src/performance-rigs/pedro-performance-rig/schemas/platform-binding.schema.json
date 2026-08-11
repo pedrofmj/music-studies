@@ -1,0 +1,263 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.music-studies.dev/performance-rig/v1/platform-binding.schema.json",
+  "title": "Performance Rig v1 Platform Binding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "id",
+    "display_name",
+    "rig",
+    "platform",
+    "rig_profiles",
+    "evidence_status",
+    "source_refs",
+    "device_slots",
+    "binding_groups",
+    "paths",
+    "lifecycle",
+    "safety"
+  ],
+  "properties": {
+    "schema": {
+      "$ref": "common.schema.json#/$defs/schema_version"
+    },
+    "kind": {
+      "const": "platform-binding"
+    },
+    "id": {
+      "$ref": "common.schema.json#/$defs/identifier"
+    },
+    "display_name": {
+      "$ref": "common.schema.json#/$defs/display_name"
+    },
+    "description": {
+      "$ref": "common.schema.json#/$defs/description"
+    },
+    "rig": {
+      "$ref": "common.schema.json#/$defs/identifier"
+    },
+    "platform": {
+      "$ref": "common.schema.json#/$defs/platform"
+    },
+    "rig_profiles": {
+      "$ref": "common.schema.json#/$defs/identifier_array",
+      "minItems": 1
+    },
+    "evidence_status": {
+      "enum": [
+        "verified-existing-runtime",
+        "contract-fixture",
+        "certified"
+      ]
+    },
+    "source_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      }
+    },
+    "device_slots": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "$ref": "common.schema.json#/$defs/identifier"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/device_binding"
+      }
+    },
+    "binding_groups": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/binding_group"
+      }
+    },
+    "paths": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "$ref": "common.schema.json#/$defs/identifier"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/path_binding"
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "$ref": "common.schema.json#/$defs/semantic_identifier"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/lifecycle_binding"
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "activation",
+        "mutates_runtime"
+      ],
+      "properties": {
+        "activation": {
+          "const": "authoring-only"
+        },
+        "mutates_runtime": {
+          "const": false
+        }
+      }
+    }
+  },
+  "$defs": {
+    "status": {
+      "enum": [
+        "available",
+        "uncertified",
+        "unavailable"
+      ]
+    },
+    "locator": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "device_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adapter",
+        "identity",
+        "endpoints",
+        "status"
+      ],
+      "properties": {
+        "adapter": {
+          "$ref": "common.schema.json#/$defs/semantic_identifier"
+        },
+        "identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "strategy",
+            "value"
+          ],
+          "properties": {
+            "strategy": {
+              "$ref": "common.schema.json#/$defs/semantic_identifier"
+            },
+            "value": {
+              "$ref": "#/$defs/locator"
+            }
+          }
+        },
+        "endpoints": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "$ref": "common.schema.json#/$defs/semantic_identifier"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "direction",
+              "locator"
+            ],
+            "properties": {
+              "direction": {
+                "enum": [
+                  "input",
+                  "output",
+                  "duplex"
+                ]
+              },
+              "locator": {
+                "$ref": "#/$defs/locator"
+              }
+            }
+          }
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        }
+      }
+    },
+    "binding_group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adapter",
+        "status",
+        "targets"
+      ],
+      "properties": {
+        "adapter": {
+          "$ref": "common.schema.json#/$defs/semantic_identifier"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "targets": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "$ref": "common.schema.json#/$defs/semantic_identifier"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/locator"
+          }
+        }
+      }
+    },
+    "path_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resolver",
+        "value"
+      ],
+      "properties": {
+        "resolver": {
+          "$ref": "common.schema.json#/$defs/semantic_identifier"
+        },
+        "value": {
+          "$ref": "#/$defs/locator"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "lifecycle_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adapter",
+        "locator",
+        "status"
+      ],
+      "properties": {
+        "adapter": {
+          "$ref": "common.schema.json#/$defs/semantic_identifier"
+        },
+        "locator": {
+          "$ref": "#/$defs/locator"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        }
+      }
+    }
+  }
+}

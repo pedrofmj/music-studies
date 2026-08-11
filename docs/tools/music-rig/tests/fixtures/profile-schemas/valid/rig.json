@@ -44,6 +44,9 @@
   "hardware_presets": [
     "fixture-preset"
   ],
+  "platform_bindings": [
+    "fixture-windows"
+  ],
   "switch_triggers": "fixture-triggers",
   "required_platforms": [
     "linux",

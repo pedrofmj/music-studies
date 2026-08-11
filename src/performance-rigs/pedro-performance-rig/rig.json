@@ -229,6 +229,9 @@
     "smc-pad-current-notes",
     "smc-pad-pocket-current-notes"
   ],
+  "platform_bindings": [
+    "airstar-current"
+  ],
   "switch_triggers": "performance-switch-triggers",
   "required_platforms": [
     "linux",

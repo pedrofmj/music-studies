@@ -58,23 +58,28 @@ Windows backends.
 
 ## Portable Profile Schemas
 
-The six strict Draft 2020-12 schemas under
+The seven strict Draft 2020-12 schemas under
 [`src/performance-rigs/pedro-performance-rig`](../../../src/performance-rigs/pedro-performance-rig/)
 define the portable v1 authoring boundary. The default CTest suite validates
-the schemas themselves, five positive plus twelve negative document fixtures,
-fourteen positive/negative catalogue scenarios, and the authored five-slot Rig
-with all five current Hardware Presets, five Device Profiles, and the initial
-`full-live-rack` Rig Profile. Semantic checks enforce
-selector order, required model and endpoint coverage, unique aliases and local
-discriminators, optional USB evidence, unambiguous shared USB IDs, unique
-hardware controls and messages, evidence status, resolved preset and profile
-IDs, source-control references, mapping ownership, required-slot composition,
-aggregate capabilities and readiness, pinned and shared resources, initial
-state ownership, and explicit-composition ownership compatibility. The Python
+the schemas themselves, six positive plus thirteen negative document fixtures,
+eighteen positive/negative catalogue scenarios, and the authored five-slot Rig
+with all five current Hardware Presets, five Device Profiles, the initial
+`full-live-rack` Rig Profile, and its Linux Platform Binding. Semantic checks
+enforce selector order, required model and endpoint coverage, unique aliases
+and local discriminators, optional USB evidence, unambiguous shared USB IDs,
+unique hardware controls and messages, evidence status, resolved preset and
+profile IDs, source-control references, mapping ownership, required-slot
+composition, aggregate capabilities and readiness, pinned and shared
+resources, initial state ownership, explicit-composition ownership
+compatibility, complete binding capability and resource coverage, known
+binding targets, and platform isolation. The Python
 `jsonschema` dependency is used only by authoring and tests; neither the C CLI
 nor the future resident runtime loads it.
 The current-catalogue test also locks all five verified Hardware Presets to the
-protected structured setup and the 2026-08-11 live pad capture.
+protected structured setup and the 2026-08-11 live pad capture. It locks the
+Linux binding to the same Airstar device aliases, paths, checksums, and
+services. The Windows binding is a contract fixture only and does not claim
+physical backend support or certification.
 
 Run the validator directly:
 

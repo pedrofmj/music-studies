@@ -4,18 +4,18 @@ This directory contains the portable authored definition of the first
 Performance Rig. Schema version `music-studies/performance-rig/v1` uses JSON
 Schema Draft 2020-12.
 
-Current status: schema, stable-slot, Hardware Preset, Device Profile, and
-initial Rig Profile extraction. No installer, service, runtime, or live
-audio/MIDI tool reads this directory. The protected `setup.json`, Carla
-project, services, and graph remain the production authority until the later
-parity and cutover gates pass.
+Current status: schema, stable-slot, Hardware Preset, Device Profile, initial
+Rig Profile, and Linux Platform Binding extraction. No installer, service,
+runtime, or live audio/MIDI tool reads this directory. The protected
+`setup.json`, Carla project, services, and graph remain the production
+authority until the later parity and cutover gates pass.
 
 `rig.json` records the five stable controller slots from the protected rack.
 Each slot orders selectors from model, semantic alias, and endpoint purpose to
 an optional local discriminator and optional USB ID. The four M-VAVE devices
 share USB ID `4353:4b4d`, so that ID is supporting evidence and cannot
-distinguish them by itself. Future platform bindings will resolve these
-portable selectors to Linux and Windows device identities.
+distinguish them by itself. Platform bindings resolve these portable selectors
+to operating-system device identities.
 
 All five Hardware Preset IDs resolve to verified files in `hardware-presets`.
 The SMC-PAD and SMC-PAD Pocket assignments are checked against the
@@ -44,7 +44,7 @@ engines, identifies the shared drum engine and effects, and retains the safe
 takeover and rollback policies. It is authored data only; the protected setup
 remains the active default. The trigger ID remains a planned forward reference.
 
-The six schemas are:
+The seven schemas are:
 
 - `common.schema.json`: shared identifiers, selectors, capabilities, MIDI,
   ownership, readiness, takeover, state, and switch-safety types;
@@ -52,20 +52,28 @@ The six schemas are:
 - `rig-profile.schema.json`: one global composition;
 - `device-profile.schema.json`: one role for one logical device slot;
 - `hardware-preset.schema.json`: controller-local raw message assignments; and
+- `platform-binding.schema.json`: backend device identities, semantic target
+  locators, machine paths, lifecycle resources, and evidence status; and
 - `switch-triggers.schema.json`: persistent management events translated to
   the same future switch operations as the CLI.
 
 Top-level authored definitions contain semantic capabilities. Operating-system
 paths, PipeWire/JACK port names, Carla parameter indices, Windows device IDs,
-and service identifiers belong in platform bindings, which are not part of
-this schema slice.
+and service identifiers belong only in Platform Bindings. The authored
+[`airstar-current`](platform-bindings/linux/airstar-current.json) Linux binding
+resolves the complete `full-live-rack` contract against the protected setup.
+It is authoring-only and cannot mutate or activate the runtime. The Windows
+document under the validator fixtures proves the portable contract shape; it
+is explicitly not physical Windows support or certification.
 
 Root validation checks the Rig, all Hardware Presets, Device Profiles, and Rig
-Profiles. It resolves slot/model/endpoint/preset/control/profile references and
-checks required-slot coverage, aggregate capabilities and readiness, pinned
-and shared resources, initial-state ownership, and explicit composition
-ownership conflicts. It reads authored files and protected evidence only; it
-does not connect to the live rig.
+Profiles, and Platform Bindings. It resolves slot, model, endpoint, preset,
+control, profile, capability, resource, and binding references; checks
+required-slot coverage, aggregate capabilities and readiness, pinned and
+shared resources, initial-state ownership, and explicit composition ownership
+conflicts; and locks the current Linux binding to protected Airstar aliases,
+paths, checksums, and services. It reads authored files and protected evidence
+only; it does not connect to the live rig.
 
 Run the offline schema suite from the repository root after installing the
 authoring-only dependency:

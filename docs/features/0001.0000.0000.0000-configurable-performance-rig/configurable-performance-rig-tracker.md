@@ -59,7 +59,7 @@ Documents:
 | Windows short-process resources | ✅ `music-rig --version`: 1,970,176-byte observed peak working set, 23 handles, 1 thread, clean exit |
 | Windows 60-second idle resources | ✅ 60.259 s, 0.000000% measured child CPU, 3,670,016-byte observed peak working set, 65 handles, 4 threads, zero events |
 | Windows resource cleanup | ✅ Zero remaining test processes; temporary directory removed and independently confirmed |
-| Portable profile schemas | ✅ [Linux 21/21, Windows 15/15, and Windows JSON 16/16](https://github.com/pedrofmj/music-studies/actions/runs/31477152056) pass with five verified Hardware Presets, zero partial presets, five Device Profiles, one Rig Profile, five valid fixtures, twelve invalid fixtures, and fourteen catalogue cases |
+| Portable profile schemas | 🟡 Local GCC and Clang pass 22/22 with five verified Hardware Presets, zero partial presets, five Device Profiles, one Rig Profile, one Linux Platform Binding, six valid fixtures, thirteen invalid fixtures, and eighteen catalogue cases; hosted proof pending |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -73,7 +73,7 @@ benchmarks.
 | Milestone | State | Exit gate |
 | --- | --- | --- |
 | 0. Baseline and technical gates | ✅ | Baseline reproducible and technical gates passed |
-| 1. Schemas and current profile extraction | 🟡 | `full-live-rack` and all five Device Profiles pass; platform bindings remain |
+| 1. Schemas and current profile extraction | 🟡 | Profiles and bindings pass; trigger-versus-musical-message collision validation remains |
 | 2. Deterministic compiler and parity | ⬜ | Not started |
 | 3. Runtime, CLI, and shadow mode | ⬜ | Not started |
 | 4. Control-only switching | ⬜ | Not started |
@@ -163,10 +163,10 @@ benchmarks.
 
 ## Milestone 1: Schemas And Current Profile Extraction
 
-- ✅ Add the six versioned Rig, Rig Profile, Device Profile, Hardware Preset,
-  Switch Trigger, and common schemas. The offline
+- ✅ Add the seven versioned Rig, Rig Profile, Device Profile, Hardware Preset,
+  Platform Binding, Switch Trigger, and common schemas. The offline
   [validator](../../tools/music-rig/validate-performance-rig.py) checks each
-  Draft 2020-12 schema and seventeen positive/negative fixtures on the default
+  Draft 2020-12 schema and nineteen positive/negative fixtures on the default
   CTest path without activating any runtime component.
 - ✅ Define stable device slots and ordered physical selectors. The authored
   [rig catalogue](../../../src/performance-rigs/pedro-performance-rig/rig.json)
@@ -192,13 +192,20 @@ benchmarks.
   references, aggregate capabilities and readiness, pinned and shared
   resources, initial-state ownership, and composed ownership conflicts. The
   pads' shared drum-note target remains valid while exclusive overlap fails.
-- ⬜ Add Linux bindings and Windows contract fixtures.
+- ✅ Add Linux bindings and Windows contract fixtures. The authoring-only
+  [`airstar-current`](../../../src/performance-rigs/pedro-performance-rig/platform-bindings/linux/airstar-current.json)
+  binding resolves all five slots and every `full-live-rack` capability and
+  resource against protected Airstar aliases, targets, paths, checksums, and
+  services. A Windows fixture proves WinMM, Known Folder, Carla, and Task
+  Scheduler contract shapes without claiming physical Windows support.
 - 🟡 Add schema, reference, collision, ownership, and ambiguity tests. Schema
   structure, portability-negative coverage, selector order, required endpoint
   coverage, shared USB ambiguity, Hardware Preset and Device Profile
   references, source controls, per-preset MIDI collisions, mapping ownership,
-  Rig Profile resolution and composition, and ownership conflicts pass.
-  Trigger-versus-musical-mapping checks remain.
+  Rig Profile resolution and composition, ownership conflicts, binding
+  coverage, missing-capability diagnostics, unknown targets, fixture isolation,
+  and cross-platform leakage pass. Trigger-versus-musical-mapping checks
+  remain.
 
 ## Milestone 2: Deterministic Compiler And Parity
 

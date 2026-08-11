@@ -1,0 +1,247 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "platform-binding",
+  "id": "airstar-current",
+  "display_name": "Airstar Current Protected Rack",
+  "description": "Authoring-only Linux binding for the verified existing Carla, PipeWire, JACK, filesystem, and systemd user deployment.",
+  "rig": "pedro-performance-rig",
+  "platform": "linux",
+  "rig_profiles": [
+    "full-live-rack"
+  ],
+  "evidence_status": "verified-existing-runtime",
+  "source_refs": [
+    "docs/tools/airstar-live-setup/setup.json",
+    "src/audio-software/carla/projects/pedro-live-rack/pedro.uproject",
+    "src/midi-setup/pedro-live-rack-patchbay.json"
+  ],
+  "device_slots": {
+    "arturia-main": {
+      "adapter": "linux.pipewire-midi",
+      "identity": {
+        "strategy": "linux.pipewire.semantic-alias",
+        "value": "KL Essential 61 mk3:KL Essential 61 mk3 MIDI"
+      },
+      "endpoints": {
+        "midi.performance-input": {
+          "direction": "input",
+          "locator": "KL Essential 61 mk3:KL Essential 61 mk3 MIDI"
+        }
+      },
+      "status": "available"
+    },
+    "smk25-main": {
+      "adapter": "linux.pipewire-midi",
+      "identity": {
+        "strategy": "linux.pipewire.semantic-alias",
+        "value": "SINCO:SINCO SMK25-Master"
+      },
+      "endpoints": {
+        "midi.performance-input": {
+          "direction": "input",
+          "locator": "SINCO:SINCO SMK25-Master"
+        },
+        "midi.transport-input": {
+          "direction": "input",
+          "locator": "SINCO:SINCO SMK25-Master"
+        }
+      },
+      "status": "available"
+    },
+    "smc-mixer-main": {
+      "adapter": "linux.pipewire-midi",
+      "identity": {
+        "strategy": "linux.pipewire.semantic-alias",
+        "value": "SINCO:SINCO SMC-Mixer-Master"
+      },
+      "endpoints": {
+        "midi.control-input": {
+          "direction": "input",
+          "locator": "SINCO:SINCO SMC-Mixer-Master"
+        }
+      },
+      "status": "available"
+    },
+    "smc-pad-main": {
+      "adapter": "linux.pipewire-midi",
+      "identity": {
+        "strategy": "linux.pipewire.semantic-alias",
+        "value": "SINCO:SINCO SMC-PAD-Master"
+      },
+      "endpoints": {
+        "midi.performance-input": {
+          "direction": "input",
+          "locator": "SINCO:SINCO SMC-PAD-Master"
+        }
+      },
+      "status": "available"
+    },
+    "smc-pad-pocket": {
+      "adapter": "linux.pipewire-midi",
+      "identity": {
+        "strategy": "linux.pipewire.semantic-alias",
+        "value": "SINCO:SINCO SMC-PAD Pocket-Master"
+      },
+      "endpoints": {
+        "midi.performance-input": {
+          "direction": "input",
+          "locator": "SINCO:SINCO SMC-PAD Pocket-Master"
+        }
+      },
+      "status": "available"
+    }
+  },
+  "binding_groups": [
+    {
+      "adapter": "linux.current-rack-controls",
+      "status": "available",
+      "targets": {
+        "control.master-mute": "arturia-main-volume-encoder.service:master-mute",
+        "control.pad-layer-latch": "smk25-pad-layers.service:layer-enabled",
+        "control.pad-layer-transport": "smk25-pad-layers.service:transport",
+        "effect.equalizer.eight-band": "carla:SMC-MIX - 8-Band EQ",
+        "notes.ambient-pad-layers": "route.smk.performance-fanout",
+        "notes.drum-set": "carla:PD-CH-1 - Drum Set:midi-in",
+        "notes.layered-instruments": "route.arturia.performance-fanout",
+        "parameter.drum-set-output-gain": "carla:PD-CH-1 Output Gain 0 to +12 dB",
+        "parameter.drum-set-volume": "carla:PD-CH-1 Volume Map",
+        "parameter.equalizer.band-gain": "carla:SMC-EQ-1..8 CC Scale",
+        "parameter.layer-reverb": "carla:AR-CH-2..9 Reverb Map",
+        "parameter.layer-volume": "carla:AR-CH-1..9 volume controls",
+        "parameter.master-volume": "arturia-main-volume-encoder.service:master-volume",
+        "parameter.pad-layer-volume": "carla:SMK Layer Mixer x8 Stereo"
+      }
+    },
+    {
+      "adapter": "linux.carla-project",
+      "status": "available",
+      "targets": {
+        "engine.arturia.alt-strings": "AR-CH-3 - Alt Strings",
+        "engine.arturia.atmosfera-pad": "AR-CH-9 - AtmosferaPAD",
+        "engine.arturia.basic-piano": "AR-CH-1 - Basic Piano",
+        "engine.arturia.good-flute": "AR-CH-4 - Good Flute",
+        "engine.arturia.hammond-organ-fast": "AR-CH-6 - Hammond Organ Fast",
+        "engine.arturia.nord-white-grand": "AR-CH-2 - Nord White Grand Full 24C",
+        "engine.arturia.optik-synth": "AR-CH-7 - Optik Synth",
+        "engine.arturia.pad-efeitos": "AR-CH-8 - PAD EFEITOS",
+        "engine.arturia.sax-lirakeys": "AR-CH-5 - SAX Lirakeys CL",
+        "engine.drum-set": "PD-CH-1 - Drum Set",
+        "engine.smk.cloud-shimmer": "SMK-CH-5 - Cloud Shimmer",
+        "engine.smk.hillsong-pad": "SMK-CH-3 - Hillsong Pad",
+        "engine.smk.magic-ambient": "SMK-CH-6 - Magic Ambient",
+        "engine.smk.majesty-pad": "SMK-CH-7 - Majesty Pad",
+        "engine.smk.oceans-worship-pad": "SMK-CH-1 - Oceans Worship Pad",
+        "engine.smk.sanctorium-pad": "SMK-CH-8 - Sanctorium Pad",
+        "engine.smk.warm-worship-pad": "SMK-CH-2 - Warm Worship Pad",
+        "engine.smk.worship-shimmer": "SMK-CH-4 - Worship Shimmer",
+        "effect.arturia.channel-2-output-trim": "AR-CH-2 Output Trim +6 dB",
+        "effect.arturia.sustain-scale": "AR Controls - Sustain Scale",
+        "effect.master.eight-band-equalizer": "SMC-MIX - 8-Band EQ",
+        "effect.master.instrument-mixer": "LSP Mixer x8 Stereo",
+        "effect.mixer.cc-scale": "SMC-EQ-1..8 CC Scale",
+        "effect.pad.output-gain-map": "PD-CH-1 Gain Map",
+        "effect.pad.sustain-scale": "PD Controls - Sustain Scale",
+        "effect.smk.layer-mixer": "SMK Layer Mixer x8 Stereo"
+      }
+    },
+    {
+      "adapter": "linux.pipewire-patchbay",
+      "status": "available",
+      "targets": {
+        "route.arturia.controls": "pedro-live-rack-patchbay.json#route.arturia.controls",
+        "route.arturia.performance-fanout": "pedro-live-rack-patchbay.json#route.arturia.performance-fanout",
+        "route.master.equalized-output": "pedro-live-rack-patchbay.json#route.master.equalized-output",
+        "route.master.output": "pedro-live-rack-patchbay.json#route.master.output",
+        "route.mixer.equalizer-control": "pedro-live-rack-patchbay.json#route.mixer.equalizer-control",
+        "route.smc-pad-main.drum-set": "pedro-live-rack-patchbay.json#route.smc-pad-main.drum-set",
+        "route.smc-pad-main.output-gain": "pedro-live-rack-patchbay.json#route.smc-pad-main.output-gain",
+        "route.smc-pad-pocket.drum-set": "pedro-live-rack-patchbay.json#route.smc-pad-pocket.drum-set",
+        "route.smk.layer-control": "pedro-live-rack-patchbay.json#route.smk.layer-control",
+        "route.smk.master-sum": "pedro-live-rack-patchbay.json#route.smk.master-sum",
+        "route.smk.performance-fanout": "pedro-live-rack-patchbay.json#route.smk.performance-fanout"
+      }
+    },
+    {
+      "adapter": "linux.systemd-user",
+      "status": "available",
+      "targets": {
+        "helper.arturia-main-volume-encoder": "arturia-main-volume-encoder.service",
+        "helper.smk25-pad-layers": "smk25-pad-layers.service"
+      }
+    },
+    {
+      "adapter": "linux.filesystem",
+      "status": "available",
+      "targets": {
+        "asset.arturia.alt-strings": "home:.config/DecentSampler/Sample Libraries/DS + VT - altstrings Free Edition.dsbundle",
+        "asset.arturia.atmosfera-pad": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/AtmosferaPAD - TIMBRES PREMIUM.sf2",
+        "asset.arturia.basic-piano": "home:.config/DecentSampler/Sample Libraries/Basic Piano.dsbundle",
+        "asset.arturia.good-flute": "home:.local/share/sounds/sf2/FluidR3_GM.sf2#program=73",
+        "asset.arturia.hammond-organ-fast": "soundfont-root:02_SoundFonts/03_Organs_and_Keys/Hammond_B3_organ_Fast_Leslie [outros-timbres-pra-audio-evolution-leads-2].sf2",
+        "asset.arturia.nord-white-grand": "soundfont-root:02_SoundFonts/01_Acoustic_Pianos/Nord White Grand Full 24C.sf2",
+        "asset.arturia.optik-synth": "soundfont-root:02_SoundFonts/10_Synth_Leads_Arps_and_Plucks/G072 Optik_Synth.sf2",
+        "asset.arturia.pad-efeitos": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/PAD EFEITOS 1 _ Infinity_studio.sf2",
+        "asset.arturia.sax-lirakeys": "soundfont-root:02_SoundFonts/06_Brass_and_Winds/SAX_Lirakeys LITE.sf2",
+        "asset.drum-set.soundfont": "soundfont-root:02_SoundFonts/09_Drums_and_Percussion/Drum_Set.sf2",
+        "asset.smk.cloud-shimmer": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/Cloud Shimmer - TIMBRES PREMIUM.sf2",
+        "asset.smk.hillsong-pad": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/Hillsong Pad - TIMBRES PREMIUM.sf2",
+        "asset.smk.magic-ambient": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/MagicAmbient - TIMBRES PREMIUM.sf2",
+        "asset.smk.majesty-pad": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/MajestyPad - TIMBRES PREMIUM.sf2",
+        "asset.smk.oceans-worship-pad": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/OceansPad - TIMBRES PREMIUM.sf2",
+        "asset.smk.sanctorium-pad": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/Sanctorium Pad - TIMBRES PREMIUM.sf2",
+        "asset.smk.warm-worship-pad": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/WarmPad - TIMBRES PREMIUM.sf2",
+        "asset.smk.worship-shimmer": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/PAD WorshipShimmer - TIMBRES PREMIUM.sf2"
+      }
+    }
+  ],
+  "paths": {
+    "carla-project-source": {
+      "resolver": "repository-relative",
+      "value": "src/audio-software/carla/projects/pedro-live-rack/pedro.uproject",
+      "sha256": "48ea4f777c68ebd39105902739258795edfa96fefd8820b62fb31d4efe329974"
+    },
+    "carla-project-target": {
+      "resolver": "linux.absolute",
+      "value": "/c/music/carla/pedro.uproject"
+    },
+    "launcher-config": {
+      "resolver": "linux.home-relative",
+      "value": ".config/pedro-live-rack.conf"
+    },
+    "patchbay-deployment-source": {
+      "resolver": "repository-relative",
+      "value": "src/midi-setup/pedro-live-rack-patchbay.json",
+      "sha256": "f6170a4c49579711033ed0379d4a7426f4ee15d1f441adbbbfedb358d016b429"
+    },
+    "patchbay-state-target": {
+      "resolver": "linux.home-relative",
+      "value": ".local/state/pipewire-patchbay/patchbay.json"
+    }
+  },
+  "lifecycle": {
+    "service.arturia-main-volume-encoder": {
+      "adapter": "linux.systemd-user",
+      "locator": "arturia-main-volume-encoder.service",
+      "status": "available"
+    },
+    "service.pipewire-carla-quantum": {
+      "adapter": "linux.systemd-user",
+      "locator": "pipewire-carla-quantum.service",
+      "status": "available"
+    },
+    "service.pipewire-patchbay-watch": {
+      "adapter": "linux.systemd-user",
+      "locator": "pipewire-patchbay-watch.service",
+      "status": "available"
+    },
+    "service.smk25-pad-layers": {
+      "adapter": "linux.systemd-user",
+      "locator": "smk25-pad-layers.service",
+      "status": "available"
+    }
+  },
+  "safety": {
+    "activation": "authoring-only",
+    "mutates_runtime": false
+  }
+}

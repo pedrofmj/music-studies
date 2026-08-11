@@ -51,6 +51,7 @@ SCHEMA_FILE_BY_KIND = {
     "rig-profile": "rig-profile.schema.json",
     "device-profile": "device-profile.schema.json",
     "hardware-preset": "hardware-preset.schema.json",
+    "platform-binding": "platform-binding.schema.json",
     "switch-triggers": "switch-triggers.schema.json",
 }
 EXPECTED_SCHEMA_FILES = frozenset(
@@ -406,6 +407,67 @@ def validate_rig_profile_semantics(
     return errors
 
 
+def validate_platform_binding_semantics(
+    document: Mapping[str, Any],
+) -> List[str]:
+    """Validate target identity and platform separation within one binding."""
+    errors = []
+    platform = document["platform"]
+
+    def check_platform_value(path: str, value: str) -> None:
+        value_platform = value.split(".", 1)[0]
+        if value_platform in {"linux", "windows", "macos"} and (
+            value_platform != platform
+        ):
+            errors.append(
+                f"{path}: {platform.capitalize()} binding contains "
+                f"{value_platform.capitalize()}-specific value {value!r}"
+            )
+
+    target_paths = {}
+    unavailable_paths = []
+    for slot_id, slot in document["device_slots"].items():
+        slot_path = f"$.device_slots.{slot_id}"
+        check_platform_value(f"{slot_path}.adapter", slot["adapter"])
+        check_platform_value(
+            f"{slot_path}.identity.strategy", slot["identity"]["strategy"]
+        )
+        if slot["status"] != "available":
+            unavailable_paths.append(f"{slot_path}.status")
+
+    for group_index, group in enumerate(document["binding_groups"]):
+        group_path = f"$.binding_groups[{group_index}]"
+        check_platform_value(f"{group_path}.adapter", group["adapter"])
+        if group["status"] != "available":
+            unavailable_paths.append(f"{group_path}.status")
+        for target in group["targets"]:
+            target_path = f"{group_path}.targets.{target}"
+            previous_path = target_paths.get(target)
+            if previous_path is not None:
+                errors.append(
+                    f"{target_path}: duplicate platform target {target!r}; "
+                    f"already bound by {previous_path}"
+                )
+            target_paths[target] = target_path
+
+    for path_id, path_binding in document["paths"].items():
+        check_platform_value(
+            f"$.paths.{path_id}.resolver", path_binding["resolver"]
+        )
+    for lifecycle_id, lifecycle in document["lifecycle"].items():
+        lifecycle_path = f"$.lifecycle.{lifecycle_id}"
+        check_platform_value(f"{lifecycle_path}.adapter", lifecycle["adapter"])
+        if lifecycle["status"] != "available":
+            unavailable_paths.append(f"{lifecycle_path}.status")
+
+    if document["evidence_status"] == "certified" and unavailable_paths:
+        errors.append(
+            "$.evidence_status: certified binding contains non-available "
+            f"entries {sorted(unavailable_paths)}"
+        )
+    return errors
+
+
 def validate_document(
     document: Any,
     schemas: Mapping[str, Mapping[str, Any]],
@@ -438,6 +500,8 @@ def validate_document(
         formatted_errors.extend(validate_device_profile_semantics(document))
     elif not formatted_errors and kind == "hardware-preset":
         formatted_errors.extend(validate_hardware_preset_semantics(document))
+    elif not formatted_errors and kind == "platform-binding":
+        formatted_errors.extend(validate_platform_binding_semantics(document))
     return kind, formatted_errors
 
 
@@ -828,11 +892,213 @@ def validate_rig_profile_catalogue_documents(
     return errors
 
 
+def validate_platform_binding_catalogue_documents(
+    rig: Mapping[str, Any],
+    device_profile_entries: Sequence[Tuple[Path, Mapping[str, Any]]],
+    rig_profile_entries: Sequence[Tuple[Path, Mapping[str, Any]]],
+    binding_entries: Sequence[Tuple[Path, Mapping[str, Any]]],
+    allow_contract_fixtures: bool = False,
+) -> List[str]:
+    """Resolve platform bindings against portable profile requirements."""
+    errors = []
+    slots_by_id = {slot["id"]: slot for slot in rig["device_slots"]}
+    device_profiles_by_key = {
+        (profile["slot"], profile["id"]): profile
+        for _, profile in device_profile_entries
+    }
+    rig_profiles_by_id = {
+        profile["id"]: profile for _, profile in rig_profile_entries
+    }
+    bindings_by_id: Dict[str, Tuple[Path, Mapping[str, Any]]] = {}
+
+    known_capabilities = {
+        capability
+        for profile in rig_profiles_by_id.values()
+        for capability in profile["required_capabilities"]
+    }
+    known_capabilities.update(
+        capability
+        for profile in device_profiles_by_key.values()
+        for capability in profile["required_capabilities"]
+    )
+    known_capabilities.update(
+        endpoint
+        for slot in rig["device_slots"]
+        for endpoint in slot["required_endpoints"]
+    )
+    known_resources = {
+        resource
+        for profile in device_profiles_by_key.values()
+        for resources in profile["dependencies"].values()
+        for resource in resources
+    }
+    for rig_profile in rig_profiles_by_id.values():
+        known_resources.update(
+            rig_profile["preparation"]["pinned_capabilities"]
+        )
+        for resources in rig_profile.get("shared_resources", {}).values():
+            known_resources.update(resources)
+    known_targets = known_capabilities | known_resources
+
+    for path, binding in binding_entries:
+        binding_id = binding["id"]
+        previous = bindings_by_id.get(binding_id)
+        if previous is not None:
+            errors.append(
+                f"{path}: duplicate Platform Binding {binding_id!r}; "
+                f"already defined by {previous[0]}"
+            )
+        else:
+            bindings_by_id[binding_id] = (path, binding)
+        if (
+            path.stem != binding_id
+            or path.parent.name != binding["platform"]
+            or path.parent.parent.name != "platform-bindings"
+        ):
+            errors.append(
+                f"{path}: file layout must be platform-bindings/"
+                f"{binding['platform']}/{binding_id}.json"
+            )
+
+    expected_ids = set(rig["platform_bindings"])
+    actual_ids = set(bindings_by_id)
+    for binding_id in sorted(expected_ids - actual_ids):
+        errors.append(f"rig.json: unresolved Platform Binding {binding_id!r}")
+    for binding_id in sorted(actual_ids - expected_ids):
+        path = bindings_by_id[binding_id][0]
+        errors.append(
+            f"{path}: Platform Binding {binding_id!r} is not declared by rig.json"
+        )
+
+    for path, binding in binding_entries:
+        if binding["rig"] != rig["id"]:
+            errors.append(
+                f"{path}: binding rig {binding['rig']!r} does not match "
+                f"{rig['id']!r}"
+            )
+        if binding["platform"] not in rig["required_platforms"]:
+            errors.append(
+                f"{path}: platform {binding['platform']!r} is not required "
+                "by rig.json"
+            )
+        if (
+            binding["evidence_status"] == "contract-fixture"
+            and not allow_contract_fixtures
+        ):
+            errors.append(
+                f"{path}: contract fixtures are test-only and cannot be "
+                "declared by the authored Rig catalogue"
+            )
+
+        available_targets = {
+            target
+            for group in binding["binding_groups"]
+            if group["status"] == "available"
+            for target in group["targets"]
+        }
+        all_targets = {
+            target
+            for group in binding["binding_groups"]
+            for target in group["targets"]
+        }
+        all_targets.update(
+            endpoint
+            for slot_binding in binding["device_slots"].values()
+            for endpoint in slot_binding["endpoints"]
+        )
+        unknown_targets = all_targets - known_targets
+        if unknown_targets:
+            errors.append(
+                f"{path}: unknown binding targets {sorted(unknown_targets)}"
+            )
+
+        unknown_slots = set(binding["device_slots"]) - set(slots_by_id)
+        if unknown_slots:
+            errors.append(
+                f"{path}: unknown bound device slots {sorted(unknown_slots)}"
+            )
+
+        for rig_profile_id in binding["rig_profiles"]:
+            rig_profile = rig_profiles_by_id.get(rig_profile_id)
+            if rig_profile is None:
+                errors.append(
+                    f"{path}: unresolved Rig Profile {rig_profile_id!r}"
+                )
+                continue
+
+            selected_profiles = []
+            provided_endpoints = set()
+            for slot_id, device_profile_id in (
+                rig_profile["device_profiles"].items()
+            ):
+                device_profile = device_profiles_by_key.get(
+                    (slot_id, device_profile_id)
+                )
+                if device_profile is None:
+                    continue
+                selected_profiles.append(device_profile)
+                slot_binding = binding["device_slots"].get(slot_id)
+                if slot_binding is None:
+                    errors.append(
+                        f"{path}: Rig Profile {rig_profile_id!r} has no "
+                        f"binding for device slot {slot_id!r}"
+                    )
+                    continue
+                if slot_binding["status"] != "available":
+                    errors.append(
+                        f"{path}: device slot {slot_id!r} is not available"
+                    )
+                    continue
+                required_endpoints = set(device_profile["required_endpoints"])
+                missing_endpoints = required_endpoints - set(
+                    slot_binding["endpoints"]
+                )
+                if missing_endpoints:
+                    errors.append(
+                        f"{path}: device slot {slot_id!r} has unresolved "
+                        f"endpoints {sorted(missing_endpoints)}"
+                    )
+                provided_endpoints.update(
+                    required_endpoints & set(slot_binding["endpoints"])
+                )
+
+            required_capabilities = set(rig_profile["required_capabilities"])
+            missing_capabilities = required_capabilities - (
+                available_targets | provided_endpoints
+            )
+            if missing_capabilities:
+                errors.append(
+                    f"{path}: Rig Profile {rig_profile_id!r} has unresolved "
+                    f"capabilities {sorted(missing_capabilities)}"
+                )
+
+            required_resources = {
+                resource
+                for profile in selected_profiles
+                for resources in profile["dependencies"].values()
+                for resource in resources
+            }
+            required_resources.update(
+                rig_profile["preparation"]["pinned_capabilities"]
+            )
+            for resources in rig_profile.get("shared_resources", {}).values():
+                required_resources.update(resources)
+            required_resources -= required_capabilities
+            missing_resources = required_resources - available_targets
+            if missing_resources:
+                errors.append(
+                    f"{path}: Rig Profile {rig_profile_id!r} has unresolved "
+                    f"resources {sorted(missing_resources)}"
+                )
+
+    return errors
+
+
 def validate_authored_catalogue(
     rig_root: Path,
     schemas: Mapping[str, Mapping[str, Any]],
     registry: Registry,
-) -> Tuple[List[str], int, int, int, int]:
+) -> Tuple[List[str], int, int, int, int, int]:
     rig_path = rig_root / "rig.json"
     rig = load_json(rig_path)
     rig_kind, rig_errors = validate_document(rig, schemas, registry)
@@ -876,8 +1142,26 @@ def validate_authored_catalogue(
         if not profile_errors and profile_kind == "rig-profile":
             rig_profile_entries.append((profile_path, profile))
 
+    binding_entries = []
+    for binding_path in sorted(
+        (rig_root / "platform-bindings").glob("*/*.json")
+    ):
+        binding = load_json(binding_path)
+        binding_kind, binding_errors = validate_document(
+            binding, schemas, registry
+        )
+        errors.extend(
+            f"{binding_path}: {error}" for error in binding_errors
+        )
+        if binding_kind != "platform-binding":
+            errors.append(
+                f"{binding_path}: expected a platform-binding document"
+            )
+        if not binding_errors and binding_kind == "platform-binding":
+            binding_entries.append((binding_path, binding))
+
     if errors:
-        return errors, 0, 0, 0, 0
+        return errors, 0, 0, 0, 0, 0
     semantic_errors, verified_count, partial_count = (
         validate_hardware_catalogue_documents(rig, preset_entries)
     )
@@ -891,12 +1175,21 @@ def validate_authored_catalogue(
             rig, profile_entries, rig_profile_entries
         )
     )
+    semantic_errors.extend(
+        validate_platform_binding_catalogue_documents(
+            rig,
+            profile_entries,
+            rig_profile_entries,
+            binding_entries,
+        )
+    )
     return (
         semantic_errors,
         verified_count,
         partial_count,
         len(profile_entries),
         len(rig_profile_entries),
+        len(binding_entries),
     )
 
 
@@ -1032,6 +1325,135 @@ def validate_current_hardware_extraction(
                     f"protected setup; expected={expected_signature} "
                     f"actual={actual_signature}"
                 )
+    return errors
+
+
+def validate_current_linux_binding(
+    rig_root: Path,
+    setup_path: Path,
+) -> List[str]:
+    """Compare the authored Linux binding with protected Airstar evidence."""
+    setup = load_json(setup_path)
+    rig_path = rig_root / "rig.json"
+    binding_path = (
+        rig_root / "platform-bindings" / "linux" / "airstar-current.json"
+    )
+    rig = load_json(rig_path)
+    binding = load_json(binding_path)
+    errors = []
+
+    if binding["evidence_status"] != "verified-existing-runtime":
+        errors.append(
+            f"{binding_path}: current Linux binding must remain verified"
+        )
+    if binding["safety"] != {
+        "activation": "authoring-only",
+        "mutates_runtime": False,
+    }:
+        errors.append(
+            f"{binding_path}: current Linux binding must remain authoring-only"
+        )
+    expected_source_ref = "docs/tools/airstar-live-setup/setup.json"
+    if expected_source_ref not in binding["source_refs"]:
+        errors.append(
+            f"{binding_path}: missing protected source_ref "
+            f"{expected_source_ref!r}"
+        )
+
+    hardware_by_model = {
+        device["model"]: device for device in setup["hardware"]
+    }
+    for slot in rig["device_slots"]:
+        slot_id = slot["id"]
+        matched_hardware = next(
+            (
+                hardware_by_model[model]
+                for model in slot["compatible_models"]
+                if model in hardware_by_model
+            ),
+            None,
+        )
+        if matched_hardware is None:
+            errors.append(
+                f"{rig_path}: slot {slot_id!r} has no protected hardware "
+                "model"
+            )
+            continue
+        slot_binding = binding["device_slots"].get(slot_id)
+        if slot_binding is None:
+            errors.append(
+                f"{binding_path}: missing protected device slot {slot_id!r}"
+            )
+            continue
+        expected_alias = matched_hardware["pipewire_alias"]
+        expected_identity = {
+            "strategy": "linux.pipewire.semantic-alias",
+            "value": expected_alias,
+        }
+        if slot_binding["identity"] != expected_identity:
+            errors.append(
+                f"{binding_path}: slot {slot_id!r} identity differs from "
+                f"protected PipeWire alias {expected_alias!r}"
+            )
+        if slot_binding["adapter"] != "linux.pipewire-midi":
+            errors.append(
+                f"{binding_path}: slot {slot_id!r} must use the protected "
+                "PipeWire MIDI adapter"
+            )
+        if slot_binding["status"] != "available":
+            errors.append(
+                f"{binding_path}: protected slot {slot_id!r} is unavailable"
+            )
+        for endpoint, endpoint_binding in slot_binding["endpoints"].items():
+            if endpoint_binding["locator"] != expected_alias:
+                errors.append(
+                    f"{binding_path}: slot {slot_id!r} endpoint {endpoint!r} "
+                    "differs from the protected PipeWire alias"
+                )
+
+    expected_paths = {
+        "carla-project-source": {
+            "resolver": "repository-relative",
+            "value": setup["paths"]["project_source"],
+            "sha256": setup["carla"]["project_sha256"],
+        },
+        "carla-project-target": {
+            "resolver": "linux.absolute",
+            "value": setup["paths"]["project_target"],
+        },
+        "patchbay-deployment-source": {
+            "resolver": "repository-relative",
+            "value": setup["patchbay"]["deployment_snapshot"],
+            "sha256": setup["patchbay"]["deployment_sha256"],
+        },
+        "patchbay-state-target": {
+            "resolver": "linux.home-relative",
+            "value": setup["paths"]["patchbay_snapshot"],
+        },
+        "launcher-config": {
+            "resolver": "linux.home-relative",
+            "value": setup["paths"]["launcher_config"],
+        },
+    }
+    if binding["paths"] != expected_paths:
+        errors.append(
+            f"{binding_path}: paths differ from protected Airstar evidence"
+        )
+
+    expected_lifecycle = {
+        f"service.{service['name'][:-len('.service')]}": {
+            "adapter": "linux.systemd-user",
+            "locator": service["name"],
+            "status": "available",
+        }
+        for service in setup["services"]
+    }
+    if binding["lifecycle"] != expected_lifecycle:
+        errors.append(
+            f"{binding_path}: lifecycle bindings differ from protected "
+            "Airstar evidence"
+        )
+
     return errors
 
 
@@ -1239,6 +1661,12 @@ def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
     fixture_rig_profile = load_json(
         fixture_dir / "valid" / "rig-profile.json"
     )
+    fixture_binding_path = Path(
+        "platform-bindings/windows/fixture-windows.json"
+    )
+    fixture_binding = load_json(
+        fixture_dir / "valid" / "platform-binding.json"
+    )
     catalogue_errors, _, _ = validate_hardware_catalogue_documents(
         fixture_rig,
         [(fixture_preset_path, fixture_preset)],
@@ -1280,6 +1708,84 @@ def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
         failures.append(
             "valid Rig Profile catalogue failed: "
             f"{'; '.join(catalogue_errors)}"
+        )
+
+    catalogue_errors = validate_platform_binding_catalogue_documents(
+        fixture_rig,
+        [(fixture_profile_path, fixture_profile)],
+        [(fixture_rig_profile_path, fixture_rig_profile)],
+        [(fixture_binding_path, fixture_binding)],
+        allow_contract_fixtures=True,
+    )
+    if catalogue_errors:
+        failures.append(
+            "valid Platform Binding catalogue failed: "
+            f"{'; '.join(catalogue_errors)}"
+        )
+
+    missing_binding_targets = json.loads(json.dumps(fixture_binding))
+    del missing_binding_targets["device_slots"]["fixture-controller"][
+        "endpoints"
+    ]["midi.performance-input"]
+    del missing_binding_targets["binding_groups"][0]["targets"][
+        "parameter.master.volume"
+    ]
+    del missing_binding_targets["binding_groups"][0]["targets"][
+        "engine.fixture"
+    ]
+    catalogue_errors = validate_platform_binding_catalogue_documents(
+        fixture_rig,
+        [(fixture_profile_path, fixture_profile)],
+        [(fixture_rig_profile_path, fixture_rig_profile)],
+        [(fixture_binding_path, missing_binding_targets)],
+        allow_contract_fixtures=True,
+    )
+    if not any(
+        "unresolved capabilities" in error
+        and "midi.performance-input" in error
+        and "parameter.master.volume" in error
+        for error in catalogue_errors
+    ):
+        failures.append(
+            "invalid Platform Binding catalogue did not reject unresolved "
+            "capabilities"
+        )
+    if not any(
+        "unresolved resources" in error and "engine.fixture" in error
+        for error in catalogue_errors
+    ):
+        failures.append(
+            "invalid Platform Binding catalogue did not reject unresolved "
+            "resources"
+        )
+
+    unknown_binding_target = json.loads(json.dumps(fixture_binding))
+    unknown_binding_target["binding_groups"][0]["targets"][
+        "unknown.binding-target"
+    ] = "fixture-unknown-target"
+    catalogue_errors = validate_platform_binding_catalogue_documents(
+        fixture_rig,
+        [(fixture_profile_path, fixture_profile)],
+        [(fixture_rig_profile_path, fixture_rig_profile)],
+        [(fixture_binding_path, unknown_binding_target)],
+        allow_contract_fixtures=True,
+    )
+    if not any("unknown binding targets" in error for error in catalogue_errors):
+        failures.append(
+            "invalid Platform Binding catalogue did not reject an unknown "
+            "target"
+        )
+
+    catalogue_errors = validate_platform_binding_catalogue_documents(
+        fixture_rig,
+        [(fixture_profile_path, fixture_profile)],
+        [(fixture_rig_profile_path, fixture_rig_profile)],
+        [(fixture_binding_path, fixture_binding)],
+    )
+    if not any("contract fixtures are test-only" in error
+               for error in catalogue_errors):
+        failures.append(
+            "authored Platform Binding catalogue accepted a contract fixture"
         )
 
     unresolved_rig_profile_rig = json.loads(json.dumps(fixture_rig))
@@ -1456,7 +1962,7 @@ def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
     print(
         "Performance Rig schemas: PASS "
         f"(schemas={len(schemas)}, valid={valid_count}, invalid={invalid_count}, "
-        "catalogues=14)"
+        "catalogues=18)"
     )
     return 0
 
@@ -1485,12 +1991,17 @@ def run_root_validation(
 ) -> int:
     schemas = load_schemas(schema_dir)
     registry = build_registry(schemas)
-    errors, verified_count, partial_count, profile_count, rig_profile_count = (
-        validate_authored_catalogue(
-            rig_root,
-            schemas,
-            registry,
-        )
+    (
+        errors,
+        verified_count,
+        partial_count,
+        profile_count,
+        rig_profile_count,
+        platform_binding_count,
+    ) = validate_authored_catalogue(
+        rig_root,
+        schemas,
+        registry,
     )
     if errors:
         for error in errors:
@@ -1500,6 +2011,9 @@ def run_root_validation(
         extraction_errors = validate_current_hardware_extraction(
             rig_root,
             authority_setup,
+        )
+        extraction_errors.extend(
+            validate_current_linux_binding(rig_root, authority_setup)
         )
         if extraction_errors:
             for error in extraction_errors:
@@ -1518,7 +2032,8 @@ def run_root_validation(
         f"{rig_root}: OK (hardware-presets="
         f"{verified_count + partial_count}, verified={verified_count}, "
         f"partial={partial_count}, device-profiles={profile_count}, "
-        f"rig-profiles={rig_profile_count})"
+        f"rig-profiles={rig_profile_count}, "
+        f"platform-bindings={platform_binding_count})"
     )
     return 0
 
@@ -1529,7 +2044,7 @@ def parse_arguments() -> argparse.Namespace:
         "--schema-dir",
         type=Path,
         default=DEFAULT_SCHEMA_DIR,
-        help="directory containing the six Performance Rig v1 schemas",
+        help="directory containing the seven Performance Rig v1 schemas",
     )
     parser.add_argument(
         "--fixture-dir",
@@ -1564,7 +2079,10 @@ def parse_arguments() -> argparse.Namespace:
         "--validate-root",
         type=Path,
         metavar="RIG_ROOT",
-        help="validate the authored Rig, Hardware Presets, and profiles",
+        help=(
+            "validate the authored Rig, Hardware Presets, profiles, and "
+            "platform bindings"
+        ),
     )
     return parser.parse_args()
 

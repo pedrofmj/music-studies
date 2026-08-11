@@ -1,0 +1,64 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "platform-binding",
+  "id": "fixture-windows",
+  "display_name": "Fixture Windows Binding",
+  "description": "Contract-only Windows binding with no physical certification claim.",
+  "rig": "fixture-rig",
+  "platform": "windows",
+  "rig_profiles": [
+    "fixture-live"
+  ],
+  "evidence_status": "contract-fixture",
+  "source_refs": [
+    "architecture-decisions/0006-windows-platform-adapter-baseline.md"
+  ],
+  "device_slots": {
+    "fixture-controller": {
+      "adapter": "windows.winmm-midi-1-0",
+      "identity": {
+        "strategy": "windows.winmm.device-interface",
+        "value": "fixture-device-interface"
+      },
+      "endpoints": {
+        "midi.performance-input": {
+          "direction": "input",
+          "locator": "fixture-winmm-input"
+        }
+      },
+      "status": "available"
+    }
+  },
+  "binding_groups": [
+    {
+      "adapter": "windows.carla-x64-contract",
+      "status": "available",
+      "targets": {
+        "engine.fixture": "fixture-carla-engine",
+        "parameter.master.volume": "fixture-carla-parameter",
+        "route.main-output": "fixture-carla-patchbay-route"
+      }
+    }
+  ],
+  "paths": {
+    "configuration": {
+      "resolver": "windows.known-folder.local-app-data",
+      "value": "MusicRig\\Config"
+    },
+    "state": {
+      "resolver": "windows.known-folder.local-app-data",
+      "value": "MusicRig\\State"
+    }
+  },
+  "lifecycle": {
+    "service.music-rigd": {
+      "adapter": "windows.task-scheduler.logon-task",
+      "locator": "fixture-music-rigd-task",
+      "status": "available"
+    }
+  },
+  "safety": {
+    "activation": "authoring-only",
+    "mutates_runtime": false
+  }
+}

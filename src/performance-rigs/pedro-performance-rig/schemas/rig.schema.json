@@ -13,6 +13,7 @@
     "device_slots",
     "rig_profiles",
     "hardware_presets",
+    "platform_bindings",
     "switch_triggers",
     "required_platforms"
   ],
@@ -52,6 +53,10 @@
     },
     "hardware_presets": {
       "$ref": "common.schema.json#/$defs/identifier_array"
+    },
+    "platform_bindings": {
+      "$ref": "common.schema.json#/$defs/identifier_array",
+      "minItems": 1
     },
     "switch_triggers": {
       "$ref": "common.schema.json#/$defs/identifier"

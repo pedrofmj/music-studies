@@ -76,9 +76,9 @@ installed or connected to the live rig. Windows audio, MIDI, plugin-host,
 lifecycle, and production-runtime certification remain explicitly deferred to
 Milestone 7.
 
-Milestone 1 schema work now includes six strict Draft 2020-12 schemas for the
-Rig, Rig Profile, Device Profile, Hardware Preset, Switch Triggers, and shared
-types under
+Milestone 1 schema work now includes seven strict Draft 2020-12 schemas for the
+Rig, Rig Profile, Device Profile, Hardware Preset, Platform Binding, Switch
+Triggers, and shared types under
 [`src/performance-rigs/pedro-performance-rig`](../../../src/performance-rigs/pedro-performance-rig/).
 The portable contract and authored `rig.json` cover the five stable device
 slots, ordered physical selectors, semantic capabilities, ownership modes,
@@ -86,14 +86,17 @@ readiness, takeover, state, raw hardware MIDI, switch safety, and future MIDI
 management operations. All five current Hardware Presets are authored and
 verified. The SMC-PAD and SMC-PAD Pocket include exact live-captured pad
 messages; the Pocket's silent hardware-internal controls are modeled
-separately. A pinned authoring-only validator checks all schemas, five valid
-and twelve invalid fixtures, fourteen positive and negative catalogue
+separately. A pinned authoring-only validator checks all schemas, six valid
+and thirteen invalid fixtures, eighteen positive and negative catalogue
 scenarios, and the concrete Rig catalogue against protected and live-capture
 evidence on Linux and Windows. The initial `full-live-rack` Rig Profile now
 composes all five current Device Profiles, declares their aggregate
 capabilities and readiness, pins all eighteen current engines, and records
-shared resources. No runtime or deployment path consumes these authored
-documents yet.
+shared resources. The `airstar-current` Linux binding resolves that complete
+profile against protected device aliases, Carla targets, graph routes, files,
+and services. A Windows contract fixture exercises the portable boundary
+without claiming physical Windows support. No runtime or deployment path
+consumes these authored documents yet.
 
 ## Objective
 
@@ -689,7 +692,7 @@ read-only milestone.
 
 ### Tasks
 
-- Add the six JSON Schemas and shared identifier definitions.
+- Add the seven JSON Schemas and shared identifier definitions.
 - Define schema version `music-studies/performance-rig/v1`.
 - Define stable slots and ordered physical-discovery selectors.
 - Extract current controller-local settings as Hardware Presets.
