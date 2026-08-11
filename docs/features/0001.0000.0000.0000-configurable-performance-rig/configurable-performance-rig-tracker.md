@@ -262,7 +262,8 @@ benchmarks.
 
 ## Milestone 3: Runtime, CLI, And Shadow Mode
 
-- 🟡 Implement the portable daemon control loop, state, metrics, and adapters.
+- ✅ Implement the portable daemon control loop, state, metrics, adapter
+  contracts, and explicit-path storage adapters.
   The fixed-storage loop provides versioned lifecycle state, saturating metrics,
   expected-generation publication, and ABI-versioned clock/control/storage
   boundaries. A bounded loader validates the current compiled envelope metadata
@@ -282,8 +283,9 @@ benchmarks.
   [run 31536417870](https://github.com/pedrofmj/music-studies/actions/runs/31536417870)
   validates the immutable tables on Linux 35/35, Windows 29/29, and Windows JSON
   32/32. `music-rigd` remains output-suppressed and inert without an explicit
-  command. Production XDG/Known Folder selection and the device/MIDI,
-  audio/graph, plugin-host, service, and diagnostics adapters remain.
+  command. Production host activation is intentionally tracked separately
+  below; audio/graph and plugin-host work remains in Milestone 6, and complete
+  Windows adapter certification remains in Milestone 7.
 - ✅ Implement the complete versioned IPC and CLI read-only/dry-run commands.
   Protocol v2 freezes all nine operation IDs in fixed 176-byte requests and
   2,592-byte bounded responses. The portable dispatcher and CLI cover status,
@@ -308,8 +310,15 @@ benchmarks.
   [run 31546338374](https://github.com/pedrofmj/music-studies/actions/runs/31546338374)
   passes Linux 39/39, Windows 33/33, and Windows JSON 36/36, including the
   bounded Windows reclamation and stable-port tests under `/W4 /WX`.
+- ⬜ Add production per-user path selection plus Linux lifecycle and
+  rate-limited diagnostics adapters. This covers XDG configuration, cache,
+  state, and runtime paths, the opt-in systemd user-service boundary, and
+  journal diagnostics without installing, starting, or replacing the protected
+  deployment during implementation tests. Windows Known Folder and lifecycle
+  completion remains part of Milestone 7.
 - ⬜ Extract reusable behavior without changing installed legacy services.
-- ⬜ Run the new adapter in output-suppressed shadow mode.
+- ⬜ Implement the device/MIDI adapter and run it in output-suppressed shadow
+  mode.
 - ⬜ Prove Linux and Windows protocol, state, parity, and resource behavior.
 
 ## Milestone 4: Control-Only Switching
