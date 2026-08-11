@@ -1,7 +1,9 @@
 # Music Rig IPC Protocol
 
 Status: Milestone 0 framing contract with Linux `SOCK_SEQPACKET` and Windows
-named pipes selected. This is not yet the complete runtime command contract.
+named pipes selected. The first Milestone 3 runtime dispatcher consumes decoded
+status requests through a mock control adapter. This is not yet the complete
+runtime command or transport contract.
 
 ## Portable Frame
 
@@ -31,8 +33,21 @@ Response frame, 40 bytes:
 | 24 | 8 | Previous generation |
 | 32 | 8 | Resulting generation |
 
-The spike implements only the `status` operation. Additional operations and
-payloads are added only after their fields and size limits are frozen here.
+The runtime implements only the `status` operation. Its result codes are:
+
+| Code | Meaning |
+| ---: | --- |
+| 0 | Success |
+| 1 | Unsupported operation or mode |
+| 2 | Invalid argument or structured request |
+| 3 | Invalid runtime lifecycle state |
+| 4 | Platform adapter failure |
+| 5 | Expected-generation conflict |
+
+For status, a zero expected generation means no precondition. A nonzero value
+must match the current published generation or the response returns code 5.
+Additional operations and payloads are added only after their fields and size
+limits are frozen here.
 
 ## Linux Transport
 

@@ -1,0 +1,395 @@
+#include "music_rig/runtime.h"
+
+#include <stdio.h>
+#include <string.h>
+
+#define MOCK_EVENT_CAPACITY 8U
+#define MOCK_RESPONSE_CAPACITY 8U
+
+typedef struct mock_adapter {
+    music_rig_control_poll events[MOCK_EVENT_CAPACITY];
+    music_rig_protocol_request requests[MOCK_EVENT_CAPACITY];
+    music_rig_protocol_response responses[MOCK_RESPONSE_CAPACITY];
+    size_t event_count;
+    size_t event_index;
+    size_t response_count;
+    uint64_t now_ns;
+    unsigned int start_calls;
+    unsigned int wait_calls;
+    unsigned int respond_calls;
+    unsigned int stop_calls;
+    music_rig_result start_result;
+    music_rig_result wait_result;
+    music_rig_result respond_result;
+    music_rig_result stop_result;
+} mock_adapter;
+
+static uint64_t mock_now_ns(void *opaque)
+{
+    mock_adapter *adapter = opaque;
+
+    adapter->now_ns += UINT64_C(10);
+    return adapter->now_ns;
+}
+
+static music_rig_result mock_start(void *opaque)
+{
+    mock_adapter *adapter = opaque;
+
+    adapter->start_calls += 1U;
+    return adapter->start_result;
+}
+
+static music_rig_control_poll mock_poll(
+    void *opaque,
+    music_rig_protocol_request *request
+)
+{
+    mock_adapter *adapter = opaque;
+    size_t index = adapter->event_index;
+
+    if (index >= adapter->event_count) {
+        return MUSIC_RIG_CONTROL_ERROR;
+    }
+    adapter->event_index += 1U;
+    if (adapter->events[index] == MUSIC_RIG_CONTROL_REQUEST) {
+        *request = adapter->requests[index];
+    }
+    return adapter->events[index];
+}
+
+static music_rig_result mock_wait(void *opaque)
+{
+    mock_adapter *adapter = opaque;
+
+    adapter->wait_calls += 1U;
+    return adapter->wait_result;
+}
+
+static music_rig_result mock_respond(
+    void *opaque,
+    const music_rig_protocol_response *response
+)
+{
+    mock_adapter *adapter = opaque;
+
+    adapter->respond_calls += 1U;
+    if (adapter->respond_result != MUSIC_RIG_RESULT_OK) {
+        return adapter->respond_result;
+    }
+    if (adapter->response_count >= MOCK_RESPONSE_CAPACITY) {
+        return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    }
+    adapter->responses[adapter->response_count] = *response;
+    adapter->response_count += 1U;
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result mock_stop(void *opaque)
+{
+    mock_adapter *adapter = opaque;
+
+    adapter->stop_calls += 1U;
+    return adapter->stop_result;
+}
+
+static void init_mock(mock_adapter *adapter)
+{
+    memset(adapter, 0, sizeof(*adapter));
+    adapter->start_result = MUSIC_RIG_RESULT_OK;
+    adapter->wait_result = MUSIC_RIG_RESULT_OK;
+    adapter->respond_result = MUSIC_RIG_RESULT_OK;
+    adapter->stop_result = MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_platform_interfaces interfaces_for(mock_adapter *adapter)
+{
+    music_rig_platform_interfaces interfaces;
+
+    interfaces.abi_version = MUSIC_RIG_RUNTIME_ABI_VERSION;
+    interfaces.clock.context = adapter;
+    interfaces.clock.now_ns = mock_now_ns;
+    interfaces.control.context = adapter;
+    interfaces.control.start = mock_start;
+    interfaces.control.poll = mock_poll;
+    interfaces.control.wait = mock_wait;
+    interfaces.control.respond = mock_respond;
+    interfaces.control.stop = mock_stop;
+    return interfaces;
+}
+
+static music_rig_runtime_config config_for(
+    const music_rig_generation *generation,
+    const uint8_t *fingerprint
+)
+{
+    music_rig_runtime_config config;
+
+    config.initial_generation = generation;
+    config.definition_fingerprint = fingerprint;
+    config.definition_fingerprint_size =
+        MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE;
+    config.output_mode = MUSIC_RIG_OUTPUT_SUPPRESSED;
+    return config;
+}
+
+static music_rig_protocol_request request(
+    uint64_t request_id,
+    uint64_t expected_generation,
+    uint32_t operation
+)
+{
+    music_rig_protocol_request value;
+
+    value.protocol_version = MUSIC_RIG_PROTOCOL_VERSION;
+    value.operation = operation;
+    value.request_id = request_id;
+    value.expected_generation = expected_generation;
+    return value;
+}
+
+static int test_lifecycle_and_metrics(void)
+{
+    static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
+        0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+        0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+        0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+        0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
+    };
+    const music_rig_generation initial = {UINT64_C(7), NULL};
+    const music_rig_generation next = {UINT64_C(8), NULL};
+    music_rig_runtime runtime;
+    mock_adapter adapter;
+    music_rig_platform_interfaces interfaces;
+    music_rig_runtime_config config;
+    const music_rig_runtime_state *state;
+    const music_rig_runtime_metrics *metrics;
+
+    init_mock(&adapter);
+    adapter.event_count = 5U;
+    adapter.events[0] = MUSIC_RIG_CONTROL_IDLE;
+    adapter.events[1] = MUSIC_RIG_CONTROL_REQUEST;
+    adapter.requests[1] = request(
+        UINT64_C(11),
+        UINT64_C(8),
+        (uint32_t)MUSIC_RIG_OPERATION_STATUS
+    );
+    adapter.events[2] = MUSIC_RIG_CONTROL_REQUEST;
+    adapter.requests[2] = request(
+        UINT64_C(12),
+        UINT64_C(7),
+        (uint32_t)MUSIC_RIG_OPERATION_STATUS
+    );
+    adapter.events[3] = MUSIC_RIG_CONTROL_REQUEST;
+    adapter.requests[3] = request(UINT64_C(13), UINT64_C(0), UINT32_C(99));
+    adapter.events[4] = MUSIC_RIG_CONTROL_STOP;
+    interfaces = interfaces_for(&adapter);
+    config = config_for(&initial, fingerprint);
+
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_OK ||
+        music_rig_runtime_get_state(&runtime)->lifecycle !=
+            MUSIC_RIG_RUNTIME_INITIALIZED ||
+        music_rig_runtime_get_state(&runtime)->generation_id != UINT64_C(7) ||
+        music_rig_runtime_get_state(&runtime)->output_mode !=
+            MUSIC_RIG_OUTPUT_SUPPRESSED ||
+        memcmp(
+            music_rig_runtime_get_state(&runtime)->definition_fingerprint,
+            fingerprint,
+            sizeof(fingerprint)
+        ) != 0) {
+        fputs("runtime initialization failed\n", stderr);
+        return 1;
+    }
+    if (music_rig_runtime_publish_generation(
+            &runtime,
+            &next,
+            UINT64_C(6)
+        ) != MUSIC_RIG_RESULT_GENERATION_CONFLICT ||
+        music_rig_runtime_publish_generation(
+            &runtime,
+            &next,
+            UINT64_C(7)
+        ) != MUSIC_RIG_RESULT_OK ||
+        music_rig_runtime_publish_generation(
+            &runtime,
+            &next,
+            UINT64_C(8)
+        ) != MUSIC_RIG_RESULT_GENERATION_CONFLICT) {
+        fputs("runtime generation publication failed\n", stderr);
+        return 1;
+    }
+    if (music_rig_runtime_run(&runtime) != MUSIC_RIG_RESULT_OK) {
+        fputs("runtime loop failed\n", stderr);
+        return 1;
+    }
+
+    state = music_rig_runtime_get_state(&runtime);
+    metrics = music_rig_runtime_get_metrics(&runtime);
+    if (state->lifecycle != MUSIC_RIG_RUNTIME_STOPPED ||
+        state->generation_id != UINT64_C(8) ||
+        state->started_at_ns != UINT64_C(10) ||
+        state->stopped_at_ns != UINT64_C(20) ||
+        adapter.start_calls != 1U || adapter.wait_calls != 1U ||
+        adapter.respond_calls != 3U || adapter.stop_calls != 1U ||
+        adapter.response_count != 3U) {
+        fputs("runtime lifecycle state is incorrect\n", stderr);
+        return 1;
+    }
+    if (adapter.responses[0].result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_OK ||
+        adapter.responses[0].request_id != UINT64_C(11) ||
+        adapter.responses[0].previous_generation != UINT64_C(8) ||
+        adapter.responses[0].resulting_generation != UINT64_C(8) ||
+        adapter.responses[1].result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_GENERATION_CONFLICT ||
+        adapter.responses[2].result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_INVALID_ARGUMENT) {
+        fputs("runtime responses are incorrect\n", stderr);
+        return 1;
+    }
+    if (metrics->loop_iterations != UINT64_C(5) ||
+        metrics->idle_polls != UINT64_C(1) ||
+        metrics->control_waits != UINT64_C(1) ||
+        metrics->control_requests != UINT64_C(3) ||
+        metrics->status_requests != UINT64_C(2) ||
+        metrics->invalid_requests != UINT64_C(1) ||
+        metrics->control_responses != UINT64_C(3) ||
+        metrics->generation_publications != UINT64_C(1) ||
+        metrics->generation_conflicts != UINT64_C(3) ||
+        metrics->adapter_failures != UINT64_C(0)) {
+        fputs("runtime metrics are incorrect\n", stderr);
+        return 1;
+    }
+    if (music_rig_runtime_run(&runtime) != MUSIC_RIG_RESULT_INVALID_STATE ||
+        music_rig_runtime_publish_generation(
+            &runtime,
+            &next,
+            UINT64_C(8)
+        ) != MUSIC_RIG_RESULT_INVALID_STATE) {
+        fputs("stopped runtime accepted work\n", stderr);
+        return 1;
+    }
+    return 0;
+}
+
+static int run_failure_case(
+    const char *label,
+    mock_adapter *adapter,
+    uint64_t expected_requests,
+    unsigned int expected_stop_calls
+)
+{
+    static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
+        0x10
+    };
+    const music_rig_generation initial = {UINT64_C(1), NULL};
+    music_rig_runtime runtime;
+    music_rig_platform_interfaces interfaces = interfaces_for(adapter);
+    music_rig_runtime_config config = config_for(&initial, fingerprint);
+
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_OK ||
+        music_rig_runtime_run(&runtime) != MUSIC_RIG_RESULT_ADAPTER_FAILURE ||
+        runtime.state.lifecycle != MUSIC_RIG_RUNTIME_FAILED ||
+        runtime.metrics.control_requests != expected_requests ||
+        runtime.metrics.adapter_failures != UINT64_C(1) ||
+        adapter->stop_calls != expected_stop_calls) {
+        fprintf(stderr, "%s failure path is incorrect\n", label);
+        return 1;
+    }
+    return 0;
+}
+
+static int test_adapter_failures(void)
+{
+    mock_adapter adapter;
+
+    init_mock(&adapter);
+    adapter.start_result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    if (run_failure_case("start", &adapter, UINT64_C(0), 0U) != 0) {
+        return 1;
+    }
+
+    init_mock(&adapter);
+    adapter.event_count = 1U;
+    adapter.events[0] = MUSIC_RIG_CONTROL_IDLE;
+    adapter.wait_result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    if (run_failure_case("wait", &adapter, UINT64_C(0), 1U) != 0) {
+        return 1;
+    }
+
+    init_mock(&adapter);
+    adapter.event_count = 1U;
+    adapter.events[0] = MUSIC_RIG_CONTROL_REQUEST;
+    adapter.requests[0] = request(
+        UINT64_C(20),
+        UINT64_C(1),
+        (uint32_t)MUSIC_RIG_OPERATION_STATUS
+    );
+    adapter.respond_result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    if (run_failure_case("respond", &adapter, UINT64_C(1), 1U) != 0) {
+        return 1;
+    }
+
+    init_mock(&adapter);
+    adapter.event_count = 1U;
+    adapter.events[0] = MUSIC_RIG_CONTROL_ERROR;
+    if (run_failure_case("poll", &adapter, UINT64_C(0), 1U) != 0) {
+        return 1;
+    }
+
+    init_mock(&adapter);
+    adapter.event_count = 1U;
+    adapter.events[0] = MUSIC_RIG_CONTROL_STOP;
+    adapter.stop_result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    if (run_failure_case("stop", &adapter, UINT64_C(0), 1U) != 0) {
+        return 1;
+    }
+    return 0;
+}
+
+static int test_invalid_configuration(void)
+{
+    static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
+        0x20
+    };
+    const music_rig_generation initial = {UINT64_C(1), NULL};
+    music_rig_runtime runtime;
+    mock_adapter adapter;
+    music_rig_platform_interfaces interfaces;
+    music_rig_runtime_config config;
+
+    init_mock(&adapter);
+    interfaces = interfaces_for(&adapter);
+    config = config_for(&initial, fingerprint);
+    config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+        MUSIC_RIG_RESULT_UNSUPPORTED) {
+        fputs("enabled output mode was accepted\n", stderr);
+        return 1;
+    }
+
+    config.output_mode = MUSIC_RIG_OUTPUT_SUPPRESSED;
+    interfaces.abi_version += UINT32_C(1);
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_INVALID_ARGUMENT ||
+        music_rig_runtime_init(NULL, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_INVALID_ARGUMENT ||
+        music_rig_runtime_get_state(NULL) != NULL ||
+        music_rig_runtime_get_metrics(NULL) != NULL) {
+        fputs("invalid runtime configuration was accepted\n", stderr);
+        return 1;
+    }
+    return 0;
+}
+
+int main(void)
+{
+    if (test_lifecycle_and_metrics() != 0 ||
+        test_adapter_failures() != 0 ||
+        test_invalid_configuration() != 0) {
+        return 1;
+    }
+    return 0;
+}

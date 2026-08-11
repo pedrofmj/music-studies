@@ -24,6 +24,15 @@ static int test_build_info(void)
         fputs("profile schema version mismatch\n", stderr);
         return 1;
     }
+    if (MUSIC_RIG_RESULT_OK != 0 ||
+        MUSIC_RIG_RESULT_UNSUPPORTED != 1 ||
+        MUSIC_RIG_RESULT_INVALID_ARGUMENT != 2 ||
+        MUSIC_RIG_RESULT_INVALID_STATE != 3 ||
+        MUSIC_RIG_RESULT_ADAPTER_FAILURE != 4 ||
+        MUSIC_RIG_RESULT_GENERATION_CONFLICT != 5) {
+        fputs("result code contract mismatch\n", stderr);
+        return 1;
+    }
 
     return 0;
 }

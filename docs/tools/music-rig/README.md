@@ -2,11 +2,11 @@
 
 This directory contains the Configurable Performance Rig implementation.
 
-Status: Milestones 0 through 2 are complete. Milestone 2 provides an
-authoring-only deterministic compilation envelope, temporary-only
-Carla/Patchbay materialization, semantic parity, and protected single-rig
-regression coverage. It does not install a service, read or write runtime
-state, connect to MIDI or audio, or modify the stable Carla/PipeWire setup.
+Status: Milestones 0 through 2 are complete. Milestone 3 is in progress with a
+portable, output-suppressed runtime control loop and an inert `music-rigd`
+binary. It does not install a service, read or write persistent runtime state,
+create an IPC endpoint, connect to MIDI or audio, or modify the stable
+Carla/PipeWire setup.
 
 ## Safety Boundary
 
@@ -37,6 +37,7 @@ cmake -S docs/tools/music-rig -B /tmp/music-rig-build -G Ninja \
 cmake --build /tmp/music-rig-build
 ctest --test-dir /tmp/music-rig-build --output-on-failure
 /tmp/music-rig-build/music-rig --version
+/tmp/music-rig-build/music-rigd --version
 ~~~
 
 The same C sources and CMake project are intended for Linux and Windows. The
@@ -138,6 +139,21 @@ installer/validator checksums, read-only entry points, missing plugin, asset,
 and endpoint diagnostics, relocation, and repeatable output. None of these
 tests claims installed-asset or live-graph availability. See
 [PARITY.md](PARITY.md) for the semantic inventory contract.
+
+## Portable Runtime Control Loop
+
+[`runtime/core/music_rig_runtime.c`](runtime/core/music_rig_runtime.c) provides
+the first Milestone 3 daemon core: fixed-storage lifecycle state, saturating
+metrics, expected-generation publication, and ABI-versioned clock/control
+adapter callbacks. Its event-driven loop handles decoded status requests,
+idle waits, responses, and shutdown through mock adapters. Output-enabled mode
+is rejected.
+
+[`music-rigd`](music-rigd.c) is currently an inert build target. It supports
+version/help output but refuses a no-argument start and has no definition,
+transport, state, installation, service, MIDI, audio, graph, or plugin-host
+path. See [RUNTIME.md](RUNTIME.md) for ownership, lifecycle, adapter, metric,
+failure, and next-slice contracts.
 
 Run the validator directly:
 

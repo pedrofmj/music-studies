@@ -12,6 +12,7 @@ option(
 add_library(music_rig_core STATIC
     runtime/core/music_rig_core.c
     runtime/core/music_rig_protocol.c
+    runtime/core/music_rig_runtime.c
 )
 target_include_directories(music_rig_core
     PUBLIC
@@ -27,6 +28,11 @@ add_executable(music-rig
 )
 target_link_libraries(music-rig PRIVATE music_rig_core)
 
+add_executable(music-rigd
+    music-rigd.c
+)
+target_link_libraries(music-rigd PRIVATE music_rig_core)
+
 if(MSVC)
     set(MUSIC_RIG_MSVC_COMPILE_OPTIONS
         /W4
@@ -39,6 +45,9 @@ if(MSVC)
     target_compile_options(music-rig PRIVATE
         ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
     )
+    target_compile_options(music-rigd PRIVATE
+        ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+    )
 else()
     target_compile_options(music_rig_core PRIVATE
         -Wall
@@ -47,6 +56,12 @@ else()
         -Werror
     )
     target_compile_options(music-rig PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Werror
+    )
+    target_compile_options(music-rigd PRIVATE
         -Wall
         -Wextra
         -Wpedantic
@@ -63,12 +78,19 @@ if(BUILD_TESTING)
         tests/protocol-test.c
     )
     target_link_libraries(music_rig_protocol_test PRIVATE music_rig_core)
+    add_executable(music_rig_runtime_test
+        tests/runtime-test.c
+    )
+    target_link_libraries(music_rig_runtime_test PRIVATE music_rig_core)
 
     if(MSVC)
         target_compile_options(music_rig_core_test PRIVATE
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
         target_compile_options(music_rig_protocol_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+        target_compile_options(music_rig_runtime_test PRIVATE
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
     else()
@@ -84,10 +106,17 @@ if(BUILD_TESTING)
             -Wpedantic
             -Werror
         )
+        target_compile_options(music_rig_runtime_test PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
     endif()
 
     add_test(NAME music_rig_core_test COMMAND music_rig_core_test)
     add_test(NAME music_rig_protocol_test COMMAND music_rig_protocol_test)
+    add_test(NAME music_rig_runtime_test COMMAND music_rig_runtime_test)
     add_test(
         NAME music_rig_core_portability
         COMMAND "${CMAKE_COMMAND}"
@@ -108,6 +137,26 @@ if(BUILD_TESTING)
     add_test(
         NAME music_rig_cli_version
         COMMAND $<TARGET_FILE:music-rig> --version
+    )
+    add_test(
+        NAME music_rigd_version
+        COMMAND $<TARGET_FILE:music-rigd> --version
+    )
+    add_test(
+        NAME music_rigd_no_default_activation
+        COMMAND "${CMAKE_COMMAND}"
+            "-DDAEMON=$<TARGET_FILE:music-rigd>"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-music-rigd-no-default.cmake"
+    )
+    set_tests_properties(
+        music_rigd_no_default_activation
+        PROPERTIES TIMEOUT 5
+    )
+    add_test(
+        NAME music_rig_runtime_boundary
+        COMMAND "${CMAKE_COMMAND}"
+            "-DRUNTIME_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}/runtime/core/music_rig_runtime.c"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-runtime-boundary.cmake"
     )
 
     find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter)
