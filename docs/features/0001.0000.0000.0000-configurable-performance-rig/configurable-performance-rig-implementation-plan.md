@@ -192,7 +192,10 @@ Rig identities remain unchanged across profile-only generations, and slot-set
 drift fails before publication. No backend port is registered. Local GCC and
 Clang pass 39/39, both optional JSON builds pass 42/42, eight ASan/UBSan
 boundary tests pass, and the protected baseline remains 30/30. Hosted Windows
-proof is pending.
+proof is complete:
+[run 31546338374](https://github.com/pedrofmj/music-studies/actions/runs/31546338374)
+passes Linux 39/39, Windows 33/33, and Windows JSON 36/36, including bounded
+reclamation and stable-port tests under `/W4 /WX`.
 
 ## Objective
 
