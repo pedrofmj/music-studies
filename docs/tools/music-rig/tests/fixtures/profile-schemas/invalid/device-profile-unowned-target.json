@@ -2,7 +2,7 @@
   "schema": "music-studies/performance-rig/v1",
   "kind": "device-profile",
   "id": "fixture-role",
-  "display_name": "Fixture Role",
+  "display_name": "Fixture Role With Unowned Target",
   "slot": "fixture-controller",
   "compatible_models": [
     "Fixture Controller Model"
@@ -26,24 +26,14 @@
       "source_control": "fader-1",
       "target": "master.volume",
       "transform": {
-        "type": "scale",
-        "input_min": 0,
-        "input_max": 127,
-        "output_min": 0,
-        "output_max": 1
-      },
-      "takeover": "pickup"
+        "type": "direct"
+      }
     }
   ],
   "ownership": [
     {
       "kind": "parameter",
-      "target": "master.volume",
-      "mode": "exclusive"
-    },
-    {
-      "kind": "state-key",
-      "target": "master.volume",
+      "target": "master.pan",
       "mode": "exclusive"
     }
   ],
@@ -55,9 +45,6 @@
     "routes": [],
     "helpers": [],
     "assets": []
-  },
-  "default_state": {
-    "master.volume": 0.75
   },
   "switch_safety": {
     "on_failure": "retain-active",

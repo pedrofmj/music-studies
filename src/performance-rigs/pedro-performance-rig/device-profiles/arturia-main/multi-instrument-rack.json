@@ -1,0 +1,359 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "device-profile",
+  "id": "multi-instrument-rack",
+  "display_name": "Multi-Instrument Rack",
+  "description": "Current nine-layer Arturia performance rack with per-layer volume and reverb plus persistent master volume and mute.",
+  "slot": "arturia-main",
+  "compatible_models": [
+    "KeyLab Essential 61 mk3"
+  ],
+  "hardware_preset": "arturia-current-rack",
+  "required_endpoints": [
+    "midi.performance-input"
+  ],
+  "required_capabilities": [
+    "notes.layered-instruments",
+    "parameter.layer-volume",
+    "parameter.layer-reverb",
+    "parameter.master-volume",
+    "control.master-mute"
+  ],
+  "readiness": "control-only",
+  "takeover_policy": {
+    "default": "ignore-until-moved",
+    "volume": "pickup"
+  },
+  "state_policy": "persist",
+  "mappings": [
+    {
+      "id": "layer-1-volume",
+      "source_control": "fader-1",
+      "target": "arturia.layer-1.volume",
+      "transform": {
+        "type": "direct"
+      },
+      "takeover": "pickup"
+    },
+    {
+      "id": "layer-2-volume",
+      "source_control": "fader-2",
+      "target": "arturia.layer-2.volume",
+      "transform": {
+        "type": "direct"
+      },
+      "takeover": "pickup"
+    },
+    {
+      "id": "layer-3-volume",
+      "source_control": "fader-3",
+      "target": "arturia.layer-3.volume",
+      "transform": {
+        "type": "direct"
+      },
+      "takeover": "pickup"
+    },
+    {
+      "id": "layer-4-volume",
+      "source_control": "fader-4",
+      "target": "arturia.layer-4.volume",
+      "transform": {
+        "type": "direct"
+      },
+      "takeover": "pickup"
+    },
+    {
+      "id": "layer-5-volume",
+      "source_control": "fader-5",
+      "target": "arturia.layer-5.volume",
+      "transform": {
+        "type": "direct"
+      },
+      "takeover": "pickup"
+    },
+    {
+      "id": "layer-6-volume",
+      "source_control": "fader-6",
+      "target": "arturia.layer-6.volume",
+      "transform": {
+        "type": "direct"
+      },
+      "takeover": "pickup"
+    },
+    {
+      "id": "layer-7-volume",
+      "source_control": "fader-7",
+      "target": "arturia.layer-7.volume",
+      "transform": {
+        "type": "direct"
+      },
+      "takeover": "pickup"
+    },
+    {
+      "id": "layer-8-volume",
+      "source_control": "fader-8",
+      "target": "arturia.layer-8.volume",
+      "transform": {
+        "type": "direct"
+      },
+      "takeover": "pickup"
+    },
+    {
+      "id": "layer-9-volume",
+      "source_control": "fader-9",
+      "target": "arturia.layer-9.volume",
+      "transform": {
+        "type": "direct"
+      },
+      "takeover": "pickup"
+    },
+    {
+      "id": "layer-1-reverb",
+      "source_control": "knob-1",
+      "target": "arturia.layer-1.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "id": "layer-2-reverb",
+      "source_control": "knob-2",
+      "target": "arturia.layer-2.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "id": "layer-3-reverb",
+      "source_control": "knob-3",
+      "target": "arturia.layer-3.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "id": "layer-4-reverb",
+      "source_control": "knob-4",
+      "target": "arturia.layer-4.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "id": "layer-5-reverb",
+      "source_control": "knob-5",
+      "target": "arturia.layer-5.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "id": "layer-6-reverb",
+      "source_control": "knob-6",
+      "target": "arturia.layer-6.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "id": "layer-7-reverb",
+      "source_control": "knob-7",
+      "target": "arturia.layer-7.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "id": "layer-8-reverb",
+      "source_control": "knob-8",
+      "target": "arturia.layer-8.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "id": "layer-9-reverb",
+      "source_control": "knob-9",
+      "target": "arturia.layer-9.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "id": "master-volume",
+      "source_control": "central-encoder",
+      "target": "master.volume",
+      "transform": {
+        "type": "relative",
+        "relative_encoding": "binary-offset"
+      }
+    },
+    {
+      "id": "master-mute",
+      "source_control": "central-click",
+      "target": "master.mute",
+      "transform": {
+        "type": "toggle"
+      }
+    }
+  ],
+  "ownership": [
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-1.volume",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-2.volume",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-3.volume",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-4.volume",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-5.volume",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-6.volume",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-7.volume",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-8.volume",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-9.volume",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-1.reverb",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-2.reverb",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-3.reverb",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-4.reverb",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-5.reverb",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-6.reverb",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-7.reverb",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-8.reverb",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "arturia.layer-9.reverb",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "master.volume",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "parameter",
+      "target": "master.mute",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "helper",
+      "target": "helper.arturia-main-volume-encoder",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "state-key",
+      "target": "master.volume",
+      "mode": "exclusive"
+    },
+    {
+      "kind": "state-key",
+      "target": "master.mute",
+      "mode": "exclusive"
+    }
+  ],
+  "dependencies": {
+    "engines": [
+      "engine.arturia.basic-piano",
+      "engine.arturia.nord-white-grand",
+      "engine.arturia.alt-strings",
+      "engine.arturia.good-flute",
+      "engine.arturia.sax-lirakeys",
+      "engine.arturia.hammond-organ-fast",
+      "engine.arturia.optik-synth",
+      "engine.arturia.pad-efeitos",
+      "engine.arturia.atmosfera-pad"
+    ],
+    "effects": [
+      "effect.arturia.sustain-scale",
+      "effect.arturia.channel-2-output-trim",
+      "effect.master.instrument-mixer"
+    ],
+    "routes": [
+      "route.arturia.performance-fanout",
+      "route.arturia.controls",
+      "route.master.output"
+    ],
+    "helpers": [
+      "helper.arturia-main-volume-encoder"
+    ],
+    "assets": [
+      "asset.arturia.basic-piano",
+      "asset.arturia.nord-white-grand",
+      "asset.arturia.alt-strings",
+      "asset.arturia.good-flute",
+      "asset.arturia.sax-lirakeys",
+      "asset.arturia.hammond-organ-fast",
+      "asset.arturia.optik-synth",
+      "asset.arturia.pad-efeitos",
+      "asset.arturia.atmosfera-pad"
+    ]
+  },
+  "switch_safety": {
+    "on_failure": "retain-active",
+    "rollback": "required",
+    "transition": "preserve"
+  }
+}

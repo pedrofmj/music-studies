@@ -62,6 +62,12 @@
       "expected_error": "carla_parameter"
     },
     {
+      "path": "invalid/device-profile-unowned-target.json",
+      "kind": "device-profile",
+      "valid": false,
+      "expected_error": "has no ownership claim"
+    },
+    {
       "path": "invalid/hardware-preset-midi-range.json",
       "kind": "hardware-preset",
       "valid": false,

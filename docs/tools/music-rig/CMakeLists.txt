@@ -128,7 +128,7 @@ if(BUILD_TESTING)
             "${CMAKE_CURRENT_SOURCE_DIR}/../../../src/performance-rigs/pedro-performance-rig/rig.json"
     )
     add_test(
-        NAME music_rig_current_hardware_catalogue
+        NAME music_rig_current_authored_catalogue
         COMMAND "${Python3_EXECUTABLE}"
             "${MUSIC_RIG_PROFILE_SCHEMA_VALIDATOR}"
             --validate-root
@@ -139,7 +139,7 @@ if(BUILD_TESTING)
     set_tests_properties(
         music_rig_profile_schema_self_test
         music_rig_current_rig_schema
-        music_rig_current_hardware_catalogue
+        music_rig_current_authored_catalogue
         PROPERTIES TIMEOUT 10
     )
 

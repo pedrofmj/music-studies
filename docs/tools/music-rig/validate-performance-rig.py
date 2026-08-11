@@ -333,6 +333,49 @@ def validate_hardware_preset_semantics(
     return errors
 
 
+def validate_device_profile_semantics(
+    document: Mapping[str, Any],
+) -> List[str]:
+    """Validate mappings and ownership relationships within one profile."""
+    errors = []
+    mapping_ids = set()
+    ownership_keys = set()
+
+    for claim_index, claim in enumerate(document["ownership"]):
+        claim_path = f"$.ownership[{claim_index}]"
+        claim_key = (claim["kind"], claim["target"])
+        if claim_key in ownership_keys:
+            errors.append(
+                f"{claim_path}: duplicate ownership claim for "
+                f"{claim['kind']!r} target {claim['target']!r}"
+            )
+        ownership_keys.add(claim_key)
+
+    owned_targets = {claim["target"] for claim in document["ownership"]}
+    for mapping_index, mapping in enumerate(document["mappings"]):
+        mapping_path = f"$.mappings[{mapping_index}]"
+        mapping_id = mapping["id"]
+        if mapping_id in mapping_ids:
+            errors.append(
+                f"{mapping_path}.id: duplicate mapping ID {mapping_id!r}"
+            )
+        mapping_ids.add(mapping_id)
+        if mapping["target"] not in owned_targets:
+            errors.append(
+                f"{mapping_path}.target: target {mapping['target']!r} has no "
+                "ownership claim"
+            )
+
+    for state_key in document.get("default_state", {}):
+        if ("state-key", state_key) not in ownership_keys:
+            errors.append(
+                f"$.default_state.{state_key}: state key has no state-key "
+                "ownership claim"
+            )
+
+    return errors
+
+
 def validate_document(
     document: Any,
     schemas: Mapping[str, Mapping[str, Any]],
@@ -359,6 +402,8 @@ def validate_document(
     ]
     if not formatted_errors and kind == "performance-rig":
         formatted_errors.extend(validate_rig_slot_semantics(document))
+    elif not formatted_errors and kind == "device-profile":
+        formatted_errors.extend(validate_device_profile_semantics(document))
     elif not formatted_errors and kind == "hardware-preset":
         formatted_errors.extend(validate_hardware_preset_semantics(document))
     return kind, formatted_errors
@@ -433,11 +478,135 @@ def validate_hardware_catalogue_documents(
     return errors, verified_count, partial_count
 
 
-def validate_hardware_catalogue(
+def validate_device_profile_catalogue_documents(
+    rig: Mapping[str, Any],
+    preset_entries: Sequence[Tuple[Path, Mapping[str, Any]]],
+    profile_entries: Sequence[Tuple[Path, Mapping[str, Any]]],
+) -> List[str]:
+    """Cross-check profile slots, presets, controls, and current ownership."""
+    errors = []
+    slots_by_id = {slot["id"]: slot for slot in rig["device_slots"]}
+    presets_by_id = {preset["id"]: preset for _, preset in preset_entries}
+    profiles_by_key: Dict[
+        Tuple[str, str], Tuple[Path, Mapping[str, Any]]
+    ] = {}
+
+    for path, profile in profile_entries:
+        profile_key = (profile["slot"], profile["id"])
+        previous = profiles_by_key.get(profile_key)
+        if previous is not None:
+            errors.append(
+                f"{path}: duplicate Device Profile {profile_key!r}; "
+                f"already defined by {previous[0]}"
+            )
+        else:
+            profiles_by_key[profile_key] = (path, profile)
+        if path.stem != profile["id"] or path.parent.name != profile["slot"]:
+            errors.append(
+                f"{path}: file layout must be "
+                f"device-profiles/{profile['slot']}/{profile['id']}.json"
+            )
+
+        slot = slots_by_id.get(profile["slot"])
+        if slot is None:
+            errors.append(
+                f"{path}: unresolved device slot {profile['slot']!r}"
+            )
+            continue
+        if not set(profile["compatible_models"]).issubset(
+            slot["compatible_models"]
+        ):
+            errors.append(
+                f"{path}: compatible_models are not covered by slot "
+                f"{profile['slot']!r}"
+            )
+        if not set(profile["required_endpoints"]).issubset(
+            slot["required_endpoints"]
+        ):
+            errors.append(
+                f"{path}: required_endpoints are not provided by slot "
+                f"{profile['slot']!r}"
+            )
+
+        preset = presets_by_id.get(profile["hardware_preset"])
+        if preset is None:
+            errors.append(
+                f"{path}: unresolved hardware preset "
+                f"{profile['hardware_preset']!r}"
+            )
+            continue
+        if not set(profile["compatible_models"]).intersection(
+            preset["device_models"]
+        ):
+            errors.append(
+                f"{path}: hardware preset {profile['hardware_preset']!r} "
+                "does not support a compatible profile model"
+            )
+        preset_controls = {control["id"] for control in preset["controls"]}
+        for mapping_index, mapping in enumerate(profile["mappings"]):
+            if mapping["source_control"] not in preset_controls:
+                errors.append(
+                    f"{path}: $.mappings[{mapping_index}].source_control: "
+                    f"control {mapping['source_control']!r} is not defined by "
+                    f"hardware preset {profile['hardware_preset']!r}"
+                )
+
+    expected_profile_keys = {
+        (slot["id"], profile_id)
+        for slot in rig["device_slots"]
+        for profile_id in slot["available_device_profiles"]
+    }
+    actual_profile_keys = set(profiles_by_key)
+    for profile_key in sorted(expected_profile_keys - actual_profile_keys):
+        errors.append(
+            "rig.json: unresolved Device Profile "
+            f"{profile_key[0]!r}/{profile_key[1]!r}"
+        )
+    for profile_key in sorted(actual_profile_keys - expected_profile_keys):
+        path = profiles_by_key[profile_key][0]
+        errors.append(
+            f"{path}: Device Profile {profile_key[0]!r}/{profile_key[1]!r} "
+            "is not declared by rig.json"
+        )
+
+    selected_keys = [
+        (slot["id"], slot["available_device_profiles"][0])
+        for slot in rig["device_slots"]
+        if len(slot["available_device_profiles"]) == 1
+    ]
+    if len(selected_keys) == len(rig["device_slots"]) and all(
+        key in profiles_by_key for key in selected_keys
+    ):
+        claims: Dict[
+            Tuple[str, str], List[Tuple[Path, str]]
+        ] = defaultdict(list)
+        for profile_key in selected_keys:
+            path, profile = profiles_by_key[profile_key]
+            for claim in profile["ownership"]:
+                claims[(claim["kind"], claim["target"])].append(
+                    (path, claim["mode"])
+                )
+        for claim_key, claim_entries in claims.items():
+            profile_paths = {path for path, _ in claim_entries}
+            if len(profile_paths) > 1 and any(
+                mode == "exclusive" for _, mode in claim_entries
+            ):
+                rendered = ", ".join(
+                    f"{path} ({mode})" for path, mode in claim_entries
+                )
+                errors.append(
+                    "current Device Profile ownership conflict for "
+                    f"{claim_key[0]!r} target {claim_key[1]!r}: {rendered}"
+                )
+
+    return errors
+
+
+def validate_authored_catalogue(
     rig_root: Path,
     schemas: Mapping[str, Mapping[str, Any]],
     registry: Registry,
-) -> Tuple[List[str], int, int]:
+) -> Tuple[List[str], int, int, int]:
     rig_path = rig_root / "rig.json"
     rig = load_json(rig_path)
     rig_kind, rig_errors = validate_document(rig, schemas, registry)
@@ -455,12 +624,36 @@ def validate_hardware_catalogue(
         if not preset_errors and preset_kind == "hardware-preset":
             preset_entries.append((preset_path, preset))
 
+    profile_entries = []
+    for profile_path in sorted(
+        (rig_root / "device-profiles").glob("*/*.json")
+    ):
+        profile = load_json(profile_path)
+        profile_kind, profile_errors = validate_document(
+            profile, schemas, registry
+        )
+        errors.extend(f"{profile_path}: {error}" for error in profile_errors)
+        if profile_kind != "device-profile":
+            errors.append(f"{profile_path}: expected a device-profile document")
+        if not profile_errors and profile_kind == "device-profile":
+            profile_entries.append((profile_path, profile))
+
     if errors:
-        return errors, 0, 0
+        return errors, 0, 0, 0
     semantic_errors, verified_count, partial_count = (
         validate_hardware_catalogue_documents(rig, preset_entries)
     )
-    return semantic_errors, verified_count, partial_count
+    semantic_errors.extend(
+        validate_device_profile_catalogue_documents(
+            rig, preset_entries, profile_entries
+        )
+    )
+    return (
+        semantic_errors,
+        verified_count,
+        partial_count,
+        len(profile_entries),
+    )
 
 
 def control_signature(control: Mapping[str, Any]) -> Mapping[str, Any]:
@@ -670,6 +863,12 @@ def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
     fixture_rig = load_json(fixture_dir / "valid" / "rig.json")
     fixture_preset_path = Path("hardware-presets/fixture-preset.json")
     fixture_preset = load_json(fixture_dir / "valid" / "hardware-preset.json")
+    fixture_profile_path = Path(
+        "device-profiles/fixture-controller/fixture-role.json"
+    )
+    fixture_profile = load_json(
+        fixture_dir / "valid" / "device-profile.json"
+    )
     catalogue_errors, _, _ = validate_hardware_catalogue_documents(
         fixture_rig,
         [(fixture_preset_path, fixture_preset)],
@@ -691,6 +890,75 @@ def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
             "invalid hardware catalogue did not reject an unresolved reference"
         )
 
+    catalogue_errors = validate_device_profile_catalogue_documents(
+        fixture_rig,
+        [(fixture_preset_path, fixture_preset)],
+        [(fixture_profile_path, fixture_profile)],
+    )
+    if catalogue_errors:
+        failures.append(
+            "valid Device Profile catalogue failed: "
+            f"{'; '.join(catalogue_errors)}"
+        )
+
+    unresolved_profile = dict(fixture_profile)
+    unresolved_profile["hardware_preset"] = "missing-preset"
+    catalogue_errors = validate_device_profile_catalogue_documents(
+        fixture_rig,
+        [(fixture_preset_path, fixture_preset)],
+        [(fixture_profile_path, unresolved_profile)],
+    )
+    if not any("unresolved hardware preset" in error for error in catalogue_errors):
+        failures.append(
+            "invalid Device Profile catalogue did not reject an unresolved "
+            "Hardware Preset"
+        )
+
+    missing_control_profile = json.loads(json.dumps(fixture_profile))
+    missing_control_profile["mappings"][0]["source_control"] = "missing-control"
+    catalogue_errors = validate_device_profile_catalogue_documents(
+        fixture_rig,
+        [(fixture_preset_path, fixture_preset)],
+        [(fixture_profile_path, missing_control_profile)],
+    )
+    if not any(
+        "is not defined by hardware preset" in error
+        for error in catalogue_errors
+    ):
+        failures.append(
+            "invalid Device Profile catalogue did not reject an unresolved "
+            "source control"
+        )
+
+    conflict_rig = json.loads(json.dumps(fixture_rig))
+    conflict_slot = json.loads(json.dumps(conflict_rig["device_slots"][0]))
+    conflict_slot["id"] = "fixture-controller-two"
+    conflict_slot["display_name"] = "Fixture Controller Two"
+    conflict_slot["available_device_profiles"] = ["fixture-role-two"]
+    for selector in conflict_slot["selectors"]:
+        if selector["kind"] == "local-discriminator":
+            selector["value"] = "fixture-controller-two"
+    conflict_rig["device_slots"].append(conflict_slot)
+    conflict_profile = json.loads(json.dumps(fixture_profile))
+    conflict_profile["id"] = "fixture-role-two"
+    conflict_profile["slot"] = "fixture-controller-two"
+    conflict_profile_path = Path(
+        "device-profiles/fixture-controller-two/fixture-role-two.json"
+    )
+    catalogue_errors = validate_device_profile_catalogue_documents(
+        conflict_rig,
+        [(fixture_preset_path, fixture_preset)],
+        [
+            (fixture_profile_path, fixture_profile),
+            (conflict_profile_path, conflict_profile),
+        ],
+    )
+    if not any("ownership conflict" in error for error in catalogue_errors):
+        failures.append(
+            "invalid Device Profile catalogue did not reject exclusive "
+            "ownership overlap"
+        )
+
     if failures:
         for failure in failures:
             print(f"FAIL: {failure}", file=sys.stderr)
@@ -699,7 +967,7 @@ def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
     print(
         "Performance Rig schemas: PASS "
         f"(schemas={len(schemas)}, valid={valid_count}, invalid={invalid_count}, "
-        "catalogues=2)"
+        "catalogues=6)"
     )
     return 0
 
@@ -727,10 +995,12 @@ def run_root_validation(
 ) -> int:
     schemas = load_schemas(schema_dir)
     registry = build_registry(schemas)
-    errors, verified_count, partial_count = validate_hardware_catalogue(
-        rig_root,
-        schemas,
-        registry,
+    errors, verified_count, partial_count, profile_count = (
+        validate_authored_catalogue(
+            rig_root,
+            schemas,
+            registry,
+        )
     )
     if errors:
         for error in errors:
@@ -748,7 +1018,7 @@ def run_root_validation(
     print(
         f"{rig_root}: OK (hardware-presets="
         f"{verified_count + partial_count}, verified={verified_count}, "
-        f"partial={partial_count})"
+        f"partial={partial_count}, device-profiles={profile_count})"
     )
     return 0
 
@@ -789,7 +1059,7 @@ def parse_arguments() -> argparse.Namespace:
         "--validate-root",
         type=Path,
         metavar="RIG_ROOT",
-        help="validate the authored Rig and its Hardware Preset catalogue",
+        help="validate the authored Rig, Hardware Presets, and Device Profiles",
     )
     return parser.parse_args()
 

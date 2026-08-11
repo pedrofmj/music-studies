@@ -1,0 +1,108 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "device-profile",
+  "id": "ambient-pad-layers",
+  "display_name": "Ambient Pad Layers",
+  "description": "Current eight-layer SMK-25 ambient pad role with per-layer volume, latch controls, and transport-driven layer state.",
+  "slot": "smk25-main",
+  "compatible_models": [
+    "M-VAVE SMK-25"
+  ],
+  "hardware_preset": "smk25-current-pad-layers",
+  "required_endpoints": [
+    "midi.performance-input",
+    "midi.transport-input"
+  ],
+  "required_capabilities": [
+    "notes.ambient-pad-layers",
+    "parameter.pad-layer-volume",
+    "control.pad-layer-latch",
+    "control.pad-layer-transport"
+  ],
+  "readiness": "control-only",
+  "takeover_policy": {
+    "default": "ignore-until-moved",
+    "volume": "pickup"
+  },
+  "state_policy": "persist",
+  "mappings": [
+    { "id": "layer-1-volume", "source_control": "knob-1", "target": "smk.layer-1.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-2-volume", "source_control": "knob-2", "target": "smk.layer-2.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-3-volume", "source_control": "knob-3", "target": "smk.layer-3.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-4-volume", "source_control": "knob-4", "target": "smk.layer-4.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-5-volume", "source_control": "knob-5", "target": "smk.layer-5.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-6-volume", "source_control": "knob-6", "target": "smk.layer-6.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-7-volume", "source_control": "knob-7", "target": "smk.layer-7.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-8-volume", "source_control": "knob-8", "target": "smk.layer-8.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-1-latch", "source_control": "side-a-pad-1", "target": "smk.layer-1.enabled", "transform": { "type": "direct" } },
+    { "id": "layer-2-latch", "source_control": "side-a-pad-2", "target": "smk.layer-2.enabled", "transform": { "type": "direct" } },
+    { "id": "layer-3-latch", "source_control": "side-a-pad-3", "target": "smk.layer-3.enabled", "transform": { "type": "direct" } },
+    { "id": "layer-4-latch", "source_control": "side-a-pad-4", "target": "smk.layer-4.enabled", "transform": { "type": "direct" } },
+    { "id": "layer-5-latch", "source_control": "side-a-pad-5", "target": "smk.layer-5.enabled", "transform": { "type": "direct" } },
+    { "id": "layer-6-latch", "source_control": "side-a-pad-6", "target": "smk.layer-6.enabled", "transform": { "type": "direct" } },
+    { "id": "layer-7-latch", "source_control": "side-a-pad-7", "target": "smk.layer-7.enabled", "transform": { "type": "direct" } },
+    { "id": "layer-8-latch", "source_control": "side-a-pad-8", "target": "smk.layer-8.enabled", "transform": { "type": "direct" } },
+    { "id": "transport-stop", "source_control": "transport-stop", "target": "smk.transport.stop", "transform": { "type": "direct" } },
+    { "id": "transport-play", "source_control": "transport-play", "target": "smk.transport.play", "transform": { "type": "direct" } }
+  ],
+  "ownership": [
+    { "kind": "parameter", "target": "smk.layer-1.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "smk.layer-2.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "smk.layer-3.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "smk.layer-4.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "smk.layer-5.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "smk.layer-6.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "smk.layer-7.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "smk.layer-8.volume", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smk.layer-1.enabled", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smk.layer-2.enabled", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smk.layer-3.enabled", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smk.layer-4.enabled", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smk.layer-5.enabled", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smk.layer-6.enabled", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smk.layer-7.enabled", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smk.layer-8.enabled", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smk.transport.stop", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smk.transport.play", "mode": "exclusive" },
+    { "kind": "helper", "target": "helper.smk25-pad-layers", "mode": "exclusive" }
+  ],
+  "dependencies": {
+    "engines": [
+      "engine.smk.oceans-worship-pad",
+      "engine.smk.warm-worship-pad",
+      "engine.smk.hillsong-pad",
+      "engine.smk.worship-shimmer",
+      "engine.smk.cloud-shimmer",
+      "engine.smk.magic-ambient",
+      "engine.smk.majesty-pad",
+      "engine.smk.sanctorium-pad"
+    ],
+    "effects": [
+      "effect.smk.layer-mixer",
+      "effect.master.instrument-mixer"
+    ],
+    "routes": [
+      "route.smk.performance-fanout",
+      "route.smk.layer-control",
+      "route.smk.master-sum"
+    ],
+    "helpers": [
+      "helper.smk25-pad-layers"
+    ],
+    "assets": [
+      "asset.smk.oceans-worship-pad",
+      "asset.smk.warm-worship-pad",
+      "asset.smk.hillsong-pad",
+      "asset.smk.worship-shimmer",
+      "asset.smk.cloud-shimmer",
+      "asset.smk.magic-ambient",
+      "asset.smk.majesty-pad",
+      "asset.smk.sanctorium-pad"
+    ]
+  },
+  "switch_safety": {
+    "on_failure": "retain-active",
+    "rollback": "required",
+    "transition": "preserve"
+  }
+}

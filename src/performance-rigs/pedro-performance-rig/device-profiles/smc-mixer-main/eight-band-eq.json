@@ -1,0 +1,64 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "device-profile",
+  "id": "eight-band-eq",
+  "display_name": "Eight-Band Equalizer",
+  "description": "Current SMC-Mixer role controlling the eight master equalizer bands from 63 Hz through 8 kHz.",
+  "slot": "smc-mixer-main",
+  "compatible_models": [
+    "M-VAVE SMC-Mixer"
+  ],
+  "hardware_preset": "smc-mixer-current-cc",
+  "required_endpoints": [
+    "midi.control-input"
+  ],
+  "required_capabilities": [
+    "effect.equalizer.eight-band",
+    "parameter.equalizer.band-gain"
+  ],
+  "readiness": "control-only",
+  "takeover_policy": {
+    "default": "ignore-until-moved",
+    "volume": "pickup"
+  },
+  "state_policy": "follow-engine",
+  "mappings": [
+    { "id": "band-63-hz-gain", "source_control": "fader-1", "target": "equalizer.band-63-hz.gain", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "band-125-hz-gain", "source_control": "fader-2", "target": "equalizer.band-125-hz.gain", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "band-250-hz-gain", "source_control": "fader-3", "target": "equalizer.band-250-hz.gain", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "band-500-hz-gain", "source_control": "fader-4", "target": "equalizer.band-500-hz.gain", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "band-1000-hz-gain", "source_control": "fader-5", "target": "equalizer.band-1000-hz.gain", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "band-2000-hz-gain", "source_control": "fader-6", "target": "equalizer.band-2000-hz.gain", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "band-4000-hz-gain", "source_control": "fader-7", "target": "equalizer.band-4000-hz.gain", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "band-8000-hz-gain", "source_control": "fader-8", "target": "equalizer.band-8000-hz.gain", "transform": { "type": "direct" }, "takeover": "pickup" }
+  ],
+  "ownership": [
+    { "kind": "parameter", "target": "equalizer.band-63-hz.gain", "mode": "exclusive" },
+    { "kind": "parameter", "target": "equalizer.band-125-hz.gain", "mode": "exclusive" },
+    { "kind": "parameter", "target": "equalizer.band-250-hz.gain", "mode": "exclusive" },
+    { "kind": "parameter", "target": "equalizer.band-500-hz.gain", "mode": "exclusive" },
+    { "kind": "parameter", "target": "equalizer.band-1000-hz.gain", "mode": "exclusive" },
+    { "kind": "parameter", "target": "equalizer.band-2000-hz.gain", "mode": "exclusive" },
+    { "kind": "parameter", "target": "equalizer.band-4000-hz.gain", "mode": "exclusive" },
+    { "kind": "parameter", "target": "equalizer.band-8000-hz.gain", "mode": "exclusive" },
+    { "kind": "effect", "target": "effect.master.eight-band-equalizer", "mode": "exclusive" }
+  ],
+  "dependencies": {
+    "engines": [],
+    "effects": [
+      "effect.master.eight-band-equalizer",
+      "effect.mixer.cc-scale"
+    ],
+    "routes": [
+      "route.mixer.equalizer-control",
+      "route.master.equalized-output"
+    ],
+    "helpers": [],
+    "assets": []
+  },
+  "switch_safety": {
+    "on_failure": "retain-active",
+    "rollback": "required",
+    "transition": "preserve"
+  }
+}

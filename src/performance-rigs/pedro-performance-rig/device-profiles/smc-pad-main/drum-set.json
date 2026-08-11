@@ -1,0 +1,61 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "device-profile",
+  "id": "drum-set",
+  "display_name": "Drum Set",
+  "description": "Current full-size SMC-PAD drum role with shared note input, instrument volume, and output gain control.",
+  "slot": "smc-pad-main",
+  "compatible_models": [
+    "M-VAVE SMC-PAD"
+  ],
+  "hardware_preset": "smc-pad-current-notes",
+  "required_endpoints": [
+    "midi.performance-input"
+  ],
+  "required_capabilities": [
+    "notes.drum-set",
+    "parameter.drum-set-volume",
+    "parameter.drum-set-output-gain"
+  ],
+  "readiness": "control-only",
+  "takeover_policy": {
+    "default": "ignore-until-moved",
+    "volume": "pickup"
+  },
+  "state_policy": "follow-engine",
+  "mappings": [
+    { "id": "drum-notes", "source_control": "performance-pads", "target": "drum-set.notes", "transform": { "type": "direct" } },
+    { "id": "drum-volume", "source_control": "knob-1", "target": "drum-set.volume", "transform": { "type": "scale", "input_min": 0, "input_max": 127, "output_min": 0, "output_max": 1 }, "takeover": "pickup" },
+    { "id": "drum-output-gain", "source_control": "knob-2", "target": "drum-set.output-gain-db", "transform": { "type": "scale", "input_min": 0, "input_max": 127, "output_min": 0, "output_max": 12 }, "takeover": "pickup" }
+  ],
+  "ownership": [
+    { "kind": "semantic-control", "target": "drum-set.notes", "mode": "shared-event-destination" },
+    { "kind": "parameter", "target": "drum-set.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "drum-set.output-gain-db", "mode": "exclusive" },
+    { "kind": "route", "target": "route.smc-pad-main.drum-set", "mode": "exclusive" },
+    { "kind": "engine", "target": "engine.drum-set", "mode": "read-only" }
+  ],
+  "dependencies": {
+    "engines": [
+      "engine.drum-set"
+    ],
+    "effects": [
+      "effect.pad.sustain-scale",
+      "effect.pad.output-gain-map",
+      "effect.master.instrument-mixer"
+    ],
+    "routes": [
+      "route.smc-pad-main.drum-set",
+      "route.smc-pad-main.output-gain"
+    ],
+    "helpers": [],
+    "assets": [
+      "asset.drum-set.soundfont"
+    ]
+  },
+  "switch_safety": {
+    "on_failure": "retain-active",
+    "rollback": "required",
+    "transition": "preserve"
+  }
+}

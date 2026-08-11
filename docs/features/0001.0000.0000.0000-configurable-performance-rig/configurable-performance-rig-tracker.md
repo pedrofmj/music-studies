@@ -2,7 +2,7 @@
 
 Feature: `0001.0000.0000.0000`
 
-Updated: 2026-08-10
+Updated: 2026-08-11
 
 Documents:
 
@@ -33,8 +33,8 @@ Documents:
 
 | Check | Result |
 | --- | --- |
-| GCC isolated suite | ✅ 18/18 passed |
-| Clang isolated suite | ✅ 18/18 passed |
+| GCC isolated suite | ✅ 20/20 passed |
+| Clang isolated suite | ✅ 20/20 passed |
 | GCC with Linux JSON probe | ✅ 18/18 passed |
 | Clang with Linux JSON probe | ✅ 18/18 passed |
 | Arturia offline parity | ✅ MIDI, state, replay, and stereo ramp passed |
@@ -59,7 +59,7 @@ Documents:
 | Windows short-process resources | ✅ `music-rig --version`: 1,970,176-byte observed peak working set, 23 handles, 1 thread, clean exit |
 | Windows 60-second idle resources | ✅ 60.259 s, 0.000000% measured child CPU, 3,670,016-byte observed peak working set, 65 handles, 4 threads, zero events |
 | Windows resource cleanup | ✅ Zero remaining test processes; temporary directory removed and independently confirmed |
-| Portable profile schemas | ✅ [Linux 20/20 and Windows 14/14](https://github.com/pedrofmj/music-studies/actions/runs/31438942437) pass; six schemas, five slots, five Hardware Presets (3 verified, 2 partial), five valid fixtures, nine invalid fixtures, and two catalogue cases |
+| Portable profile schemas | ✅ Local GCC and Clang 20/20 pass; six schemas, five slots, five Hardware Presets (3 verified, 2 partial), five Device Profiles, five valid fixtures, ten invalid fixtures, and six catalogue cases; current hosted proof remains [run 31438942437](https://github.com/pedrofmj/music-studies/actions/runs/31438942437) pending this slice's run |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -73,7 +73,7 @@ benchmarks.
 | Milestone | State | Exit gate |
 | --- | --- | --- |
 | 0. Baseline and technical gates | ✅ | Baseline reproducible and technical gates passed |
-| 1. Schemas and current profile extraction | 🟡 | Schema foundation passes; current-profile extraction remains |
+| 1. Schemas and current profile extraction | 🟡 | Five current Device Profiles pass; `full-live-rack` and bindings remain |
 | 2. Deterministic compiler and parity | ⬜ | Not started |
 | 3. Runtime, CLI, and shadow mode | ⬜ | Not started |
 | 4. Control-only switching | ⬜ | Not started |
@@ -166,7 +166,7 @@ benchmarks.
 - ✅ Add the six versioned Rig, Rig Profile, Device Profile, Hardware Preset,
   Switch Trigger, and common schemas. The offline
   [validator](../../tools/music-rig/validate-performance-rig.py) checks each
-  Draft 2020-12 schema and fourteen positive/negative fixtures on the default
+  Draft 2020-12 schema and fifteen positive/negative fixtures on the default
   CTest path without activating any runtime component.
 - ✅ Define stable device slots and ordered physical selectors. The authored
   [rig catalogue](../../../src/performance-rigs/pedro-performance-rig/rig.json)
@@ -176,17 +176,24 @@ benchmarks.
   [preset documents](../../../src/performance-rigs/pedro-performance-rig/hardware-presets/)
   resolve from the Rig catalogue. Arturia, SMK-25, and SMC-Mixer are verified;
   SMC-PAD and Pocket remain partial until every pad message is captured.
-- ⬜ Extract the five current Device Profiles.
+- ✅ Extract the five current Device Profiles. The
+  [portable definitions](../../../src/performance-rigs/pedro-performance-rig/device-profiles/)
+  preserve the Arturia multi-instrument rack, SMK-25 ambient pad layers,
+  SMC-Mixer eight-band equalizer, and both SMC-PAD drum roles without platform
+  paths or backend-specific identifiers.
 - ⬜ Add the `full-live-rack` Rig Profile.
 - 🟡 Model ownership, semantic capabilities, readiness, and takeover policies.
-  Their strict shared types are present; current-profile claims remain to be
-  extracted and checked across documents.
+  All five current profiles now declare and validate them. The implicit current
+  one-profile-per-slot composition accepts the pads' shared drum-note target
+  and rejects exclusive collisions; explicit Rig Profile composition checks
+  remain with `full-live-rack`.
 - ⬜ Add Linux bindings and Windows contract fixtures.
 - 🟡 Add schema, reference, collision, ownership, and ambiguity tests. Schema
   structure, portability-negative coverage, selector order, required endpoint
-  coverage, shared USB ambiguity, Hardware Preset references, control IDs, and
-  per-preset MIDI collision checks pass; Device Profile references,
-  cross-profile MIDI collisions, and ownership checks remain.
+  coverage, shared USB ambiguity, Hardware Preset and Device Profile
+  references, source controls, per-preset MIDI collisions, mapping ownership,
+  and current-profile ownership conflicts pass. Explicit Rig Profile and
+  trigger-versus-musical-mapping checks remain.
 
 ## Milestone 2: Deterministic Compiler And Parity
 
