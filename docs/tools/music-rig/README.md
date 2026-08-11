@@ -109,9 +109,13 @@ Run a no-write compilation check:
 
 The compiler requires either `--check-only` or an explicit `--output` path. It
 refuses to overwrite authored source and has no install, activation, MIDI,
-audio, Carla, Patchbay, service, or persistent-state path. Direct runtime
-mapping tables, ownership tables, and graph deltas are the next compiler slice.
-See [COMPILER.md](COMPILER.md) for the canonical format and fingerprint contract.
+audio, Carla, Patchbay, service, or persistent-state path. It compiles 72
+current MIDI mappings with a direct dispatch index, 5 stable-slot input
+bindings, 71 selected target bindings, 57 consolidated ownership entries, and
+an explicitly empty current graph delta. Materialization and semantic parity
+against Carla and Patchbay remain separate later gates. See
+[COMPILER.md](COMPILER.md) for the canonical table, delta, and fingerprint
+contracts.
 
 Run the validator directly:
 

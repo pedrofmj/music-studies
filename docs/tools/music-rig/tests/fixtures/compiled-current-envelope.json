@@ -2,9 +2,9 @@
   "active_rig_profile": "full-live-rack",
   "compiler": {
     "id": "music-rig-authoring-compiler",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
-  "definition_fingerprint": "sha256:b978f01a8144e228d2f0cfc1edf82353ab7a807bc15f804abe113e4532b804c4",
+  "definition_fingerprint": "sha256:9be68993c164802f694f4d6359c208d9937fbfcf668781ce5a1c3bff5f30cb9e",
   "device_profiles": [
     {
       "hardware_preset": "arturia-current-rack",
@@ -44,6 +44,2532 @@
     "schema_set": "sha256:2c1de2ba9a3a7b519eb758b688d874cdd1060b94d83a2ba469cf7fda65f63e06"
   },
   "generation": 1,
+  "graph_delta": {
+    "applied": false,
+    "basis": "selected-platform-binding.available-targets",
+    "control_only_eligible": true,
+    "counts": {
+      "created_links": 0,
+      "created_objects": 0,
+      "metadata_changes": 0,
+      "removed_links": 0,
+      "removed_objects": 0
+    },
+    "empty": true,
+    "operations": {
+      "create_links": [],
+      "create_objects": [],
+      "metadata_changes": [],
+      "remove_links": [],
+      "remove_objects": []
+    },
+    "required_resources": {
+      "effects": [
+        "effect.arturia.channel-2-output-trim",
+        "effect.arturia.sustain-scale",
+        "effect.master.eight-band-equalizer",
+        "effect.master.instrument-mixer",
+        "effect.mixer.cc-scale",
+        "effect.pad.output-gain-map",
+        "effect.pad.sustain-scale",
+        "effect.smk.layer-mixer"
+      ],
+      "engines": [
+        "engine.arturia.alt-strings",
+        "engine.arturia.atmosfera-pad",
+        "engine.arturia.basic-piano",
+        "engine.arturia.good-flute",
+        "engine.arturia.hammond-organ-fast",
+        "engine.arturia.nord-white-grand",
+        "engine.arturia.optik-synth",
+        "engine.arturia.pad-efeitos",
+        "engine.arturia.sax-lirakeys",
+        "engine.drum-set",
+        "engine.smk.cloud-shimmer",
+        "engine.smk.hillsong-pad",
+        "engine.smk.magic-ambient",
+        "engine.smk.majesty-pad",
+        "engine.smk.oceans-worship-pad",
+        "engine.smk.sanctorium-pad",
+        "engine.smk.warm-worship-pad",
+        "engine.smk.worship-shimmer"
+      ],
+      "routes": [
+        "route.arturia.controls",
+        "route.arturia.performance-fanout",
+        "route.master.equalized-output",
+        "route.master.output",
+        "route.mixer.equalizer-control",
+        "route.smc-pad-main.drum-set",
+        "route.smc-pad-main.output-gain",
+        "route.smc-pad-pocket.drum-set",
+        "route.smk.layer-control",
+        "route.smk.master-sum",
+        "route.smk.performance-fanout"
+      ]
+    },
+    "switch_classification": "control-only"
+  },
+  "input_bindings": {
+    "arturia-main": {
+      "adapter": "linux.pipewire-midi",
+      "endpoints": {
+        "midi.performance-input": {
+          "direction": "input",
+          "locator": "KL Essential 61 mk3:KL Essential 61 mk3 MIDI"
+        }
+      },
+      "identity": {
+        "strategy": "linux.pipewire.semantic-alias",
+        "value": "KL Essential 61 mk3:KL Essential 61 mk3 MIDI"
+      },
+      "status": "available"
+    },
+    "smc-mixer-main": {
+      "adapter": "linux.pipewire-midi",
+      "endpoints": {
+        "midi.control-input": {
+          "direction": "input",
+          "locator": "SINCO:SINCO SMC-Mixer-Master"
+        }
+      },
+      "identity": {
+        "strategy": "linux.pipewire.semantic-alias",
+        "value": "SINCO:SINCO SMC-Mixer-Master"
+      },
+      "status": "available"
+    },
+    "smc-pad-main": {
+      "adapter": "linux.pipewire-midi",
+      "endpoints": {
+        "midi.performance-input": {
+          "direction": "input",
+          "locator": "SINCO:SINCO SMC-PAD-Master"
+        }
+      },
+      "identity": {
+        "strategy": "linux.pipewire.semantic-alias",
+        "value": "SINCO:SINCO SMC-PAD-Master"
+      },
+      "status": "available"
+    },
+    "smc-pad-pocket": {
+      "adapter": "linux.pipewire-midi",
+      "endpoints": {
+        "midi.performance-input": {
+          "direction": "input",
+          "locator": "SINCO:SINCO SMC-PAD Pocket-Master"
+        }
+      },
+      "identity": {
+        "strategy": "linux.pipewire.semantic-alias",
+        "value": "SINCO:SINCO SMC-PAD Pocket-Master"
+      },
+      "status": "available"
+    },
+    "smk25-main": {
+      "adapter": "linux.pipewire-midi",
+      "endpoints": {
+        "midi.performance-input": {
+          "direction": "input",
+          "locator": "SINCO:SINCO SMK25-Master"
+        },
+        "midi.transport-input": {
+          "direction": "input",
+          "locator": "SINCO:SINCO SMK25-Master"
+        }
+      },
+      "identity": {
+        "strategy": "linux.pipewire.semantic-alias",
+        "value": "SINCO:SINCO SMK25-Master"
+      },
+      "status": "available"
+    }
+  },
+  "mapping_index": {
+    "arturia-main|cc|1|114": 0,
+    "arturia-main|cc|1|115": 1,
+    "arturia-main|cc|1|16": 2,
+    "arturia-main|cc|1|17": 3,
+    "arturia-main|cc|1|18": 4,
+    "arturia-main|cc|1|19": 5,
+    "arturia-main|cc|1|71": 6,
+    "arturia-main|cc|1|72": 7,
+    "arturia-main|cc|1|73": 8,
+    "arturia-main|cc|1|74": 9,
+    "arturia-main|cc|1|75": 10,
+    "arturia-main|cc|1|76": 11,
+    "arturia-main|cc|1|77": 12,
+    "arturia-main|cc|1|79": 13,
+    "arturia-main|cc|1|80": 14,
+    "arturia-main|cc|1|81": 15,
+    "arturia-main|cc|1|82": 16,
+    "arturia-main|cc|1|83": 17,
+    "arturia-main|cc|1|85": 18,
+    "arturia-main|cc|1|93": 19,
+    "smc-mixer-main|cc|1|40": 20,
+    "smc-mixer-main|cc|1|41": 21,
+    "smc-mixer-main|cc|1|42": 22,
+    "smc-mixer-main|cc|1|43": 23,
+    "smc-mixer-main|cc|1|44": 24,
+    "smc-mixer-main|cc|1|45": 25,
+    "smc-mixer-main|cc|1|46": 26,
+    "smc-mixer-main|cc|1|47": 27,
+    "smc-pad-main|cc|1|36": 28,
+    "smc-pad-main|cc|1|37": 29,
+    "smc-pad-main|note|10|36": 30,
+    "smc-pad-main|note|10|37": 31,
+    "smc-pad-main|note|10|38": 32,
+    "smc-pad-main|note|10|39": 33,
+    "smc-pad-main|note|10|40": 34,
+    "smc-pad-main|note|10|41": 35,
+    "smc-pad-main|note|10|42": 36,
+    "smc-pad-main|note|10|43": 37,
+    "smc-pad-main|note|10|44": 38,
+    "smc-pad-main|note|10|45": 39,
+    "smc-pad-main|note|10|46": 40,
+    "smc-pad-main|note|10|47": 41,
+    "smc-pad-main|note|10|48": 42,
+    "smc-pad-main|note|10|49": 43,
+    "smc-pad-main|note|10|50": 44,
+    "smc-pad-main|note|10|51": 45,
+    "smc-pad-pocket|note|10|36": 46,
+    "smc-pad-pocket|note|10|37": 47,
+    "smc-pad-pocket|note|10|38": 48,
+    "smc-pad-pocket|note|10|39": 49,
+    "smc-pad-pocket|note|10|40": 50,
+    "smc-pad-pocket|note|10|41": 51,
+    "smc-pad-pocket|note|10|42": 52,
+    "smc-pad-pocket|note|10|43": 53,
+    "smk25-main|cc|1|20": 54,
+    "smk25-main|cc|1|21": 55,
+    "smk25-main|cc|1|22": 56,
+    "smk25-main|cc|1|23": 57,
+    "smk25-main|cc|1|24": 58,
+    "smk25-main|cc|1|25": 59,
+    "smk25-main|cc|1|26": 60,
+    "smk25-main|cc|1|27": 61,
+    "smk25-main|cc|1|40": 62,
+    "smk25-main|cc|2|41": 63,
+    "smk25-main|cc|3|42": 64,
+    "smk25-main|cc|4|43": 65,
+    "smk25-main|cc|5|36": 66,
+    "smk25-main|cc|6|37": 67,
+    "smk25-main|cc|7|38": 68,
+    "smk25-main|cc|8|39": 69,
+    "smk25-main|note|1|93": 70,
+    "smk25-main|note|1|94": 71
+  },
+  "mappings": [
+    {
+      "dispatch_key": "arturia-main|cc|1|114",
+      "mapping": "master-volume",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "relative",
+        "control": "central-encoder",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 114,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack",
+        "relative_encoding": "binary-offset"
+      },
+      "takeover": null,
+      "target": "master.volume",
+      "transform": {
+        "relative_encoding": "binary-offset",
+        "type": "relative"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|115",
+      "mapping": "master-mute",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "central-click",
+        "event": {
+          "channel": 1,
+          "edge": "any",
+          "number": 115,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack",
+        "off_value": 0,
+        "on_value": 127
+      },
+      "takeover": null,
+      "target": "master.mute",
+      "transform": {
+        "type": "toggle"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|16",
+      "mapping": "layer-8-reverb",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-8",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 16,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "ignore-until-moved",
+      "target": "arturia.layer-8.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|17",
+      "mapping": "layer-9-reverb",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-9",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 17,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "ignore-until-moved",
+      "target": "arturia.layer-9.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|18",
+      "mapping": "layer-6-reverb",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-6",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 18,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "ignore-until-moved",
+      "target": "arturia.layer-6.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|19",
+      "mapping": "layer-7-reverb",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-7",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 19,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "ignore-until-moved",
+      "target": "arturia.layer-7.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|71",
+      "mapping": "layer-2-reverb",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-2",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 71,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "ignore-until-moved",
+      "target": "arturia.layer-2.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|72",
+      "mapping": "layer-4-volume",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-4",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 72,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "pickup",
+      "target": "arturia.layer-4.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|73",
+      "mapping": "layer-1-volume",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-1",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 73,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "pickup",
+      "target": "arturia.layer-1.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|74",
+      "mapping": "layer-1-reverb",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-1",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 74,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "ignore-until-moved",
+      "target": "arturia.layer-1.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|75",
+      "mapping": "layer-2-volume",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-2",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 75,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "pickup",
+      "target": "arturia.layer-2.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|76",
+      "mapping": "layer-3-reverb",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-3",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 76,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "ignore-until-moved",
+      "target": "arturia.layer-3.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|77",
+      "mapping": "layer-4-reverb",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-4",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 77,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "ignore-until-moved",
+      "target": "arturia.layer-4.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|79",
+      "mapping": "layer-3-volume",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-3",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 79,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "pickup",
+      "target": "arturia.layer-3.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|80",
+      "mapping": "layer-5-volume",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-5",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 80,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "pickup",
+      "target": "arturia.layer-5.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|81",
+      "mapping": "layer-6-volume",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-6",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 81,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "pickup",
+      "target": "arturia.layer-6.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|82",
+      "mapping": "layer-7-volume",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-7",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 82,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "pickup",
+      "target": "arturia.layer-7.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|83",
+      "mapping": "layer-8-volume",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-8",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 83,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "pickup",
+      "target": "arturia.layer-8.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|85",
+      "mapping": "layer-9-volume",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-9",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 85,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "pickup",
+      "target": "arturia.layer-9.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "arturia-main|cc|1|93",
+      "mapping": "layer-5-reverb",
+      "profile": "multi-instrument-rack",
+      "slot": "arturia-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-5",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 93,
+          "type": "cc"
+        },
+        "hardware_preset": "arturia-current-rack"
+      },
+      "takeover": "ignore-until-moved",
+      "target": "arturia.layer-5.reverb",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-mixer-main|cc|1|40",
+      "mapping": "band-63-hz-gain",
+      "profile": "eight-band-eq",
+      "slot": "smc-mixer-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-1",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 40,
+          "type": "cc"
+        },
+        "hardware_preset": "smc-mixer-current-cc"
+      },
+      "takeover": "pickup",
+      "target": "equalizer.band-63-hz.gain",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-mixer-main|cc|1|41",
+      "mapping": "band-125-hz-gain",
+      "profile": "eight-band-eq",
+      "slot": "smc-mixer-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-2",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 41,
+          "type": "cc"
+        },
+        "hardware_preset": "smc-mixer-current-cc"
+      },
+      "takeover": "pickup",
+      "target": "equalizer.band-125-hz.gain",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-mixer-main|cc|1|42",
+      "mapping": "band-250-hz-gain",
+      "profile": "eight-band-eq",
+      "slot": "smc-mixer-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-3",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 42,
+          "type": "cc"
+        },
+        "hardware_preset": "smc-mixer-current-cc"
+      },
+      "takeover": "pickup",
+      "target": "equalizer.band-250-hz.gain",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-mixer-main|cc|1|43",
+      "mapping": "band-500-hz-gain",
+      "profile": "eight-band-eq",
+      "slot": "smc-mixer-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-4",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 43,
+          "type": "cc"
+        },
+        "hardware_preset": "smc-mixer-current-cc"
+      },
+      "takeover": "pickup",
+      "target": "equalizer.band-500-hz.gain",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-mixer-main|cc|1|44",
+      "mapping": "band-1000-hz-gain",
+      "profile": "eight-band-eq",
+      "slot": "smc-mixer-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-5",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 44,
+          "type": "cc"
+        },
+        "hardware_preset": "smc-mixer-current-cc"
+      },
+      "takeover": "pickup",
+      "target": "equalizer.band-1000-hz.gain",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-mixer-main|cc|1|45",
+      "mapping": "band-2000-hz-gain",
+      "profile": "eight-band-eq",
+      "slot": "smc-mixer-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-6",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 45,
+          "type": "cc"
+        },
+        "hardware_preset": "smc-mixer-current-cc"
+      },
+      "takeover": "pickup",
+      "target": "equalizer.band-2000-hz.gain",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-mixer-main|cc|1|46",
+      "mapping": "band-4000-hz-gain",
+      "profile": "eight-band-eq",
+      "slot": "smc-mixer-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-7",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 46,
+          "type": "cc"
+        },
+        "hardware_preset": "smc-mixer-current-cc"
+      },
+      "takeover": "pickup",
+      "target": "equalizer.band-4000-hz.gain",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-mixer-main|cc|1|47",
+      "mapping": "band-8000-hz-gain",
+      "profile": "eight-band-eq",
+      "slot": "smc-mixer-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "fader-8",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 47,
+          "type": "cc"
+        },
+        "hardware_preset": "smc-mixer-current-cc"
+      },
+      "takeover": "pickup",
+      "target": "equalizer.band-8000-hz.gain",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|cc|1|36",
+      "mapping": "drum-volume",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-1",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 36,
+          "type": "cc"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": "pickup",
+      "target": "drum-set.volume",
+      "transform": {
+        "input_max": 127,
+        "input_min": 0,
+        "output_max": 1,
+        "output_min": 0,
+        "type": "scale"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|cc|1|37",
+      "mapping": "drum-output-gain",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-2",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 37,
+          "type": "cc"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": "pickup",
+      "target": "drum-set.output-gain-db",
+      "transform": {
+        "input_max": 127,
+        "input_min": 0,
+        "output_max": 12,
+        "output_min": 0,
+        "type": "scale"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|36",
+      "mapping": "drum-note-13",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-13",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 36,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|37",
+      "mapping": "drum-note-14",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-14",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 37,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|38",
+      "mapping": "drum-note-15",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-15",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 38,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|39",
+      "mapping": "drum-note-16",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-16",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 39,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|40",
+      "mapping": "drum-note-9",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-9",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 40,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|41",
+      "mapping": "drum-note-10",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-10",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 41,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|42",
+      "mapping": "drum-note-11",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-11",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 42,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|43",
+      "mapping": "drum-note-12",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-12",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 43,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|44",
+      "mapping": "drum-note-5",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-5",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 44,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|45",
+      "mapping": "drum-note-6",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-6",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 45,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|46",
+      "mapping": "drum-note-7",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-7",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 46,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|47",
+      "mapping": "drum-note-8",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-8",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 47,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|48",
+      "mapping": "drum-note-1",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-1",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 48,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|49",
+      "mapping": "drum-note-2",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-2",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 49,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|50",
+      "mapping": "drum-note-3",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-3",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 50,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-main|note|10|51",
+      "mapping": "drum-note-4",
+      "profile": "drum-set",
+      "slot": "smc-pad-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-4",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 51,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-pocket|note|10|36",
+      "mapping": "drum-note-13",
+      "profile": "drum-set",
+      "slot": "smc-pad-pocket",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-13",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 36,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-pocket-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-pocket|note|10|37",
+      "mapping": "drum-note-14",
+      "profile": "drum-set",
+      "slot": "smc-pad-pocket",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-14",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 37,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-pocket-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-pocket|note|10|38",
+      "mapping": "drum-note-15",
+      "profile": "drum-set",
+      "slot": "smc-pad-pocket",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-15",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 38,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-pocket-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-pocket|note|10|39",
+      "mapping": "drum-note-16",
+      "profile": "drum-set",
+      "slot": "smc-pad-pocket",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-16",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 39,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-pocket-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-pocket|note|10|40",
+      "mapping": "drum-note-9",
+      "profile": "drum-set",
+      "slot": "smc-pad-pocket",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-9",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 40,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-pocket-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-pocket|note|10|41",
+      "mapping": "drum-note-10",
+      "profile": "drum-set",
+      "slot": "smc-pad-pocket",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-10",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 41,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-pocket-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-pocket|note|10|42",
+      "mapping": "drum-note-11",
+      "profile": "drum-set",
+      "slot": "smc-pad-pocket",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-11",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 42,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-pocket-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smc-pad-pocket|note|10|43",
+      "mapping": "drum-note-12",
+      "profile": "drum-set",
+      "slot": "smc-pad-pocket",
+      "source": {
+        "behavior": "momentary",
+        "control": "performance-pad-12",
+        "event": {
+          "channel": 10,
+          "edge": "any",
+          "number": 43,
+          "type": "note"
+        },
+        "hardware_preset": "smc-pad-pocket-current-notes"
+      },
+      "takeover": null,
+      "target": "drum-set.notes",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|1|20",
+      "mapping": "layer-1-volume",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-1",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 20,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers"
+      },
+      "takeover": "pickup",
+      "target": "smk.layer-1.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|1|21",
+      "mapping": "layer-2-volume",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-2",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 21,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers"
+      },
+      "takeover": "pickup",
+      "target": "smk.layer-2.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|1|22",
+      "mapping": "layer-3-volume",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-3",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 22,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers"
+      },
+      "takeover": "pickup",
+      "target": "smk.layer-3.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|1|23",
+      "mapping": "layer-4-volume",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-4",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 23,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers"
+      },
+      "takeover": "pickup",
+      "target": "smk.layer-4.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|1|24",
+      "mapping": "layer-5-volume",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-5",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 24,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers"
+      },
+      "takeover": "pickup",
+      "target": "smk.layer-5.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|1|25",
+      "mapping": "layer-6-volume",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-6",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 25,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers"
+      },
+      "takeover": "pickup",
+      "target": "smk.layer-6.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|1|26",
+      "mapping": "layer-7-volume",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-7",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 26,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers"
+      },
+      "takeover": "pickup",
+      "target": "smk.layer-7.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|1|27",
+      "mapping": "layer-8-volume",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "absolute",
+        "control": "knob-8",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 27,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers"
+      },
+      "takeover": "pickup",
+      "target": "smk.layer-8.volume",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|1|40",
+      "mapping": "layer-1-latch",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "toggle",
+        "control": "side-a-pad-1",
+        "event": {
+          "channel": 1,
+          "edge": "change",
+          "number": 40,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers",
+        "off_value": 0,
+        "on_value": 127
+      },
+      "takeover": null,
+      "target": "smk.layer-1.enabled",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|2|41",
+      "mapping": "layer-2-latch",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "toggle",
+        "control": "side-a-pad-2",
+        "event": {
+          "channel": 2,
+          "edge": "change",
+          "number": 41,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers",
+        "off_value": 0,
+        "on_value": 127
+      },
+      "takeover": null,
+      "target": "smk.layer-2.enabled",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|3|42",
+      "mapping": "layer-3-latch",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "toggle",
+        "control": "side-a-pad-3",
+        "event": {
+          "channel": 3,
+          "edge": "change",
+          "number": 42,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers",
+        "off_value": 0,
+        "on_value": 127
+      },
+      "takeover": null,
+      "target": "smk.layer-3.enabled",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|4|43",
+      "mapping": "layer-4-latch",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "toggle",
+        "control": "side-a-pad-4",
+        "event": {
+          "channel": 4,
+          "edge": "change",
+          "number": 43,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers",
+        "off_value": 0,
+        "on_value": 127
+      },
+      "takeover": null,
+      "target": "smk.layer-4.enabled",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|5|36",
+      "mapping": "layer-5-latch",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "toggle",
+        "control": "side-a-pad-5",
+        "event": {
+          "channel": 5,
+          "edge": "change",
+          "number": 36,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers",
+        "off_value": 0,
+        "on_value": 127
+      },
+      "takeover": null,
+      "target": "smk.layer-5.enabled",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|6|37",
+      "mapping": "layer-6-latch",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "toggle",
+        "control": "side-a-pad-6",
+        "event": {
+          "channel": 6,
+          "edge": "change",
+          "number": 37,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers",
+        "off_value": 0,
+        "on_value": 127
+      },
+      "takeover": null,
+      "target": "smk.layer-6.enabled",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|7|38",
+      "mapping": "layer-7-latch",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "toggle",
+        "control": "side-a-pad-7",
+        "event": {
+          "channel": 7,
+          "edge": "change",
+          "number": 38,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers",
+        "off_value": 0,
+        "on_value": 127
+      },
+      "takeover": null,
+      "target": "smk.layer-7.enabled",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|cc|8|39",
+      "mapping": "layer-8-latch",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "toggle",
+        "control": "side-a-pad-8",
+        "event": {
+          "channel": 8,
+          "edge": "change",
+          "number": 39,
+          "type": "cc"
+        },
+        "hardware_preset": "smk25-current-pad-layers",
+        "off_value": 0,
+        "on_value": 127
+      },
+      "takeover": null,
+      "target": "smk.layer-8.enabled",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|note|1|93",
+      "mapping": "transport-stop",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "transport-stop",
+        "event": {
+          "channel": 1,
+          "edge": "any",
+          "number": 93,
+          "type": "note"
+        },
+        "hardware_preset": "smk25-current-pad-layers"
+      },
+      "takeover": null,
+      "target": "smk.transport.stop",
+      "transform": {
+        "type": "direct"
+      }
+    },
+    {
+      "dispatch_key": "smk25-main|note|1|94",
+      "mapping": "transport-play",
+      "profile": "ambient-pad-layers",
+      "slot": "smk25-main",
+      "source": {
+        "behavior": "momentary",
+        "control": "transport-play",
+        "event": {
+          "channel": 1,
+          "edge": "any",
+          "number": 94,
+          "type": "note"
+        },
+        "hardware_preset": "smk25-current-pad-layers"
+      },
+      "takeover": null,
+      "target": "smk.transport.play",
+      "transform": {
+        "type": "direct"
+      }
+    }
+  ],
+  "ownership": {
+    "effect|effect.master.eight-band-equalizer": {
+      "kind": "effect",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "eight-band-eq",
+          "scope": "device-profile",
+          "slot": "smc-mixer-main"
+        }
+      ],
+      "target": "effect.master.eight-band-equalizer"
+    },
+    "engine|engine.drum-set": {
+      "kind": "engine",
+      "mode": "read-only",
+      "owners": [
+        {
+          "profile": "drum-set",
+          "scope": "device-profile",
+          "slot": "smc-pad-main"
+        },
+        {
+          "profile": "drum-set",
+          "scope": "device-profile",
+          "slot": "smc-pad-pocket"
+        }
+      ],
+      "target": "engine.drum-set"
+    },
+    "helper|helper.arturia-main-volume-encoder": {
+      "kind": "helper",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "helper.arturia-main-volume-encoder"
+    },
+    "helper|helper.smk25-pad-layers": {
+      "kind": "helper",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "helper.smk25-pad-layers"
+    },
+    "parameter|arturia.layer-1.reverb": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-1.reverb"
+    },
+    "parameter|arturia.layer-1.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-1.volume"
+    },
+    "parameter|arturia.layer-2.reverb": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-2.reverb"
+    },
+    "parameter|arturia.layer-2.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-2.volume"
+    },
+    "parameter|arturia.layer-3.reverb": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-3.reverb"
+    },
+    "parameter|arturia.layer-3.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-3.volume"
+    },
+    "parameter|arturia.layer-4.reverb": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-4.reverb"
+    },
+    "parameter|arturia.layer-4.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-4.volume"
+    },
+    "parameter|arturia.layer-5.reverb": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-5.reverb"
+    },
+    "parameter|arturia.layer-5.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-5.volume"
+    },
+    "parameter|arturia.layer-6.reverb": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-6.reverb"
+    },
+    "parameter|arturia.layer-6.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-6.volume"
+    },
+    "parameter|arturia.layer-7.reverb": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-7.reverb"
+    },
+    "parameter|arturia.layer-7.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-7.volume"
+    },
+    "parameter|arturia.layer-8.reverb": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-8.reverb"
+    },
+    "parameter|arturia.layer-8.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-8.volume"
+    },
+    "parameter|arturia.layer-9.reverb": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-9.reverb"
+    },
+    "parameter|arturia.layer-9.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "arturia.layer-9.volume"
+    },
+    "parameter|drum-set.output-gain-db": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "drum-set",
+          "scope": "device-profile",
+          "slot": "smc-pad-main"
+        }
+      ],
+      "target": "drum-set.output-gain-db"
+    },
+    "parameter|drum-set.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "drum-set",
+          "scope": "device-profile",
+          "slot": "smc-pad-main"
+        }
+      ],
+      "target": "drum-set.volume"
+    },
+    "parameter|equalizer.band-1000-hz.gain": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "eight-band-eq",
+          "scope": "device-profile",
+          "slot": "smc-mixer-main"
+        }
+      ],
+      "target": "equalizer.band-1000-hz.gain"
+    },
+    "parameter|equalizer.band-125-hz.gain": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "eight-band-eq",
+          "scope": "device-profile",
+          "slot": "smc-mixer-main"
+        }
+      ],
+      "target": "equalizer.band-125-hz.gain"
+    },
+    "parameter|equalizer.band-2000-hz.gain": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "eight-band-eq",
+          "scope": "device-profile",
+          "slot": "smc-mixer-main"
+        }
+      ],
+      "target": "equalizer.band-2000-hz.gain"
+    },
+    "parameter|equalizer.band-250-hz.gain": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "eight-band-eq",
+          "scope": "device-profile",
+          "slot": "smc-mixer-main"
+        }
+      ],
+      "target": "equalizer.band-250-hz.gain"
+    },
+    "parameter|equalizer.band-4000-hz.gain": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "eight-band-eq",
+          "scope": "device-profile",
+          "slot": "smc-mixer-main"
+        }
+      ],
+      "target": "equalizer.band-4000-hz.gain"
+    },
+    "parameter|equalizer.band-500-hz.gain": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "eight-band-eq",
+          "scope": "device-profile",
+          "slot": "smc-mixer-main"
+        }
+      ],
+      "target": "equalizer.band-500-hz.gain"
+    },
+    "parameter|equalizer.band-63-hz.gain": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "eight-band-eq",
+          "scope": "device-profile",
+          "slot": "smc-mixer-main"
+        }
+      ],
+      "target": "equalizer.band-63-hz.gain"
+    },
+    "parameter|equalizer.band-8000-hz.gain": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "eight-band-eq",
+          "scope": "device-profile",
+          "slot": "smc-mixer-main"
+        }
+      ],
+      "target": "equalizer.band-8000-hz.gain"
+    },
+    "parameter|master.mute": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "master.mute"
+    },
+    "parameter|master.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "master.volume"
+    },
+    "parameter|smk.layer-1.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-1.volume"
+    },
+    "parameter|smk.layer-2.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-2.volume"
+    },
+    "parameter|smk.layer-3.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-3.volume"
+    },
+    "parameter|smk.layer-4.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-4.volume"
+    },
+    "parameter|smk.layer-5.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-5.volume"
+    },
+    "parameter|smk.layer-6.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-6.volume"
+    },
+    "parameter|smk.layer-7.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-7.volume"
+    },
+    "parameter|smk.layer-8.volume": {
+      "kind": "parameter",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-8.volume"
+    },
+    "route|route.smc-pad-main.drum-set": {
+      "kind": "route",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "drum-set",
+          "scope": "device-profile",
+          "slot": "smc-pad-main"
+        }
+      ],
+      "target": "route.smc-pad-main.drum-set"
+    },
+    "route|route.smc-pad-pocket.drum-set": {
+      "kind": "route",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "drum-set",
+          "scope": "device-profile",
+          "slot": "smc-pad-pocket"
+        }
+      ],
+      "target": "route.smc-pad-pocket.drum-set"
+    },
+    "semantic-control|drum-set.notes": {
+      "kind": "semantic-control",
+      "mode": "shared-event-destination",
+      "owners": [
+        {
+          "profile": "drum-set",
+          "scope": "device-profile",
+          "slot": "smc-pad-main"
+        },
+        {
+          "profile": "drum-set",
+          "scope": "device-profile",
+          "slot": "smc-pad-pocket"
+        }
+      ],
+      "target": "drum-set.notes"
+    },
+    "semantic-control|smk.layer-1.enabled": {
+      "kind": "semantic-control",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-1.enabled"
+    },
+    "semantic-control|smk.layer-2.enabled": {
+      "kind": "semantic-control",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-2.enabled"
+    },
+    "semantic-control|smk.layer-3.enabled": {
+      "kind": "semantic-control",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-3.enabled"
+    },
+    "semantic-control|smk.layer-4.enabled": {
+      "kind": "semantic-control",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-4.enabled"
+    },
+    "semantic-control|smk.layer-5.enabled": {
+      "kind": "semantic-control",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-5.enabled"
+    },
+    "semantic-control|smk.layer-6.enabled": {
+      "kind": "semantic-control",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-6.enabled"
+    },
+    "semantic-control|smk.layer-7.enabled": {
+      "kind": "semantic-control",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-7.enabled"
+    },
+    "semantic-control|smk.layer-8.enabled": {
+      "kind": "semantic-control",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.layer-8.enabled"
+    },
+    "semantic-control|smk.transport.play": {
+      "kind": "semantic-control",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.transport.play"
+    },
+    "semantic-control|smk.transport.stop": {
+      "kind": "semantic-control",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "ambient-pad-layers",
+          "scope": "device-profile",
+          "slot": "smk25-main"
+        }
+      ],
+      "target": "smk.transport.stop"
+    },
+    "state-key|master.mute": {
+      "kind": "state-key",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "master.mute"
+    },
+    "state-key|master.volume": {
+      "kind": "state-key",
+      "mode": "exclusive",
+      "owners": [
+        {
+          "profile": "multi-instrument-rack",
+          "scope": "device-profile",
+          "slot": "arturia-main"
+        }
+      ],
+      "target": "master.volume"
+    }
+  },
   "platform_binding": {
     "evidence_status": "verified-existing-runtime",
     "id": "airstar-current",
@@ -163,6 +2689,7 @@
   "rig": "pedro-performance-rig",
   "safety": {
     "activation": "authoring-only",
+    "applies_graph_delta": false,
     "materializes_runtime": false
   },
   "schema": "music-studies/compiled-performance-rig/v1",
@@ -255,5 +2782,362 @@
         "path": "schemas/switch-triggers.schema.json"
       }
     ]
+  },
+  "target_bindings": {
+    "asset.arturia.alt-strings": {
+      "adapter": "linux.filesystem",
+      "locator": "home:.config/DecentSampler/Sample Libraries/DS + VT - altstrings Free Edition.dsbundle",
+      "status": "available"
+    },
+    "asset.arturia.atmosfera-pad": {
+      "adapter": "linux.filesystem",
+      "locator": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/AtmosferaPAD - TIMBRES PREMIUM.sf2",
+      "status": "available"
+    },
+    "asset.arturia.basic-piano": {
+      "adapter": "linux.filesystem",
+      "locator": "home:.config/DecentSampler/Sample Libraries/Basic Piano.dsbundle",
+      "status": "available"
+    },
+    "asset.arturia.good-flute": {
+      "adapter": "linux.filesystem",
+      "locator": "home:.local/share/sounds/sf2/FluidR3_GM.sf2#program=73",
+      "status": "available"
+    },
+    "asset.arturia.hammond-organ-fast": {
+      "adapter": "linux.filesystem",
+      "locator": "soundfont-root:02_SoundFonts/03_Organs_and_Keys/Hammond_B3_organ_Fast_Leslie [outros-timbres-pra-audio-evolution-leads-2].sf2",
+      "status": "available"
+    },
+    "asset.arturia.nord-white-grand": {
+      "adapter": "linux.filesystem",
+      "locator": "soundfont-root:02_SoundFonts/01_Acoustic_Pianos/Nord White Grand Full 24C.sf2",
+      "status": "available"
+    },
+    "asset.arturia.optik-synth": {
+      "adapter": "linux.filesystem",
+      "locator": "soundfont-root:02_SoundFonts/10_Synth_Leads_Arps_and_Plucks/G072 Optik_Synth.sf2",
+      "status": "available"
+    },
+    "asset.arturia.pad-efeitos": {
+      "adapter": "linux.filesystem",
+      "locator": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/PAD EFEITOS 1 _ Infinity_studio.sf2",
+      "status": "available"
+    },
+    "asset.arturia.sax-lirakeys": {
+      "adapter": "linux.filesystem",
+      "locator": "soundfont-root:02_SoundFonts/06_Brass_and_Winds/SAX_Lirakeys LITE.sf2",
+      "status": "available"
+    },
+    "asset.drum-set.soundfont": {
+      "adapter": "linux.filesystem",
+      "locator": "soundfont-root:02_SoundFonts/09_Drums_and_Percussion/Drum_Set.sf2",
+      "status": "available"
+    },
+    "asset.smk.cloud-shimmer": {
+      "adapter": "linux.filesystem",
+      "locator": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/Cloud Shimmer - TIMBRES PREMIUM.sf2",
+      "status": "available"
+    },
+    "asset.smk.hillsong-pad": {
+      "adapter": "linux.filesystem",
+      "locator": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/Hillsong Pad - TIMBRES PREMIUM.sf2",
+      "status": "available"
+    },
+    "asset.smk.magic-ambient": {
+      "adapter": "linux.filesystem",
+      "locator": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/MagicAmbient - TIMBRES PREMIUM.sf2",
+      "status": "available"
+    },
+    "asset.smk.majesty-pad": {
+      "adapter": "linux.filesystem",
+      "locator": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/MajestyPad - TIMBRES PREMIUM.sf2",
+      "status": "available"
+    },
+    "asset.smk.oceans-worship-pad": {
+      "adapter": "linux.filesystem",
+      "locator": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/OceansPad - TIMBRES PREMIUM.sf2",
+      "status": "available"
+    },
+    "asset.smk.sanctorium-pad": {
+      "adapter": "linux.filesystem",
+      "locator": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/Sanctorium Pad - TIMBRES PREMIUM.sf2",
+      "status": "available"
+    },
+    "asset.smk.warm-worship-pad": {
+      "adapter": "linux.filesystem",
+      "locator": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/WarmPad - TIMBRES PREMIUM.sf2",
+      "status": "available"
+    },
+    "asset.smk.worship-shimmer": {
+      "adapter": "linux.filesystem",
+      "locator": "soundfont-root:02_SoundFonts/11_Pads_and_Ambience/PAD WorshipShimmer - TIMBRES PREMIUM.sf2",
+      "status": "available"
+    },
+    "control.master-mute": {
+      "adapter": "linux.current-rack-controls",
+      "locator": "arturia-main-volume-encoder.service:master-mute",
+      "status": "available"
+    },
+    "control.pad-layer-latch": {
+      "adapter": "linux.current-rack-controls",
+      "locator": "smk25-pad-layers.service:layer-enabled",
+      "status": "available"
+    },
+    "control.pad-layer-transport": {
+      "adapter": "linux.current-rack-controls",
+      "locator": "smk25-pad-layers.service:transport",
+      "status": "available"
+    },
+    "effect.arturia.channel-2-output-trim": {
+      "adapter": "linux.carla-project",
+      "locator": "AR-CH-2 Output Trim +6 dB",
+      "status": "available"
+    },
+    "effect.arturia.sustain-scale": {
+      "adapter": "linux.carla-project",
+      "locator": "AR Controls - Sustain Scale",
+      "status": "available"
+    },
+    "effect.equalizer.eight-band": {
+      "adapter": "linux.current-rack-controls",
+      "locator": "carla:SMC-MIX - 8-Band EQ",
+      "status": "available"
+    },
+    "effect.master.eight-band-equalizer": {
+      "adapter": "linux.carla-project",
+      "locator": "SMC-MIX - 8-Band EQ",
+      "status": "available"
+    },
+    "effect.master.instrument-mixer": {
+      "adapter": "linux.carla-project",
+      "locator": "LSP Mixer x8 Stereo",
+      "status": "available"
+    },
+    "effect.mixer.cc-scale": {
+      "adapter": "linux.carla-project",
+      "locator": "SMC-EQ-1..8 CC Scale",
+      "status": "available"
+    },
+    "effect.pad.output-gain-map": {
+      "adapter": "linux.carla-project",
+      "locator": "PD-CH-1 Gain Map",
+      "status": "available"
+    },
+    "effect.pad.sustain-scale": {
+      "adapter": "linux.carla-project",
+      "locator": "PD Controls - Sustain Scale",
+      "status": "available"
+    },
+    "effect.smk.layer-mixer": {
+      "adapter": "linux.carla-project",
+      "locator": "SMK Layer Mixer x8 Stereo",
+      "status": "available"
+    },
+    "engine.arturia.alt-strings": {
+      "adapter": "linux.carla-project",
+      "locator": "AR-CH-3 - Alt Strings",
+      "status": "available"
+    },
+    "engine.arturia.atmosfera-pad": {
+      "adapter": "linux.carla-project",
+      "locator": "AR-CH-9 - AtmosferaPAD",
+      "status": "available"
+    },
+    "engine.arturia.basic-piano": {
+      "adapter": "linux.carla-project",
+      "locator": "AR-CH-1 - Basic Piano",
+      "status": "available"
+    },
+    "engine.arturia.good-flute": {
+      "adapter": "linux.carla-project",
+      "locator": "AR-CH-4 - Good Flute",
+      "status": "available"
+    },
+    "engine.arturia.hammond-organ-fast": {
+      "adapter": "linux.carla-project",
+      "locator": "AR-CH-6 - Hammond Organ Fast",
+      "status": "available"
+    },
+    "engine.arturia.nord-white-grand": {
+      "adapter": "linux.carla-project",
+      "locator": "AR-CH-2 - Nord White Grand Full 24C",
+      "status": "available"
+    },
+    "engine.arturia.optik-synth": {
+      "adapter": "linux.carla-project",
+      "locator": "AR-CH-7 - Optik Synth",
+      "status": "available"
+    },
+    "engine.arturia.pad-efeitos": {
+      "adapter": "linux.carla-project",
+      "locator": "AR-CH-8 - PAD EFEITOS",
+      "status": "available"
+    },
+    "engine.arturia.sax-lirakeys": {
+      "adapter": "linux.carla-project",
+      "locator": "AR-CH-5 - SAX Lirakeys CL",
+      "status": "available"
+    },
+    "engine.drum-set": {
+      "adapter": "linux.carla-project",
+      "locator": "PD-CH-1 - Drum Set",
+      "status": "available"
+    },
+    "engine.smk.cloud-shimmer": {
+      "adapter": "linux.carla-project",
+      "locator": "SMK-CH-5 - Cloud Shimmer",
+      "status": "available"
+    },
+    "engine.smk.hillsong-pad": {
+      "adapter": "linux.carla-project",
+      "locator": "SMK-CH-3 - Hillsong Pad",
+      "status": "available"
+    },
+    "engine.smk.magic-ambient": {
+      "adapter": "linux.carla-project",
+      "locator": "SMK-CH-6 - Magic Ambient",
+      "status": "available"
+    },
+    "engine.smk.majesty-pad": {
+      "adapter": "linux.carla-project",
+      "locator": "SMK-CH-7 - Majesty Pad",
+      "status": "available"
+    },
+    "engine.smk.oceans-worship-pad": {
+      "adapter": "linux.carla-project",
+      "locator": "SMK-CH-1 - Oceans Worship Pad",
+      "status": "available"
+    },
+    "engine.smk.sanctorium-pad": {
+      "adapter": "linux.carla-project",
+      "locator": "SMK-CH-8 - Sanctorium Pad",
+      "status": "available"
+    },
+    "engine.smk.warm-worship-pad": {
+      "adapter": "linux.carla-project",
+      "locator": "SMK-CH-2 - Warm Worship Pad",
+      "status": "available"
+    },
+    "engine.smk.worship-shimmer": {
+      "adapter": "linux.carla-project",
+      "locator": "SMK-CH-4 - Worship Shimmer",
+      "status": "available"
+    },
+    "helper.arturia-main-volume-encoder": {
+      "adapter": "linux.systemd-user",
+      "locator": "arturia-main-volume-encoder.service",
+      "status": "available"
+    },
+    "helper.smk25-pad-layers": {
+      "adapter": "linux.systemd-user",
+      "locator": "smk25-pad-layers.service",
+      "status": "available"
+    },
+    "notes.ambient-pad-layers": {
+      "adapter": "linux.current-rack-controls",
+      "locator": "route.smk.performance-fanout",
+      "status": "available"
+    },
+    "notes.drum-set": {
+      "adapter": "linux.current-rack-controls",
+      "locator": "carla:PD-CH-1 - Drum Set:midi-in",
+      "status": "available"
+    },
+    "notes.layered-instruments": {
+      "adapter": "linux.current-rack-controls",
+      "locator": "route.arturia.performance-fanout",
+      "status": "available"
+    },
+    "parameter.drum-set-output-gain": {
+      "adapter": "linux.current-rack-controls",
+      "locator": "carla:PD-CH-1 Output Gain 0 to +12 dB",
+      "status": "available"
+    },
+    "parameter.drum-set-volume": {
+      "adapter": "linux.current-rack-controls",
+      "locator": "carla:PD-CH-1 Volume Map",
+      "status": "available"
+    },
+    "parameter.equalizer.band-gain": {
+      "adapter": "linux.current-rack-controls",
+      "locator": "carla:SMC-EQ-1..8 CC Scale",
+      "status": "available"
+    },
+    "parameter.layer-reverb": {
+      "adapter": "linux.current-rack-controls",
+      "locator": "carla:AR-CH-2..9 Reverb Map",
+      "status": "available"
+    },
+    "parameter.layer-volume": {
+      "adapter": "linux.current-rack-controls",
+      "locator": "carla:AR-CH-1..9 volume controls",
+      "status": "available"
+    },
+    "parameter.master-volume": {
+      "adapter": "linux.current-rack-controls",
+      "locator": "arturia-main-volume-encoder.service:master-volume",
+      "status": "available"
+    },
+    "parameter.pad-layer-volume": {
+      "adapter": "linux.current-rack-controls",
+      "locator": "carla:SMK Layer Mixer x8 Stereo",
+      "status": "available"
+    },
+    "route.arturia.controls": {
+      "adapter": "linux.pipewire-patchbay",
+      "locator": "pedro-live-rack-patchbay.json#route.arturia.controls",
+      "status": "available"
+    },
+    "route.arturia.performance-fanout": {
+      "adapter": "linux.pipewire-patchbay",
+      "locator": "pedro-live-rack-patchbay.json#route.arturia.performance-fanout",
+      "status": "available"
+    },
+    "route.master.equalized-output": {
+      "adapter": "linux.pipewire-patchbay",
+      "locator": "pedro-live-rack-patchbay.json#route.master.equalized-output",
+      "status": "available"
+    },
+    "route.master.output": {
+      "adapter": "linux.pipewire-patchbay",
+      "locator": "pedro-live-rack-patchbay.json#route.master.output",
+      "status": "available"
+    },
+    "route.mixer.equalizer-control": {
+      "adapter": "linux.pipewire-patchbay",
+      "locator": "pedro-live-rack-patchbay.json#route.mixer.equalizer-control",
+      "status": "available"
+    },
+    "route.smc-pad-main.drum-set": {
+      "adapter": "linux.pipewire-patchbay",
+      "locator": "pedro-live-rack-patchbay.json#route.smc-pad-main.drum-set",
+      "status": "available"
+    },
+    "route.smc-pad-main.output-gain": {
+      "adapter": "linux.pipewire-patchbay",
+      "locator": "pedro-live-rack-patchbay.json#route.smc-pad-main.output-gain",
+      "status": "available"
+    },
+    "route.smc-pad-pocket.drum-set": {
+      "adapter": "linux.pipewire-patchbay",
+      "locator": "pedro-live-rack-patchbay.json#route.smc-pad-pocket.drum-set",
+      "status": "available"
+    },
+    "route.smk.layer-control": {
+      "adapter": "linux.pipewire-patchbay",
+      "locator": "pedro-live-rack-patchbay.json#route.smk.layer-control",
+      "status": "available"
+    },
+    "route.smk.master-sum": {
+      "adapter": "linux.pipewire-patchbay",
+      "locator": "pedro-live-rack-patchbay.json#route.smk.master-sum",
+      "status": "available"
+    },
+    "route.smk.performance-fanout": {
+      "adapter": "linux.pipewire-patchbay",
+      "locator": "pedro-live-rack-patchbay.json#route.smk.performance-fanout",
+      "status": "available"
+    }
   }
 }

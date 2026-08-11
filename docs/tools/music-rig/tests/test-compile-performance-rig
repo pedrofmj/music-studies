@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 import re
 import shutil
@@ -11,7 +12,11 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from types import ModuleType
 from typing import Any, Optional, Sequence
+
+
+sys.dont_write_bytecode = True
 
 
 SCRIPT_PATH = Path(__file__).resolve()
@@ -38,6 +43,18 @@ def canonical_json_bytes(document: Any) -> bytes:
 
 def fingerprint(document: Any) -> str:
     return "sha256:" + hashlib.sha256(canonical_json_bytes(document)).hexdigest()
+
+
+def load_compiler_module() -> ModuleType:
+    spec = importlib.util.spec_from_file_location(
+        "music_rig_authoring_compiler",
+        COMPILER_PATH,
+    )
+    if spec is None or spec.loader is None:
+        raise AssertionError("could not load compiler module")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def run_compiler(
@@ -133,8 +150,35 @@ def remove_required_binding_target(rig_root: Path) -> None:
     write_json(binding_path, binding)
 
 
+def break_relative_encoding(rig_root: Path) -> None:
+    profile_path = (
+        rig_root
+        / "device-profiles"
+        / "arturia-main"
+        / "multi-instrument-rack.json"
+    )
+    profile = load_json(profile_path)
+    for mapping in profile["mappings"]:
+        if mapping["id"] == "master-volume":
+            mapping["transform"]["relative_encoding"] = "twos-complement"
+            break
+    write_json(profile_path, profile)
+
+
+def mapping_for(document: Any, key: str) -> Any:
+    position = document["mapping_index"].get(key)
+    if position is None:
+        raise AssertionError(f"compiled mapping index omitted {key!r}")
+    mapping = document["mappings"][position]
+    if mapping["dispatch_key"] != key:
+        raise AssertionError(f"compiled mapping index misdirected {key!r}")
+    return mapping
+
+
 def main() -> int:
     try:
+        completed_cases = []
+        compiler_module = load_compiler_module()
         with tempfile.TemporaryDirectory(
             prefix="music-rig-compiler-test-"
         ) as temporary:
@@ -163,6 +207,7 @@ def main() -> int:
                 raise AssertionError(
                     "compiled bytes differ across working directories"
                 )
+            completed_cases.append("repeatable-output")
 
             document = load_json(first_output)
             canonical_render = (
@@ -221,8 +266,114 @@ def main() -> int:
             )
             if any("\\" in path or path.startswith("/") for path in manifest_paths):
                 raise AssertionError("manifest contains a machine-specific path")
+            completed_cases.append("fingerprint-hierarchy")
+
+            expected_counts = {
+                "input_bindings": 5,
+                "mappings": 72,
+                "mapping_index": 72,
+                "target_bindings": 71,
+                "ownership": 57,
+            }
+            for field, expected_count in expected_counts.items():
+                if len(document[field]) != expected_count:
+                    raise AssertionError(
+                        f"compiled {field} count is {len(document[field])}, "
+                        f"expected {expected_count}"
+                    )
+            if sorted(document["mapping_index"].values()) != list(range(72)):
+                raise AssertionError("mapping index is not a complete row index")
+            if [row["dispatch_key"] for row in document["mappings"]] != sorted(
+                document["mapping_index"]
+            ):
+                raise AssertionError("mapping rows are not dispatch-key ordered")
+
+            arturia_relative = mapping_for(
+                document,
+                "arturia-main|cc|1|114",
+            )
+            if (
+                arturia_relative["target"] != "master.volume"
+                or arturia_relative["transform"] != {
+                    "type": "relative",
+                    "relative_encoding": "binary-offset",
+                }
+                or arturia_relative["source"]["relative_encoding"]
+                != "binary-offset"
+            ):
+                raise AssertionError("Arturia relative mapping was not resolved")
+            arturia_reverb = mapping_for(
+                document,
+                "arturia-main|cc|1|74",
+            )
+            if arturia_reverb["takeover"] != "ignore-until-moved":
+                raise AssertionError("default absolute takeover was not resolved")
+            if (
+                mapping_for(document, "smc-mixer-main|cc|1|40")["target"]
+                != "equalizer.band-63-hz.gain"
+            ):
+                raise AssertionError("SMC-Mixer mapping was not resolved")
+            pad_main = mapping_for(document, "smc-pad-main|note|10|36")
+            pad_pocket = mapping_for(document, "smc-pad-pocket|note|10|36")
+            if (
+                pad_main["target"] != "drum-set.notes"
+                or pad_pocket["target"] != "drum-set.notes"
+                or pad_main["slot"] == pad_pocket["slot"]
+            ):
+                raise AssertionError("independent pad dispatch was not preserved")
+            smk_toggle = mapping_for(document, "smk25-main|cc|1|40")
+            if (
+                smk_toggle["source"].get("off_value") != 0
+                or smk_toggle["source"].get("on_value") != 127
+            ):
+                raise AssertionError("SMK-25 toggle values were not compiled")
+            if set(document["input_bindings"]) != {
+                "arturia-main",
+                "smk25-main",
+                "smc-mixer-main",
+                "smc-pad-main",
+                "smc-pad-pocket",
+            }:
+                raise AssertionError("compiled input bindings omit a stable slot")
+            if document["target_bindings"]["parameter.master-volume"] != {
+                "adapter": "linux.current-rack-controls",
+                "status": "available",
+                "locator": "arturia-main-volume-encoder.service:master-volume",
+            }:
+                raise AssertionError("selected target binding was not compiled")
+            completed_cases.append("runtime-lookup-tables")
+
+            shared_notes = document["ownership"].get(
+                "semantic-control|drum-set.notes"
+            )
+            shared_engine = document["ownership"].get(
+                "engine|engine.drum-set"
+            )
+            if (
+                shared_notes is None
+                or shared_notes["mode"] != "shared-event-destination"
+                or len(shared_notes["owners"]) != 2
+                or shared_engine is None
+                or shared_engine["mode"] != "read-only"
+                or len(shared_engine["owners"]) != 2
+            ):
+                raise AssertionError("compatible shared ownership was not merged")
+            completed_cases.append("consolidated-ownership")
+
+            graph_delta = document["graph_delta"]
+            if (
+                not graph_delta["empty"]
+                or not graph_delta["control_only_eligible"]
+                or graph_delta["applied"]
+                or any(graph_delta["counts"].values())
+                or any(graph_delta["operations"].values())
+            ):
+                raise AssertionError("current control-only graph delta is not empty")
+            completed_cases.append("current-empty-graph-delta")
+
             if first_bytes != GOLDEN_PATH.read_bytes():
                 raise AssertionError("compiled output differs from golden fixture")
+            completed_cases.append("golden-output")
 
             pycache_before = pycache_files()
             check_only = run_compiler(
@@ -233,6 +384,7 @@ def main() -> int:
             require_success(check_only, "check-only compilation")
             if pycache_files() != pycache_before:
                 raise AssertionError("check-only compilation wrote bytecode")
+            completed_cases.append("check-only-no-write")
 
             rig_path = RIG_ROOT / "rig.json"
             rig_before = rig_path.read_bytes()
@@ -246,6 +398,7 @@ def main() -> int:
                 raise AssertionError("compiler did not reject source overwrite")
             if rig_path.read_bytes() != rig_before:
                 raise AssertionError("source-overwrite rejection changed rig.json")
+            completed_cases.append("source-overwrite-rejection")
 
             missing = run_compiler(
                 RIG_ROOT,
@@ -256,6 +409,7 @@ def main() -> int:
                 "ERROR: unresolved Platform Binding 'missing-binding'\n"
             ):
                 raise AssertionError("missing-binding diagnostic is unstable")
+            completed_cases.append("missing-binding-diagnostic")
 
             alternate_root = temporary_root / "alternate-rig"
             shutil.copytree(RIG_ROOT, alternate_root)
@@ -299,6 +453,14 @@ def main() -> int:
                 == alternate_document["definition_fingerprint"]
             ):
                 raise AssertionError("definition ignored binding selection")
+            if current_document["mappings"] != alternate_document["mappings"]:
+                raise AssertionError("portable mappings changed with binding")
+            if (
+                current_document["input_bindings"]
+                == alternate_document["input_bindings"]
+            ):
+                raise AssertionError("compiled inputs ignored binding selection")
+            completed_cases.append("independent-binding")
 
             diagnostic_outputs = []
             for root_name in ("invalid-one", "invalid-two"):
@@ -320,7 +482,68 @@ def main() -> int:
             if "unresolved capabilities" not in diagnostic_outputs[0]:
                 raise AssertionError("missing capability diagnostic was absent")
 
-        print("Performance Rig compiler tests: PASS (cases=9)")
+            completed_cases.append("relocatable-diagnostics")
+
+            graph_resources = {
+                "assets": set(),
+                "effects": set(),
+                "engines": set(),
+                "helpers": set(),
+                "routes": {"route.fixture-missing"},
+            }
+            prepared_delta = compiler_module.compile_graph_delta(
+                "prepared-fixture",
+                "prepared",
+                graph_resources,
+                {},
+            )
+            if (
+                prepared_delta["empty"]
+                or prepared_delta["control_only_eligible"]
+                or prepared_delta["counts"]["created_links"] != 1
+            ):
+                raise AssertionError("nonempty prepared graph delta was misclassified")
+            try:
+                compiler_module.compile_graph_delta(
+                    "control-only-fixture",
+                    "control-only",
+                    graph_resources,
+                    {},
+                )
+            except compiler_module.CompilationError as error:
+                if (
+                    "control-only"
+                    not in str(error)
+                    or "nonempty graph delta" not in str(error)
+                ):
+                    raise AssertionError(
+                        "control-only graph diagnostic is incomplete"
+                    )
+            else:
+                raise AssertionError("control-only nonempty graph delta compiled")
+            completed_cases.append("graph-delta-safety")
+
+            mismatch_root = temporary_root / "relative-mismatch-rig"
+            shutil.copytree(RIG_ROOT, mismatch_root)
+            break_relative_encoding(mismatch_root)
+            mismatch = run_compiler(
+                mismatch_root,
+                "airstar-current",
+                other_cwd,
+            )
+            if (
+                mismatch.returncode != 1
+                or "relative encoding 'twos-complement' differs"
+                not in mismatch.stderr
+            ):
+                raise AssertionError("relative encoding mismatch compiled")
+            completed_cases.append("relative-encoding-rejection")
+
+        if len(completed_cases) != 13:
+            raise AssertionError(
+                f"compiler test accounting expected 13, got {completed_cases}"
+            )
+        print("Performance Rig compiler tests: PASS (cases=13)")
         return 0
     except (AssertionError, OSError, ValueError, KeyError) as error:
         print(f"FAIL: {error}", file=sys.stderr)

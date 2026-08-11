@@ -106,10 +106,11 @@ Milestone 2 now has an authoring-only deterministic compiler envelope. It
 validates the complete catalogue, resolves the selected Rig Profile and explicit
 Platform Binding, emits canonical UTF-8 JSON, and records independent schema,
 portable-source, binding, and generated-definition SHA-256 fingerprints. A
-nine-case suite locks exact golden bytes, repeated and relocated execution,
-fingerprint recomputation, source-overwrite refusal, no-write behavior, stable
-diagnostics, and binding isolation. No compiled semantic lookup table, graph
-delta, materializer, runtime, or activation path exists yet.
+thirteen-case suite also locks the five input bindings, seventy-two direct MIDI
+mappings, seventy-one selected target bindings, fifty-seven consolidated
+ownership entries, relative encoding and takeover resolution, and an empty
+current graph delta. A nonempty control-only delta fails compilation. No
+materializer, runtime, or activation path exists yet.
 
 ## Objective
 

@@ -99,7 +99,7 @@ python3 docs/tools/music-rig/compile-performance-rig.py \
 ```
 
 The compiler emits only to an explicit output path and refuses to overwrite
-authored source. Its first Milestone 2 envelope and fingerprint contract is
-documented in
+authored source. Its Milestone 2 lookup, ownership, graph-delta, and fingerprint
+contracts are documented in
 [`COMPILER.md`](../../../docs/tools/music-rig/COMPILER.md). It does not
 materialize or activate Carla, Patchbay, MIDI, audio, service, or runtime state.

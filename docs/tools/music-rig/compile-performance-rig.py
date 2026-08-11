@@ -26,7 +26,7 @@ DEFAULT_RIG_ROOT = (
 VALIDATOR_PATH = SCRIPT_PATH.with_name("validate-performance-rig.py")
 COMPILED_SCHEMA = "music-studies/compiled-performance-rig/v1"
 COMPILER_ID = "music-rig-authoring-compiler"
-COMPILER_VERSION = "0.1.0"
+COMPILER_VERSION = "0.2.0"
 
 
 class CompilationError(Exception):
@@ -168,6 +168,310 @@ def load_profiles(
     return rig_profiles, device_profiles
 
 
+def load_hardware_presets(
+    rig_root: Path,
+) -> Mapping[str, Mapping[str, Any]]:
+    presets = {}
+    for path in sorted((rig_root / "hardware-presets").glob("*.json")):
+        preset = load_json(path)
+        presets[preset["id"]] = preset
+    return presets
+
+
+def normalized_midi_event(message: Mapping[str, Any]) -> Mapping[str, Any]:
+    return {
+        "type": message["type"],
+        "channel": message["channel"],
+        "number": message["number"],
+        "edge": message.get("edge", "any"),
+    }
+
+
+def dispatch_key(slot_id: str, event: Mapping[str, Any]) -> str:
+    return "|".join(
+        (
+            slot_id,
+            str(event["type"]),
+            str(event["channel"]),
+            str(event["number"]),
+        )
+    )
+
+
+def compile_input_bindings(
+    selected_profiles: Sequence[Tuple[str, Mapping[str, Any]]],
+    binding: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    inputs = {}
+    for slot_id, profile in selected_profiles:
+        slot_binding = binding["device_slots"][slot_id]
+        inputs[slot_id] = {
+            "adapter": slot_binding["adapter"],
+            "identity": slot_binding["identity"],
+            "status": slot_binding["status"],
+            "endpoints": {
+                endpoint: slot_binding["endpoints"][endpoint]
+                for endpoint in sorted(profile["required_endpoints"])
+            },
+        }
+    return {slot_id: inputs[slot_id] for slot_id in sorted(inputs)}
+
+
+def compile_mappings(
+    selected_profiles: Sequence[Tuple[str, Mapping[str, Any]]],
+    hardware_presets: Mapping[str, Mapping[str, Any]],
+) -> Tuple[List[Mapping[str, Any]], Mapping[str, int]]:
+    rows = []
+    seen_dispatch_keys = set()
+    errors = []
+
+    for slot_id, profile in selected_profiles:
+        preset_id = profile["hardware_preset"]
+        preset = hardware_presets[preset_id]
+        controls = {control["id"]: control for control in preset["controls"]}
+        for mapping in profile["mappings"]:
+            mapping_identity = f"{slot_id}/{profile['id']}/{mapping['id']}"
+            control = controls[mapping["source_control"]]
+            event = normalized_midi_event(control["message"])
+            key = dispatch_key(slot_id, event)
+            if key in seen_dispatch_keys:
+                errors.append(
+                    f"mapping {mapping_identity!r} duplicates dispatch key {key!r}"
+                )
+                continue
+            seen_dispatch_keys.add(key)
+
+            transform = mapping.get("transform", {"type": "direct"})
+            source_behavior = control["behavior"]
+            source_encoding = control.get("relative_encoding")
+            transform_encoding = transform.get("relative_encoding")
+            if source_behavior == "relative" or transform["type"] == "relative":
+                if source_behavior != "relative" or transform["type"] != "relative":
+                    errors.append(
+                        f"mapping {mapping_identity!r} has inconsistent relative "
+                        "source and transform types"
+                    )
+                    continue
+                if source_encoding != transform_encoding:
+                    errors.append(
+                        f"mapping {mapping_identity!r} relative encoding "
+                        f"{transform_encoding!r} differs from Hardware Preset "
+                        f"encoding {source_encoding!r}"
+                    )
+                    continue
+
+            takeover = None
+            if source_behavior == "absolute":
+                takeover = mapping.get(
+                    "takeover",
+                    profile["takeover_policy"]["default"],
+                )
+            elif "takeover" in mapping:
+                errors.append(
+                    f"mapping {mapping_identity!r} applies takeover to "
+                    f"non-absolute control {mapping['source_control']!r}"
+                )
+                continue
+
+            source = {
+                "hardware_preset": preset_id,
+                "control": mapping["source_control"],
+                "behavior": source_behavior,
+                "event": event,
+            }
+            for field in (
+                "off_value",
+                "on_value",
+                "relative_encoding",
+            ):
+                if field in control:
+                    source[field] = control[field]
+
+            rows.append(
+                {
+                    "dispatch_key": key,
+                    "slot": slot_id,
+                    "profile": profile["id"],
+                    "mapping": mapping["id"],
+                    "source": source,
+                    "target": mapping["target"],
+                    "transform": transform,
+                    "takeover": takeover,
+                }
+            )
+
+    if errors:
+        raise CompilationError(errors)
+    rows.sort(key=lambda row: (row["dispatch_key"], row["mapping"]))
+    index = {row["dispatch_key"]: position for position, row in enumerate(rows)}
+    return rows, index
+
+
+def binding_target_index(
+    binding: Mapping[str, Any],
+) -> Mapping[str, Mapping[str, Any]]:
+    targets = {}
+    errors = []
+    for group in binding["binding_groups"]:
+        for target, locator in group["targets"].items():
+            if target in targets:
+                errors.append(f"duplicate Platform Binding target {target!r}")
+                continue
+            targets[target] = {
+                "adapter": group["adapter"],
+                "status": group["status"],
+                "locator": locator,
+            }
+    if errors:
+        raise CompilationError(errors)
+    return targets
+
+
+def compile_target_bindings(
+    required_capabilities: Sequence[str],
+    pinned_capabilities: Sequence[str],
+    resource_requirements: Mapping[str, set],
+    input_bindings: Mapping[str, Any],
+    all_binding_targets: Mapping[str, Mapping[str, Any]],
+) -> Mapping[str, Mapping[str, Any]]:
+    input_endpoints = {
+        endpoint
+        for input_binding in input_bindings.values()
+        for endpoint in input_binding["endpoints"]
+    }
+    selected_targets = set(required_capabilities) - input_endpoints
+    selected_targets.update(pinned_capabilities)
+    for resources in resource_requirements.values():
+        selected_targets.update(resources)
+
+    missing = selected_targets - set(all_binding_targets)
+    if missing:
+        raise CompilationError(
+            [f"unresolved selected binding targets {sorted(missing)}"]
+        )
+    unavailable = sorted(
+        target
+        for target in selected_targets
+        if all_binding_targets[target]["status"] != "available"
+    )
+    if unavailable:
+        raise CompilationError(
+            [f"selected binding targets are unavailable {unavailable}"]
+        )
+    return {
+        target: all_binding_targets[target]
+        for target in sorted(selected_targets)
+    }
+
+
+def compile_ownership(
+    selected_profiles: Sequence[Tuple[str, Mapping[str, Any]]],
+    rig_profile: Mapping[str, Any],
+) -> Mapping[str, Mapping[str, Any]]:
+    compiled = {}
+    errors = []
+
+    def add_claim(claim: Mapping[str, str], owner: Mapping[str, str]) -> None:
+        key = f"{claim['kind']}|{claim['target']}"
+        existing = compiled.get(key)
+        if existing is None:
+            existing = {
+                "kind": claim["kind"],
+                "target": claim["target"],
+                "mode": claim["mode"],
+                "owners": [],
+            }
+            compiled[key] = existing
+        elif existing["mode"] != claim["mode"]:
+            errors.append(
+                f"ownership {key!r} mixes modes {existing['mode']!r} and "
+                f"{claim['mode']!r}"
+            )
+            return
+        if owner not in existing["owners"]:
+            existing["owners"].append(owner)
+
+    for slot_id, profile in selected_profiles:
+        owner = {
+            "scope": "device-profile",
+            "slot": slot_id,
+            "profile": profile["id"],
+        }
+        for claim in profile["ownership"]:
+            add_claim(claim, owner)
+    rig_owner = {
+        "scope": "rig-profile",
+        "profile": rig_profile["id"],
+    }
+    for claim in rig_profile["ownership"]:
+        add_claim(claim, rig_owner)
+
+    if errors:
+        raise CompilationError(errors)
+    for entry in compiled.values():
+        entry["owners"].sort(key=canonical_json_bytes)
+    return {key: compiled[key] for key in sorted(compiled)}
+
+
+def compile_graph_delta(
+    rig_profile_id: str,
+    readiness: str,
+    resource_requirements: Mapping[str, set],
+    all_binding_targets: Mapping[str, Mapping[str, Any]],
+) -> Mapping[str, Any]:
+    available_targets = {
+        target
+        for target, target_binding in all_binding_targets.items()
+        if target_binding["status"] == "available"
+    }
+    required_graph = {
+        category: sorted(resource_requirements[category])
+        for category in ("effects", "engines", "routes")
+    }
+    create_links = sorted(
+        set(required_graph["routes"]) - available_targets
+    )
+    create_objects = [
+        {"kind": kind, "target": target}
+        for category, kind in (("effects", "effect"), ("engines", "engine"))
+        for target in sorted(
+            set(required_graph[category]) - available_targets
+        )
+    ]
+    operations = {
+        "create_links": create_links,
+        "remove_links": [],
+        "create_objects": create_objects,
+        "remove_objects": [],
+        "metadata_changes": [],
+    }
+    counts = {
+        "created_links": len(operations["create_links"]),
+        "removed_links": len(operations["remove_links"]),
+        "created_objects": len(operations["create_objects"]),
+        "removed_objects": len(operations["remove_objects"]),
+        "metadata_changes": len(operations["metadata_changes"]),
+    }
+    is_empty = all(count == 0 for count in counts.values())
+    if readiness == "control-only" and not is_empty:
+        raise CompilationError(
+            [
+                f"Rig Profile {rig_profile_id!r} is control-only but requires "
+                f"a nonempty graph delta: {counts}"
+            ]
+        )
+    return {
+        "basis": "selected-platform-binding.available-targets",
+        "required_resources": required_graph,
+        "operations": operations,
+        "counts": counts,
+        "empty": is_empty,
+        "switch_classification": readiness,
+        "control_only_eligible": readiness == "control-only" and is_empty,
+        "applied": False,
+    }
+
+
 def compile_definition(
     rig_root: Path,
     binding_id: str,
@@ -192,6 +496,7 @@ def compile_definition(
         raise CompilationError(["rig.json has no default Rig Profile"])
 
     rig_profiles, device_profiles = load_profiles(rig_root)
+    hardware_presets = load_hardware_presets(rig_root)
     rig_profile = rig_profiles.get(selected_rig_profile_id)
     if rig_profile is None:
         raise CompilationError(
@@ -206,6 +511,7 @@ def compile_definition(
         )
 
     compiled_profiles = []
+    selected_profiles = []
     resource_requirements: Dict[str, set] = {
         "assets": set(),
         "effects": set(),
@@ -217,6 +523,7 @@ def compile_definition(
         rig_profile["device_profiles"].items()
     ):
         profile = device_profiles[(slot_id, profile_id)]
+        selected_profiles.append((slot_id, profile))
         compiled_profiles.append(
             {
                 "slot": slot_id,
@@ -229,6 +536,27 @@ def compile_definition(
             resource_requirements[category].update(resources)
     for category, resources in rig_profile.get("shared_resources", {}).items():
         resource_requirements[category].update(resources)
+
+    input_bindings = compile_input_bindings(selected_profiles, binding)
+    mappings, mapping_index = compile_mappings(
+        selected_profiles,
+        hardware_presets,
+    )
+    all_binding_targets = binding_target_index(binding)
+    target_bindings = compile_target_bindings(
+        rig_profile["required_capabilities"],
+        rig_profile["preparation"]["pinned_capabilities"],
+        resource_requirements,
+        input_bindings,
+        all_binding_targets,
+    )
+    ownership = compile_ownership(selected_profiles, rig_profile)
+    graph_delta = compile_graph_delta(
+        selected_rig_profile_id,
+        rig_profile["readiness"],
+        resource_requirements,
+        all_binding_targets,
+    )
 
     schema_paths = sorted((rig_root / "schemas").glob("*.schema.json"))
     portable_paths = portable_source_paths(rig_root)
@@ -247,6 +575,12 @@ def compile_definition(
         "active_rig_profile": selected_rig_profile_id,
         "readiness": rig_profile["readiness"],
         "device_profiles": compiled_profiles,
+        "input_bindings": input_bindings,
+        "mappings": mappings,
+        "mapping_index": mapping_index,
+        "target_bindings": target_bindings,
+        "ownership": ownership,
+        "graph_delta": graph_delta,
         "platform_binding": {
             "id": binding["id"],
             "platform": binding["platform"],
@@ -281,6 +615,7 @@ def compile_definition(
         "safety": {
             "activation": "authoring-only",
             "materializes_runtime": False,
+            "applies_graph_delta": False,
         },
     }
     definition["definition_fingerprint"] = fingerprint(definition)
@@ -372,6 +707,10 @@ def main() -> int:
             f"(rig={definition['rig']}, "
             f"rig-profile={definition['active_rig_profile']}, "
             f"platform-binding={definition['platform_binding']['id']}, "
+            f"mappings={len(definition['mappings'])}, "
+            f"ownership={len(definition['ownership'])}, "
+            "graph-delta="
+            f"{'empty' if definition['graph_delta']['empty'] else 'nonempty'}, "
             f"portable-source={definition['fingerprints']['portable_source']}, "
             f"binding={definition['fingerprints']['platform_binding']}, "
             f"definition={definition['definition_fingerprint']})"
