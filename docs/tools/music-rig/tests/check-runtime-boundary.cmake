@@ -4,6 +4,7 @@ endif()
 
 set(RUNTIME_SOURCES
     "${RUNTIME_DIR}/music_rig_compiled_tables.c"
+    "${RUNTIME_DIR}/music_rig_control.c"
     "${RUNTIME_DIR}/music_rig_definition.c"
     "${RUNTIME_DIR}/music_rig_runtime.c"
     "${RUNTIME_DIR}/music_rig_state.c"

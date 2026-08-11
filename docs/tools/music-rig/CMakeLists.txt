@@ -11,6 +11,7 @@ option(
 
 add_library(music_rig_core STATIC
     runtime/core/music_rig_compiled_tables.c
+    runtime/core/music_rig_control.c
     runtime/core/music_rig_core.c
     runtime/core/music_rig_definition.c
     runtime/core/music_rig_protocol.c
@@ -25,6 +26,17 @@ target_compile_features(music_rig_core PUBLIC c_std_17)
 set_target_properties(music_rig_core PROPERTIES
     C_EXTENSIONS OFF
 )
+
+add_library(music_rig_cli STATIC
+    runtime/client/music_rig_cli.c
+)
+target_include_directories(music_rig_cli
+    PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}/runtime/client/include"
+)
+target_link_libraries(music_rig_cli PUBLIC music_rig_core)
+target_compile_features(music_rig_cli PUBLIC c_std_17)
+set_target_properties(music_rig_cli PROPERTIES C_EXTENSIONS OFF)
 
 if(WIN32)
     set(MUSIC_RIG_FILE_STORAGE_SOURCE
@@ -74,7 +86,7 @@ endif()
 add_executable(music-rig
     music-rig.c
 )
-target_link_libraries(music-rig PRIVATE music_rig_core)
+target_link_libraries(music-rig PRIVATE music_rig_cli)
 
 add_executable(music-rigd
     music-rigd.c
@@ -102,6 +114,9 @@ if(MSVC)
     target_compile_options(music_rig_core PRIVATE
         ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
     )
+    target_compile_options(music_rig_cli PRIVATE
+        ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+    )
     if(TARGET music_rig_file_storage)
         target_compile_options(music_rig_file_storage PRIVATE
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
@@ -120,6 +135,12 @@ if(MSVC)
     )
 else()
     target_compile_options(music_rig_core PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Werror
+    )
+    target_compile_options(music_rig_cli PRIVATE
         -Wall
         -Wextra
         -Wpedantic
@@ -168,6 +189,14 @@ if(BUILD_TESTING)
         tests/runtime-test.c
     )
     target_link_libraries(music_rig_runtime_test PRIVATE music_rig_core)
+    add_executable(music_rig_control_test
+        tests/control-test.c
+    )
+    target_link_libraries(music_rig_control_test PRIVATE music_rig_core)
+    add_executable(music_rig_cli_test
+        tests/cli-test.c
+    )
+    target_link_libraries(music_rig_cli_test PRIVATE music_rig_cli)
     add_executable(music_rig_state_test
         tests/state-test.c
     )
@@ -193,6 +222,12 @@ if(BUILD_TESTING)
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
         target_compile_options(music_rig_runtime_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+        target_compile_options(music_rig_control_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+        target_compile_options(music_rig_cli_test PRIVATE
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
         target_compile_options(music_rig_state_test PRIVATE
@@ -225,6 +260,18 @@ if(BUILD_TESTING)
             -Wpedantic
             -Werror
         )
+        target_compile_options(music_rig_control_test PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+        target_compile_options(music_rig_cli_test PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
         target_compile_options(music_rig_state_test PRIVATE
             -Wall
             -Wextra
@@ -250,6 +297,8 @@ if(BUILD_TESTING)
     add_test(NAME music_rig_core_test COMMAND music_rig_core_test)
     add_test(NAME music_rig_protocol_test COMMAND music_rig_protocol_test)
     add_test(NAME music_rig_runtime_test COMMAND music_rig_runtime_test)
+    add_test(NAME music_rig_control_test COMMAND music_rig_control_test)
+    add_test(NAME music_rig_cli_test COMMAND music_rig_cli_test)
     add_test(NAME music_rig_state_test COMMAND music_rig_state_test)
     add_test(NAME music_rig_definition_test COMMAND music_rig_definition_test)
     if(TARGET music_rig_file_storage_test)
@@ -282,6 +331,13 @@ if(BUILD_TESTING)
         NAME music_rig_cli_version
         COMMAND $<TARGET_FILE:music-rig> --version
     )
+    add_test(
+        NAME music_rig_cli_no_transport
+        COMMAND "${CMAKE_COMMAND}"
+            "-DCLI=$<TARGET_FILE:music-rig>"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-music-rig-no-transport.cmake"
+    )
+    set_tests_properties(music_rig_cli_no_transport PROPERTIES TIMEOUT 5)
     add_test(
         NAME music_rigd_version
         COMMAND $<TARGET_FILE:music-rigd> --version

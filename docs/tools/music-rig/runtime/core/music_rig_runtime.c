@@ -1,5 +1,7 @@
 #include "music_rig/runtime.h"
 
+#include "music_rig/control.h"
+
 #include <stdint.h>
 #include <string.h>
 
@@ -102,34 +104,49 @@ static music_rig_result adapter_failure(music_rig_runtime *runtime)
     return finish(runtime, MUSIC_RIG_RESULT_ADAPTER_FAILURE);
 }
 
-static void dispatch_request(
-    music_rig_runtime *runtime,
-    const music_rig_protocol_request *request,
-    music_rig_protocol_response *response
-)
+static bool bounded_profile(const char *value)
 {
-    music_rig_result result = MUSIC_RIG_RESULT_OK;
+    size_t index;
 
-    response->protocol_version = MUSIC_RIG_PROTOCOL_VERSION;
-    response->request_id = request->request_id;
-    response->previous_generation = runtime->state.generation_id;
-    response->resulting_generation = runtime->state.generation_id;
-
-    increment(&runtime->metrics.control_requests);
-    if (request->protocol_version != MUSIC_RIG_PROTOCOL_VERSION ||
-        request->operation != (uint32_t)MUSIC_RIG_OPERATION_STATUS ||
-        request->request_id == UINT64_C(0)) {
-        increment(&runtime->metrics.invalid_requests);
-        result = MUSIC_RIG_RESULT_INVALID_ARGUMENT;
-    } else {
-        increment(&runtime->metrics.status_requests);
-        if (request->expected_generation != UINT64_C(0) &&
-            request->expected_generation != runtime->state.generation_id) {
-            increment(&runtime->metrics.generation_conflicts);
-            result = MUSIC_RIG_RESULT_GENERATION_CONFLICT;
+    if (value == NULL) {
+        return false;
+    }
+    for (index = 0; index < MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY; ++index) {
+        if (value[index] == '\0') {
+            return index != 0;
         }
     }
-    response->result_code = (uint32_t)result;
+    return false;
+}
+
+static void classify_request(
+    music_rig_runtime *runtime,
+    const music_rig_protocol_request *request,
+    const music_rig_protocol_response *response
+)
+{
+    if (response->result_code == (uint32_t)MUSIC_RIG_RESULT_INVALID_ARGUMENT) {
+        increment(&runtime->metrics.invalid_requests);
+    }
+    if (response->result_code == (uint32_t)MUSIC_RIG_RESULT_UNSUPPORTED) {
+        increment(&runtime->metrics.unsupported_requests);
+    }
+    if (response->result_code ==
+        (uint32_t)MUSIC_RIG_RESULT_GENERATION_CONFLICT) {
+        increment(&runtime->metrics.generation_conflicts);
+    }
+    if (request->flags == MUSIC_RIG_REQUEST_DRY_RUN) {
+        increment(&runtime->metrics.dry_run_requests);
+    }
+    if (request->operation == (uint32_t)MUSIC_RIG_OPERATION_STATUS) {
+        increment(&runtime->metrics.status_requests);
+    } else if (request->operation ==
+        (uint32_t)MUSIC_RIG_OPERATION_LIST_PROFILES) {
+        increment(&runtime->metrics.list_requests);
+    } else if (request->operation ==
+        (uint32_t)MUSIC_RIG_OPERATION_VALIDATE_ACTIVE) {
+        increment(&runtime->metrics.validate_requests);
+    }
 }
 
 music_rig_result music_rig_runtime_init(
@@ -146,6 +163,7 @@ music_rig_result music_rig_runtime_init(
         config->definition_fingerprint == NULL ||
         config->definition_fingerprint_size !=
             MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE ||
+        !bounded_profile(config->active_rig_profile) ||
         !interfaces_are_valid(interfaces)) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
@@ -163,6 +181,11 @@ music_rig_result music_rig_runtime_init(
         config->definition_fingerprint,
         MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE
     );
+    memcpy(
+        runtime->active_rig_profile,
+        config->active_rig_profile,
+        strlen(config->active_rig_profile) + 1U
+    );
     runtime->state.output_mode = config->output_mode;
     result = restore_state(runtime);
     if (result != MUSIC_RIG_RESULT_OK) {
@@ -175,6 +198,7 @@ music_rig_result music_rig_runtime_init(
     if (result != MUSIC_RIG_RESULT_OK) {
         return result;
     }
+    runtime->control_generation = &runtime->initial_generation;
     runtime->state.lifecycle = MUSIC_RIG_RUNTIME_INITIALIZED;
     return MUSIC_RIG_RESULT_OK;
 }
@@ -213,6 +237,7 @@ music_rig_result music_rig_runtime_publish_generation(
     }
 
     runtime->state.generation_id = next_generation->id;
+    runtime->control_generation = next_generation;
     increment(&runtime->metrics.generation_publications);
     return MUSIC_RIG_RESULT_OK;
 }
@@ -256,7 +281,13 @@ music_rig_result music_rig_runtime_run(music_rig_runtime *runtime)
         if (poll_result == MUSIC_RIG_CONTROL_REQUEST) {
             music_rig_protocol_response response;
 
-            dispatch_request(runtime, &request, &response);
+            if (music_rig_runtime_dispatch(
+                    runtime,
+                    &request,
+                    &response
+                ) != MUSIC_RIG_RESULT_OK) {
+                return adapter_failure(runtime);
+            }
             if (runtime->interfaces.control.respond(
                     runtime->interfaces.control.context,
                     &response
@@ -278,6 +309,49 @@ music_rig_result music_rig_runtime_run(music_rig_runtime *runtime)
             return adapter_failure(runtime);
         }
     }
+}
+
+music_rig_result music_rig_runtime_dispatch(
+    music_rig_runtime *runtime,
+    const music_rig_protocol_request *request,
+    music_rig_protocol_response *response
+)
+{
+    music_rig_control_snapshot snapshot;
+    music_rig_result result;
+    uint64_t started_ns;
+    uint64_t finished_ns;
+
+    if (runtime == NULL || request == NULL || response == NULL) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+    if (runtime->state.lifecycle != MUSIC_RIG_RUNTIME_INITIALIZED &&
+        runtime->state.lifecycle != MUSIC_RIG_RUNTIME_RUNNING) {
+        return MUSIC_RIG_RESULT_INVALID_STATE;
+    }
+
+    started_ns = runtime->interfaces.clock.now_ns(
+        runtime->interfaces.clock.context
+    );
+    snapshot.generation_id = runtime->state.generation_id;
+    snapshot.active_rig_profile = runtime->active_rig_profile;
+    snapshot.tables = runtime->control_generation->mapping;
+    snapshot.output_mode = runtime->state.output_mode;
+    result = music_rig_control_dispatch(&snapshot, request, response);
+    finished_ns = runtime->interfaces.clock.now_ns(
+        runtime->interfaces.clock.context
+    );
+
+    increment(&runtime->metrics.control_requests);
+    if (result != MUSIC_RIG_RESULT_OK) {
+        increment(&runtime->metrics.invalid_requests);
+        return result;
+    }
+    response->control_duration_ns = finished_ns >= started_ns
+        ? finished_ns - started_ns
+        : UINT64_C(0);
+    classify_request(runtime, request, response);
+    return MUSIC_RIG_RESULT_OK;
 }
 
 music_rig_result music_rig_runtime_persist_state(music_rig_runtime *runtime)

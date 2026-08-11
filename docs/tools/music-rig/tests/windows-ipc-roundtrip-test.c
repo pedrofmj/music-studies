@@ -2,7 +2,9 @@
 #include <windows.h>
 #include <aclapi.h>
 
+#include "music_rig/control.h"
 #include "music_rig/protocol.h"
+#include "compiled-tables-fixture.h"
 #include "protocol-golden.h"
 
 #include <inttypes.h>
@@ -21,7 +23,10 @@
 typedef struct server_context {
     HANDLE pipe;
     volatile LONG failed;
+    music_rig_control_snapshot snapshot;
 } server_context;
+
+static music_rig_compiled_tables tables;
 
 static DWORD fail_server(server_context *context)
 {
@@ -44,7 +49,6 @@ static int elapsed_ns(
         value == NULL) {
         return 0;
     }
-
     ticks = (uint64_t)(finished.QuadPart - started.QuadPart);
     ticks_per_second = (uint64_t)frequency.QuadPart;
     *value = ticks / ticks_per_second * UINT64_C(1000000000) +
@@ -66,19 +70,12 @@ static HANDLE create_server_pipe(const wchar_t *pipe_name)
     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &process_token)) {
         goto cleanup;
     }
-    if (GetTokenInformation(
-            process_token,
-            TokenUser,
-            NULL,
-            0U,
-            &token_user_size
-        ) || GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
+    if (GetTokenInformation(process_token, TokenUser, NULL, 0U,
+            &token_user_size) || GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
         goto cleanup;
     }
-
     token_user = malloc((size_t)token_user_size);
-    if (token_user == NULL ||
-        !GetTokenInformation(
+    if (token_user == NULL || !GetTokenInformation(
             process_token,
             TokenUser,
             token_user,
@@ -95,12 +92,8 @@ static HANDLE create_server_pipe(const wchar_t *pipe_name)
     access.Trustee.TrusteeForm = TRUSTEE_IS_SID;
     access.Trustee.TrusteeType = TRUSTEE_IS_USER;
     access.Trustee.ptstrName = token_user->User.Sid;
-    if (SetEntriesInAclW(
-            1U,
-            &access,
-            NULL,
-            &access_control_list
-        ) != ERROR_SUCCESS ||
+    if (SetEntriesInAclW(1U, &access, NULL, &access_control_list) !=
+            ERROR_SUCCESS ||
         !InitializeSecurityDescriptor(
             &security_descriptor,
             SECURITY_DESCRIPTOR_REVISION
@@ -140,6 +133,34 @@ cleanup:
     return pipe;
 }
 
+static void build_request(size_t index, music_rig_protocol_request *request)
+{
+    memset(request, 0, sizeof(*request));
+    request->protocol_version = MUSIC_RIG_PROTOCOL_VERSION;
+    request->request_id = index == 0U
+        ? GOLDEN_REQUEST_ID
+        : (uint64_t)index + UINT64_C(1000);
+    request->expected_generation = EXPECTED_GENERATION;
+    switch (index % 4U) {
+    case 0U:
+        request->operation = (uint32_t)MUSIC_RIG_OPERATION_STATUS;
+        break;
+    case 1U:
+        request->operation = (uint32_t)MUSIC_RIG_OPERATION_LIST_PROFILES;
+        fixture_copy(request->device_slot, "smc-mixer-main");
+        break;
+    case 2U:
+        request->operation = (uint32_t)MUSIC_RIG_OPERATION_VALIDATE_ACTIVE;
+        break;
+    default:
+        request->operation = (uint32_t)MUSIC_RIG_OPERATION_SWITCH_DEVICE;
+        request->flags = MUSIC_RIG_REQUEST_DRY_RUN;
+        fixture_copy(request->device_slot, "smc-mixer-main");
+        fixture_copy(request->profile, "eight-band-eq");
+        break;
+    }
+}
+
 static DWORD WINAPI serve_requests(LPVOID opaque)
 {
     server_context *context = opaque;
@@ -157,56 +178,41 @@ static DWORD WINAPI serve_requests(LPVOID opaque)
         music_rig_protocol_response response;
         DWORD transferred;
 
-        if (!ReadFile(
-                context->pipe,
+        if (!ReadFile(context->pipe, request_bytes,
+                (DWORD)sizeof(request_bytes), &transferred, NULL) ||
+            transferred != (DWORD)sizeof(request_bytes) ||
+            (index == 0U && memcmp(
                 request_bytes,
-                (DWORD)sizeof(request_bytes),
-                &transferred,
-                NULL
-            ) || transferred != (DWORD)sizeof(request_bytes) ||
-            (index == 0U &&
-                memcmp(
-                    request_bytes,
-                    MUSIC_RIG_PROTOCOL_REQUEST_GOLDEN,
-                    sizeof(request_bytes)
-                ) != 0) ||
+                MUSIC_RIG_PROTOCOL_REQUEST_GOLDEN_PREFIX,
+                MUSIC_RIG_PROTOCOL_REQUEST_GOLDEN_PREFIX_SIZE
+            ) != 0) ||
             music_rig_protocol_decode_request(
                 request_bytes,
                 sizeof(request_bytes),
                 &request
             ) != MUSIC_RIG_RESULT_OK ||
-            request.operation != (uint32_t)MUSIC_RIG_OPERATION_STATUS ||
-            request.expected_generation != EXPECTED_GENERATION) {
-            return fail_server(context);
-        }
-
-        response.protocol_version = MUSIC_RIG_PROTOCOL_VERSION;
-        response.result_code = (uint32_t)MUSIC_RIG_RESULT_OK;
-        response.request_id = request.request_id;
-        response.previous_generation = EXPECTED_GENERATION;
-        response.resulting_generation = EXPECTED_GENERATION;
-        if (music_rig_protocol_encode_response(
+            music_rig_control_dispatch(
+                &context->snapshot,
+                &request,
+                &response
+            ) != MUSIC_RIG_RESULT_OK ||
+            response.result_code != (uint32_t)MUSIC_RIG_RESULT_OK ||
+            music_rig_protocol_encode_response(
                 &response,
                 response_bytes,
                 sizeof(response_bytes)
             ) != MUSIC_RIG_RESULT_OK ||
-            (index == 0U &&
-                memcmp(
-                    response_bytes,
-                    MUSIC_RIG_PROTOCOL_RESPONSE_GOLDEN,
-                    sizeof(response_bytes)
-                ) != 0) ||
-            !WriteFile(
-                context->pipe,
+            (index == 0U && memcmp(
                 response_bytes,
-                (DWORD)sizeof(response_bytes),
-                &transferred,
-                NULL
-            ) || transferred != (DWORD)sizeof(response_bytes)) {
+                MUSIC_RIG_PROTOCOL_RESPONSE_GOLDEN_PREFIX,
+                MUSIC_RIG_PROTOCOL_RESPONSE_GOLDEN_PREFIX_SIZE
+            ) != 0) ||
+            !WriteFile(context->pipe, response_bytes,
+                (DWORD)sizeof(response_bytes), &transferred, NULL) ||
+            transferred != (DWORD)sizeof(response_bytes)) {
             return fail_server(context);
         }
     }
-
     return 0U;
 }
 
@@ -235,11 +241,12 @@ int main(void)
     DWORD wait_result;
     DWORD read_mode = PIPE_READMODE_MESSAGE;
 
-    if (_snwprintf_s(
+    if (init_compiled_tables_fixture(&tables) != MUSIC_RIG_RESULT_OK ||
+        _snwprintf_s(
             pipe_name,
             _countof(pipe_name),
             _TRUNCATE,
-            L"\\\\.\\pipe\\music-rig-ipc-spike-%lu",
+            L"\\\\.\\pipe\\music-rig-mock-control-%lu",
             GetCurrentProcessId()
         ) < 0 || !QueryPerformanceFrequency(&frequency)) {
         fputs("could not initialize Windows IPC test\n", stderr);
@@ -251,16 +258,8 @@ int main(void)
         fputs("could not create current-user-only named pipe\n", stderr);
         return 1;
     }
-
-    client_pipe = CreateFileW(
-        pipe_name,
-        GENERIC_READ | GENERIC_WRITE,
-        0U,
-        NULL,
-        OPEN_EXISTING,
-        0U,
-        NULL
-    );
+    client_pipe = CreateFileW(pipe_name, GENERIC_READ | GENERIC_WRITE, 0U,
+        NULL, OPEN_EXISTING, 0U, NULL);
     if (client_pipe == INVALID_HANDLE_VALUE ||
         !SetNamedPipeHandleState(client_pipe, &read_mode, NULL, NULL)) {
         fputs("could not connect named-pipe client in message mode\n", stderr);
@@ -271,8 +270,12 @@ int main(void)
         return 1;
     }
 
+    memset(&context, 0, sizeof(context));
     context.pipe = server_pipe;
-    context.failed = 0L;
+    context.snapshot.generation_id = EXPECTED_GENERATION;
+    context.snapshot.active_rig_profile = "full-live-rack";
+    context.snapshot.tables = &tables;
+    context.snapshot.output_mode = MUSIC_RIG_OUTPUT_SUPPRESSED;
     server_thread = CreateThread(NULL, 0U, serve_requests, &context, 0U, NULL);
     if (server_thread == NULL) {
         fputs("could not start named-pipe server thread\n", stderr);
@@ -282,15 +285,7 @@ int main(void)
     }
 
     for (index = 0; index < ROUND_TRIPS; ++index) {
-        const uint64_t request_id = index == 0U
-            ? GOLDEN_REQUEST_ID
-            : (uint64_t)index + UINT64_C(1000);
-        const music_rig_protocol_request request = {
-            MUSIC_RIG_PROTOCOL_VERSION,
-            (uint32_t)MUSIC_RIG_OPERATION_STATUS,
-            request_id,
-            EXPECTED_GENERATION
-        };
+        music_rig_protocol_request request;
         music_rig_protocol_response response;
         uint8_t request_bytes[MUSIC_RIG_PROTOCOL_REQUEST_SIZE];
         uint8_t response_bytes[MUSIC_RIG_PROTOCOL_RESPONSE_SIZE];
@@ -298,72 +293,54 @@ int main(void)
         LARGE_INTEGER finished;
         DWORD transferred;
 
+        build_request(index, &request);
         if (music_rig_protocol_encode_request(
                 &request,
                 request_bytes,
                 sizeof(request_bytes)
             ) != MUSIC_RIG_RESULT_OK ||
-            (index == 0U &&
-                memcmp(
-                    request_bytes,
-                    MUSIC_RIG_PROTOCOL_REQUEST_GOLDEN,
-                    sizeof(request_bytes)
-                ) != 0) ||
             !QueryPerformanceCounter(&started) ||
-            !WriteFile(
-                client_pipe,
-                request_bytes,
-                (DWORD)sizeof(request_bytes),
-                &transferred,
-                NULL
-            ) || transferred != (DWORD)sizeof(request_bytes) ||
-            !ReadFile(
-                client_pipe,
-                response_bytes,
-                (DWORD)sizeof(response_bytes),
-                &transferred,
-                NULL
-            ) || transferred != (DWORD)sizeof(response_bytes) ||
+            !WriteFile(client_pipe, request_bytes, (DWORD)sizeof(request_bytes),
+                &transferred, NULL) ||
+            transferred != (DWORD)sizeof(request_bytes) ||
+            !ReadFile(client_pipe, response_bytes,
+                (DWORD)sizeof(response_bytes), &transferred, NULL) ||
+            transferred != (DWORD)sizeof(response_bytes) ||
             !QueryPerformanceCounter(&finished) ||
-            (index == 0U &&
-                memcmp(
-                    response_bytes,
-                    MUSIC_RIG_PROTOCOL_RESPONSE_GOLDEN,
-                    sizeof(response_bytes)
-                ) != 0) ||
             music_rig_protocol_decode_response(
                 response_bytes,
                 sizeof(response_bytes),
                 &response
             ) != MUSIC_RIG_RESULT_OK ||
             response.request_id != request.request_id ||
+            response.operation != request.operation ||
             response.result_code != (uint32_t)MUSIC_RIG_RESULT_OK ||
             response.previous_generation != EXPECTED_GENERATION ||
             response.resulting_generation != EXPECTED_GENERATION ||
             !elapsed_ns(started, finished, frequency, &latencies[index])) {
-            fputs("named-pipe request/response validation failed\n", stderr);
+            fputs("invalid named-pipe response\n", stderr);
             failed = 1;
             break;
         }
     }
 
-    if (failed != 0) {
+    if (failed) {
         CloseHandle(client_pipe);
         client_pipe = INVALID_HANDLE_VALUE;
     }
     wait_result = WaitForSingleObject(server_thread, SERVER_WAIT_MS);
     if (wait_result != WAIT_OBJECT_0 ||
         InterlockedCompareExchange(&context.failed, 0L, 0L) != 0L) {
-        fputs("named-pipe server failed or timed out\n", stderr);
+        fputs("named-pipe server failed\n", stderr);
         failed = 1;
     }
-
+    CloseHandle(server_thread);
     if (client_pipe != INVALID_HANDLE_VALUE) {
         CloseHandle(client_pipe);
     }
-    CloseHandle(server_thread);
+    DisconnectNamedPipe(server_pipe);
     CloseHandle(server_pipe);
-    if (failed != 0) {
+    if (failed) {
         return 1;
     }
 
@@ -372,15 +349,13 @@ int main(void)
         fputs("named-pipe p99 round trip exceeded 20 ms\n", stderr);
         return 1;
     }
-
     printf(
         "{\"schema\":\"music-studies/ipc-round-trip-spike/v1\","
-        "\"transport\":\"windows-named-pipe-message\","
-        "\"security\":\"current-user-only\","
+        "\"transport\":\"windows-named-pipe-mock-control\","
+        "\"security\":\"current-user-only\",\"golden_frames\":true,"
         "\"round_trips\":%zu,\"p50_ns\":%" PRIu64 ","
         "\"p95_ns\":%" PRIu64 ",\"p99_ns\":%" PRIu64 ","
-        "\"maximum_ns\":%" PRIu64 ",\"golden_frames\":true,"
-        "\"failures\":0}\n",
+        "\"maximum_ns\":%" PRIu64 ",\"failures\":0}\n",
         ROUND_TRIPS,
         latencies[499],
         latencies[949],

@@ -282,7 +282,15 @@ benchmarks.
   32/32. `music-rigd` remains output-suppressed and inert without an explicit
   command. Production XDG/Known Folder selection and the device/MIDI,
   audio/graph, plugin-host, service, and diagnostics adapters remain.
-- ⬜ Implement the complete versioned IPC and CLI read-only/dry-run commands.
+- 🟡 Implement the complete versioned IPC and CLI read-only/dry-run commands.
+  Protocol v2 freezes all nine operation IDs in fixed 176-byte requests and
+  2,592-byte bounded responses. The portable dispatcher and CLI cover status,
+  filtered profile listing, validation, and global/device dry-runs while
+  rejecting every commit request. Ephemeral Linux and Windows transports carry
+  real table-backed requests; the executable has no configured endpoint. Local
+  GCC/Clang pass 38/38, both optional JSON builds pass 41/41, eight ASan/UBSan
+  boundary tests pass, and the protected baseline remains 30/30. Hosted Windows
+  proof is pending.
 - ⬜ Add immutable-generation reclamation and stable device-slot ports.
 - ⬜ Extract reusable behavior without changing installed legacy services.
 - ⬜ Run the new adapter in output-suppressed shadow mode.

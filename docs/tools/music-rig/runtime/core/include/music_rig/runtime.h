@@ -10,7 +10,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define MUSIC_RIG_RUNTIME_ABI_VERSION UINT32_C(2)
+#define MUSIC_RIG_RUNTIME_ABI_VERSION UINT32_C(3)
 
 typedef enum music_rig_runtime_lifecycle {
     MUSIC_RIG_RUNTIME_UNINITIALIZED = 0,
@@ -43,6 +43,10 @@ typedef struct music_rig_runtime_metrics {
     uint64_t control_waits;
     uint64_t control_requests;
     uint64_t status_requests;
+    uint64_t list_requests;
+    uint64_t validate_requests;
+    uint64_t dry_run_requests;
+    uint64_t unsupported_requests;
     uint64_t invalid_requests;
     uint64_t control_responses;
     uint64_t generation_publications;
@@ -84,6 +88,7 @@ typedef struct music_rig_runtime_config {
     const music_rig_generation *initial_generation;
     const uint8_t *definition_fingerprint;
     size_t definition_fingerprint_size;
+    const char *active_rig_profile;
     music_rig_output_mode output_mode;
 } music_rig_runtime_config;
 
@@ -92,8 +97,10 @@ typedef struct music_rig_runtime {
     music_rig_runtime_state state;
     music_rig_runtime_metrics metrics;
     music_rig_generation initial_generation;
+    const music_rig_generation *control_generation;
     music_rig_generation_slot generations;
     music_rig_platform_interfaces interfaces;
+    char active_rig_profile[MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY];
     bool control_started;
 } music_rig_runtime;
 
@@ -110,6 +117,12 @@ music_rig_result music_rig_runtime_publish_generation(
 );
 
 music_rig_result music_rig_runtime_run(music_rig_runtime *runtime);
+
+music_rig_result music_rig_runtime_dispatch(
+    music_rig_runtime *runtime,
+    const music_rig_protocol_request *request,
+    music_rig_protocol_response *response
+);
 
 music_rig_result music_rig_runtime_persist_state(music_rig_runtime *runtime);
 

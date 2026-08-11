@@ -36,7 +36,8 @@ uninitialized -> initialized -> running -> stopped
 ```
 
 Initialization requires a nonzero generation, an exact 32-byte definition
-fingerprint, output-suppressed mode, runtime adapter ABI version 2, and storage
+fingerprint, an active Rig Profile ID, output-suppressed mode, runtime adapter
+ABI version 3, and storage
 adapter ABI version 1. It reads qualified state before publishing the initial
 generation. `run` may be called exactly once. A normal stop closes the control
 adapter and records the monotonic stop time. Start, poll, wait, response, stop,
@@ -151,19 +152,25 @@ uses the adapter's atomic-replace callback.
 
 Publishing a new caller-owned generation supports an optional
 expected-generation precondition. Stale preconditions and non-increasing
-generation IDs fail without changing state.
+generation IDs fail without changing state. Control inspection follows the
+most recently published generation's immutable table pointer.
 
 All metrics are unsigned 64-bit saturating counters:
 
 - loop iterations, idle polls, and control waits;
-- control, status, invalid, and response counts;
+- control, status, list, validation, dry-run, unsupported, invalid, and response
+  counts;
 - generation publications and conflicts; and
 - state restores, qualified fallbacks, and writes; and
 - adapter failures.
 
-Status dispatch returns the current generation. A nonzero stale expected
-generation produces result code 5 while keeping the previous and resulting
-generation equal. Invalid structured requests produce result code 2.
+Protocol v2 dispatch implements status, filtered profile listing, active
+validation, and dry-run prepare/switch/reset/reload planning over the immutable
+table image. Every response remains output-suppressed. Dry-runs report
+readiness, selected profiles, warnings, and an empty graph delta while keeping
+the previous and resulting generations equal. Commit-capable requests without
+the dry-run flag return unsupported. A stale expected generation produces
+result code 5 before operation evaluation.
 
 ## Executable Boundary
 
@@ -174,20 +181,28 @@ validation command above. It reports the runtime and storage ABIs and, when
 compiled, the native file-storage ABI. It has no configured definition/state
 path, transport, installation, service, or default-start path.
 
-CTest exercises successful idle/request/stop sequencing, status and stale
-generation responses, invalid requests, publication conflicts, qualified state
+`music-rig` now has a portable parser, transport interface, and human/JSON
+renderer for `status`, `profiles list`, `validate`, and explicit global/device
+dry-run switches. The executable has no configured production transport. It
+fails closed with adapter result 4 and sends nothing; a switch without
+`--dry-run` is rejected as an invalid command.
+
+CTest exercises successful idle/request/stop sequencing, read-only and dry-run
+responses, filtered inventories, cold warnings, stale generations, unsafe
+switch rejection, publication conflicts, qualified state
 restore/fallback, all 64 single-byte state corruptions, state I/O failures,
 definition source/decoder failures, the full compiled-envelope JSON decoder,
 native temporary-file definition reads and atomic state replacements, explicit
 daemon validation and fingerprint mismatch, invalid lifecycle/configuration,
-ABI rejection, and daemon inertness. A source audit rejects allocation and C
-thread-lock calls from the compiled tables, definition, runtime, and state core.
+ABI rejection, CLI fail-closed behavior, and daemon inertness. Linux and Windows
+mock transports carry 1,000 mixed v2 requests through the real table dispatcher.
+A source audit rejects allocation and C thread-lock calls from the compiled
+tables, control dispatcher, definition, runtime, and state core.
 Existing portability tests continue to reject platform headers and backend
 identifiers from the complete core tree.
 
 ## Next Runtime Slice
 
-The next slice freezes the complete read-only and dry-run IPC/CLI contract and
-adds mock Linux/Windows control transports around the prepared table image. It
-remains output-suppressed and does not replace the protected single-rig
-deployment.
+The next slice adds bounded immutable-generation reclamation and stable
+device-slot port identities. It remains output-suppressed and does not replace
+the protected single-rig deployment.

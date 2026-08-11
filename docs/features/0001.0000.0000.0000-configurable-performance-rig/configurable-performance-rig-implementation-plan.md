@@ -166,6 +166,19 @@ definition/state location, IPC endpoint, device, audio, graph, plugin host,
 service, or live activation path exists yet, and the protected baseline remains
 30/30.
 
+Protocol v2 now freezes all nine planned operation IDs in fixed little-endian
+frames with bounded identifiers and a complete 16-profile response inventory.
+An allocation-free dispatcher implements status, filtered profile listing,
+active validation, and dry-run prepare/switch/reset/reload operations over the
+currently published immutable table image. Every committing request returns
+unsupported. The portable CLI parses and renders human/JSON inspection and
+global/device dry-run commands, but its executable has no configured endpoint
+and fails closed without sending. Ephemeral Linux `SOCK_SEQPACKET` and Windows
+current-user named-pipe tests carry 1,000 mixed requests through the real
+dispatcher. Local GCC/Clang pass 38/38, both optional JSON builds pass 41/41,
+eight ASan/UBSan boundary tests pass, and the protected baseline remains 30/30.
+Hosted proof is pending.
+
 ## Objective
 
 Implement the Performance Rig model defined by the feature proposal while

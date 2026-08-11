@@ -1,4 +1,5 @@
 #include "music_rig/runtime.h"
+#include "compiled-tables-fixture.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -193,6 +194,7 @@ static music_rig_runtime_config config_for(
     config.definition_fingerprint = fingerprint;
     config.definition_fingerprint_size =
         MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE;
+    config.active_rig_profile = "full-live-rack";
     config.output_mode = MUSIC_RIG_OUTPUT_SUPPRESSED;
     return config;
 }
@@ -205,6 +207,7 @@ static music_rig_protocol_request request(
 {
     music_rig_protocol_request value;
 
+    memset(&value, 0, sizeof(value));
     value.protocol_version = MUSIC_RIG_PROTOCOL_VERSION;
     value.operation = operation;
     value.request_id = request_id;
@@ -220,8 +223,10 @@ static int test_lifecycle_and_metrics(void)
         0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
         0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
     };
-    const music_rig_generation initial = {UINT64_C(7), NULL};
-    const music_rig_generation next = {UINT64_C(8), NULL};
+    static music_rig_compiled_tables tables;
+    static music_rig_compiled_tables next_tables;
+    music_rig_generation initial;
+    music_rig_generation next;
     music_rig_runtime runtime;
     mock_adapter adapter;
     music_rig_platform_interfaces interfaces;
@@ -229,6 +234,27 @@ static int test_lifecycle_and_metrics(void)
     const music_rig_runtime_state *state;
     const music_rig_runtime_metrics *metrics;
 
+    if (init_compiled_tables_fixture(&tables) != MUSIC_RIG_RESULT_OK ||
+        init_compiled_tables_fixture(&next_tables) != MUSIC_RIG_RESULT_OK) {
+        fputs("runtime table fixture failed\n", stderr);
+        return 1;
+    }
+    fixture_copy(next_tables.device_profiles[0].profile, "organ");
+    fixture_copy(next_tables.ownership[0].owners[0].profile, "organ");
+    if (music_rig_compiled_tables_prepare(
+            &next_tables,
+            UINT32_C(2),
+            UINT32_C(2),
+            UINT32_C(2),
+            UINT32_C(2)
+        ) != MUSIC_RIG_RESULT_OK) {
+        fputs("next runtime table fixture failed\n", stderr);
+        return 1;
+    }
+    initial.id = UINT64_C(7);
+    initial.mapping = &tables;
+    next.id = UINT64_C(8);
+    next.mapping = &next_tables;
     init_mock(&adapter);
     adapter.event_count = 5U;
     adapter.events[0] = MUSIC_RIG_CONTROL_IDLE;
@@ -245,7 +271,12 @@ static int test_lifecycle_and_metrics(void)
         (uint32_t)MUSIC_RIG_OPERATION_STATUS
     );
     adapter.events[3] = MUSIC_RIG_CONTROL_REQUEST;
-    adapter.requests[3] = request(UINT64_C(13), UINT64_C(0), UINT32_C(99));
+    adapter.requests[3] = request(
+        UINT64_C(13),
+        UINT64_C(0),
+        (uint32_t)MUSIC_RIG_OPERATION_SWITCH_GLOBAL
+    );
+    fixture_copy(adapter.requests[3].profile, "full-live-rack");
     adapter.events[4] = MUSIC_RIG_CONTROL_STOP;
     interfaces = interfaces_for(&adapter);
     config = config_for(&initial, fingerprint);
@@ -294,7 +325,7 @@ static int test_lifecycle_and_metrics(void)
     if (state->lifecycle != MUSIC_RIG_RUNTIME_STOPPED ||
         state->generation_id != UINT64_C(8) ||
         state->started_at_ns != UINT64_C(10) ||
-        state->stopped_at_ns != UINT64_C(20) ||
+        state->stopped_at_ns != UINT64_C(80) ||
         adapter.start_calls != 1U || adapter.wait_calls != 1U ||
         adapter.respond_calls != 3U || adapter.stop_calls != 1U ||
         adapter.response_count != 3U || adapter.state_read_calls != 1U ||
@@ -310,7 +341,10 @@ static int test_lifecycle_and_metrics(void)
         adapter.responses[1].result_code !=
             (uint32_t)MUSIC_RIG_RESULT_GENERATION_CONFLICT ||
         adapter.responses[2].result_code !=
-            (uint32_t)MUSIC_RIG_RESULT_INVALID_ARGUMENT) {
+            (uint32_t)MUSIC_RIG_RESULT_UNSUPPORTED ||
+        adapter.responses[0].profile_count != UINT32_C(2) ||
+        strcmp(adapter.responses[0].profiles[0].profile, "organ") != 0 ||
+        adapter.responses[0].control_duration_ns != UINT64_C(10)) {
         fputs("runtime responses are incorrect\n", stderr);
         return 1;
     }
@@ -319,7 +353,11 @@ static int test_lifecycle_and_metrics(void)
         metrics->control_waits != UINT64_C(1) ||
         metrics->control_requests != UINT64_C(3) ||
         metrics->status_requests != UINT64_C(2) ||
-        metrics->invalid_requests != UINT64_C(1) ||
+        metrics->list_requests != UINT64_C(0) ||
+        metrics->validate_requests != UINT64_C(0) ||
+        metrics->dry_run_requests != UINT64_C(0) ||
+        metrics->unsupported_requests != UINT64_C(1) ||
+        metrics->invalid_requests != UINT64_C(0) ||
         metrics->control_responses != UINT64_C(3) ||
         metrics->generation_publications != UINT64_C(1) ||
         metrics->generation_conflicts != UINT64_C(3) ||

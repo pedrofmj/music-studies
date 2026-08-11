@@ -1,39 +1,98 @@
 # Music Rig IPC Protocol
 
-Status: Milestone 0 framing contract with Linux `SOCK_SEQPACKET` and Windows
-named pipes selected. The first Milestone 3 runtime dispatcher consumes decoded
-status requests through a mock control adapter. This is not yet the complete
-runtime command or transport contract.
+Status: protocol v2 freezes the complete operation inventory and implements the
+Milestone 3 read-only and dry-run subset. Linux `SOCK_SEQPACKET` and Windows
+message-mode named pipes carry the same frames through ephemeral mock tests.
+No production endpoint, daemon listener, service, or installed state exists.
 
-## Portable Frame
+## Versioning
 
-Version 1 uses fixed-size little-endian frames. C structure layout is never sent
-directly, so compiler padding and host byte order cannot change the wire format.
+Frames are fixed-size little-endian byte sequences. C structure layout is never
+sent directly, so compiler padding and host byte order cannot change the wire
+format. Decoders require the exact frame size, version, reserved zeros, bounded
+counts, known flags, and schema-safe identifiers.
 
-Request frame, 32 bytes:
+Protocol v1 was the 32-byte request and 40-byte status-only Milestone 0 spike.
+Protocol v2 is intentionally incompatible because it freezes operation
+arguments and bounded response data before any production endpoint exists.
+
+## Request Frame
+
+Every v2 request is exactly 176 bytes:
 
 | Offset | Size | Field |
 | ---: | ---: | --- |
 | 0 | 4 | Magic `MRIG` |
-| 4 | 4 | Protocol version |
+| 4 | 4 | Protocol version, `2` |
 | 8 | 4 | Operation |
-| 12 | 4 | Reserved, zero |
-| 16 | 8 | Request ID |
-| 24 | 8 | Expected generation |
+| 12 | 4 | Request flags |
+| 16 | 8 | Nonzero request ID |
+| 24 | 8 | Expected generation, or zero for no precondition |
+| 32 | 65 | NUL-terminated device slot, when required |
+| 97 | 65 | NUL-terminated profile ID, when required |
+| 162 | 14 | Reserved, zero |
 
-Response frame, 40 bytes:
+Request flag `0x1` means dry-run. No other request flag is accepted.
+
+The complete operation inventory is:
+
+| ID | Operation | Arguments | Milestone 3 behavior |
+| ---: | --- | --- | --- |
+| 1 | `status` | none | Read-only |
+| 2 | `list-profiles` | optional device slot | Read-only |
+| 3 | `prepare-global` | profile | Dry-run only |
+| 4 | `prepare-device` | device slot and profile | Dry-run only |
+| 5 | `switch-global` | profile | Dry-run only |
+| 6 | `switch-device` | device slot and profile | Dry-run only |
+| 7 | `reset-device-override` | device slot | Dry-run only |
+| 8 | `reload-compiled-definition` | none | Dry-run validation only |
+| 9 | `validate-active` | none | Read-only |
+
+Any prepare, switch, reset, or reload request without the dry-run flag returns
+`unsupported`. A dry-run can inspect only profiles present in the loaded
+immutable definition. It never publishes a generation, persists state, loads a
+resource, contacts a device, or changes a graph.
+
+## Response Frame
+
+Every v2 response is exactly 2,592 bytes. The fixed inventory holds all 16
+profiles allowed by compiled-table ABI v1.
 
 | Offset | Size | Field |
 | ---: | ---: | --- |
 | 0 | 4 | Magic `MRIG` |
-| 4 | 4 | Protocol version |
-| 8 | 4 | Result code |
-| 12 | 4 | Reserved, zero |
-| 16 | 8 | Request ID |
-| 24 | 8 | Previous generation |
-| 32 | 8 | Resulting generation |
+| 4 | 4 | Protocol version, `2` |
+| 8 | 4 | Operation |
+| 12 | 4 | Result code |
+| 16 | 4 | Response flags |
+| 20 | 4 | Aggregate or selected readiness |
+| 24 | 8 | Request ID |
+| 32 | 8 | Previous generation |
+| 40 | 8 | Resulting generation |
+| 48 | 8 | Control-plane duration in nanoseconds |
+| 56 | 8 | Effective adoption timestamp, zero when not applicable |
+| 64 | 4 | Rollback status |
+| 68 | 4 | Warning flags |
+| 72 | 4 | Profile row count, at most 16 |
+| 76 | 4 | Reserved, zero |
+| 80 | 65 | Active Rig Profile |
+| 145 | 65 | Selected device slot, when applicable |
+| 210 | 65 | Selected target profile, when applicable |
+| 275 | 13 | Reserved, zero |
+| 288 | 2,304 | Sixteen fixed 144-byte profile rows |
 
-The runtime implements only the `status` operation. Its result codes are:
+Each profile row contains a 65-byte device slot, a 65-byte profile ID, two
+reserved zero bytes, 32-bit readiness, 32-bit profile flags, and four reserved
+zero bytes. Unused rows must be entirely zero.
+
+Response flags identify output suppression (`0x1`), dry-run (`0x2`), a valid
+plan or active definition (`0x4`), and an empty graph delta (`0x8`). Profile
+flags identify active (`0x1`) and override (`0x2`) rows. Readiness values are
+not evaluated (`0`), control-only (`1`), prepared (`2`), and cold (`3`). Warning
+flags currently identify cold loading (`0x1`) and unavailable bindings (`0x2`).
+Rollback is not required (`0`), succeeded (`1`), or failed (`2`).
+
+Result codes remain stable:
 
 | Code | Meaning |
 | ---: | --- |
@@ -43,32 +102,42 @@ The runtime implements only the `status` operation. Its result codes are:
 | 3 | Invalid runtime lifecycle state |
 | 4 | Platform adapter failure |
 | 5 | Expected-generation conflict |
-| 6 | Requested storage object not found |
+| 6 | Requested profile or storage object not found |
 | 7 | Invalid or corrupt structured data |
 | 8 | Caller-owned buffer is too small |
 
-For status, a zero expected generation means no precondition. A nonzero value
-must match the current published generation or the response returns code 5.
-Additional operations and payloads are added only after their fields and size
-limits are frozen here.
+All current responses keep previous and resulting generations equal. A stale
+nonzero expected generation returns code 5 before operation evaluation.
 
-## Linux Transport
+## CLI Contract
 
-Linux uses local Unix `SOCK_SEQPACKET`. It preserves one frame per message and
-rejects partial framing assumptions. The Milestone 0 test uses `socketpair`, so
-it creates no filesystem endpoint, daemon, service, or installed state.
+The portable client parser and renderer support:
 
-Before a real daemon is introduced, the adapter must add a runtime-directory
-socket path, peer credential checks, permissions, bounded timeouts, and explicit
-oversized-message rejection.
+```text
+music-rig status [--json] [--expected-generation ID]
+music-rig profiles list [--device SLOT] [--json]
+music-rig validate [--json]
+music-rig switch --global PROFILE --dry-run [--json]
+music-rig switch --device SLOT --profile PROFILE --dry-run [--json]
+```
 
-## Windows Transport
+Human and versioned JSON rendering use the same decoded response. The parser
+rejects a switch without `--dry-run`, conflicting scopes, duplicate options,
+invalid identifiers, and numeric overflow. The executable currently has no
+configured transport; recognized commands return adapter failure 4, write no
+response output, and state that no request was sent.
 
-The selected Windows transport is a local named pipe in message mode with an
-explicit current-user-only ACL and remote clients rejected. It can preserve the
-request/response message boundary while the portable encoder remains unchanged.
-The native test sends the shared request and response golden frames before
-running 1,000 measured round trips. It passes in hosted MSVC CI and from a
-hash-verified artifact on `beanstar`; the accepted transport decision and
-production requirements are recorded in
+## Mock Transports
+
+The Linux test uses an unnamed local `SOCK_SEQPACKET` pair. The Windows test
+uses a unique local message-mode named pipe with a current-user-only ACL and
+remote clients rejected. Both exchange shared v2 golden prefixes and run 1,000
+mixed status, filtered-list, validation, and device dry-run requests through
+the real immutable-table dispatcher. They create no filesystem socket, default
+pipe, service, runtime state, device connection, or musical output.
+
+A future production Linux adapter still requires an XDG runtime path, peer
+credential checks, permissions, bounded timeouts, and oversized-message
+rejection. The Windows production adapter requires the equivalent lifecycle
+and timeout handling described in
 [ADR 0004](../../features/0001.0000.0000.0000-configurable-performance-rig/architecture-decisions/0004-windows-local-ipc-named-pipes.md).

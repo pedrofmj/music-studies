@@ -5,7 +5,8 @@ This directory contains the Configurable Performance Rig implementation.
 Status: Milestones 0 through 2 are complete. Milestone 3 is in progress with a
 portable, output-suppressed runtime control loop, qualified persistent-state
 contract, bounded immutable definition tables, explicit-path Linux/Windows file
-adapters, and inert `music-rigd` binary. It does not select production storage
+adapters, protocol v2 read-only/dry-run dispatch, portable CLI contract, and
+inert `music-rigd` binary. It does not select production storage
 locations, install a service, create an IPC endpoint, connect to MIDI or audio,
 or modify the stable Carla/PipeWire setup.
 
@@ -147,8 +148,8 @@ tests claims installed-asset or live-graph availability. See
 the Milestone 3 daemon core: fixed-storage lifecycle state, a checksummed
 persistent-state frame, saturating metrics, expected-generation publication,
 and ABI-versioned clock/control/storage callbacks. Its event-driven loop handles
-decoded status requests, idle waits, responses, and shutdown through mock
-adapters. Output-enabled mode is rejected.
+decoded protocol v2 inspection and dry-run requests, idle waits, responses, and
+shutdown through mock adapters. Output-enabled mode is rejected.
 
 [`runtime/core/music_rig_definition.c`](runtime/core/music_rig_definition.c)
 loads bounded definition metadata and caller-owned tables through logical
@@ -173,6 +174,12 @@ without a state path or output. The daemon has no configured definition/state
 path, transport, installation, service, MIDI, audio, graph, or plugin-host path.
 See [RUNTIME.md](RUNTIME.md) for ownership, lifecycle, storage, adapter, metric,
 failure, and next-slice contracts.
+
+[`music-rig`](music-rig.c) recognizes `status`, `profiles list`, `validate`, and
+global/device switches only with `--dry-run`. The portable client library
+strictly parses commands and renders human or versioned JSON responses. Since
+no production endpoint exists, the executable returns adapter failure without
+sending a request; CTest locks this fail-closed behavior.
 
 Example for the opt-in build:
 
@@ -219,12 +226,14 @@ a complete synthetic campaign, threshold-boundary failures, and thirteen
 negative semantic cases using only the Python standard library. The fixture is
 not performance evidence and no test connects to the live rack.
 
-## Versioned IPC Spike
+## Versioned IPC Contract
 
-The portable core encodes fixed-size protocol frames explicitly in little-endian
-order. The Linux test performs 1,000 local `SOCK_SEQPACKET` request/response
-round trips and enforces a 20 ms p99 ceiling. It uses an unnamed `socketpair`
-and does not create a daemon, service, runtime socket file, or persistent state.
+The portable core encodes fixed-size protocol v2 frames explicitly in
+little-endian order. The 176-byte request and 2,592-byte response cover the
+complete operation inventory and a bounded 16-profile result. Linux and Windows
+mock tests perform 1,000 mixed status/list/validate/dry-run round trips through
+the actual immutable-table dispatcher and enforce a 20 ms p99 ceiling. They use
+ephemeral transports and create no daemon, service, default endpoint, or state.
 
 See [PROTOCOL.md](PROTOCOL.md) for the frame contract and selected Windows
 named-pipe boundary.

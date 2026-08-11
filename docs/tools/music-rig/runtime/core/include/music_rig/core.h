@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 #define MUSIC_RIG_CORE_VERSION "0.1.0"
-#define MUSIC_RIG_PROTOCOL_VERSION UINT32_C(1)
+#define MUSIC_RIG_PROTOCOL_VERSION UINT32_C(2)
 #define MUSIC_RIG_PROFILE_SCHEMA_VERSION UINT32_C(1)
 
 typedef enum music_rig_result {
