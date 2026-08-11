@@ -2,10 +2,10 @@
 
 This directory contains the Configurable Performance Rig implementation.
 
-Status: Milestones 0 and 1 are complete. Milestone 2 has started with an
-authoring-only deterministic compilation envelope. It does not install a
-service, read or write runtime state, connect to MIDI or audio, or modify the
-stable Carla/PipeWire setup.
+Status: Milestones 0 and 1 are complete. Milestone 2 has an authoring-only
+deterministic compilation envelope and temporary-only Carla/Patchbay
+materialization. It does not install a service, read or write runtime state,
+connect to MIDI or audio, or modify the stable Carla/PipeWire setup.
 
 ## Safety Boundary
 
@@ -112,10 +112,21 @@ refuses to overwrite authored source and has no install, activation, MIDI,
 audio, Carla, Patchbay, service, or persistent-state path. It compiles 72
 current MIDI mappings with a direct dispatch index, 5 stable-slot input
 bindings, 71 selected target bindings, 57 consolidated ownership entries, and
-an explicitly empty current graph delta. Materialization and semantic parity
-against Carla and Patchbay remain separate later gates. See
+an explicitly empty current graph delta. See
 [COMPILER.md](COMPILER.md) for the canonical table, delta, and fingerprint
 contracts.
+
+## Temporary Carla And Patchbay Materialization
+
+[`materialize-compiled-rig.py`](materialize-compiled-rig.py) consumes the
+fingerprinted compiled `full-live-rack` definition and renders Carla and
+Patchbay artifacts only below the system temporary directory. It rejects
+installed, repository, home, nonempty, and symbolic-link output roots, requires
+an empty unapplied graph delta, and emits a deterministic checksummed bundle.
+It performs no activation or runtime mutation. See
+[MATERIALIZATION.md](MATERIALIZATION.md) for the input and output contract and
+an offline example. Semantic inventory parity remains the next Milestone 2
+gate.
 
 Run the validator directly:
 

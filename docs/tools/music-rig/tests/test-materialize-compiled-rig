@@ -1,0 +1,374 @@
+#!/usr/bin/env python3
+"""Exercise temporary-only compiled Performance Rig materialization."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import shutil
+import subprocess
+import sys
+import tempfile
+import xml.etree.ElementTree as ET
+from pathlib import Path
+from typing import Any, Mapping, Optional
+
+
+sys.dont_write_bytecode = True
+
+
+SCRIPT_PATH = Path(__file__).resolve()
+TOOLS_ROOT = SCRIPT_PATH.parents[1]
+REPOSITORY_ROOT = SCRIPT_PATH.parents[4]
+MATERIALIZER = TOOLS_ROOT / "materialize-compiled-rig.py"
+COMPILED_DEFINITION = (
+    TOOLS_ROOT / "tests" / "fixtures" / "compiled-current-envelope.json"
+)
+RIG_ROOT = (
+    REPOSITORY_ROOT / "src" / "performance-rigs" / "pedro-performance-rig"
+)
+REFERENCE_HOME = "/home/ldap/pedro.ferreira"
+TARGET_HOME = "/portable-test/home"
+TARGET_SOUNDFONT_ROOT = "/portable-test/soundfonts"
+SINK_NODE = "Portable Test Sink"
+LEFT_ALIAS = "Portable Speakers:playback_FL"
+RIGHT_ALIAS = "Portable Speakers:playback_FR"
+
+
+def canonical_json_bytes(document: Any) -> bytes:
+    return json.dumps(
+        document,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+
+
+def fingerprint(document: Any) -> str:
+    return "sha256:" + hashlib.sha256(canonical_json_bytes(document)).hexdigest()
+
+
+def file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def write_json(path: Path, document: Any) -> None:
+    path.write_text(
+        json.dumps(document, ensure_ascii=True, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
+def current_graph() -> Mapping[str, Any]:
+    return {
+        "ports": [
+            {
+                "node_name": SINK_NODE,
+                "name": "playback_FL",
+                "direction": "in",
+                "alias": LEFT_ALIAS,
+                "name_selector": "portable_sink:playback_FL",
+            },
+            {
+                "node_name": SINK_NODE,
+                "name": "playback_FR",
+                "direction": "in",
+                "alias": RIGHT_ALIAS,
+                "name_selector": "portable_sink:playback_FR",
+            },
+        ]
+    }
+
+
+def run_materializer(
+    graph_path: Path,
+    compiled_path: Path = COMPILED_DEFINITION,
+    output_root: Optional[Path] = None,
+    target_home: str = TARGET_HOME,
+    target_soundfont_root: str = TARGET_SOUNDFONT_ROOT,
+) -> subprocess.CompletedProcess:
+    command = [
+        sys.executable,
+        str(MATERIALIZER),
+        "--compiled-definition",
+        str(compiled_path),
+        "--current-graph",
+        str(graph_path),
+        "--default-node-name",
+        SINK_NODE,
+        "--target-home",
+        target_home,
+        "--target-soundfont-root",
+        target_soundfont_root,
+        "--rig-root",
+        str(RIG_ROOT),
+        "--repository-root",
+        str(REPOSITORY_ROOT),
+    ]
+    if output_root is None:
+        command.append("--check-only")
+    else:
+        command.extend(["--output-root", str(output_root)])
+    return subprocess.run(
+        command,
+        cwd=str(REPOSITORY_ROOT),
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+
+
+def require_success(result: subprocess.CompletedProcess, label: str) -> None:
+    if result.returncode != 0:
+        raise AssertionError(
+            f"{label} failed ({result.returncode}): {result.stderr}"
+        )
+
+
+def require_failure(
+    result: subprocess.CompletedProcess,
+    label: str,
+    message: str,
+) -> None:
+    if result.returncode == 0:
+        raise AssertionError(f"{label} unexpectedly succeeded")
+    if message not in result.stderr:
+        raise AssertionError(
+            f"{label} omitted {message!r}: {result.stderr!r}"
+        )
+
+
+def collect_aliases(value: Any) -> set[str]:
+    aliases = set()
+    if isinstance(value, dict):
+        alias = value.get("alias")
+        if isinstance(alias, str):
+            aliases.add(alias)
+        for child in value.values():
+            aliases.update(collect_aliases(child))
+    elif isinstance(value, list):
+        for child in value:
+            aliases.update(collect_aliases(child))
+    return aliases
+
+
+def bundle_bytes(root: Path) -> Mapping[str, bytes]:
+    return {
+        path.relative_to(root).as_posix(): path.read_bytes()
+        for path in sorted(item for item in root.rglob("*") if item.is_file())
+    }
+
+
+def protected_hashes() -> Mapping[Path, str]:
+    paths = [
+        REPOSITORY_ROOT
+        / "docs"
+        / "tools"
+        / "airstar-live-setup"
+        / "materialize-carla-project.py",
+        REPOSITORY_ROOT
+        / "docs"
+        / "tools"
+        / "airstar-live-setup"
+        / "materialize-patchbay.py",
+        REPOSITORY_ROOT
+        / "src"
+        / "audio-software"
+        / "carla"
+        / "projects"
+        / "pedro-live-rack"
+        / "pedro.uproject",
+        REPOSITORY_ROOT
+        / "src"
+        / "midi-setup"
+        / "pedro-live-rack-patchbay.json",
+    ]
+    return {path: file_sha256(path) for path in paths}
+
+
+def verify_bundle(root: Path) -> None:
+    files = bundle_bytes(root)
+    expected = {
+        "carla/pedro.uproject",
+        "materialization.json",
+        "patchbay/pedro-live-rack-patchbay.json",
+    }
+    if set(files) != expected:
+        raise AssertionError(f"unexpected bundle files: {sorted(files)}")
+
+    carla_path = root / "carla" / "pedro.uproject"
+    carla_text = carla_path.read_text(encoding="utf-8")
+    ET.parse(carla_path)
+    if TARGET_HOME not in carla_text or TARGET_SOUNDFONT_ROOT not in carla_text:
+        raise AssertionError("Carla output omitted relocated target roots")
+    if REFERENCE_HOME in carla_text:
+        raise AssertionError("Carla output retained the reference home")
+
+    patchbay = json.loads(
+        (root / "patchbay" / "pedro-live-rack-patchbay.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    aliases = collect_aliases(patchbay)
+    if LEFT_ALIAS not in aliases or RIGHT_ALIAS not in aliases:
+        raise AssertionError("Patchbay output omitted relocated stereo aliases")
+
+    manifest = json.loads(
+        (root / "materialization.json").read_text(encoding="utf-8")
+    )
+    if manifest["safety"] != {
+        "activation": "authoring-only",
+        "applies_graph_delta": False,
+        "materializes_runtime": False,
+        "output_policy": "system-temporary-descendant",
+    }:
+        raise AssertionError("materialization manifest changed its safety boundary")
+    for record in manifest["outputs"].values():
+        content = files[record["path"]]
+        if record["bytes"] != len(content):
+            raise AssertionError(f"wrong byte count for {record['path']}")
+        if record["sha256"] != hashlib.sha256(content).hexdigest():
+            raise AssertionError(f"wrong checksum for {record['path']}")
+
+
+def main() -> int:
+    completed_cases = []
+    before = protected_hashes()
+    forbidden_root = REPOSITORY_ROOT / ".music-rig-materializer-forbidden"
+    if forbidden_root.exists():
+        raise AssertionError(f"unexpected test path exists: {forbidden_root}")
+    try:
+        with tempfile.TemporaryDirectory(
+            prefix="music-rig-materializer-test-"
+        ) as temporary:
+            temporary_root = Path(temporary)
+            graph_path = temporary_root / "current-graph.json"
+            write_json(graph_path, current_graph())
+
+            check = run_materializer(graph_path)
+            require_success(check, "check-only materialization")
+            if "output=memory, activation=none" not in check.stdout:
+                raise AssertionError(
+                    "check-only output omitted the no-activation state"
+                )
+            completed_cases.append("check-only")
+
+            first_root = temporary_root / "first-bundle"
+            first = run_materializer(graph_path, output_root=first_root)
+            require_success(first, "first materialization")
+            verify_bundle(first_root)
+            completed_cases.append("temporary-bundle")
+
+            second_root = temporary_root / "second-bundle"
+            second = run_materializer(graph_path, output_root=second_root)
+            require_success(second, "second materialization")
+            if bundle_bytes(first_root) != bundle_bytes(second_root):
+                raise AssertionError("materialized bundles are not deterministic")
+            completed_cases.append("repeatable-output")
+
+            existing_empty_root = temporary_root / "existing-empty-bundle"
+            existing_empty_root.mkdir()
+            existing_empty = run_materializer(
+                graph_path,
+                output_root=existing_empty_root,
+            )
+            require_success(existing_empty, "existing empty root")
+            verify_bundle(existing_empty_root)
+            completed_cases.append("existing-empty-root")
+
+            identity_root = temporary_root / "identity-bundle"
+            identity = run_materializer(
+                graph_path,
+                output_root=identity_root,
+                target_home=REFERENCE_HOME,
+                target_soundfont_root=(
+                    REFERENCE_HOME
+                    + "/Flash/PED/MIDI/Pack de Timbres/Library"
+                ),
+            )
+            require_success(identity, "identity relocation")
+            identity_manifest = json.loads(
+                (identity_root / "materialization.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            identity_replacements = identity_manifest["relocation"][
+                "carla_path_replacements"
+            ]
+            if identity_replacements != 0:
+                raise AssertionError("identity relocation unexpectedly changed paths")
+            completed_cases.append("identity-relocation")
+
+            nonempty_root = temporary_root / "nonempty"
+            nonempty_root.mkdir()
+            (nonempty_root / "sentinel").write_text("keep\n", encoding="utf-8")
+            nonempty = run_materializer(graph_path, output_root=nonempty_root)
+            require_failure(nonempty, "nonempty root", "output root must be empty")
+            sentinel = (nonempty_root / "sentinel").read_text(
+                encoding="utf-8"
+            )
+            if sentinel != "keep\n":
+                raise AssertionError("nonempty-root rejection altered existing content")
+            completed_cases.append("nonempty-root-rejected")
+
+            tampered_path = temporary_root / "tampered-definition.json"
+            tampered = json.loads(COMPILED_DEFINITION.read_text(encoding="utf-8"))
+            tampered["safety"]["materializes_runtime"] = True
+            unsigned = dict(tampered)
+            unsigned.pop("definition_fingerprint")
+            tampered["definition_fingerprint"] = fingerprint(unsigned)
+            write_json(tampered_path, tampered)
+            tampered_root = temporary_root / "tampered-bundle"
+            unsafe = run_materializer(
+                graph_path,
+                compiled_path=tampered_path,
+                output_root=tampered_root,
+            )
+            require_failure(unsafe, "unsafe definition", "not authoring-only")
+            if tampered_root.exists():
+                raise AssertionError("unsafe definition created an output root")
+            completed_cases.append("unsafe-definition-rejected")
+
+            outside = run_materializer(graph_path, output_root=forbidden_root)
+            require_failure(
+                outside,
+                "non-temporary destination",
+                "output root must be a strict descendant",
+            )
+            if forbidden_root.exists():
+                raise AssertionError("non-temporary destination was created")
+            completed_cases.append("non-temporary-root-rejected")
+
+            broken_graph_path = temporary_root / "broken-graph.json"
+            write_json(broken_graph_path, {"ports": []})
+            broken_root = temporary_root / "broken-bundle"
+            broken = run_materializer(
+                broken_graph_path,
+                output_root=broken_root,
+            )
+            require_failure(broken, "missing sink", "expected one")
+            if broken_root.exists():
+                raise AssertionError("missing-sink failure created an output root")
+            completed_cases.append("missing-sink-rejected")
+    finally:
+        if forbidden_root.exists():
+            shutil.rmtree(forbidden_root)
+
+    after = protected_hashes()
+    if before != after:
+        changed = sorted(
+            str(path) for path in before if before[path] != after[path]
+        )
+        raise AssertionError(f"protected artifacts changed: {changed}")
+    completed_cases.append("protected-artifacts-unchanged")
+
+    print(
+        "Compiled Rig materializer self-test: PASS "
+        f"({len(completed_cases)} cases: {', '.join(completed_cases)})"
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

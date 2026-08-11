@@ -109,8 +109,11 @@ portable-source, binding, and generated-definition SHA-256 fingerprints. A
 thirteen-case suite also locks the five input bindings, seventy-two direct MIDI
 mappings, seventy-one selected target bindings, fifty-seven consolidated
 ownership entries, relative encoding and takeover resolution, and an empty
-current graph delta. A nonempty control-only delta fails compilation. No
-materializer, runtime, or activation path exists yet.
+current graph delta. A nonempty control-only delta fails compilation. The
+authoring-only materializer consumes that definition and can render Carla and
+Patchbay output only into a new or empty system-temporary descendant. It
+records a deterministic checksummed manifest and has no install, runtime, or
+activation path. Semantic inventory parity remains in progress.
 
 ## Objective
 

@@ -192,6 +192,16 @@ if(BUILD_TESTING)
         PROPERTIES TIMEOUT 30
     )
 
+    add_test(
+        NAME music_rig_materializer_self_test
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-materialize-compiled-rig"
+    )
+    set_tests_properties(
+        music_rig_materializer_self_test
+        PROPERTIES TIMEOUT 30
+    )
+
     set(MUSIC_RIG_SWITCH_BENCHMARK_VALIDATOR
         "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/validate-switch-benchmark"
     )
