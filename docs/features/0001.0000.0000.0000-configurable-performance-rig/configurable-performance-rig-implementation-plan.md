@@ -2,8 +2,8 @@
 
 Language: **English**
 
-Status: Milestones 0 through 2 complete. Milestone 3 is next. The protected
-single-rig deployment remains the production default.
+Status: Milestones 0 through 2 complete. Milestone 3 is in progress. The
+protected single-rig deployment remains the production default.
 
 Related documents:
 
@@ -131,6 +131,18 @@ validator. Local GCC and Clang pass 28/28, both optional Linux JSON builds pass
 29/29, and hosted
 [run 31514575263](https://github.com/pedrofmj/music-studies/actions/runs/31514575263)
 passes Linux 28/28, Windows 22/22, and Windows JSON 23/23.
+
+Milestone 3 has begun with an allocation-free portable control dispatcher,
+fixed-storage versioned state, saturating metrics, expected-generation
+publication, and ABI-versioned clock/control adapters. The initial
+`music-rigd` executable is deliberately inert: it exposes version/help only,
+rejects a no-argument start, and accepts no output-enabled mode. Mock adapters
+cover normal idle/request/stop sequencing and every adapter failure boundary.
+Local GCC and Clang pass 32/32, both optional Linux JSON builds pass 33/33, and
+hosted [run 31521502726](https://github.com/pedrofmj/music-studies/actions/runs/31521502726)
+passes Linux 32/32, Windows 26/26, and Windows JSON 27/27. No definition, IPC
+endpoint, persistent state, device, audio, graph, plugin host, service, or live
+activation path exists yet, and the protected baseline remains 30/30.
 
 ## Objective
 
