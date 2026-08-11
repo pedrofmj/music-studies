@@ -2,8 +2,8 @@
 
 Language: **English**
 
-Status: Milestone 1 implementation complete; hosted proof pending. The
-protected single-rig deployment remains the production default.
+Status: Milestones 0 and 1 complete. Milestone 2 has not started. The protected
+single-rig deployment remains the production default.
 
 Related documents:
 
