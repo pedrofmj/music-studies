@@ -5,9 +5,10 @@ Performance Rig. Schema version `music-studies/performance-rig/v1` uses JSON
 Schema Draft 2020-12.
 
 Current status: schema, stable-slot, Hardware Preset, Device Profile, initial
-Rig Profile, and Linux Platform Binding extraction. No installer, service,
-runtime, or live audio/MIDI tool reads this directory. The protected
-`setup.json`, Carla project, services, and graph remain the production
+Rig Profile, Linux Platform Binding extraction, and deterministic compilation
+envelope. Only authoring validation and compilation tools read this directory;
+no installer, service, runtime, or live audio/MIDI tool consumes it. The
+protected `setup.json`, Carla project, services, and graph remain the production
 authority until the later parity and cutover gates pass.
 
 `rig.json` records the five stable controller slots from the protected rack.
@@ -90,4 +91,15 @@ python3 docs/tools/music-rig/validate-performance-rig.py \
   --authority-setup docs/tools/airstar-live-setup/setup.json \
   --authority-pad-capture \
     docs/tools/music-rig/benchmarks/hardware-preset-airstar-2026-08-11.json
+
+python3 docs/tools/music-rig/compile-performance-rig.py \
+  --rig-root src/performance-rigs/pedro-performance-rig \
+  --platform-binding airstar-current \
+  --check-only
 ```
+
+The compiler emits only to an explicit output path and refuses to overwrite
+authored source. Its first Milestone 2 envelope and fingerprint contract is
+documented in
+[`COMPILER.md`](../../../docs/tools/music-rig/COMPILER.md). It does not
+materialize or activate Carla, Patchbay, MIDI, audio, service, or runtime state.

@@ -2,9 +2,10 @@
 
 This directory contains the Configurable Performance Rig implementation.
 
-Status: Milestone 1 schema extraction is implemented, with Milestone 0
-technical gates complete. It does not install a service, read or write runtime
-state, connect to MIDI or audio, or modify the stable Carla/PipeWire setup.
+Status: Milestones 0 and 1 are complete. Milestone 2 has started with an
+authoring-only deterministic compilation envelope. It does not install a
+service, read or write runtime state, connect to MIDI or audio, or modify the
+stable Carla/PipeWire setup.
 
 ## Safety Boundary
 
@@ -85,6 +86,32 @@ Linux binding to the same Airstar device aliases, paths, checksums, and
 services. The Windows binding is a contract fixture only and does not claim
 physical backend support or certification. The authored trigger catalogue has
 zero triggers and therefore enables no MIDI management operation.
+
+## Deterministic Compiler Envelope
+
+[`compile-performance-rig.py`](compile-performance-rig.py) validates the full
+authored catalogue and resolves an explicit Rig Profile and Platform Binding
+into canonical JSON. It records independent SHA-256 fingerprints for every
+schema and portable source, the schema set, portable source set, selected
+binding, and complete compiled definition. Source paths are relative POSIX
+paths, so the exact golden output is portable across working directories and
+Linux/Windows path layouts.
+
+Run a no-write compilation check:
+
+~~~bash
+/tmp/music-rig-schema-venv/bin/python \
+  docs/tools/music-rig/compile-performance-rig.py \
+  --rig-root src/performance-rigs/pedro-performance-rig \
+  --platform-binding airstar-current \
+  --check-only
+~~~
+
+The compiler requires either `--check-only` or an explicit `--output` path. It
+refuses to overwrite authored source and has no install, activation, MIDI,
+audio, Carla, Patchbay, service, or persistent-state path. Direct runtime
+mapping tables, ownership tables, and graph deltas are the next compiler slice.
+See [COMPILER.md](COMPILER.md) for the canonical format and fingerprint contract.
 
 Run the validator directly:
 

@@ -33,8 +33,8 @@ Documents:
 
 | Check | Result |
 | --- | --- |
-| GCC isolated suite | ✅ 20/20 passed |
-| Clang isolated suite | ✅ 20/20 passed |
+| GCC isolated suite | ✅ 25/25 passed |
+| Clang isolated suite | ✅ 25/25 passed |
 | GCC with Linux JSON probe | ✅ 18/18 passed |
 | Clang with Linux JSON probe | ✅ 18/18 passed |
 | Arturia offline parity | ✅ MIDI, state, replay, and stereo ramp passed |
@@ -60,6 +60,7 @@ Documents:
 | Windows 60-second idle resources | ✅ 60.259 s, 0.000000% measured child CPU, 3,670,016-byte observed peak working set, 65 handles, 4 threads, zero events |
 | Windows resource cleanup | ✅ Zero remaining test processes; temporary directory removed and independently confirmed |
 | Portable profile schemas | ✅ [Linux 23/23, Windows 17/17, and Windows JSON 18/18](https://github.com/pedrofmj/music-studies/actions/runs/31486826609) pass with five verified Hardware Presets, zero partial presets, five Device Profiles, one Rig Profile, one Linux Platform Binding, one inactive Switch Trigger document, six valid fixtures, fourteen invalid fixtures, and twenty-eight catalogue cases |
+| Deterministic compiler envelope | 🟡 Linux GCC and Clang 25/25 pass; exact golden bytes and nine compiler cases pass; hosted Linux/Windows proof pending |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -74,7 +75,7 @@ benchmarks.
 | --- | --- | --- |
 | 0. Baseline and technical gates | ✅ | Baseline reproducible and technical gates passed |
 | 1. Schemas and current profile extraction | ✅ | `full-live-rack` describes every current role and dependency; all known conflict classes are rejected |
-| 2. Deterministic compiler and parity | ⬜ | Not started |
+| 2. Deterministic compiler and parity | 🟡 | Canonical compilation envelope and fingerprints pass; mappings, materialization, and semantic parity remain |
 | 3. Runtime, CLI, and shadow mode | ⬜ | Not started |
 | 4. Control-only switching | ⬜ | Not started |
 | 5. MIDI management triggers | ⬜ | Not started |
@@ -212,7 +213,13 @@ benchmarks.
 
 ## Milestone 2: Deterministic Compiler And Parity
 
-- ⬜ Implement deterministic source compilation and fingerprints.
+- 🟡 Implement deterministic source compilation and fingerprints. The
+  authoring-only compiler emits canonical UTF-8 JSON with independent schema,
+  portable-source, Platform Binding, and generated-definition SHA-256
+  fingerprints. Nine cases cover exact golden bytes, repeatability across
+  working directories, fingerprint recomputation, source-overwrite refusal,
+  no-write mode, deterministic diagnostics, and binding isolation. Linux GCC
+  and Clang suites pass 25/25; hosted Linux/Windows proof remains.
 - ⬜ Compile semantic mappings, ownership, and graph deltas.
 - ⬜ Materialize Carla and Patchbay output only in temporary test locations.
 - ⬜ Prove 49-plugin, 111-project-connection, and 115-link semantic parity.

@@ -2,7 +2,7 @@
 
 Language: **English**
 
-Status: Milestones 0 and 1 complete. Milestone 2 has not started. The protected
+Status: Milestones 0 and 1 complete. Milestone 2 is in progress. The protected
 single-rig deployment remains the production default.
 
 Related documents:
@@ -101,6 +101,15 @@ events, unresolved sources and operations, missing Hardware Preset assignments,
 readiness violations, and consumed-event overlap with any available Device
 Profile mapping while retaining explicit passthrough. No runtime or deployment
 path consumes these authored documents yet.
+
+Milestone 2 now has an authoring-only deterministic compiler envelope. It
+validates the complete catalogue, resolves the selected Rig Profile and explicit
+Platform Binding, emits canonical UTF-8 JSON, and records independent schema,
+portable-source, binding, and generated-definition SHA-256 fingerprints. A
+nine-case suite locks exact golden bytes, repeated and relocated execution,
+fingerprint recomputation, source-overwrite refusal, no-write behavior, stable
+diagnostics, and binding isolation. No compiled semantic lookup table, graph
+delta, materializer, runtime, or activation path exists yet.
 
 ## Objective
 

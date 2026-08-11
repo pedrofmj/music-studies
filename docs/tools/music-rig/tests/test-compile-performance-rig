@@ -1,0 +1,331 @@
+#!/usr/bin/env python3
+"""Exercise the deterministic Performance Rig compilation envelope."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+from typing import Any, Optional, Sequence
+
+
+SCRIPT_PATH = Path(__file__).resolve()
+TOOLS_ROOT = SCRIPT_PATH.parents[1]
+REPOSITORY_ROOT = SCRIPT_PATH.parents[4]
+COMPILER_PATH = TOOLS_ROOT / "compile-performance-rig.py"
+RIG_ROOT = (
+    REPOSITORY_ROOT / "src" / "performance-rigs" / "pedro-performance-rig"
+)
+GOLDEN_PATH = (
+    TOOLS_ROOT / "tests" / "fixtures" / "compiled-current-envelope.json"
+)
+FINGERPRINT_PATTERN = re.compile(r"^sha256:[0-9a-f]{64}$")
+
+
+def canonical_json_bytes(document: Any) -> bytes:
+    return json.dumps(
+        document,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+
+
+def fingerprint(document: Any) -> str:
+    return "sha256:" + hashlib.sha256(canonical_json_bytes(document)).hexdigest()
+
+
+def run_compiler(
+    rig_root: Path,
+    binding_id: str,
+    cwd: Path,
+    output: Optional[Path] = None,
+) -> subprocess.CompletedProcess:
+    command = [
+        sys.executable,
+        str(COMPILER_PATH),
+        "--rig-root",
+        str(rig_root),
+        "--platform-binding",
+        binding_id,
+    ]
+    if output is None:
+        command.append("--check-only")
+    else:
+        command.extend(["--output", str(output)])
+    return subprocess.run(
+        command,
+        cwd=str(cwd),
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+
+
+def require_success(
+    result: subprocess.CompletedProcess,
+    label: str,
+) -> None:
+    if result.returncode != 0:
+        raise AssertionError(
+            f"{label} failed ({result.returncode}): {result.stderr}"
+        )
+
+
+def load_json(path: Path) -> Any:
+    with path.open("r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def write_json(path: Path, document: Any) -> None:
+    path.write_text(
+        json.dumps(document, ensure_ascii=True, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
+def pycache_files() -> Sequence[str]:
+    pycache = TOOLS_ROOT / "__pycache__"
+    if not pycache.exists():
+        return []
+    return sorted(path.name for path in pycache.iterdir())
+
+
+def add_alternate_binding(rig_root: Path) -> None:
+    rig_path = rig_root / "rig.json"
+    rig = load_json(rig_path)
+    rig["platform_bindings"].append("airstar-alternate")
+    write_json(rig_path, rig)
+
+    source_path = (
+        rig_root
+        / "platform-bindings"
+        / "linux"
+        / "airstar-current.json"
+    )
+    binding = load_json(source_path)
+    binding["id"] = "airstar-alternate"
+    binding["display_name"] = "Airstar Alternate Test Binding"
+    binding["description"] = "Synthetic deterministic compiler test binding."
+    binding["device_slots"]["arturia-main"]["identity"][
+        "value"
+    ] = "fixture-alternate-arturia"
+    alternate_path = source_path.with_name("airstar-alternate.json")
+    write_json(alternate_path, binding)
+
+
+def remove_required_binding_target(rig_root: Path) -> None:
+    binding_path = (
+        rig_root
+        / "platform-bindings"
+        / "linux"
+        / "airstar-current.json"
+    )
+    binding = load_json(binding_path)
+    for group in binding["binding_groups"]:
+        group["targets"].pop("parameter.master-volume", None)
+    write_json(binding_path, binding)
+
+
+def main() -> int:
+    try:
+        with tempfile.TemporaryDirectory(
+            prefix="music-rig-compiler-test-"
+        ) as temporary:
+            temporary_root = Path(temporary)
+            first_output = temporary_root / "first.json"
+            second_output = temporary_root / "second.json"
+            other_cwd = temporary_root / "other-cwd"
+            other_cwd.mkdir()
+
+            first = run_compiler(
+                RIG_ROOT,
+                "airstar-current",
+                REPOSITORY_ROOT,
+                first_output,
+            )
+            require_success(first, "first compilation")
+            second = run_compiler(
+                RIG_ROOT,
+                "airstar-current",
+                other_cwd,
+                second_output,
+            )
+            require_success(second, "second compilation")
+            first_bytes = first_output.read_bytes()
+            if first_bytes != second_output.read_bytes():
+                raise AssertionError(
+                    "compiled bytes differ across working directories"
+                )
+
+            document = load_json(first_output)
+            canonical_render = (
+                json.dumps(
+                    document,
+                    ensure_ascii=True,
+                    indent=2,
+                    sort_keys=True,
+                )
+                + "\n"
+            ).encode("utf-8")
+            if first_bytes != canonical_render:
+                raise AssertionError("compiled output is not canonical JSON")
+            definition_fingerprint = document.pop("definition_fingerprint")
+            if definition_fingerprint != fingerprint(document):
+                raise AssertionError("definition fingerprint is not reproducible")
+            for value in document["fingerprints"].values():
+                if value != "sha256" and not FINGERPRINT_PATTERN.fullmatch(value):
+                    raise AssertionError(f"invalid fingerprint value: {value}")
+
+            for category in ("schemas", "portable"):
+                manifest = document["source_manifest"][category]
+                for entry in manifest:
+                    source_document = load_json(RIG_ROOT / entry["path"])
+                    if entry["fingerprint"] != fingerprint(source_document):
+                        raise AssertionError(
+                            f"incorrect {category} source fingerprint: "
+                            f"{entry['path']}"
+                        )
+                aggregate_name = (
+                    "schema_set" if category == "schemas" else "portable_source"
+                )
+                if document["fingerprints"][aggregate_name] != fingerprint(manifest):
+                    raise AssertionError(
+                        f"incorrect {aggregate_name} aggregate fingerprint"
+                    )
+
+            binding_manifest = document["source_manifest"]["platform_binding"]
+            binding_document = load_json(RIG_ROOT / binding_manifest["path"])
+            expected_binding_fingerprint = fingerprint(binding_document)
+            if binding_manifest["fingerprint"] != expected_binding_fingerprint:
+                raise AssertionError("incorrect binding source fingerprint")
+            if (
+                document["fingerprints"]["platform_binding"]
+                != expected_binding_fingerprint
+            ):
+                raise AssertionError("incorrect aggregate binding fingerprint")
+
+            manifest_paths = [
+                entry["path"]
+                for category in ("schemas", "portable")
+                for entry in document["source_manifest"][category]
+            ]
+            manifest_paths.append(
+                document["source_manifest"]["platform_binding"]["path"]
+            )
+            if any("\\" in path or path.startswith("/") for path in manifest_paths):
+                raise AssertionError("manifest contains a machine-specific path")
+            if first_bytes != GOLDEN_PATH.read_bytes():
+                raise AssertionError("compiled output differs from golden fixture")
+
+            pycache_before = pycache_files()
+            check_only = run_compiler(
+                RIG_ROOT,
+                "airstar-current",
+                other_cwd,
+            )
+            require_success(check_only, "check-only compilation")
+            if pycache_files() != pycache_before:
+                raise AssertionError("check-only compilation wrote bytecode")
+
+            rig_path = RIG_ROOT / "rig.json"
+            rig_before = rig_path.read_bytes()
+            overwrite = run_compiler(
+                RIG_ROOT,
+                "airstar-current",
+                other_cwd,
+                rig_path,
+            )
+            if overwrite.returncode != 1 or "overwrite source" not in overwrite.stderr:
+                raise AssertionError("compiler did not reject source overwrite")
+            if rig_path.read_bytes() != rig_before:
+                raise AssertionError("source-overwrite rejection changed rig.json")
+
+            missing = run_compiler(
+                RIG_ROOT,
+                "missing-binding",
+                other_cwd,
+            )
+            if missing.returncode != 1 or missing.stderr != (
+                "ERROR: unresolved Platform Binding 'missing-binding'\n"
+            ):
+                raise AssertionError("missing-binding diagnostic is unstable")
+
+            alternate_root = temporary_root / "alternate-rig"
+            shutil.copytree(RIG_ROOT, alternate_root)
+            add_alternate_binding(alternate_root)
+            current_output = temporary_root / "current-binding.json"
+            alternate_output = temporary_root / "alternate-binding.json"
+            require_success(
+                run_compiler(
+                    alternate_root,
+                    "airstar-current",
+                    other_cwd,
+                    current_output,
+                ),
+                "current binding in multi-binding Rig",
+            )
+            require_success(
+                run_compiler(
+                    alternate_root,
+                    "airstar-alternate",
+                    other_cwd,
+                    alternate_output,
+                ),
+                "alternate binding in multi-binding Rig",
+            )
+            current_document = load_json(current_output)
+            alternate_document = load_json(alternate_output)
+            if (
+                current_document["fingerprints"]["portable_source"]
+                != alternate_document["fingerprints"]["portable_source"]
+            ):
+                raise AssertionError(
+                    "portable fingerprint changed with binding selection"
+                )
+            if (
+                current_document["fingerprints"]["platform_binding"]
+                == alternate_document["fingerprints"]["platform_binding"]
+            ):
+                raise AssertionError("binding fingerprints are not independent")
+            if (
+                current_document["definition_fingerprint"]
+                == alternate_document["definition_fingerprint"]
+            ):
+                raise AssertionError("definition ignored binding selection")
+
+            diagnostic_outputs = []
+            for root_name in ("invalid-one", "invalid-two"):
+                invalid_root = temporary_root / root_name
+                shutil.copytree(RIG_ROOT, invalid_root)
+                remove_required_binding_target(invalid_root)
+                invalid = run_compiler(
+                    invalid_root,
+                    "airstar-current",
+                    other_cwd,
+                )
+                if invalid.returncode != 1:
+                    raise AssertionError("invalid catalogue compiled")
+                diagnostic_outputs.append(invalid.stderr)
+            if diagnostic_outputs[0] != diagnostic_outputs[1]:
+                raise AssertionError(
+                    "catalogue diagnostics depend on absolute Rig path"
+                )
+            if "unresolved capabilities" not in diagnostic_outputs[0]:
+                raise AssertionError("missing capability diagnostic was absent")
+
+        print("Performance Rig compiler tests: PASS (cases=9)")
+        return 0
+    except (AssertionError, OSError, ValueError, KeyError) as error:
+        print(f"FAIL: {error}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

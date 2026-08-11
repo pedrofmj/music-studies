@@ -169,6 +169,29 @@ if(BUILD_TESTING)
         PROPERTIES TIMEOUT 10
     )
 
+    set(MUSIC_RIG_COMPILER
+        "${CMAKE_CURRENT_SOURCE_DIR}/compile-performance-rig.py"
+    )
+    add_test(
+        NAME music_rig_compiler_self_test
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-compile-performance-rig"
+    )
+    add_test(
+        NAME music_rig_current_compile_check
+        COMMAND "${Python3_EXECUTABLE}"
+            "${MUSIC_RIG_COMPILER}"
+            --rig-root
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../../src/performance-rigs/pedro-performance-rig"
+            --platform-binding airstar-current
+            --check-only
+    )
+    set_tests_properties(
+        music_rig_compiler_self_test
+        music_rig_current_compile_check
+        PROPERTIES TIMEOUT 30
+    )
+
     set(MUSIC_RIG_SWITCH_BENCHMARK_VALIDATOR
         "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/validate-switch-benchmark"
     )

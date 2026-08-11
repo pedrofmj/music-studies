@@ -1,0 +1,259 @@
+{
+  "active_rig_profile": "full-live-rack",
+  "compiler": {
+    "id": "music-rig-authoring-compiler",
+    "version": "0.1.0"
+  },
+  "definition_fingerprint": "sha256:b978f01a8144e228d2f0cfc1edf82353ab7a807bc15f804abe113e4532b804c4",
+  "device_profiles": [
+    {
+      "hardware_preset": "arturia-current-rack",
+      "profile": "multi-instrument-rack",
+      "readiness": "control-only",
+      "slot": "arturia-main"
+    },
+    {
+      "hardware_preset": "smc-mixer-current-cc",
+      "profile": "eight-band-eq",
+      "readiness": "control-only",
+      "slot": "smc-mixer-main"
+    },
+    {
+      "hardware_preset": "smc-pad-current-notes",
+      "profile": "drum-set",
+      "readiness": "control-only",
+      "slot": "smc-pad-main"
+    },
+    {
+      "hardware_preset": "smc-pad-pocket-current-notes",
+      "profile": "drum-set",
+      "readiness": "control-only",
+      "slot": "smc-pad-pocket"
+    },
+    {
+      "hardware_preset": "smk25-current-pad-layers",
+      "profile": "ambient-pad-layers",
+      "readiness": "control-only",
+      "slot": "smk25-main"
+    }
+  ],
+  "fingerprints": {
+    "algorithm": "sha256",
+    "platform_binding": "sha256:eb331c7f04f29ebde8e4e767e012a26b48a09acada3a5d540a41bc551fe8c504",
+    "portable_source": "sha256:dceb0d635c1816c2228cd3cd191691161052a1c9ec21ae266b7742f1158a2f95",
+    "schema_set": "sha256:2c1de2ba9a3a7b519eb758b688d874cdd1060b94d83a2ba469cf7fda65f63e06"
+  },
+  "generation": 1,
+  "platform_binding": {
+    "evidence_status": "verified-existing-runtime",
+    "id": "airstar-current",
+    "platform": "linux"
+  },
+  "readiness": "control-only",
+  "requirements": {
+    "capabilities": [
+      "control.master-mute",
+      "control.pad-layer-latch",
+      "control.pad-layer-transport",
+      "effect.equalizer.eight-band",
+      "midi.control-input",
+      "midi.performance-input",
+      "midi.transport-input",
+      "notes.ambient-pad-layers",
+      "notes.drum-set",
+      "notes.layered-instruments",
+      "parameter.drum-set-output-gain",
+      "parameter.drum-set-volume",
+      "parameter.equalizer.band-gain",
+      "parameter.layer-reverb",
+      "parameter.layer-volume",
+      "parameter.master-volume",
+      "parameter.pad-layer-volume"
+    ],
+    "pinned_capabilities": [
+      "engine.arturia.alt-strings",
+      "engine.arturia.atmosfera-pad",
+      "engine.arturia.basic-piano",
+      "engine.arturia.good-flute",
+      "engine.arturia.hammond-organ-fast",
+      "engine.arturia.nord-white-grand",
+      "engine.arturia.optik-synth",
+      "engine.arturia.pad-efeitos",
+      "engine.arturia.sax-lirakeys",
+      "engine.drum-set",
+      "engine.smk.cloud-shimmer",
+      "engine.smk.hillsong-pad",
+      "engine.smk.magic-ambient",
+      "engine.smk.majesty-pad",
+      "engine.smk.oceans-worship-pad",
+      "engine.smk.sanctorium-pad",
+      "engine.smk.warm-worship-pad",
+      "engine.smk.worship-shimmer"
+    ],
+    "resources": {
+      "assets": [
+        "asset.arturia.alt-strings",
+        "asset.arturia.atmosfera-pad",
+        "asset.arturia.basic-piano",
+        "asset.arturia.good-flute",
+        "asset.arturia.hammond-organ-fast",
+        "asset.arturia.nord-white-grand",
+        "asset.arturia.optik-synth",
+        "asset.arturia.pad-efeitos",
+        "asset.arturia.sax-lirakeys",
+        "asset.drum-set.soundfont",
+        "asset.smk.cloud-shimmer",
+        "asset.smk.hillsong-pad",
+        "asset.smk.magic-ambient",
+        "asset.smk.majesty-pad",
+        "asset.smk.oceans-worship-pad",
+        "asset.smk.sanctorium-pad",
+        "asset.smk.warm-worship-pad",
+        "asset.smk.worship-shimmer"
+      ],
+      "effects": [
+        "effect.arturia.channel-2-output-trim",
+        "effect.arturia.sustain-scale",
+        "effect.master.eight-band-equalizer",
+        "effect.master.instrument-mixer",
+        "effect.mixer.cc-scale",
+        "effect.pad.output-gain-map",
+        "effect.pad.sustain-scale",
+        "effect.smk.layer-mixer"
+      ],
+      "engines": [
+        "engine.arturia.alt-strings",
+        "engine.arturia.atmosfera-pad",
+        "engine.arturia.basic-piano",
+        "engine.arturia.good-flute",
+        "engine.arturia.hammond-organ-fast",
+        "engine.arturia.nord-white-grand",
+        "engine.arturia.optik-synth",
+        "engine.arturia.pad-efeitos",
+        "engine.arturia.sax-lirakeys",
+        "engine.drum-set",
+        "engine.smk.cloud-shimmer",
+        "engine.smk.hillsong-pad",
+        "engine.smk.magic-ambient",
+        "engine.smk.majesty-pad",
+        "engine.smk.oceans-worship-pad",
+        "engine.smk.sanctorium-pad",
+        "engine.smk.warm-worship-pad",
+        "engine.smk.worship-shimmer"
+      ],
+      "helpers": [
+        "helper.arturia-main-volume-encoder",
+        "helper.smk25-pad-layers"
+      ],
+      "routes": [
+        "route.arturia.controls",
+        "route.arturia.performance-fanout",
+        "route.master.equalized-output",
+        "route.master.output",
+        "route.mixer.equalizer-control",
+        "route.smc-pad-main.drum-set",
+        "route.smc-pad-main.output-gain",
+        "route.smc-pad-pocket.drum-set",
+        "route.smk.layer-control",
+        "route.smk.master-sum",
+        "route.smk.performance-fanout"
+      ]
+    }
+  },
+  "rig": "pedro-performance-rig",
+  "safety": {
+    "activation": "authoring-only",
+    "materializes_runtime": false
+  },
+  "schema": "music-studies/compiled-performance-rig/v1",
+  "source_manifest": {
+    "platform_binding": {
+      "fingerprint": "sha256:eb331c7f04f29ebde8e4e767e012a26b48a09acada3a5d540a41bc551fe8c504",
+      "path": "platform-bindings/linux/airstar-current.json"
+    },
+    "portable": [
+      {
+        "fingerprint": "sha256:142bbf33a21af1c9487c4aa83289ec94ebe286d6003bc35e349574762f4ae4b7",
+        "path": "device-profiles/arturia-main/multi-instrument-rack.json"
+      },
+      {
+        "fingerprint": "sha256:9d107e283894c6a3c85611ecc263d540d2d57bb1ac48d6e37ad6226331e481e5",
+        "path": "device-profiles/smc-mixer-main/eight-band-eq.json"
+      },
+      {
+        "fingerprint": "sha256:871c8237a52249fcc818420d254c64c1722200df89e64a2e0af0815fccfb8a89",
+        "path": "device-profiles/smc-pad-main/drum-set.json"
+      },
+      {
+        "fingerprint": "sha256:38822e0754fc8ad5673e3454d362f869a92d04e056e73bda04b3d2d0baaf7d7f",
+        "path": "device-profiles/smc-pad-pocket/drum-set.json"
+      },
+      {
+        "fingerprint": "sha256:9ce8397ac4809e1b409b44b4a72ec400813ea0a748d73d44c3e0a34b70ba205d",
+        "path": "device-profiles/smk25-main/ambient-pad-layers.json"
+      },
+      {
+        "fingerprint": "sha256:5846927f570d521ac3da23c9d22d4b180f3bd9214de4bc675dc27ac3842dc16e",
+        "path": "hardware-presets/arturia-current-rack.json"
+      },
+      {
+        "fingerprint": "sha256:14a37fd0ddc4cb2b9c583bb5588671ec19517aa3bca2c317985d2f9c78c1ad0d",
+        "path": "hardware-presets/smc-mixer-current-cc.json"
+      },
+      {
+        "fingerprint": "sha256:b962d088227de28fb3ec007b32a1806ef0d1f093279a167a173dbe7c9c375aa6",
+        "path": "hardware-presets/smc-pad-current-notes.json"
+      },
+      {
+        "fingerprint": "sha256:3ec1bec967ce8de863f77e511b3cae3ee7191fa90a90049a270f727fe5d8490f",
+        "path": "hardware-presets/smc-pad-pocket-current-notes.json"
+      },
+      {
+        "fingerprint": "sha256:e53347884ee2b4b4d66c36f3c4d36a2b1a7da8fb9023dca80d6e84c450cd1d32",
+        "path": "hardware-presets/smk25-current-pad-layers.json"
+      },
+      {
+        "fingerprint": "sha256:c113392d40603cdae209934095febf2bed9a6530d7064db7238772f7473010ee",
+        "path": "rig-profiles/full-live-rack.json"
+      },
+      {
+        "fingerprint": "sha256:d4fa456056e1c3f204cf81ce8fa2f01f2b2c5264738c8ddf865d82576e182529",
+        "path": "rig.json"
+      },
+      {
+        "fingerprint": "sha256:e4c0ec9bed7bed5edb6b9ab010eee073a41c227d9e338cc01e3f1dc06be0232b",
+        "path": "switch-triggers.json"
+      }
+    ],
+    "schemas": [
+      {
+        "fingerprint": "sha256:450500e3302c81a9c85b5139235cabbcb31addbc10b20dc36b70e914c28d135f",
+        "path": "schemas/common.schema.json"
+      },
+      {
+        "fingerprint": "sha256:c08cb72db6dee61f6fd2ef06012a159ec534a1b12c6764a304844a585bc954a8",
+        "path": "schemas/device-profile.schema.json"
+      },
+      {
+        "fingerprint": "sha256:e7fcf825787239b4031c04a909f9a199224b6f9762d343ea546ee65af9ca8851",
+        "path": "schemas/hardware-preset.schema.json"
+      },
+      {
+        "fingerprint": "sha256:4390221894ba027f0058a269679c9f692bf84aab4727dad8d68f8d85ed81184a",
+        "path": "schemas/platform-binding.schema.json"
+      },
+      {
+        "fingerprint": "sha256:dfa5e9a5433c7cf1bc8e4c4a802abe841d62e8db2b943a2a8dd9af6b6fa6d5ac",
+        "path": "schemas/rig-profile.schema.json"
+      },
+      {
+        "fingerprint": "sha256:44847af2e84b49cda69096030790c5049a0701f6afc79b653b35acee890d66b1",
+        "path": "schemas/rig.schema.json"
+      },
+      {
+        "fingerprint": "sha256:981adb638f470b102252a13b4b5045c9abcefbaea26557ee2f61118e7c5878b7",
+        "path": "schemas/switch-triggers.schema.json"
+      }
+    ]
+  }
+}
