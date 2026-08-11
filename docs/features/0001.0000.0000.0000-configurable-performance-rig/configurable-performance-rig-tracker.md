@@ -75,7 +75,7 @@ benchmarks.
 | --- | --- | --- |
 | 0. Baseline and technical gates | ✅ | Baseline reproducible and technical gates passed |
 | 1. Schemas and current profile extraction | ✅ | `full-live-rack` describes every current role and dependency; all known conflict classes are rejected |
-| 2. Deterministic compiler and parity | 🟡 | Canonical mappings, ownership, empty graph delta, and temporary-only materialization pass locally; hosted proof and semantic parity remain |
+| 2. Deterministic compiler and parity | 🟡 | Canonical mappings, ownership, empty graph delta, and temporary-only materialization pass on Linux and Windows; semantic parity remains |
 | 3. Runtime, CLI, and shadow mode | ⬜ | Not started |
 | 4. Control-only switching | ⬜ | Not started |
 | 5. MIDI management triggers | ⬜ | Not started |
@@ -227,12 +227,13 @@ benchmarks.
   objects, and metadata changes; nonempty control-only deltas are rejected.
   Local GCC and Clang pass 25/25; hosted Linux passes 25/25, Windows passes
   19/19, and the Windows JSON-enabled regression passes 20/20.
-- 🟡 Materialize Carla and Patchbay output only in temporary test locations.
+- ✅ Materialize Carla and Patchbay output only in temporary test locations.
   The guarded authoring command produces a deterministic three-file bundle,
   refuses non-temporary and unsafe definitions before output creation, and
   leaves the protected baseline at 30/30. Its eleven-case self-test passes in
-  the full local GCC and Clang suites at 26/26; hosted Linux and Windows proof
-  remains.
+  the full local GCC and Clang suites at 26/26. Hosted
+  [run 31502486077](https://github.com/pedrofmj/music-studies/actions/runs/31502486077)
+  passes Linux 26/26, Windows 20/20, and the Windows JSON-enabled suite 21/21.
 - ⬜ Prove 49-plugin, 111-project-connection, and 115-link semantic parity.
 - ⬜ Add relocation, missing-capability, repeatability, and regression tests.
 
