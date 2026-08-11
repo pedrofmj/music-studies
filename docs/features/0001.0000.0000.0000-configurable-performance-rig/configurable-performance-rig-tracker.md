@@ -60,7 +60,7 @@ Documents:
 | Windows 60-second idle resources | ✅ 60.259 s, 0.000000% measured child CPU, 3,670,016-byte observed peak working set, 65 handles, 4 threads, zero events |
 | Windows resource cleanup | ✅ Zero remaining test processes; temporary directory removed and independently confirmed |
 | Portable profile schemas | ✅ [Linux 23/23, Windows 17/17, and Windows JSON 18/18](https://github.com/pedrofmj/music-studies/actions/runs/31486826609) pass with five verified Hardware Presets, zero partial presets, five Device Profiles, one Rig Profile, one Linux Platform Binding, one inactive Switch Trigger document, six valid fixtures, fourteen invalid fixtures, and twenty-eight catalogue cases |
-| Deterministic compiler runtime tables | 🟡 Local GCC and Clang 25/25 pass; 5 inputs, 72 mappings, 71 selected targets, 57 ownership entries, empty current graph delta, and 13 compiler cases pass; hosted Linux/Windows proof pending |
+| Deterministic compiler runtime tables | ✅ [Linux 25/25, Windows 19/19, and Windows JSON 20/20](https://github.com/pedrofmj/music-studies/actions/runs/31494175730) pass; 5 inputs, 72 mappings, 71 selected targets, 57 ownership entries, empty current graph delta, and 13 compiler cases pass on both platforms |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -220,12 +220,13 @@ benchmarks.
   working directories, fingerprint recomputation, source-overwrite refusal,
   no-write mode, deterministic diagnostics, binding isolation, runtime tables,
   ownership, graph classification, and relative encoding.
-- 🟡 Compile semantic mappings, ownership, and graph deltas. The compiler emits
+- ✅ Compile semantic mappings, ownership, and graph deltas. The compiler emits
   5 stable-slot input bindings, 72 mapping rows plus a direct dispatch index,
   71 selected semantic target bindings, and 57 consolidated ownership entries.
   The current graph delta has zero created/removed links, created/removed
   objects, and metadata changes; nonempty control-only deltas are rejected.
-  Local GCC and Clang suites pass 25/25; hosted Linux/Windows proof remains.
+  Local GCC and Clang pass 25/25; hosted Linux passes 25/25, Windows passes
+  19/19, and the Windows JSON-enabled regression passes 20/20.
 - ⬜ Materialize Carla and Patchbay output only in temporary test locations.
 - ⬜ Prove 49-plugin, 111-project-connection, and 115-link semantic parity.
 - ⬜ Add relocation, missing-capability, repeatability, and regression tests.
