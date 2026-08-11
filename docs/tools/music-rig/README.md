@@ -125,8 +125,15 @@ installed, repository, home, nonempty, and symbolic-link output roots, requires
 an empty unapplied graph delta, and emits a deterministic checksummed bundle.
 It performs no activation or runtime mutation. See
 [MATERIALIZATION.md](MATERIALIZATION.md) for the input and output contract and
-an offline example. Semantic inventory parity remains the next Milestone 2
-gate.
+an offline example.
+
+[`verify-materialized-rig-parity.py`](verify-materialized-rig-parity.py)
+validates the temporary bundle manifest and proves exact normalized inventories
+for all 49 plugins, 111 Carla project connections, and 115 Patchbay links. Full
+plugin subtrees include parameter mappings and state; home and SoundFont paths
+and the explicitly relocated default sink are normalized. The verifier is
+read-only and does not claim installed-asset or live-graph availability. See
+[PARITY.md](PARITY.md) for the semantic inventory contract.
 
 Run the validator directly:
 

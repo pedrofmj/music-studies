@@ -81,3 +81,7 @@ render both artifacts in memory without creating any file.
 The output is test evidence only. Promotion to an installed or live path is
 not implemented by this command and remains prohibited before the later
 deployment milestones.
+
+Run the read-only [semantic parity gate](PARITY.md) against the completed
+bundle to compare all 49 plugins, 111 Carla project connections, and 115
+Patchbay links with the protected sources.

@@ -113,7 +113,12 @@ current graph delta. A nonempty control-only delta fails compilation. The
 authoring-only materializer consumes that definition and can render Carla and
 Patchbay output only into a new or empty system-temporary descendant. It
 records a deterministic checksummed manifest and has no install, runtime, or
-activation path. Semantic inventory parity remains in progress.
+activation path. The read-only parity gate compares complete normalized Carla
+plugin subtrees, exact Carla source-target connection pairs, and stable
+Patchbay endpoint selectors. It enforces the protected 49-plugin,
+111-connection, and 115-link counts without treating transient backend IDs or
+intended path/sink relocation as semantic drift. Broader relocation and
+missing-capability regression coverage remains in progress.
 
 ## Objective
 

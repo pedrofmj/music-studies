@@ -75,7 +75,7 @@ benchmarks.
 | --- | --- | --- |
 | 0. Baseline and technical gates | ✅ | Baseline reproducible and technical gates passed |
 | 1. Schemas and current profile extraction | ✅ | `full-live-rack` describes every current role and dependency; all known conflict classes are rejected |
-| 2. Deterministic compiler and parity | 🟡 | Canonical mappings, ownership, empty graph delta, and temporary-only materialization pass on Linux and Windows; semantic parity remains |
+| 2. Deterministic compiler and parity | 🟡 | Compiler and temporary materialization pass on Linux and Windows; semantic parity passes locally, with hosted proof and broader regression coverage remaining |
 | 3. Runtime, CLI, and shadow mode | ⬜ | Not started |
 | 4. Control-only switching | ⬜ | Not started |
 | 5. MIDI management triggers | ⬜ | Not started |
@@ -234,7 +234,12 @@ benchmarks.
   the full local GCC and Clang suites at 26/26. Hosted
   [run 31502486077](https://github.com/pedrofmj/music-studies/actions/runs/31502486077)
   passes Linux 26/26, Windows 20/20, and the Windows JSON-enabled suite 21/21.
-- ⬜ Prove 49-plugin, 111-project-connection, and 115-link semantic parity.
+- 🟡 Prove 49-plugin, 111-project-connection, and 115-link semantic parity.
+  The read-only gate matches full path-normalized plugin subtrees, exact Carla
+  connection pairs, and stable Patchbay endpoint selectors rather than counts
+  alone. Its eight-case mutation suite passes in the full local GCC and Clang
+  suites at 27/27, and the protected baseline remains 30/30. Hosted Linux and
+  Windows proof remains.
 - ⬜ Add relocation, missing-capability, repeatability, and regression tests.
 
 ## Milestone 3: Runtime, CLI, And Shadow Mode

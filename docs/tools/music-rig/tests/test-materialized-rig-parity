@@ -1,0 +1,312 @@
+#!/usr/bin/env python3
+"""Exercise semantic parity checks for temporary Performance Rig bundles."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import shutil
+import subprocess
+import sys
+import tempfile
+import xml.etree.ElementTree as ET
+from pathlib import Path
+from typing import Any
+
+
+sys.dont_write_bytecode = True
+
+
+SCRIPT_PATH = Path(__file__).resolve()
+TOOLS_ROOT = SCRIPT_PATH.parents[1]
+REPOSITORY_ROOT = SCRIPT_PATH.parents[4]
+MATERIALIZER = TOOLS_ROOT / "materialize-compiled-rig.py"
+PARITY_VERIFIER = TOOLS_ROOT / "verify-materialized-rig-parity.py"
+COMPILED_DEFINITION = (
+    TOOLS_ROOT / "tests" / "fixtures" / "compiled-current-envelope.json"
+)
+RIG_ROOT = (
+    REPOSITORY_ROOT / "src" / "performance-rigs" / "pedro-performance-rig"
+)
+REFERENCE_CARLA = (
+    REPOSITORY_ROOT
+    / "src"
+    / "audio-software"
+    / "carla"
+    / "projects"
+    / "pedro-live-rack"
+    / "pedro.uproject"
+)
+REFERENCE_PATCHBAY = (
+    REPOSITORY_ROOT
+    / "src"
+    / "midi-setup"
+    / "pedro-live-rack-patchbay.json"
+)
+SINK_NODE = "Parity Test Sink"
+
+
+def rendered_json(document: Any) -> bytes:
+    return (
+        json.dumps(document, ensure_ascii=True, indent=2, sort_keys=True)
+        + "\n"
+    ).encode("utf-8")
+
+
+def write_json(path: Path, document: Any) -> None:
+    path.write_bytes(rendered_json(document))
+
+
+def write_carla(path: Path, tree: ET.ElementTree) -> None:
+    ET.indent(tree, space=" ")
+    body = ET.tostring(
+        tree.getroot(),
+        encoding="unicode",
+        short_empty_elements=True,
+    )
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write(
+            "<?xml version='1.0' encoding='UTF-8'?>\n"
+            "<!DOCTYPE CARLA-PROJECT>\n"
+            f"{body}\n"
+        )
+
+
+def current_graph() -> Any:
+    return {
+        "ports": [
+            {
+                "node_name": SINK_NODE,
+                "name": "playback_FL",
+                "direction": "in",
+                "alias": "Parity Speakers:playback_FL",
+                "name_selector": "parity_sink:playback_FL",
+            },
+            {
+                "node_name": SINK_NODE,
+                "name": "playback_FR",
+                "direction": "in",
+                "alias": "Parity Speakers:playback_FR",
+                "name_selector": "parity_sink:playback_FR",
+            },
+        ]
+    }
+
+
+def run(command: list[str]) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        command,
+        cwd=str(REPOSITORY_ROOT),
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+
+
+def materialize(graph_path: Path, output_root: Path) -> None:
+    result = run(
+        [
+            sys.executable,
+            str(MATERIALIZER),
+            "--compiled-definition",
+            str(COMPILED_DEFINITION),
+            "--current-graph",
+            str(graph_path),
+            "--default-node-name",
+            SINK_NODE,
+            "--target-home",
+            "/parity-test/home",
+            "--target-soundfont-root",
+            "/parity-test/soundfonts",
+            "--rig-root",
+            str(RIG_ROOT),
+            "--repository-root",
+            str(REPOSITORY_ROOT),
+            "--output-root",
+            str(output_root),
+        ]
+    )
+    require_success(result, "materialization")
+
+
+def verify(root: Path) -> subprocess.CompletedProcess:
+    return run(
+        [
+            sys.executable,
+            str(PARITY_VERIFIER),
+            "--materialized-root",
+            str(root),
+        ]
+    )
+
+
+def require_success(result: subprocess.CompletedProcess, label: str) -> None:
+    if result.returncode != 0:
+        raise AssertionError(
+            f"{label} failed ({result.returncode}): {result.stderr}"
+        )
+
+
+def require_failure(
+    result: subprocess.CompletedProcess,
+    label: str,
+    expected: str,
+) -> None:
+    if result.returncode == 0:
+        raise AssertionError(f"{label} unexpectedly succeeded")
+    if expected not in result.stderr:
+        raise AssertionError(
+            f"{label} omitted {expected!r}: {result.stderr!r}"
+        )
+
+
+def refresh_manifest(root: Path, output_id: str) -> None:
+    manifest_path = root / "materialization.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    record = manifest["outputs"][output_id]
+    content = (root / record["path"]).read_bytes()
+    record["bytes"] = len(content)
+    record["sha256"] = hashlib.sha256(content).hexdigest()
+    manifest_path.write_bytes(rendered_json(manifest))
+
+
+def protected_hashes() -> tuple[str, str]:
+    return (
+        hashlib.sha256(REFERENCE_CARLA.read_bytes()).hexdigest(),
+        hashlib.sha256(REFERENCE_PATCHBAY.read_bytes()).hexdigest(),
+    )
+
+
+def main() -> int:
+    completed_cases = []
+    before = protected_hashes()
+    with tempfile.TemporaryDirectory(
+        prefix="music-rig-parity-test-"
+    ) as temporary:
+        temporary_root = Path(temporary)
+        graph_path = temporary_root / "current-graph.json"
+        write_json(graph_path, current_graph())
+        baseline_root = temporary_root / "baseline"
+        materialize(graph_path, baseline_root)
+
+        baseline = verify(baseline_root)
+        require_success(baseline, "baseline parity")
+        expected_summary = (
+            "plugins=49, carla-connections=111, patchbay-links=115, "
+            "activation=none"
+        )
+        if expected_summary not in baseline.stdout:
+            raise AssertionError("parity summary omitted protected counts")
+        completed_cases.append("semantic-parity")
+
+        integrity_root = temporary_root / "integrity"
+        shutil.copytree(baseline_root, integrity_root)
+        with (integrity_root / "carla" / "pedro.uproject").open(
+            "a", encoding="utf-8"
+        ) as handle:
+            handle.write("\n")
+        integrity = verify(integrity_root)
+        require_failure(integrity, "manifest integrity", "checksum mismatch")
+        completed_cases.append("manifest-integrity")
+
+        identity_root = temporary_root / "identity"
+        shutil.copytree(baseline_root, identity_root)
+        identity_manifest_path = identity_root / "materialization.json"
+        identity_manifest = json.loads(
+            identity_manifest_path.read_text(encoding="utf-8")
+        )
+        identity_manifest["rig_profile"] = "not-full-live-rack"
+        identity_manifest_path.write_bytes(rendered_json(identity_manifest))
+        identity = verify(identity_root)
+        require_failure(identity, "Rig identity", "not the current full-live-rack")
+        completed_cases.append("rig-identity")
+
+        plugin_root = temporary_root / "plugin-parameter"
+        shutil.copytree(baseline_root, plugin_root)
+        plugin_path = plugin_root / "carla" / "pedro.uproject"
+        plugin_tree = ET.parse(plugin_path)
+        plugin = plugin_tree.getroot().find("Plugin")
+        if plugin is None:
+            raise AssertionError("fixture Carla project has no plugin")
+        plugin_name = plugin.findtext("Info/Name")
+        mapped_control = plugin.find("Data/Parameter/MappedControlIndex")
+        if mapped_control is None:
+            raise AssertionError("fixture Carla plugin has no parameter mapping")
+        mapped_control.text = "999"
+        write_carla(plugin_path, plugin_tree)
+        refresh_manifest(plugin_root, "carla_project")
+        plugin_result = verify(plugin_root)
+        require_failure(
+            plugin_result,
+            "plugin parameter drift",
+            f"Carla plugins changed: ['{plugin_name}']",
+        )
+        completed_cases.append("plugin-parameter-drift")
+
+        connection_root = temporary_root / "connection-count"
+        shutil.copytree(baseline_root, connection_root)
+        connection_path = connection_root / "carla" / "pedro.uproject"
+        connection_tree = ET.parse(connection_path)
+        patchbay = connection_tree.getroot().find("ExternalPatchbay")
+        connection = None if patchbay is None else patchbay.find("Connection")
+        if patchbay is None or connection is None:
+            raise AssertionError("fixture Carla project has no connection")
+        patchbay.remove(connection)
+        write_carla(connection_path, connection_tree)
+        refresh_manifest(connection_root, "carla_project")
+        connection_result = verify(connection_root)
+        require_failure(
+            connection_result,
+            "Carla connection count drift",
+            "materialized Carla connection count: expected 111, found 110",
+        )
+        completed_cases.append("connection-count-drift")
+
+        link_root = temporary_root / "link-count"
+        shutil.copytree(baseline_root, link_root)
+        link_path = link_root / "patchbay" / "pedro-live-rack-patchbay.json"
+        link_document = json.loads(link_path.read_text(encoding="utf-8"))
+        link_document["links"].pop()
+        write_json(link_path, link_document)
+        refresh_manifest(link_root, "patchbay")
+        link_result = verify(link_root)
+        require_failure(
+            link_result,
+            "Patchbay link count drift",
+            "materialized Patchbay link count: expected 115, found 114",
+        )
+        completed_cases.append("link-count-drift")
+
+        selector_root = temporary_root / "selector-drift"
+        shutil.copytree(baseline_root, selector_root)
+        selector_path = (
+            selector_root / "patchbay" / "pedro-live-rack-patchbay.json"
+        )
+        selector_document = json.loads(
+            selector_path.read_text(encoding="utf-8")
+        )
+        selector_document["links"][0]["output"]["name_selector"] += "-changed"
+        write_json(selector_path, selector_document)
+        refresh_manifest(selector_root, "patchbay")
+        selector_result = verify(selector_root)
+        require_failure(
+            selector_result,
+            "Patchbay selector drift",
+            "Patchbay links missing",
+        )
+        completed_cases.append("selector-drift")
+
+    after = protected_hashes()
+    if before != after:
+        raise AssertionError("semantic parity test changed protected sources")
+    completed_cases.append("protected-sources-unchanged")
+    print(
+        "Materialized Rig parity self-test: PASS "
+        f"({len(completed_cases)} cases: {', '.join(completed_cases)})"
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
