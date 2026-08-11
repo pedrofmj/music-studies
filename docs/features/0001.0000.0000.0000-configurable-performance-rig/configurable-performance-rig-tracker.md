@@ -33,10 +33,10 @@ Documents:
 
 | Check | Result |
 | --- | --- |
-| GCC isolated suite | ✅ 32/32 passed |
-| Clang isolated suite | ✅ 32/32 passed |
-| GCC with Linux JSON probe | ✅ 33/33 passed |
-| Clang with Linux JSON probe | ✅ 33/33 passed |
+| GCC isolated suite | ✅ 34/34 passed |
+| Clang isolated suite | ✅ 34/34 passed |
+| GCC with Linux JSON adapter | ✅ 36/36 passed |
+| Clang with Linux JSON adapter | ✅ 36/36 passed |
 | Arturia offline parity | ✅ MIDI, state, replay, and stereo ramp passed |
 | SMK-25 offline parity | ✅ Self-test, config, and JACK guard passed |
 | Startup contract | ✅ Protected authority and read-only boundaries pass |
@@ -63,6 +63,7 @@ Documents:
 | Deterministic compiler runtime tables | ✅ [Linux 25/25, Windows 19/19, and Windows JSON 20/20](https://github.com/pedrofmj/music-studies/actions/runs/31494175730) pass; 5 inputs, 72 mappings, 71 selected targets, 57 ownership entries, empty current graph delta, and 13 compiler cases pass on both platforms |
 | Milestone 2 regression gate | ✅ [Linux 28/28, Windows 22/22, and Windows JSON 23/23](https://github.com/pedrofmj/music-studies/actions/runs/31514575263) pass; relocation, repeatability, missing plugin/asset/endpoint diagnostics, 18 asset references, and all 25 protected checksums pass |
 | Portable runtime control loop | ✅ [Linux 32/32, Windows 26/26, and Windows JSON 27/27](https://github.com/pedrofmj/music-studies/actions/runs/31521502726) pass; fixed-storage state, saturating metrics, generation conflicts, adapter failures, output suppression, and inert daemon startup are covered |
+| Qualified definition and state loading | ✅ [Linux 34/34, Windows 28/28, and Windows JSON 30/30](https://github.com/pedrofmj/music-studies/actions/runs/31526121270) pass; bounded compiled metadata, 64-byte state integrity, restore/fallback, storage failures, and inert output behavior are covered |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -78,7 +79,7 @@ benchmarks.
 | 0. Baseline and technical gates | ✅ | Baseline reproducible and technical gates passed |
 | 1. Schemas and current profile extraction | ✅ | `full-live-rack` describes every current role and dependency; all known conflict classes are rejected |
 | 2. Deterministic compiler and parity | ✅ | Authored definitions deterministically materialize an equivalent temporary deployment on Linux and Windows; the protected live setup remains unchanged |
-| 3. Runtime, CLI, and shadow mode | 🟡 | Portable output-suppressed control loop and inert daemon target pass on Linux and Windows; persistent state, complete adapters, CLI/IPC, and shadow execution remain |
+| 3. Runtime, CLI, and shadow mode | 🟡 | Portable output-suppressed control loop, qualified state/definition contracts, and inert daemon target pass on Linux and Windows; platform storage, complete adapters, CLI/IPC, mapping tables, and shadow execution remain |
 | 4. Control-only switching | ⬜ | Not started |
 | 5. MIDI management triggers | ⬜ | Not started |
 | 6. Prepared engines and graph deltas | ⬜ | Not started |
@@ -260,12 +261,16 @@ benchmarks.
 
 - 🟡 Implement the portable daemon control loop, state, metrics, and adapters.
   The fixed-storage loop provides versioned lifecycle state, saturating metrics,
-  expected-generation publication, and an ABI-versioned clock/control adapter
-  boundary. Tests cover successful and injected-failure paths on GCC, Clang,
-  and MSVC.
-  `music-rigd` remains output-suppressed and inert without an explicit command.
-  Persistent state and the path, device/MIDI, audio/graph, plugin-host, service,
-  and diagnostics adapters remain.
+  expected-generation publication, and ABI-versioned clock/control/storage
+  boundaries. A bounded loader validates the current compiled envelope metadata;
+  the exact 64-byte persistent-state frame detects corruption and covers
+  qualified restore, definition-fingerprint fallback, and atomic-replace failure
+  through mock storage. Local GCC/Clang pass 34/34, both optional JSON builds
+  pass 36/36, and hosted run 31526121270 passes Linux 34/34, Windows 28/28, and
+  Windows JSON 30/30. `music-rigd` remains output-suppressed and inert without
+  an explicit command. Platform storage paths, executable mapping tables, and
+  the device/MIDI, audio/graph, plugin-host, service, and diagnostics adapters
+  remain.
 - ⬜ Implement the complete versioned IPC and CLI read-only/dry-run commands.
 - ⬜ Add immutable-generation reclamation and stable device-slot ports.
 - ⬜ Extract reusable behavior without changing installed legacy services.
