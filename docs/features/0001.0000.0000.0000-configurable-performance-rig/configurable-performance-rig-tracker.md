@@ -60,7 +60,7 @@ Documents:
 | Windows 60-second idle resources | ✅ 60.259 s, 0.000000% measured child CPU, 3,670,016-byte observed peak working set, 65 handles, 4 threads, zero events |
 | Windows resource cleanup | ✅ Zero remaining test processes; temporary directory removed and independently confirmed |
 | Portable profile schemas | ✅ [Linux 23/23, Windows 17/17, and Windows JSON 18/18](https://github.com/pedrofmj/music-studies/actions/runs/31486826609) pass with five verified Hardware Presets, zero partial presets, five Device Profiles, one Rig Profile, one Linux Platform Binding, one inactive Switch Trigger document, six valid fixtures, fourteen invalid fixtures, and twenty-eight catalogue cases |
-| Deterministic compiler envelope | 🟡 Linux GCC and Clang 25/25 pass; exact golden bytes and nine compiler cases pass; hosted Linux/Windows proof pending |
+| Deterministic compiler envelope | ✅ [Linux 25/25, Windows 19/19, and Windows JSON 20/20](https://github.com/pedrofmj/music-studies/actions/runs/31489758269) pass; exact golden bytes, nine compiler cases, and current-catalogue check pass on both platforms |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -213,13 +213,14 @@ benchmarks.
 
 ## Milestone 2: Deterministic Compiler And Parity
 
-- 🟡 Implement deterministic source compilation and fingerprints. The
+- ✅ Implement deterministic source compilation and fingerprints. The
   authoring-only compiler emits canonical UTF-8 JSON with independent schema,
   portable-source, Platform Binding, and generated-definition SHA-256
   fingerprints. Nine cases cover exact golden bytes, repeatability across
   working directories, fingerprint recomputation, source-overwrite refusal,
-  no-write mode, deterministic diagnostics, and binding isolation. Linux GCC
-  and Clang suites pass 25/25; hosted Linux/Windows proof remains.
+  no-write mode, deterministic diagnostics, and binding isolation. Local GCC
+  and Clang pass 25/25; hosted Linux passes 25/25, Windows passes 19/19, and the
+  Windows JSON-enabled regression passes 20/20.
 - ⬜ Compile semantic mappings, ownership, and graph deltas.
 - ⬜ Materialize Carla and Patchbay output only in temporary test locations.
 - ⬜ Prove 49-plugin, 111-project-connection, and 115-link semantic parity.
