@@ -33,10 +33,10 @@ Documents:
 
 | Check | Result |
 | --- | --- |
-| GCC isolated suite | ✅ 25/25 passed |
-| Clang isolated suite | ✅ 25/25 passed |
-| GCC with Linux JSON probe | ✅ 18/18 passed |
-| Clang with Linux JSON probe | ✅ 18/18 passed |
+| GCC isolated suite | ✅ 28/28 passed |
+| Clang isolated suite | ✅ 28/28 passed |
+| GCC with Linux JSON probe | ✅ 29/29 passed |
+| Clang with Linux JSON probe | ✅ 29/29 passed |
 | Arturia offline parity | ✅ MIDI, state, replay, and stereo ramp passed |
 | SMK-25 offline parity | ✅ Self-test, config, and JACK guard passed |
 | Startup contract | ✅ Protected authority and read-only boundaries pass |
@@ -61,6 +61,7 @@ Documents:
 | Windows resource cleanup | ✅ Zero remaining test processes; temporary directory removed and independently confirmed |
 | Portable profile schemas | ✅ [Linux 23/23, Windows 17/17, and Windows JSON 18/18](https://github.com/pedrofmj/music-studies/actions/runs/31486826609) pass with five verified Hardware Presets, zero partial presets, five Device Profiles, one Rig Profile, one Linux Platform Binding, one inactive Switch Trigger document, six valid fixtures, fourteen invalid fixtures, and twenty-eight catalogue cases |
 | Deterministic compiler runtime tables | ✅ [Linux 25/25, Windows 19/19, and Windows JSON 20/20](https://github.com/pedrofmj/music-studies/actions/runs/31494175730) pass; 5 inputs, 72 mappings, 71 selected targets, 57 ownership entries, empty current graph delta, and 13 compiler cases pass on both platforms |
+| Milestone 2 regression gate | ✅ [Linux 28/28, Windows 22/22, and Windows JSON 23/23](https://github.com/pedrofmj/music-studies/actions/runs/31514575263) pass; relocation, repeatability, missing plugin/asset/endpoint diagnostics, 18 asset references, and all 25 protected checksums pass |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -75,7 +76,7 @@ benchmarks.
 | --- | --- | --- |
 | 0. Baseline and technical gates | ✅ | Baseline reproducible and technical gates passed |
 | 1. Schemas and current profile extraction | ✅ | `full-live-rack` describes every current role and dependency; all known conflict classes are rejected |
-| 2. Deterministic compiler and parity | 🟡 | Compiler, temporary materialization, and semantic parity pass on Linux and Windows; broader regression coverage remains |
+| 2. Deterministic compiler and parity | ✅ | Authored definitions deterministically materialize an equivalent temporary deployment on Linux and Windows; the protected live setup remains unchanged |
 | 3. Runtime, CLI, and shadow mode | ⬜ | Not started |
 | 4. Control-only switching | ⬜ | Not started |
 | 5. MIDI management triggers | ⬜ | Not started |
@@ -229,19 +230,30 @@ benchmarks.
   19/19, and the Windows JSON-enabled regression passes 20/20.
 - ✅ Materialize Carla and Patchbay output only in temporary test locations.
   The guarded authoring command produces a deterministic three-file bundle,
-  refuses non-temporary and unsafe definitions before output creation, and
-  leaves the protected baseline at 30/30. Its eleven-case self-test passes in
-  the full local GCC and Clang suites at 26/26. Hosted
-  [run 31502486077](https://github.com/pedrofmj/music-studies/actions/runs/31502486077)
-  passes Linux 26/26, Windows 20/20, and the Windows JSON-enabled suite 21/21.
+  refuses non-temporary and unsafe definitions before output creation, proves
+  combined, home, SoundFont-only, and identity relocation, and leaves the
+  protected baseline at 30/30. Its thirteen-case self-test passes in the full
+  local GCC and Clang suites at 28/28. Hosted
+  [run 31514575263](https://github.com/pedrofmj/music-studies/actions/runs/31514575263)
+  passes Linux 28/28, Windows 22/22, and the Windows JSON-enabled suite 23/23.
 - ✅ Prove 49-plugin, 111-project-connection, and 115-link semantic parity.
-  The read-only gate matches full path-normalized plugin subtrees, exact Carla
-  connection pairs, and stable Patchbay endpoint selectors rather than counts
-  alone. Its eight-case mutation suite passes in the full local GCC and Clang
-  suites at 27/27, and the protected baseline remains 30/30. Hosted
-  [run 31506900077](https://github.com/pedrofmj/music-studies/actions/runs/31506900077)
-  passes Linux 27/27, Windows 21/21, and the Windows JSON-enabled suite 22/22.
-- ⬜ Add relocation, missing-capability, repeatability, and regression tests.
+  The read-only gate matches full path-normalized plugin subtrees, eighteen
+  plugin asset references, exact Carla connection pairs, and stable Patchbay
+  endpoint selectors rather than counts alone. Its ten-case mutation suite
+  passes in the full local GCC and Clang suites at 28/28, and the protected
+  baseline remains 30/30. Hosted
+  [run 31514575263](https://github.com/pedrofmj/music-studies/actions/runs/31514575263)
+  passes Linux 28/28, Windows 22/22, and the Windows JSON-enabled suite 23/23.
+- ✅ Add relocation, missing-capability, repeatability, and regression tests.
+  Compiler diagnostics reject missing bindings; materializer and parity tests
+  reject missing endpoints, plugins, and assets with deterministic messages.
+  Exact relocation and repeatability pass across working directories and CRLF
+  checkouts. The portable protected-single-rig regression verifies all 25
+  protected checksums, legacy Python and shell validation entry points,
+  controlled missing-asset diagnostics, read-only behavior, and unchanged
+  sources. The compiler check and legacy regression run together in CTest
+  without editing the production installer or entering its installation,
+  service-lifecycle, or live-graph paths.
 
 ## Milestone 3: Runtime, CLI, And Shadow Mode
 

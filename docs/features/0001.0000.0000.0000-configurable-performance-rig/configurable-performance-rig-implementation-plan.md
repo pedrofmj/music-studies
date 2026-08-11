@@ -2,7 +2,7 @@
 
 Language: **English**
 
-Status: Milestones 0 and 1 complete. Milestone 2 is in progress. The protected
+Status: Milestones 0 through 2 complete. Milestone 3 is next. The protected
 single-rig deployment remains the production default.
 
 Related documents:
@@ -102,7 +102,7 @@ readiness violations, and consumed-event overlap with any available Device
 Profile mapping while retaining explicit passthrough. No runtime or deployment
 path consumes these authored documents yet.
 
-Milestone 2 now has an authoring-only deterministic compiler envelope. It
+Milestone 2 has a completed authoring-only deterministic compiler envelope. It
 validates the complete catalogue, resolves the selected Rig Profile and explicit
 Platform Binding, emits canonical UTF-8 JSON, and records independent schema,
 portable-source, binding, and generated-definition SHA-256 fingerprints. A
@@ -115,10 +115,22 @@ Patchbay output only into a new or empty system-temporary descendant. It
 records a deterministic checksummed manifest and has no install, runtime, or
 activation path. The read-only parity gate compares complete normalized Carla
 plugin subtrees, exact Carla source-target connection pairs, and stable
-Patchbay endpoint selectors. It enforces the protected 49-plugin,
-111-connection, and 115-link counts without treating transient backend IDs or
-intended path/sink relocation as semantic drift. Broader relocation and
-missing-capability regression coverage remains in progress.
+Patchbay endpoint selectors and eighteen normalized Carla plugin asset
+references. It enforces the protected 49-plugin, 111-connection, and 115-link
+counts without treating transient backend IDs or intended path/sink relocation
+as semantic drift. Thirteen materializer cases cover exact home, SoundFont,
+combined, and identity relocation, repeatable bytes, CRLF portability, guarded
+temporary output, and missing endpoints. Ten parity cases cover missing
+plugins and assets plus parameter, connection, link, selector, manifest, and
+identity drift. An eight-case portable regression verifies all twenty-five
+protected checksums, legacy Python and shell validation entry points,
+working-directory independence, controlled missing-asset output, and no
+protected changes. The CTest validation path runs these gates beside the
+compiler check without modifying the protected production installer or
+validator. Local GCC and Clang pass 28/28, both optional Linux JSON builds pass
+29/29, and hosted
+[run 31514575263](https://github.com/pedrofmj/music-studies/actions/runs/31514575263)
+passes Linux 28/28, Windows 22/22, and Windows JSON 23/23.
 
 ## Objective
 

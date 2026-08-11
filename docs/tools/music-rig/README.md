@@ -2,10 +2,11 @@
 
 This directory contains the Configurable Performance Rig implementation.
 
-Status: Milestones 0 and 1 are complete. Milestone 2 has an authoring-only
-deterministic compilation envelope and temporary-only Carla/Patchbay
-materialization. It does not install a service, read or write runtime state,
-connect to MIDI or audio, or modify the stable Carla/PipeWire setup.
+Status: Milestones 0 through 2 are complete. Milestone 2 provides an
+authoring-only deterministic compilation envelope, temporary-only
+Carla/Patchbay materialization, semantic parity, and protected single-rig
+regression coverage. It does not install a service, read or write runtime
+state, connect to MIDI or audio, or modify the stable Carla/PipeWire setup.
 
 ## Safety Boundary
 
