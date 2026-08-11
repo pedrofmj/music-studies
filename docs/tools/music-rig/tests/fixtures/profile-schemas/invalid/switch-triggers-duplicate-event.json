@@ -1,0 +1,45 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "switch-triggers",
+  "id": "fixture-triggers",
+  "rig": "fixture-rig",
+  "layer": "management",
+  "triggers": [
+    {
+      "id": "select-fixture-live",
+      "source_slot": "fixture-controller",
+      "event": {
+        "type": "note",
+        "channel": 16,
+        "number": 36,
+        "edge": "press"
+      },
+      "operation": {
+        "type": "activate-rig-profile",
+        "rig_profile": "fixture-live"
+      },
+      "consume": true,
+      "debounce_ms": 100,
+      "maximum_readiness": "control-only",
+      "enabled": true
+    },
+    {
+      "id": "select-fixture-live-again",
+      "source_slot": "fixture-controller",
+      "event": {
+        "type": "note",
+        "channel": 16,
+        "number": 36,
+        "edge": "any"
+      },
+      "operation": {
+        "type": "activate-rig-profile",
+        "rig_profile": "fixture-live"
+      },
+      "consume": true,
+      "debounce_ms": 100,
+      "maximum_readiness": "control-only",
+      "enabled": true
+    }
+  ]
+}

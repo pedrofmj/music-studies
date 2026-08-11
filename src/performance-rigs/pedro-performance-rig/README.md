@@ -42,7 +42,9 @@ all five roles as the default and fallback Rig Profile. It declares the
 aggregate endpoint and musical capabilities, pins the eighteen current sound
 engines, identifies the shared drum engine and effects, and retains the safe
 takeover and rollback policies. It is authored data only; the protected setup
-remains the active default. The trigger ID remains a planned forward reference.
+remains the active default. The resolved
+[`switch-triggers.json`](switch-triggers.json) management catalogue is empty,
+so it enables no MIDI-triggered switching.
 
 The seven schemas are:
 
@@ -51,7 +53,7 @@ The seven schemas are:
 - `rig.schema.json`: the complete Rig catalogue and stable device slots;
 - `rig-profile.schema.json`: one global composition;
 - `device-profile.schema.json`: one role for one logical device slot;
-- `hardware-preset.schema.json`: controller-local raw message assignments; and
+- `hardware-preset.schema.json`: controller-local raw message assignments;
 - `platform-binding.schema.json`: backend device identities, semantic target
   locators, machine paths, lifecycle resources, and evidence status; and
 - `switch-triggers.schema.json`: persistent management events translated to
@@ -66,14 +68,16 @@ It is authoring-only and cannot mutate or activate the runtime. The Windows
 document under the validator fixtures proves the portable contract shape; it
 is explicitly not physical Windows support or certification.
 
-Root validation checks the Rig, all Hardware Presets, Device Profiles, and Rig
-Profiles, and Platform Bindings. It resolves slot, model, endpoint, preset,
-control, profile, capability, resource, and binding references; checks
-required-slot coverage, aggregate capabilities and readiness, pinned and
-shared resources, initial-state ownership, and explicit composition ownership
-conflicts; and locks the current Linux binding to protected Airstar aliases,
-paths, checksums, and services. It reads authored files and protected evidence
-only; it does not connect to the live rig.
+Root validation checks the Rig, all Hardware Presets, Device Profiles, Rig
+Profiles, Platform Bindings, and Switch Triggers. It resolves slot, model,
+endpoint, preset, control, profile, capability, resource, binding, trigger
+source, and trigger-operation references; checks required-slot coverage,
+aggregate capabilities and readiness, pinned and shared resources,
+initial-state ownership, explicit composition ownership conflicts, management
+MIDI assignment, readiness ceilings, and consumed-event mapping conflicts; and
+locks the current Linux binding to protected Airstar aliases, paths, checksums,
+and services. It reads authored files and protected evidence only; it does not
+connect to the live rig.
 
 Run the offline schema suite from the repository root after installing the
 authoring-only dependency:

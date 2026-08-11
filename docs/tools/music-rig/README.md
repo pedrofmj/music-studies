@@ -2,9 +2,9 @@
 
 This directory contains the Configurable Performance Rig implementation.
 
-Status: Milestone 1 schema extraction in progress, with Milestone 0 technical
-gates complete. It does not install a service, read or write runtime state,
-connect to MIDI or audio, or modify the stable Carla/PipeWire setup.
+Status: Milestone 1 schema extraction is implemented, with Milestone 0
+technical gates complete. It does not install a service, read or write runtime
+state, connect to MIDI or audio, or modify the stable Carla/PipeWire setup.
 
 ## Safety Boundary
 
@@ -61,25 +61,30 @@ Windows backends.
 The seven strict Draft 2020-12 schemas under
 [`src/performance-rigs/pedro-performance-rig`](../../../src/performance-rigs/pedro-performance-rig/)
 define the portable v1 authoring boundary. The default CTest suite validates
-the schemas themselves, six positive plus thirteen negative document fixtures,
-eighteen positive/negative catalogue scenarios, and the authored five-slot Rig
-with all five current Hardware Presets, five Device Profiles, the initial
-`full-live-rack` Rig Profile, and its Linux Platform Binding. Semantic checks
-enforce selector order, required model and endpoint coverage, unique aliases
-and local discriminators, optional USB evidence, unambiguous shared USB IDs,
-unique hardware controls and messages, evidence status, resolved preset and
-profile IDs, source-control references, mapping ownership, required-slot
-composition, aggregate capabilities and readiness, pinned and shared
-resources, initial state ownership, explicit-composition ownership
-compatibility, complete binding capability and resource coverage, known
-binding targets, and platform isolation. The Python
+the schemas themselves, six positive plus fourteen negative document fixtures,
+twenty-eight positive/negative catalogue scenarios, and the authored five-slot
+Rig with all five current Hardware Presets, five Device Profiles, the initial
+`full-live-rack` Rig Profile, its Linux Platform Binding, and one inactive
+Switch Trigger document. Semantic checks enforce selector order, required
+model and endpoint coverage, unique aliases and local discriminators, optional
+USB evidence, unambiguous shared USB IDs, unique hardware controls and
+messages, evidence status, resolved preset and profile IDs, source-control
+references, mapping ownership, required-slot composition, aggregate
+capabilities and readiness, pinned and shared resources, initial state
+ownership, explicit-composition ownership compatibility, complete binding
+capability and resource coverage, known binding targets, platform isolation,
+unique management events, trigger source and operation resolution, Hardware
+Preset assignments, readiness ceilings, and consumed-event mapping conflicts.
+Explicit `consume: false` overlaps remain valid for later passthrough behavior.
+The Python
 `jsonschema` dependency is used only by authoring and tests; neither the C CLI
 nor the future resident runtime loads it.
 The current-catalogue test also locks all five verified Hardware Presets to the
 protected structured setup and the 2026-08-11 live pad capture. It locks the
 Linux binding to the same Airstar device aliases, paths, checksums, and
 services. The Windows binding is a contract fixture only and does not claim
-physical backend support or certification.
+physical backend support or certification. The authored trigger catalogue has
+zero triggers and therefore enables no MIDI management operation.
 
 Run the validator directly:
 

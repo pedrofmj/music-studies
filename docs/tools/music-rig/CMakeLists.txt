@@ -142,6 +142,13 @@ if(BUILD_TESTING)
             "${CMAKE_CURRENT_SOURCE_DIR}/../../../src/performance-rigs/pedro-performance-rig/platform-bindings/linux/airstar-current.json"
     )
     add_test(
+        NAME music_rig_current_switch_triggers_schema
+        COMMAND "${Python3_EXECUTABLE}"
+            "${MUSIC_RIG_PROFILE_SCHEMA_VALIDATOR}"
+            --validate
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../../src/performance-rigs/pedro-performance-rig/switch-triggers.json"
+    )
+    add_test(
         NAME music_rig_current_authored_catalogue
         COMMAND "${Python3_EXECUTABLE}"
             "${MUSIC_RIG_PROFILE_SCHEMA_VALIDATOR}"
@@ -157,6 +164,7 @@ if(BUILD_TESTING)
         music_rig_current_rig_schema
         music_rig_current_rig_profile_schema
         music_rig_current_platform_binding_schema
+        music_rig_current_switch_triggers_schema
         music_rig_current_authored_catalogue
         PROPERTIES TIMEOUT 10
     )

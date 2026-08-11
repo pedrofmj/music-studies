@@ -1,0 +1,8 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "switch-triggers",
+  "id": "performance-switch-triggers",
+  "rig": "pedro-performance-rig",
+  "layer": "management",
+  "triggers": []
+}

@@ -2,8 +2,8 @@
 
 Language: **English**
 
-Status: Milestone 1 in progress. The protected single-rig deployment remains
-the production default.
+Status: Milestone 1 implementation complete; hosted proof pending. The
+protected single-rig deployment remains the production default.
 
 Related documents:
 
@@ -11,7 +11,7 @@ Related documents:
 - [Proposta de Funcionalidade (pt-BR)](configurable-performance-rig.pt-BR.md)
 - [Implementation Tracker](configurable-performance-rig-tracker.md)
 
-## Implementation Checkpoint: 2026-08-10
+## Implementation Checkpoint: 2026-08-11
 
 Completed Milestone 0 work:
 
@@ -87,7 +87,7 @@ management operations. All five current Hardware Presets are authored and
 verified. The SMC-PAD and SMC-PAD Pocket include exact live-captured pad
 messages; the Pocket's silent hardware-internal controls are modeled
 separately. A pinned authoring-only validator checks all schemas, six valid
-and thirteen invalid fixtures, eighteen positive and negative catalogue
+and fourteen invalid fixtures, twenty-eight positive and negative catalogue
 scenarios, and the concrete Rig catalogue against protected and live-capture
 evidence on Linux and Windows. The initial `full-live-rack` Rig Profile now
 composes all five current Device Profiles, declares their aggregate
@@ -95,8 +95,12 @@ capabilities and readiness, pins all eighteen current engines, and records
 shared resources. The `airstar-current` Linux binding resolves that complete
 profile against protected device aliases, Carla targets, graph routes, files,
 and services. A Windows contract fixture exercises the portable boundary
-without claiming physical Windows support. No runtime or deployment path
-consumes these authored documents yet.
+without claiming physical Windows support. The resolved Switch Trigger
+catalogue is intentionally empty. Validation rejects duplicate management
+events, unresolved sources and operations, missing Hardware Preset assignments,
+readiness violations, and consumed-event overlap with any available Device
+Profile mapping while retaining explicit passthrough. No runtime or deployment
+path consumes these authored documents yet.
 
 ## Objective
 

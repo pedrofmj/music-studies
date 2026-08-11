@@ -33,6 +33,17 @@
         "number": 20,
         "edge": "change"
       }
+    },
+    {
+      "id": "management-pad",
+      "physical_control": "Management Pad",
+      "behavior": "momentary",
+      "message": {
+        "type": "note",
+        "channel": 16,
+        "number": 36,
+        "edge": "any"
+      }
     }
   ]
 }

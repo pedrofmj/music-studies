@@ -107,6 +107,12 @@
       "kind": "switch-triggers",
       "valid": false,
       "expected_error": "cold"
+    },
+    {
+      "path": "invalid/switch-triggers-duplicate-event.json",
+      "kind": "switch-triggers",
+      "valid": false,
+      "expected_error": "overlaps trigger"
     }
   ]
 }

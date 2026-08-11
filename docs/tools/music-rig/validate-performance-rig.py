@@ -271,6 +271,22 @@ def is_wildcard_note_stream(message: Mapping[str, Any]) -> bool:
     return message.get("channel") == "any" and message.get("number") == "any"
 
 
+def midi_event_signature(event: Mapping[str, Any]) -> Tuple[Any, Any, Any]:
+    return event["type"], event["channel"], event["number"]
+
+
+def midi_events_overlap(
+    left: Mapping[str, Any],
+    right: Mapping[str, Any],
+) -> bool:
+    """Return whether two MIDI event selectors can match one input event."""
+    if midi_event_signature(left) != midi_event_signature(right):
+        return False
+    left_edge = left.get("edge", "any")
+    right_edge = right.get("edge", "any")
+    return {left_edge, right_edge} != {"press", "release"}
+
+
 def validate_hardware_preset_semantics(
     document: Mapping[str, Any],
 ) -> List[str]:
@@ -407,6 +423,39 @@ def validate_rig_profile_semantics(
     return errors
 
 
+def validate_switch_trigger_semantics(
+    document: Mapping[str, Any],
+) -> List[str]:
+    """Validate trigger identities and ambiguous management MIDI events."""
+    errors = []
+    trigger_ids = set()
+    previous_triggers: List[Tuple[int, Mapping[str, Any]]] = []
+
+    for trigger_index, trigger in enumerate(document["triggers"]):
+        trigger_path = f"$.triggers[{trigger_index}]"
+        trigger_id = trigger["id"]
+        if trigger_id in trigger_ids:
+            errors.append(
+                f"{trigger_path}.id: duplicate Switch Trigger ID "
+                f"{trigger_id!r}"
+            )
+        trigger_ids.add(trigger_id)
+
+        for previous_index, previous in previous_triggers:
+            if (
+                trigger["source_slot"] == previous["source_slot"]
+                and midi_events_overlap(trigger["event"], previous["event"])
+            ):
+                errors.append(
+                    f"{trigger_path}.event: management MIDI event overlaps "
+                    f"trigger {previous['id']!r} at "
+                    f"$.triggers[{previous_index}]"
+                )
+        previous_triggers.append((trigger_index, trigger))
+
+    return errors
+
+
 def validate_platform_binding_semantics(
     document: Mapping[str, Any],
 ) -> List[str]:
@@ -502,6 +551,8 @@ def validate_document(
         formatted_errors.extend(validate_hardware_preset_semantics(document))
     elif not formatted_errors and kind == "platform-binding":
         formatted_errors.extend(validate_platform_binding_semantics(document))
+    elif not formatted_errors and kind == "switch-triggers":
+        formatted_errors.extend(validate_switch_trigger_semantics(document))
     return kind, formatted_errors
 
 
@@ -892,6 +943,146 @@ def validate_rig_profile_catalogue_documents(
     return errors
 
 
+def validate_switch_trigger_catalogue_document(
+    rig: Mapping[str, Any],
+    preset_entries: Sequence[Tuple[Path, Mapping[str, Any]]],
+    device_profile_entries: Sequence[Tuple[Path, Mapping[str, Any]]],
+    rig_profile_entries: Sequence[Tuple[Path, Mapping[str, Any]]],
+    trigger_path: Path,
+    trigger_document: Mapping[str, Any],
+) -> List[str]:
+    """Resolve management MIDI triggers and reject consumed musical input."""
+    errors = []
+    slots_by_id = {slot["id"]: slot for slot in rig["device_slots"]}
+    presets_by_id = {preset["id"]: preset for _, preset in preset_entries}
+    profiles_by_key = {
+        (profile["slot"], profile["id"]): (path, profile)
+        for path, profile in device_profile_entries
+    }
+    rig_profiles_by_id = {
+        profile["id"]: profile for _, profile in rig_profile_entries
+    }
+    readiness_rank = {"control-only": 0, "prepared": 1, "cold": 2}
+
+    if trigger_path.name != "switch-triggers.json":
+        errors.append(
+            f"{trigger_path}: file name must be switch-triggers.json"
+        )
+    if trigger_document["id"] != rig["switch_triggers"]:
+        errors.append(
+            f"{trigger_path}: Switch Trigger ID "
+            f"{trigger_document['id']!r} does not match rig.json reference "
+            f"{rig['switch_triggers']!r}"
+        )
+    if trigger_document["rig"] != rig["id"]:
+        errors.append(
+            f"{trigger_path}: trigger rig {trigger_document['rig']!r} does "
+            f"not match {rig['id']!r}"
+        )
+
+    for trigger_index, trigger in enumerate(trigger_document["triggers"]):
+        item_path = f"{trigger_path}: $.triggers[{trigger_index}]"
+        source_slot = trigger["source_slot"]
+        if source_slot not in slots_by_id:
+            errors.append(
+                f"{item_path}.source_slot: unresolved device slot "
+                f"{source_slot!r}"
+            )
+            source_profiles: List[Tuple[Path, Mapping[str, Any]]] = []
+        else:
+            source_profiles = [
+                entry
+                for (slot_id, _), entry in profiles_by_key.items()
+                if slot_id == source_slot
+            ]
+
+        source_presets = {
+            profile["hardware_preset"]
+            for _, profile in source_profiles
+        }
+        for preset_id in sorted(source_presets):
+            preset = presets_by_id.get(preset_id)
+            if preset is None:
+                continue
+            if not any(
+                midi_events_overlap(trigger["event"], control["message"])
+                for control in preset["controls"]
+            ):
+                errors.append(
+                    f"{item_path}.event: management MIDI event "
+                    f"{midi_event_signature(trigger['event'])!r} is not "
+                    f"defined by hardware preset {preset_id!r}"
+                )
+
+        operation = trigger["operation"]
+        operation_type = operation["type"]
+        target_readiness = "control-only"
+        if operation_type == "activate-rig-profile":
+            target_id = operation["rig_profile"]
+            target_profile = rig_profiles_by_id.get(target_id)
+            if target_profile is None:
+                errors.append(
+                    f"{item_path}.operation.rig_profile: unresolved Rig "
+                    f"Profile {target_id!r}"
+                )
+            else:
+                target_readiness = target_profile["readiness"]
+        elif operation_type == "activate-device-profile":
+            target_slot = operation["slot"]
+            target_profile_id = operation["device_profile"]
+            if target_slot not in slots_by_id:
+                errors.append(
+                    f"{item_path}.operation.slot: unresolved device slot "
+                    f"{target_slot!r}"
+                )
+            target_entry = profiles_by_key.get(
+                (target_slot, target_profile_id)
+            )
+            if target_entry is None:
+                errors.append(
+                    f"{item_path}.operation.device_profile: unresolved "
+                    f"Device Profile {target_slot!r}/{target_profile_id!r}"
+                )
+            else:
+                target_readiness = target_entry[1]["readiness"]
+        else:
+            target_slot = operation["slot"]
+            if target_slot not in slots_by_id:
+                errors.append(
+                    f"{item_path}.operation.slot: unresolved device slot "
+                    f"{target_slot!r}"
+                )
+
+        maximum_readiness = trigger["maximum_readiness"]
+        if readiness_rank[target_readiness] > readiness_rank[maximum_readiness]:
+            errors.append(
+                f"{item_path}.maximum_readiness: target readiness "
+                f"{target_readiness!r} exceeds {maximum_readiness!r}"
+            )
+
+        if not trigger["consume"]:
+            continue
+        for profile_path, profile in source_profiles:
+            preset = presets_by_id.get(profile["hardware_preset"])
+            if preset is None:
+                continue
+            controls_by_id = {
+                control["id"]: control for control in preset["controls"]
+            }
+            for mapping in profile["mappings"]:
+                control = controls_by_id.get(mapping["source_control"])
+                if control is not None and midi_events_overlap(
+                    trigger["event"], control["message"]
+                ):
+                    errors.append(
+                        f"{item_path}.event: consumed management MIDI event "
+                        f"collides with musical mapping {mapping['id']!r} "
+                        f"in {profile_path} via control {control['id']!r}"
+                    )
+
+    return errors
+
+
 def validate_platform_binding_catalogue_documents(
     rig: Mapping[str, Any],
     device_profile_entries: Sequence[Tuple[Path, Mapping[str, Any]]],
@@ -1098,7 +1289,7 @@ def validate_authored_catalogue(
     rig_root: Path,
     schemas: Mapping[str, Mapping[str, Any]],
     registry: Registry,
-) -> Tuple[List[str], int, int, int, int, int]:
+) -> Tuple[List[str], int, int, int, int, int, int]:
     rig_path = rig_root / "rig.json"
     rig = load_json(rig_path)
     rig_kind, rig_errors = validate_document(rig, schemas, registry)
@@ -1160,8 +1351,30 @@ def validate_authored_catalogue(
         if not binding_errors and binding_kind == "platform-binding":
             binding_entries.append((binding_path, binding))
 
+    trigger_path = rig_root / "switch-triggers.json"
+    trigger_document = None
+    if not trigger_path.exists():
+        errors.append(
+            f"rig.json: unresolved Switch Trigger document "
+            f"{rig['switch_triggers']!r}"
+        )
+    else:
+        trigger_candidate = load_json(trigger_path)
+        trigger_kind, trigger_errors = validate_document(
+            trigger_candidate, schemas, registry
+        )
+        errors.extend(
+            f"{trigger_path}: {error}" for error in trigger_errors
+        )
+        if trigger_kind != "switch-triggers":
+            errors.append(
+                f"{trigger_path}: expected a switch-triggers document"
+            )
+        if not trigger_errors and trigger_kind == "switch-triggers":
+            trigger_document = trigger_candidate
+
     if errors:
-        return errors, 0, 0, 0, 0, 0
+        return errors, 0, 0, 0, 0, 0, 0
     semantic_errors, verified_count, partial_count = (
         validate_hardware_catalogue_documents(rig, preset_entries)
     )
@@ -1183,6 +1396,17 @@ def validate_authored_catalogue(
             binding_entries,
         )
     )
+    if trigger_document is not None:
+        semantic_errors.extend(
+            validate_switch_trigger_catalogue_document(
+                rig,
+                preset_entries,
+                profile_entries,
+                rig_profile_entries,
+                trigger_path,
+                trigger_document,
+            )
+        )
     return (
         semantic_errors,
         verified_count,
@@ -1190,6 +1414,7 @@ def validate_authored_catalogue(
         len(profile_entries),
         len(rig_profile_entries),
         len(binding_entries),
+        1 if trigger_document is not None else 0,
     )
 
 
@@ -1667,6 +1892,10 @@ def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
     fixture_binding = load_json(
         fixture_dir / "valid" / "platform-binding.json"
     )
+    fixture_trigger_path = Path("switch-triggers.json")
+    fixture_trigger = load_json(
+        fixture_dir / "valid" / "switch-triggers.json"
+    )
     catalogue_errors, _, _ = validate_hardware_catalogue_documents(
         fixture_rig,
         [(fixture_preset_path, fixture_preset)],
@@ -1786,6 +2015,178 @@ def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
                for error in catalogue_errors):
         failures.append(
             "authored Platform Binding catalogue accepted a contract fixture"
+        )
+
+    trigger_catalogue_arguments = (
+        fixture_rig,
+        [(fixture_preset_path, fixture_preset)],
+        [(fixture_profile_path, fixture_profile)],
+        [(fixture_rig_profile_path, fixture_rig_profile)],
+        fixture_trigger_path,
+    )
+    catalogue_errors = validate_switch_trigger_catalogue_document(
+        *trigger_catalogue_arguments,
+        fixture_trigger,
+    )
+    if catalogue_errors:
+        failures.append(
+            "valid Switch Trigger catalogue failed: "
+            f"{'; '.join(catalogue_errors)}"
+        )
+
+    device_activation_trigger = json.loads(json.dumps(fixture_trigger))
+    device_activation_trigger["triggers"][0]["operation"] = {
+        "type": "activate-device-profile",
+        "slot": "fixture-controller",
+        "device_profile": "fixture-role",
+    }
+    catalogue_errors = validate_switch_trigger_catalogue_document(
+        *trigger_catalogue_arguments,
+        device_activation_trigger,
+    )
+    if catalogue_errors:
+        failures.append(
+            "valid device-profile Switch Trigger failed: "
+            f"{'; '.join(catalogue_errors)}"
+        )
+
+    reset_trigger = json.loads(json.dumps(fixture_trigger))
+    reset_trigger["triggers"][0]["operation"] = {
+        "type": "reset-device-profile",
+        "slot": "fixture-controller",
+    }
+    catalogue_errors = validate_switch_trigger_catalogue_document(
+        *trigger_catalogue_arguments,
+        reset_trigger,
+    )
+    if catalogue_errors:
+        failures.append(
+            "valid device-reset Switch Trigger failed: "
+            f"{'; '.join(catalogue_errors)}"
+        )
+
+    consumed_collision_trigger = json.loads(json.dumps(fixture_trigger))
+    consumed_collision_trigger["triggers"][0]["event"] = {
+        "type": "cc",
+        "channel": 1,
+        "number": 20,
+        "edge": "change",
+    }
+    catalogue_errors = validate_switch_trigger_catalogue_document(
+        *trigger_catalogue_arguments,
+        consumed_collision_trigger,
+    )
+    if not any("consumed management MIDI event collides" in error
+               for error in catalogue_errors):
+        failures.append(
+            "invalid Switch Trigger catalogue did not reject a consumed "
+            "musical mapping collision"
+        )
+
+    passthrough_trigger = json.loads(json.dumps(consumed_collision_trigger))
+    passthrough_trigger["triggers"][0]["consume"] = False
+    catalogue_errors = validate_switch_trigger_catalogue_document(
+        *trigger_catalogue_arguments,
+        passthrough_trigger,
+    )
+    if catalogue_errors:
+        failures.append(
+            "explicit passthrough Switch Trigger overlap failed: "
+            f"{'; '.join(catalogue_errors)}"
+        )
+
+    unassigned_trigger = json.loads(json.dumps(fixture_trigger))
+    unassigned_trigger["triggers"][0]["event"]["number"] = 37
+    catalogue_errors = validate_switch_trigger_catalogue_document(
+        *trigger_catalogue_arguments,
+        unassigned_trigger,
+    )
+    if not any("is not defined by hardware preset" in error
+               for error in catalogue_errors):
+        failures.append(
+            "invalid Switch Trigger catalogue accepted an unassigned "
+            "hardware message"
+        )
+
+    unresolved_trigger = json.loads(json.dumps(fixture_trigger))
+    unresolved_trigger["triggers"][0]["source_slot"] = "missing-controller"
+    unresolved_trigger["triggers"][0]["operation"][
+        "rig_profile"
+    ] = "missing-rig-profile"
+    catalogue_errors = validate_switch_trigger_catalogue_document(
+        *trigger_catalogue_arguments,
+        unresolved_trigger,
+    )
+    if not any("unresolved device slot" in error for error in catalogue_errors):
+        failures.append(
+            "invalid Switch Trigger catalogue accepted an unresolved source"
+        )
+    if not any("unresolved Rig Profile" in error for error in catalogue_errors):
+        failures.append(
+            "invalid Switch Trigger catalogue accepted an unresolved Rig "
+            "Profile operation"
+        )
+
+    unresolved_device_trigger = json.loads(json.dumps(device_activation_trigger))
+    unresolved_device_trigger["triggers"][0]["operation"] = {
+        "type": "activate-device-profile",
+        "slot": "missing-controller",
+        "device_profile": "missing-role",
+    }
+    catalogue_errors = validate_switch_trigger_catalogue_document(
+        *trigger_catalogue_arguments,
+        unresolved_device_trigger,
+    )
+    if not any("unresolved Device Profile" in error
+               for error in catalogue_errors):
+        failures.append(
+            "invalid Switch Trigger catalogue accepted an unresolved Device "
+            "Profile operation"
+        )
+
+    mismatched_trigger_document = json.loads(json.dumps(fixture_trigger))
+    mismatched_trigger_document["id"] = "wrong-triggers"
+    mismatched_trigger_document["rig"] = "wrong-rig"
+    catalogue_errors = validate_switch_trigger_catalogue_document(
+        fixture_rig,
+        [(fixture_preset_path, fixture_preset)],
+        [(fixture_profile_path, fixture_profile)],
+        [(fixture_rig_profile_path, fixture_rig_profile)],
+        Path("wrong-switch-triggers.json"),
+        mismatched_trigger_document,
+    )
+    expected_identity_errors = (
+        "file name must be switch-triggers.json",
+        "does not match rig.json reference",
+        "trigger rig",
+    )
+    if not all(
+        any(expected in error for error in catalogue_errors)
+        for expected in expected_identity_errors
+    ):
+        failures.append(
+            "invalid Switch Trigger catalogue accepted mismatched document "
+            "identity references"
+        )
+
+    prepared_rig_profile = json.loads(json.dumps(fixture_rig_profile))
+    prepared_rig_profile["readiness"] = "prepared"
+    readiness_arguments = (
+        fixture_rig,
+        [(fixture_preset_path, fixture_preset)],
+        [(fixture_profile_path, fixture_profile)],
+        [(fixture_rig_profile_path, prepared_rig_profile)],
+        fixture_trigger_path,
+    )
+    catalogue_errors = validate_switch_trigger_catalogue_document(
+        *readiness_arguments,
+        fixture_trigger,
+    )
+    if not any("target readiness" in error and "exceeds" in error
+               for error in catalogue_errors):
+        failures.append(
+            "invalid Switch Trigger catalogue accepted a target above its "
+            "maximum readiness"
         )
 
     unresolved_rig_profile_rig = json.loads(json.dumps(fixture_rig))
@@ -1962,7 +2363,7 @@ def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
     print(
         "Performance Rig schemas: PASS "
         f"(schemas={len(schemas)}, valid={valid_count}, invalid={invalid_count}, "
-        "catalogues=18)"
+        "catalogues=28)"
     )
     return 0
 
@@ -1998,6 +2399,7 @@ def run_root_validation(
         profile_count,
         rig_profile_count,
         platform_binding_count,
+        switch_trigger_count,
     ) = validate_authored_catalogue(
         rig_root,
         schemas,
@@ -2033,7 +2435,8 @@ def run_root_validation(
         f"{verified_count + partial_count}, verified={verified_count}, "
         f"partial={partial_count}, device-profiles={profile_count}, "
         f"rig-profiles={rig_profile_count}, "
-        f"platform-bindings={platform_binding_count})"
+        f"platform-bindings={platform_binding_count}, "
+        f"switch-trigger-documents={switch_trigger_count})"
     )
     return 0
 
@@ -2081,7 +2484,7 @@ def parse_arguments() -> argparse.Namespace:
         metavar="RIG_ROOT",
         help=(
             "validate the authored Rig, Hardware Presets, profiles, and "
-            "platform bindings"
+            "platform bindings and Switch Triggers"
         ),
     )
     return parser.parse_args()
