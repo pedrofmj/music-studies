@@ -1,7 +1,6 @@
 #include "music_rig/core.h"
 
 #include <stddef.h>
-#include <string.h>
 
 static const music_rig_build_info BUILD_INFO = {
     MUSIC_RIG_CORE_VERSION,
@@ -19,6 +18,8 @@ music_rig_result music_rig_generation_slot_init(
     const music_rig_generation *initial_generation
 )
 {
+    size_t index;
+
     if (slot == NULL || initial_generation == NULL ||
         initial_generation->id == UINT64_C(0)) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
@@ -26,7 +27,9 @@ music_rig_result music_rig_generation_slot_init(
 
     atomic_init(&slot->published, initial_generation);
     atomic_init(&slot->adopted, initial_generation);
-    memset(slot->retired, 0, sizeof(slot->retired));
+    for (index = 0U; index < MUSIC_RIG_RETIRED_GENERATION_CAPACITY; ++index) {
+        slot->retired[index] = NULL;
+    }
     slot->retired_head = 0U;
     slot->retired_count = 0U;
     return MUSIC_RIG_RESULT_OK;
