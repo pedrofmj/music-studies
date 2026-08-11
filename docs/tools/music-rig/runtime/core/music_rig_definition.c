@@ -82,6 +82,15 @@ music_rig_result music_rig_definition_validate(
         !valid_id(definition->platform_binding_id) ||
         !valid_id(definition->platform) ||
         definition->device_profile_count == UINT32_C(0) ||
+        definition->device_profile_count >
+            MUSIC_RIG_DEVICE_PROFILE_CAPACITY ||
+        definition->mapping_count == UINT32_C(0) ||
+        definition->mapping_count > MUSIC_RIG_MAPPING_CAPACITY ||
+        definition->target_binding_count == UINT32_C(0) ||
+        definition->target_binding_count >
+            MUSIC_RIG_TARGET_BINDING_CAPACITY ||
+        definition->ownership_count == UINT32_C(0) ||
+        definition->ownership_count > MUSIC_RIG_OWNERSHIP_CAPACITY ||
         !definition->control_only || !definition->graph_delta_empty ||
         !definition->authoring_only) {
         return MUSIC_RIG_RESULT_INVALID_DATA;
@@ -91,6 +100,7 @@ music_rig_result music_rig_definition_validate(
 
 music_rig_result music_rig_definition_generation_init(
     const music_rig_compiled_definition *definition,
+    const music_rig_compiled_tables *tables,
     music_rig_generation *generation
 )
 {
@@ -103,8 +113,18 @@ music_rig_result music_rig_definition_generation_init(
     if (result != MUSIC_RIG_RESULT_OK) {
         return result;
     }
+    result = music_rig_compiled_tables_validate(
+        tables,
+        definition->device_profile_count,
+        definition->mapping_count,
+        definition->target_binding_count,
+        definition->ownership_count
+    );
+    if (result != MUSIC_RIG_RESULT_OK) {
+        return result;
+    }
     generation->id = definition->generation_id;
-    generation->mapping = definition;
+    generation->mapping = tables;
     return MUSIC_RIG_RESULT_OK;
 }
 
@@ -115,7 +135,8 @@ music_rig_result music_rig_definition_load(
     size_t document_capacity,
     const uint8_t *expected_fingerprint,
     size_t expected_fingerprint_size,
-    music_rig_compiled_definition *definition
+    music_rig_compiled_definition *definition,
+    music_rig_compiled_tables *tables
 )
 {
     music_rig_result result;
@@ -125,7 +146,7 @@ music_rig_result music_rig_definition_load(
         decoder->decode == NULL || document_buffer == NULL ||
         document_capacity == 0 || expected_fingerprint == NULL ||
         expected_fingerprint_size != MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE ||
-        definition == NULL) {
+        definition == NULL || tables == NULL) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
 
@@ -144,11 +165,13 @@ music_rig_result music_rig_definition_load(
     }
 
     memset(definition, 0, sizeof(*definition));
+    memset(tables, 0, sizeof(*tables));
     result = decoder->decode(
         decoder->context,
         document_buffer,
         document_size,
-        definition
+        definition,
+        tables
     );
     if (result != MUSIC_RIG_RESULT_OK) {
         return result;
@@ -164,5 +187,11 @@ music_rig_result music_rig_definition_load(
         ) != 0) {
         return MUSIC_RIG_RESULT_INVALID_DATA;
     }
-    return MUSIC_RIG_RESULT_OK;
+    return music_rig_compiled_tables_prepare(
+        tables,
+        definition->device_profile_count,
+        definition->mapping_count,
+        definition->target_binding_count,
+        definition->ownership_count
+    );
 }

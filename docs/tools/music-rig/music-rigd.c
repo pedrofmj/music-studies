@@ -1,4 +1,5 @@
 #include "music_rig/core.h"
+#include "music_rig/compiled_tables.h"
 #include "music_rig/runtime.h"
 
 #if defined(MUSIC_RIG_HAS_FILE_STORAGE)
@@ -31,6 +32,7 @@ static void print_usage(FILE *stream, const char *program)
 #define DEFINITION_DOCUMENT_CAPACITY ((size_t)131072)
 
 static uint8_t definition_document[DEFINITION_DOCUMENT_CAPACITY];
+static music_rig_compiled_tables definition_tables;
 
 static int validate_definition(const char *path, const char *fingerprint)
 {
@@ -66,11 +68,16 @@ static int validate_definition(const char *path, const char *fingerprint)
             sizeof(definition_document),
             expected,
             sizeof(expected),
-            &definition
+            &definition,
+            &definition_tables
         );
     }
     if (result == MUSIC_RIG_RESULT_OK) {
-        result = music_rig_definition_generation_init(&definition, &generation);
+        result = music_rig_definition_generation_init(
+            &definition,
+            &definition_tables,
+            &generation
+        );
     }
     if (result != MUSIC_RIG_RESULT_OK) {
         fprintf(stderr, "definition validation failed: result %d\n", (int)result);
@@ -84,9 +91,14 @@ static int validate_definition(const char *path, const char *fingerprint)
     printf("platform-binding %s\n", definition.platform_binding_id);
     printf("platform %s\n", definition.platform);
     printf("device-profiles %" PRIu32 "\n", definition.device_profile_count);
+    printf("input-bindings %" PRIu32 "\n",
+        definition_tables.input_binding_count);
     printf("mappings %" PRIu32 "\n", definition.mapping_count);
+    printf("dispatch-entries %" PRIu32 "\n",
+        definition_tables.mapping_count);
     printf("target-bindings %" PRIu32 "\n", definition.target_binding_count);
     printf("ownership %" PRIu32 "\n", definition.ownership_count);
+    printf("table-storage-bytes %zu\n", sizeof(definition_tables));
     puts("output-mode suppressed");
     return MUSIC_RIG_RESULT_OK;
 }
@@ -104,6 +116,7 @@ int main(int argc, char **argv)
         printf("runtime-abi %u\n", MUSIC_RIG_RUNTIME_ABI_VERSION);
         printf("runtime-state %u\n", MUSIC_RIG_RUNTIME_STATE_VERSION);
         printf("storage-abi %u\n", MUSIC_RIG_STORAGE_ABI_VERSION);
+        printf("compiled-tables %u\n", MUSIC_RIG_COMPILED_TABLES_VERSION);
 #if defined(MUSIC_RIG_HAS_FILE_STORAGE)
         printf("file-storage-abi %u\n", MUSIC_RIG_FILE_STORAGE_ABI_VERSION);
 #endif

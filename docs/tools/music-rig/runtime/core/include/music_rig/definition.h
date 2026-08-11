@@ -1,6 +1,7 @@
 #ifndef MUSIC_RIG_DEFINITION_H
 #define MUSIC_RIG_DEFINITION_H
 
+#include "music_rig/compiled_tables.h"
 #include "music_rig/core.h"
 #include "music_rig/state.h"
 #include "music_rig/storage.h"
@@ -10,7 +11,7 @@
 #include <stdint.h>
 
 #define MUSIC_RIG_COMPILED_DEFINITION_VERSION UINT32_C(1)
-#define MUSIC_RIG_DEFINITION_ID_CAPACITY ((size_t)64)
+#define MUSIC_RIG_DEFINITION_ID_CAPACITY MUSIC_RIG_IDENTIFIER_CAPACITY
 
 typedef struct music_rig_compiled_definition {
     uint32_t schema_version;
@@ -35,7 +36,8 @@ typedef struct music_rig_definition_decoder {
         void *context,
         const uint8_t *document,
         size_t document_size,
-        music_rig_compiled_definition *definition
+        music_rig_compiled_definition *definition,
+        music_rig_compiled_tables *tables
     );
 } music_rig_definition_decoder;
 
@@ -52,6 +54,7 @@ music_rig_result music_rig_definition_validate(
 
 music_rig_result music_rig_definition_generation_init(
     const music_rig_compiled_definition *definition,
+    const music_rig_compiled_tables *tables,
     music_rig_generation *generation
 );
 
@@ -62,7 +65,8 @@ music_rig_result music_rig_definition_load(
     size_t document_capacity,
     const uint8_t *expected_fingerprint,
     size_t expected_fingerprint_size,
-    music_rig_compiled_definition *definition
+    music_rig_compiled_definition *definition,
+    music_rig_compiled_tables *tables
 );
 
 #endif

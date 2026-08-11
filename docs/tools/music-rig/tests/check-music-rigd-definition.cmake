@@ -32,9 +32,12 @@ set(EXPECTED_LINES
     "platform-binding airstar-current"
     "platform linux"
     "device-profiles 5"
+    "input-bindings 5"
     "mappings 72"
+    "dispatch-entries 72"
     "target-bindings 71"
     "ownership 57"
+    "table-storage-bytes "
     "output-mode suppressed"
 )
 foreach(EXPECTED_LINE IN LISTS EXPECTED_LINES)

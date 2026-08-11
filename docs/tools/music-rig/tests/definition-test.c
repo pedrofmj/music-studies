@@ -9,6 +9,7 @@ typedef struct mock_definition_source {
     music_rig_result read_result;
     music_rig_result decode_result;
     music_rig_compiled_definition decoded;
+    music_rig_compiled_tables decoded_tables;
     unsigned int read_calls;
     unsigned int decode_calls;
 } mock_definition_source;
@@ -56,7 +57,8 @@ static music_rig_result mock_decode(
     void *opaque,
     const uint8_t *document,
     size_t document_size,
-    music_rig_compiled_definition *definition
+    music_rig_compiled_definition *definition,
+    music_rig_compiled_tables *tables
 )
 {
     mock_definition_source *source = opaque;
@@ -69,6 +71,7 @@ static music_rig_result mock_decode(
         return source->decode_result;
     }
     *definition = source->decoded;
+    *tables = source->decoded_tables;
     return MUSIC_RIG_RESULT_OK;
 }
 
@@ -91,16 +94,86 @@ static void init_source(mock_definition_source *source)
     memcpy(source->decoded.platform_binding_id, "airstar-current",
         sizeof("airstar-current"));
     memcpy(source->decoded.platform, "linux", sizeof("linux"));
-    source->decoded.device_profile_count = UINT32_C(5);
-    source->decoded.mapping_count = UINT32_C(72);
-    source->decoded.target_binding_count = UINT32_C(71);
-    source->decoded.ownership_count = UINT32_C(57);
+    source->decoded.device_profile_count = UINT32_C(1);
+    source->decoded.mapping_count = UINT32_C(1);
+    source->decoded.target_binding_count = UINT32_C(1);
+    source->decoded.ownership_count = UINT32_C(1);
     source->decoded.control_only = true;
     source->decoded.graph_delta_empty = true;
     source->decoded.authoring_only = true;
     for (index = 0; index < MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE; ++index) {
         source->decoded.fingerprint[index] = (uint8_t)index;
     }
+
+    source->decoded_tables.device_profile_count = UINT32_C(1);
+    source->decoded_tables.input_binding_count = UINT32_C(1);
+    source->decoded_tables.mapping_count = UINT32_C(1);
+    source->decoded_tables.target_binding_count = UINT32_C(1);
+    source->decoded_tables.ownership_count = UINT32_C(1);
+    memcpy(source->decoded_tables.device_profiles[0].slot, "arturia-main",
+        sizeof("arturia-main"));
+    memcpy(source->decoded_tables.device_profiles[0].profile,
+        "multi-instrument-rack", sizeof("multi-instrument-rack"));
+    memcpy(source->decoded_tables.device_profiles[0].hardware_preset,
+        "arturia-current-rack", sizeof("arturia-current-rack"));
+    source->decoded_tables.device_profiles[0].readiness =
+        MUSIC_RIG_READINESS_CONTROL_ONLY;
+    memcpy(source->decoded_tables.input_bindings[0].slot, "arturia-main",
+        sizeof("arturia-main"));
+    memcpy(source->decoded_tables.input_bindings[0].adapter, "mock-midi",
+        sizeof("mock-midi"));
+    memcpy(source->decoded_tables.input_bindings[0].identity_strategy,
+        "mock-identity", sizeof("mock-identity"));
+    memcpy(source->decoded_tables.input_bindings[0].identity_value,
+        "arturia", sizeof("arturia"));
+    source->decoded_tables.input_bindings[0].status =
+        MUSIC_RIG_BINDING_STATUS_AVAILABLE;
+    source->decoded_tables.input_bindings[0].endpoint_count = UINT16_C(1);
+    memcpy(source->decoded_tables.input_bindings[0].endpoints[0].purpose,
+        "midi.performance-input", sizeof("midi.performance-input"));
+    memcpy(source->decoded_tables.input_bindings[0].endpoints[0].locator,
+        "mock:arturia", sizeof("mock:arturia"));
+
+    memcpy(source->decoded_tables.mappings[0].mapping, "master-volume",
+        sizeof("master-volume"));
+    memcpy(source->decoded_tables.mappings[0].control, "central-encoder",
+        sizeof("central-encoder"));
+    memcpy(source->decoded_tables.mappings[0].target, "master.volume",
+        sizeof("master.volume"));
+    source->decoded_tables.mappings[0].profile_index = UINT16_C(0);
+    source->decoded_tables.mappings[0].event_type = MUSIC_RIG_MIDI_EVENT_CC;
+    source->decoded_tables.mappings[0].edge = MUSIC_RIG_MIDI_EDGE_CHANGE;
+    source->decoded_tables.mappings[0].channel = UINT8_C(1);
+    source->decoded_tables.mappings[0].number = UINT8_C(114);
+    source->decoded_tables.mappings[0].behavior =
+        MUSIC_RIG_CONTROL_BEHAVIOR_ABSOLUTE;
+    source->decoded_tables.mappings[0].transform =
+        MUSIC_RIG_TRANSFORM_DIRECT;
+    source->decoded_tables.mappings[0].takeover = MUSIC_RIG_TAKEOVER_PICKUP;
+
+    memcpy(source->decoded_tables.target_bindings[0].target,
+        "parameter.master-volume", sizeof("parameter.master-volume"));
+    memcpy(source->decoded_tables.target_bindings[0].adapter, "mock-control",
+        sizeof("mock-control"));
+    memcpy(source->decoded_tables.target_bindings[0].locator, "mock:volume",
+        sizeof("mock:volume"));
+    source->decoded_tables.target_bindings[0].status =
+        MUSIC_RIG_BINDING_STATUS_AVAILABLE;
+
+    source->decoded_tables.ownership[0].kind =
+        MUSIC_RIG_OWNERSHIP_KIND_PARAMETER;
+    source->decoded_tables.ownership[0].mode =
+        MUSIC_RIG_OWNERSHIP_MODE_EXCLUSIVE;
+    memcpy(source->decoded_tables.ownership[0].target, "master.volume",
+        sizeof("master.volume"));
+    source->decoded_tables.ownership[0].owner_count = UINT16_C(1);
+    source->decoded_tables.ownership[0].owners[0].scope =
+        MUSIC_RIG_OWNER_SCOPE_DEVICE_PROFILE;
+    source->decoded_tables.ownership[0].owners[0].profile_index = UINT16_C(0);
+    memcpy(source->decoded_tables.ownership[0].owners[0].slot,
+        "arturia-main", sizeof("arturia-main"));
+    memcpy(source->decoded_tables.ownership[0].owners[0].profile,
+        "multi-instrument-rack", sizeof("multi-instrument-rack"));
 }
 
 static music_rig_storage_adapter storage_for(mock_definition_source *source)
@@ -125,7 +198,8 @@ static music_rig_definition_decoder decoder_for(mock_definition_source *source)
 
 static int test_load_and_failures(void)
 {
-    mock_definition_source source;
+    static mock_definition_source source;
+    static music_rig_compiled_tables tables;
     music_rig_storage_adapter storage;
     music_rig_definition_decoder decoder;
     music_rig_compiled_definition definition;
@@ -143,13 +217,34 @@ static int test_load_and_failures(void)
             sizeof(buffer),
             source.decoded.fingerprint,
             sizeof(source.decoded.fingerprint),
-            &definition
+            &definition,
+            &tables
         ) != MUSIC_RIG_RESULT_OK ||
-        music_rig_definition_generation_init(&definition, &generation) !=
+        music_rig_definition_generation_init(
+            &definition,
+            &tables,
+            &generation
+        ) !=
             MUSIC_RIG_RESULT_OK ||
-        generation.id != UINT64_C(1) || generation.mapping != &definition ||
+        generation.id != UINT64_C(1) || generation.mapping != &tables ||
         source.read_calls != 1U || source.decode_calls != 1U ||
-        definition.mapping_count != UINT32_C(72)) {
+        definition.mapping_count != UINT32_C(1) ||
+        music_rig_compiled_mapping_lookup(
+            &tables,
+            UINT16_C(0),
+            MUSIC_RIG_MIDI_EVENT_CC,
+            UINT8_C(1),
+            UINT8_C(114)
+        ) != &tables.mappings[0] ||
+        music_rig_compiled_target_lookup(
+            &tables,
+            "parameter.master-volume"
+        ) != &tables.target_bindings[0] ||
+        music_rig_compiled_ownership_lookup(
+            &tables,
+            MUSIC_RIG_OWNERSHIP_KIND_PARAMETER,
+            "master.volume"
+        ) != &tables.ownership[0]) {
         fputs("compiled definition load failed\n", stderr);
         return 1;
     }
@@ -162,7 +257,8 @@ static int test_load_and_failures(void)
             sizeof(buffer),
             unexpected,
             sizeof(unexpected),
-            &definition
+            &definition,
+            &tables
         ) != MUSIC_RIG_RESULT_INVALID_DATA) {
         fputs("unexpected definition fingerprint was accepted\n", stderr);
         return 1;
@@ -176,7 +272,8 @@ static int test_load_and_failures(void)
             sizeof(buffer),
             source.decoded.fingerprint,
             sizeof(source.decoded.fingerprint),
-            &definition
+            &definition,
+            &tables
         ) != MUSIC_RIG_RESULT_NOT_FOUND) {
         fputs("missing compiled definition was accepted\n", stderr);
         return 1;
@@ -191,7 +288,8 @@ static int test_load_and_failures(void)
             sizeof(buffer),
             source.decoded.fingerprint,
             sizeof(source.decoded.fingerprint),
-            &definition
+            &definition,
+            &tables
         ) != MUSIC_RIG_RESULT_BUFFER_TOO_SMALL) {
         fputs("oversize compiled definition was accepted\n", stderr);
         return 1;
@@ -206,9 +304,32 @@ static int test_load_and_failures(void)
             sizeof(buffer),
             source.decoded.fingerprint,
             sizeof(source.decoded.fingerprint),
-            &definition
+            &definition,
+            &tables
         ) != MUSIC_RIG_RESULT_INVALID_DATA) {
         fputs("unsafe compiled definition was accepted\n", stderr);
+        return 1;
+    }
+    return 0;
+}
+
+static int test_duplicate_dispatch_rejected(void)
+{
+    static mock_definition_source source;
+    static music_rig_compiled_tables tables;
+
+    init_source(&source);
+    tables = source.decoded_tables;
+    tables.mapping_count = UINT32_C(2);
+    tables.mappings[1] = tables.mappings[0];
+    if (music_rig_compiled_tables_prepare(
+            &tables,
+            UINT32_C(1),
+            UINT32_C(2),
+            UINT32_C(1),
+            UINT32_C(1)
+        ) != MUSIC_RIG_RESULT_INVALID_DATA) {
+        fputs("duplicate mapping dispatch was accepted\n", stderr);
         return 1;
     }
     return 0;
@@ -260,5 +381,7 @@ static int test_fingerprint_parser(void)
 
 int main(void)
 {
-    return test_load_and_failures() != 0 || test_fingerprint_parser() != 0;
+    return test_load_and_failures() != 0 ||
+        test_duplicate_dispatch_rejected() != 0 ||
+        test_fingerprint_parser() != 0;
 }

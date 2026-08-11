@@ -10,6 +10,7 @@ option(
 )
 
 add_library(music_rig_core STATIC
+    runtime/core/music_rig_compiled_tables.c
     runtime/core/music_rig_core.c
     runtime/core/music_rig_definition.c
     runtime/core/music_rig_protocol.c

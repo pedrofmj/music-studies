@@ -263,18 +263,23 @@ benchmarks.
 - 🟡 Implement the portable daemon control loop, state, metrics, and adapters.
   The fixed-storage loop provides versioned lifecycle state, saturating metrics,
   expected-generation publication, and ABI-versioned clock/control/storage
-  boundaries. A bounded loader validates the current compiled envelope metadata;
-  the exact 64-byte persistent-state frame detects corruption and covers
-  qualified restore, definition-fingerprint fallback, and atomic-replace failure
-  through mock storage. Explicit-path host adapters now read definitions and
+  boundaries. A bounded loader validates the current compiled envelope metadata
+  and prepares caller-owned immutable tables for all 5 profile/input bindings,
+  72 mappings, 71 targets, and 57 ownership entries. It cross-checks every
+  compiler mapping-index entry and builds a fixed 256-entry numeric event
+  dispatch index with no lookup allocation, lock, JSON traversal, or string
+  comparison. The complete version 1 table image is 451,032 bytes on the local
+  64-bit builds. The exact 64-byte persistent-state frame detects corruption and
+  covers qualified restore, definition-fingerprint fallback, and atomic-replace
+  failure through mock storage. Explicit-path host adapters read definitions and
   state on Linux and Windows and atomically replace only state through native
   same-directory temporary files. The opt-in daemon can load and report one
   trusted definition through an explicit offline command. Local GCC/Clang pass
-  35/35, both optional JSON builds pass 38/38, and hosted run 31531477956 passes
-  Linux 35/35, Windows 29/29, and Windows JSON 32/32. `music-rigd` remains
-  output-suppressed and inert without an explicit command. Production XDG/Known
-  Folder selection, executable mapping tables, and the device/MIDI, audio/graph,
-  plugin-host, service, and diagnostics adapters remain.
+  35/35, both optional JSON builds pass 38/38, seven ASan/UBSan boundary tests
+  pass, and the protected baseline remains 30/30. Hosted table evidence is
+  pending. `music-rigd` remains output-suppressed and inert without an explicit
+  command. Production XDG/Known Folder selection and the device/MIDI,
+  audio/graph, plugin-host, service, and diagnostics adapters remain.
 - ⬜ Implement the complete versioned IPC and CLI read-only/dry-run commands.
 - ⬜ Add immutable-generation reclamation and stable device-slot ports.
 - ⬜ Extract reusable behavior without changing installed legacy services.

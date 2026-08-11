@@ -4,7 +4,7 @@ This directory contains the Configurable Performance Rig implementation.
 
 Status: Milestones 0 through 2 are complete. Milestone 3 is in progress with a
 portable, output-suppressed runtime control loop, qualified persistent-state
-contract, checked definition-metadata loader, explicit-path Linux/Windows file
+contract, bounded immutable definition tables, explicit-path Linux/Windows file
 adapters, and inert `music-rigd` binary. It does not select production storage
 locations, install a service, create an IPC endpoint, connect to MIDI or audio,
 or modify the stable Carla/PipeWire setup.
@@ -151,10 +151,13 @@ decoded status requests, idle waits, responses, and shutdown through mock
 adapters. Output-enabled mode is rejected.
 
 [`runtime/core/music_rig_definition.c`](runtime/core/music_rig_definition.c)
-loads bounded definition metadata through logical storage and decoder adapters.
-The optional `json-c` adapter validates the checked-in compiled
-`full-live-rack` envelope and hands its metadata to an immutable generation; it
-does not yet decode executable mapping tables.
+loads bounded definition metadata and caller-owned tables through logical
+storage and decoder adapters. The optional `json-c` adapter validates the
+checked-in compiled `full-live-rack` envelope, cross-checks its 5 inputs, 72
+mappings and compiler dispatch index, 71 targets, and 57 ownership entries, and
+hands the prepared immutable table image to a generation. Event lookup uses a
+fixed numeric dispatch index with no allocation, lock, JSON traversal, or
+string comparison.
 
 [`runtime/platform/include/music_rig/file_storage.h`](runtime/platform/include/music_rig/file_storage.h)
 defines explicit caller-owned UTF-8 paths. Linux and Windows implementations
@@ -165,10 +168,11 @@ with ephemeral build-directory state files.
 [`music-rigd`](music-rigd.c) is currently an inert build target. It supports
 version/help output but refuses a no-argument start. An opt-in JSON build adds an
 explicit offline `validate-definition` command; it reads one named definition,
-reports validated metadata, and exits without a state path or output. The daemon
-has no configured definition/state path, transport, installation, service, MIDI,
-audio, graph, or plugin-host path. See [RUNTIME.md](RUNTIME.md) for ownership,
-lifecycle, storage, adapter, metric, failure, and next-slice contracts.
+reports validated metadata, table counts, and fixed storage size, and exits
+without a state path or output. The daemon has no configured definition/state
+path, transport, installation, service, MIDI, audio, graph, or plugin-host path.
+See [RUNTIME.md](RUNTIME.md) for ownership, lifecycle, storage, adapter, metric,
+failure, and next-slice contracts.
 
 Example for the opt-in build:
 

@@ -135,20 +135,26 @@ passes Linux 28/28, Windows 22/22, and Windows JSON 23/23.
 Milestone 3 has an allocation-free portable control dispatcher, fixed-storage
 versioned state, saturating metrics, expected-generation publication, and
 ABI-versioned clock/control/storage contracts. A bounded loader reads compiled
-definition metadata through logical storage and validates the current
-`full-live-rack` envelope with the opt-in `json-c` adapter. The exact 64-byte
-persistent-state frame covers integrity rejection, qualified restore,
-definition-fingerprint fallback, and atomic-replace failure through mock
-storage. It does not yet persist profile overrides, recompute the canonical JSON
-fingerprint emitted by the compiler, or decode executable mapping tables.
+definition metadata and caller-owned immutable tables through logical storage.
+The opt-in `json-c` adapter validates the current `full-live-rack` envelope
+and cross-checks 5 profile/input rows, 72 mappings and every compiler dispatch
+index entry, 71 targets, and 57 ownership entries. A fixed 256-entry numeric
+dispatch index performs mapping lookup without allocation, locks, JSON
+traversal, or string comparison. The version 1 table image has explicit
+capacities and occupies 451,032 bytes in the current 64-bit local builds.
+
+The exact 64-byte persistent-state frame covers integrity rejection, qualified
+restore, definition-fingerprint fallback, and atomic-replace failure through
+mock storage. The runtime does not yet persist profile overrides or recompute
+the canonical JSON fingerprint emitted by the compiler.
 
 Explicit-path file adapters now perform bounded definition/state reads and
 native same-directory atomic state replacement on Linux and Windows. They use
 caller-owned UTF-8 paths, create no parent or default location, own no worker
 thread, and are exercised only with ephemeral build-directory state files. The
 opt-in `music-rigd validate-definition` command loads one named envelope,
-requires its trusted fingerprint, reports bounded metadata, and exits with
-output suppressed and no state path.
+requires its trusted fingerprint, reports bounded metadata, tables, and storage
+size, and exits with output suppressed and no state path.
 
 The daemon still rejects a no-argument start and accepts no output-enabled mode.
 Local GCC and Clang pass 35/35, both optional Linux JSON builds pass 38/38, and

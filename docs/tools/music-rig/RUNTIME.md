@@ -9,10 +9,11 @@ service.
 
 ## Ownership And Storage
 
-`music_rig_runtime`, decoded definition metadata, document workspaces, and every
-published immutable `music_rig_generation` use caller-owned storage. Runtime
-initialization copies the first generation, 32-byte compiled-definition
-fingerprint, and versioned adapter table; it performs no allocation.
+`music_rig_runtime`, decoded definition metadata and tables, document
+workspaces, and every published immutable `music_rig_generation` use
+caller-owned storage. Runtime initialization copies the first generation,
+32-byte compiled-definition fingerprint, and versioned adapter table; it
+performs no allocation.
 
 One control thread owns runtime initialization, `music_rig_runtime_run`, state,
 and metrics. Platform callbacks execute synchronously on that thread. A future
@@ -86,16 +87,35 @@ callbacks.
 
 `music_rig_definition_load` reads a compiled document through the storage
 adapter into a caller-owned bounded workspace, invokes a decoder adapter, checks
-the portable metadata contract, compares the recorded fingerprint with a
-trusted expected fingerprint, and returns validated metadata. A separate call
-initializes a caller-owned immutable generation from that metadata.
+the portable metadata and table contracts, compares the recorded fingerprint
+with a trusted expected fingerprint, and prepares a caller-owned immutable
+table image. A separate call initializes a generation whose mapping pointer
+refers directly to that table image.
+
+Compiled-table ABI version 1 has explicit maximums: 16 Device Profiles and
+input bindings, 4 endpoints per input, 128 mappings, a 256-entry mapping
+dispatch index, 128 target bindings, 128 ownership entries, and 8 owners per
+entry. Oversize, incomplete, duplicate, mismatched, or unprepared tables fail
+closed. The complete table image is 451,032 bytes in the current 64-bit
+GCC/Clang builds; the offline validator reports `sizeof` for each platform.
+It is static caller-owned storage, not resident JSON or owned heap state.
+
+Mapping preparation builds a fixed open-addressed index from Device Profile
+index, MIDI event type, channel, and number. Event lookup compares compact
+numeric fields and returns the immutable mapping row without allocation, locks,
+JSON traversal, or string comparison. Profile and target discovery use sorted
+bounded tables; ownership discovery is bounded by its fixed maximum. The
+no-allocation/no-lock source audit covers table preparation and lookup.
 
 The optional `json-c` adapter now decodes the checked-in 86,617-byte compiled
 `full-live-rack` envelope on Linux and Windows. It verifies the v1 schema,
 generation, Rig and profile identities, platform binding, five selected Device
-Profiles, control-only readiness, empty/unapplied graph delta, authoring-only
-safety flags, and the 72-mapping, 71-target, and 57-ownership counts. Trailing
-data and malformed or unsafe documents fail.
+Profiles and input bindings, control-only readiness, empty/unapplied graph
+delta, authoring-only safety flags, 72 mapping rows plus every compiler
+`mapping_index` entry, 71 target bindings, and 57 ownership entries. Profile,
+Hardware Preset, dispatch-key, target, ownership-key, and owner relationships
+are cross-checked. Trailing data, a misdirected compiler index, and malformed,
+unsafe, or over-capacity documents fail.
 
 An opt-in JSON-enabled daemon build exposes one explicit offline command:
 
@@ -105,15 +125,14 @@ music-rigd validate-definition --definition PATH \
 ```
 
 It reads only the named document through the native file adapter, validates the
-metadata and trusted fingerprint, initializes a caller-owned immutable
-generation, reports its bounded inventory, and exits. It has no state path and
-cannot write, activate, connect, or publish output.
+metadata, tables, and trusted fingerprint, initializes a caller-owned immutable
+generation, reports its bounded inventory and table-storage size, and exits. It
+has no state path and cannot write, activate, connect, or publish output.
 
-This slice decodes metadata only. It does not yet build bounded mapping lookup
-tables or recompute the compiler's canonical JSON SHA-256 inside the daemon.
-The trusted fingerprint is supplied independently to the loader and compared
-with the document field. Output remains unavailable, so no decoded document can
-affect MIDI, audio, or graph behavior.
+The daemon still does not recompute the compiler's canonical JSON SHA-256. The
+trusted fingerprint is supplied independently to the loader and compared with
+the document field. Output remains unavailable, so no decoded table can affect
+MIDI, audio, or graph behavior.
 
 ## State And Metrics
 
@@ -162,13 +181,13 @@ definition source/decoder failures, the full compiled-envelope JSON decoder,
 native temporary-file definition reads and atomic state replacements, explicit
 daemon validation and fingerprint mismatch, invalid lifecycle/configuration,
 ABI rejection, and daemon inertness. A source audit rejects allocation and C
-thread-lock calls from the definition, runtime, and state core. Existing
-portability tests continue to reject platform headers and backend identifiers
-from the complete core tree.
+thread-lock calls from the compiled tables, definition, runtime, and state core.
+Existing portability tests continue to reject platform headers and backend
+identifiers from the complete core tree.
 
 ## Next Runtime Slice
 
-The next slice expands compiled metadata into bounded immutable profile and
-mapping lookup tables, freezes the complete read-only and dry-run IPC/CLI
-contract, and adds mock Linux/Windows control transports. It remains
-output-suppressed and does not replace the protected single-rig deployment.
+The next slice freezes the complete read-only and dry-run IPC/CLI contract and
+adds mock Linux/Windows control transports around the prepared table image. It
+remains output-suppressed and does not replace the protected single-rig
+deployment.
