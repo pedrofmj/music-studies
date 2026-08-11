@@ -22,7 +22,14 @@
   },
   "state_policy": "follow-engine",
   "mappings": [
-    { "id": "drum-notes", "source_control": "performance-pads", "target": "drum-set.notes", "transform": { "type": "direct" } }
+    { "id": "drum-note-9", "source_control": "performance-pad-9", "target": "drum-set.notes", "transform": { "type": "direct" } },
+    { "id": "drum-note-10", "source_control": "performance-pad-10", "target": "drum-set.notes", "transform": { "type": "direct" } },
+    { "id": "drum-note-11", "source_control": "performance-pad-11", "target": "drum-set.notes", "transform": { "type": "direct" } },
+    { "id": "drum-note-12", "source_control": "performance-pad-12", "target": "drum-set.notes", "transform": { "type": "direct" } },
+    { "id": "drum-note-13", "source_control": "performance-pad-13", "target": "drum-set.notes", "transform": { "type": "direct" } },
+    { "id": "drum-note-14", "source_control": "performance-pad-14", "target": "drum-set.notes", "transform": { "type": "direct" } },
+    { "id": "drum-note-15", "source_control": "performance-pad-15", "target": "drum-set.notes", "transform": { "type": "direct" } },
+    { "id": "drum-note-16", "source_control": "performance-pad-16", "target": "drum-set.notes", "transform": { "type": "direct" } }
   ],
   "ownership": [
     { "kind": "semantic-control", "target": "drum-set.notes", "mode": "shared-event-destination" },

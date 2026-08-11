@@ -1,5 +1,11 @@
 # Music Rig Benchmarks
 
+The [2026-08-11 Airstar Hardware Preset capture](hardware-preset-airstar-2026-08-11.json)
+records the exact current SMC-PAD and SMC-PAD Pocket pad assignments, the
+Pocket's non-MIDI hardware controls, and matching pre/post subscription
+fingerprints. The temporary observers were removed and the operator confirmed
+normal drum audio after cleanup.
+
 ## Airstar Baseline
 
 The baseline collector observes the protected Airstar setup without changing

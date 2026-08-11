@@ -1,0 +1,86 @@
+{
+  "schema": "music-studies/hardware-preset-capture/v1",
+  "captured_at": "2026-08-11T05:34:07-03:00",
+  "host": "airstar",
+  "capture_method": "live-aseqdump-ssh",
+  "source_ref": "live-midi-capture.airstar-2026-08-11",
+  "operator_setup": "default - pedro rack setup",
+  "bank_context": "Current power-on bank; no preset, bank, transpose, octave, note-repeat, service, or graph control was changed during capture.",
+  "safety": {
+    "temporary_subscription_only": true,
+    "pre_subscription_sha256": "8f73bf40786436e23d7038d146aabf1f9fe08ee0b126c3ff4bc569cf833dc221",
+    "post_subscription_sha256": "8f73bf40786436e23d7038d146aabf1f9fe08ee0b126c3ff4bc569cf833dc221",
+    "remaining_observers": 0,
+    "operator_confirmed_audio_after_cleanup": true
+  },
+  "devices": [
+    {
+      "hardware_preset": "smc-pad-current-notes",
+      "source_endpoint": "SINCO SMC-PAD-Master",
+      "midi_channel": 10,
+      "note_off_velocity": 64,
+      "raw_note_on_sequence": [
+        48, 49, 43, 50, 51, 44, 45, 46, 47, 40, 41, 42, 43, 36, 37, 38,
+        39, 36, 37, 38, 39
+      ],
+      "silent_control_press_count": 0,
+      "pads": [
+        { "id": "performance-pad-1", "note": 48 },
+        { "id": "performance-pad-2", "note": 49 },
+        { "id": "performance-pad-3", "note": 50 },
+        { "id": "performance-pad-4", "note": 51 },
+        { "id": "performance-pad-5", "note": 44 },
+        { "id": "performance-pad-6", "note": 45 },
+        { "id": "performance-pad-7", "note": 46 },
+        { "id": "performance-pad-8", "note": 47 },
+        { "id": "performance-pad-9", "note": 40 },
+        { "id": "performance-pad-10", "note": 41 },
+        { "id": "performance-pad-11", "note": 42 },
+        { "id": "performance-pad-12", "note": 43 },
+        { "id": "performance-pad-13", "note": 36 },
+        { "id": "performance-pad-14", "note": 37 },
+        { "id": "performance-pad-15", "note": 38 },
+        { "id": "performance-pad-16", "note": 39 }
+      ],
+      "internal_controls": [],
+      "observation_notes": [
+        "All sixteen ordered pad positions produced matching note-on and note-off events.",
+        "A duplicate pad-12 touch and a repeated pad-13 through pad-16 sequence were excluded from the ordered mapping and confirmed the same note assignments."
+      ]
+    },
+    {
+      "hardware_preset": "smc-pad-pocket-current-notes",
+      "source_endpoint": "SINCO SMC-PAD Pocket-Master",
+      "midi_channel": 10,
+      "note_off_velocity": 64,
+      "raw_note_on_sequence": [
+        40, 41, 42, 43, 36, 37, 38, 39
+      ],
+      "silent_control_press_count": 8,
+      "pads": [
+        { "id": "performance-pad-9", "note": 40 },
+        { "id": "performance-pad-10", "note": 41 },
+        { "id": "performance-pad-11", "note": 42 },
+        { "id": "performance-pad-12", "note": 43 },
+        { "id": "performance-pad-13", "note": 36 },
+        { "id": "performance-pad-14", "note": 37 },
+        { "id": "performance-pad-15", "note": 38 },
+        { "id": "performance-pad-16", "note": 39 }
+      ],
+      "internal_controls": [
+        { "id": "control-note-repeat", "action": "device.note-repeat" },
+        { "id": "control-latch", "action": "device.note-repeat-latch" },
+        { "id": "control-rate-decrease", "action": "device.note-repeat-rate-decrease" },
+        { "id": "control-rate-increase", "action": "device.note-repeat-rate-increase" },
+        { "id": "control-swing-decrease", "action": "device.note-repeat-swing-decrease" },
+        { "id": "control-swing-increase", "action": "device.note-repeat-swing-increase" },
+        { "id": "control-bank-decrease", "action": "device.pad-bank-decrease" },
+        { "id": "control-bank-increase", "action": "device.pad-bank-increase" }
+      ],
+      "observation_notes": [
+        "Operator positions 1 through 8 are hardware-internal control pads and produced no MIDI events.",
+        "Operator positions 9 through 16 produced eight ordered note-on and note-off pairs."
+      ]
+    }
+  ]
+}

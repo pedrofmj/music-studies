@@ -74,6 +74,12 @@
       "expected_error": "less than the minimum"
     },
     {
+      "path": "invalid/hardware-preset-internal-control-collision.json",
+      "kind": "hardware-preset",
+      "valid": false,
+      "expected_error": "duplicate hardware control ID"
+    },
+    {
       "path": "invalid/hardware-preset-verified-wildcard.json",
       "kind": "hardware-preset",
       "valid": false,

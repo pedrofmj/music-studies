@@ -3,33 +3,36 @@
   "kind": "hardware-preset",
   "id": "smc-pad-current-notes",
   "display_name": "SMC-PAD Current Notes",
-  "description": "Current drum note stream plus the two measured channel-1 knob assignments. No individual pad note layout is inferred.",
+  "description": "Verified Pedro rack default with sixteen channel-10 drum pads plus the two measured channel-1 knob assignments.",
   "device_models": [
     "M-VAVE SMC-PAD"
   ],
   "verification": {
-    "status": "partial",
+    "status": "verified",
     "source_refs": [
       "protected-setup.controller-profile.pad-devices",
-      "documented-controller-profile.smc-pad"
-    ],
-    "limitations": [
-      "The protected capture proves normal drum note events but does not record each pad's note number, MIDI channel, preset, or bank.",
-      "Knob 1 channel-1 CC36 and Knob 2 channel-1 CC37 are measured; other assignable controls are not accepted without a raw MIDI capture."
+      "documented-controller-profile.smc-pad",
+      "live-midi-capture.airstar-2026-08-11"
     ]
   },
+  "preset_slot": "Default - Pedro Rack Setup",
   "controls": [
-    {
-      "id": "performance-pads",
-      "physical_control": "Performance pads",
-      "behavior": "momentary",
-      "message": {
-        "type": "note",
-        "channel": "any",
-        "number": "any",
-        "edge": "any"
-      }
-    },
+    { "id": "performance-pad-1", "physical_control": "Performance Pad 1", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 48, "edge": "any" } },
+    { "id": "performance-pad-2", "physical_control": "Performance Pad 2", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 49, "edge": "any" } },
+    { "id": "performance-pad-3", "physical_control": "Performance Pad 3", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 50, "edge": "any" } },
+    { "id": "performance-pad-4", "physical_control": "Performance Pad 4", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 51, "edge": "any" } },
+    { "id": "performance-pad-5", "physical_control": "Performance Pad 5", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 44, "edge": "any" } },
+    { "id": "performance-pad-6", "physical_control": "Performance Pad 6", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 45, "edge": "any" } },
+    { "id": "performance-pad-7", "physical_control": "Performance Pad 7", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 46, "edge": "any" } },
+    { "id": "performance-pad-8", "physical_control": "Performance Pad 8", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 47, "edge": "any" } },
+    { "id": "performance-pad-9", "physical_control": "Performance Pad 9", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 40, "edge": "any" } },
+    { "id": "performance-pad-10", "physical_control": "Performance Pad 10", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 41, "edge": "any" } },
+    { "id": "performance-pad-11", "physical_control": "Performance Pad 11", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 42, "edge": "any" } },
+    { "id": "performance-pad-12", "physical_control": "Performance Pad 12", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 43, "edge": "any" } },
+    { "id": "performance-pad-13", "physical_control": "Performance Pad 13", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 36, "edge": "any" } },
+    { "id": "performance-pad-14", "physical_control": "Performance Pad 14", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 37, "edge": "any" } },
+    { "id": "performance-pad-15", "physical_control": "Performance Pad 15", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 38, "edge": "any" } },
+    { "id": "performance-pad-16", "physical_control": "Performance Pad 16", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 39, "edge": "any" } },
     {
       "id": "knob-1",
       "physical_control": "Knob 1",

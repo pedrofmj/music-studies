@@ -3,31 +3,38 @@
   "kind": "hardware-preset",
   "id": "smc-pad-pocket-current-notes",
   "display_name": "SMC-PAD Pocket Current Notes",
-  "description": "Current drum note stream from the Pocket Master endpoint. No individual pad note layout is inferred.",
+  "description": "Verified Pedro rack default with eight hardware-internal control pads and eight channel-10 drum pads.",
   "device_models": [
     "M-VAVE SMC-PAD Pocket"
   ],
   "verification": {
-    "status": "partial",
+    "status": "verified",
     "source_refs": [
       "protected-setup.controller-profile.pad-devices",
-      "documented-controller-profile.smc-pad-pocket"
-    ],
-    "limitations": [
-      "The protected capture proves normal drum note events but does not record each pad's note number, MIDI channel, preset, or bank."
+      "documented-controller-profile.smc-pad-pocket",
+      "live-midi-capture.airstar-2026-08-11"
     ]
   },
+  "preset_slot": "Default - Pedro Rack Setup",
+  "configuration_tool": "MIDI Suite",
+  "internal_controls": [
+    { "id": "control-note-repeat", "physical_control": "Control Pad 1 - Note Repeat", "behavior": "momentary", "action": "device.note-repeat" },
+    { "id": "control-latch", "physical_control": "Control Pad 2 - Latch", "behavior": "toggle", "action": "device.note-repeat-latch" },
+    { "id": "control-rate-decrease", "physical_control": "Control Pad 3 - Rate Decrease", "behavior": "momentary", "action": "device.note-repeat-rate-decrease" },
+    { "id": "control-rate-increase", "physical_control": "Control Pad 4 - Rate Increase", "behavior": "momentary", "action": "device.note-repeat-rate-increase" },
+    { "id": "control-swing-decrease", "physical_control": "Control Pad 5 - Swing Decrease", "behavior": "momentary", "action": "device.note-repeat-swing-decrease" },
+    { "id": "control-swing-increase", "physical_control": "Control Pad 6 - Swing Increase", "behavior": "momentary", "action": "device.note-repeat-swing-increase" },
+    { "id": "control-bank-decrease", "physical_control": "Control Pad 7 - Bank Decrease", "behavior": "momentary", "action": "device.pad-bank-decrease" },
+    { "id": "control-bank-increase", "physical_control": "Control Pad 8 - Bank Increase", "behavior": "momentary", "action": "device.pad-bank-increase" }
+  ],
   "controls": [
-    {
-      "id": "performance-pads",
-      "physical_control": "Performance pads",
-      "behavior": "momentary",
-      "message": {
-        "type": "note",
-        "channel": "any",
-        "number": "any",
-        "edge": "any"
-      }
-    }
+    { "id": "performance-pad-9", "physical_control": "Performance Pad 9", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 40, "edge": "any" } },
+    { "id": "performance-pad-10", "physical_control": "Performance Pad 10", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 41, "edge": "any" } },
+    { "id": "performance-pad-11", "physical_control": "Performance Pad 11", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 42, "edge": "any" } },
+    { "id": "performance-pad-12", "physical_control": "Performance Pad 12", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 43, "edge": "any" } },
+    { "id": "performance-pad-13", "physical_control": "Performance Pad 13", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 36, "edge": "any" } },
+    { "id": "performance-pad-14", "physical_control": "Performance Pad 14", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 37, "edge": "any" } },
+    { "id": "performance-pad-15", "physical_control": "Performance Pad 15", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 38, "edge": "any" } },
+    { "id": "performance-pad-16", "physical_control": "Performance Pad 16", "behavior": "momentary", "message": { "type": "note", "channel": 10, "number": 39, "edge": "any" } }
   ]
 }

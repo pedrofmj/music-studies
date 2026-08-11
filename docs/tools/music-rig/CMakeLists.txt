@@ -135,6 +135,8 @@ if(BUILD_TESTING)
             "${CMAKE_CURRENT_SOURCE_DIR}/../../../src/performance-rigs/pedro-performance-rig"
             --authority-setup
             "${CMAKE_CURRENT_SOURCE_DIR}/../airstar-live-setup/setup.json"
+            --authority-pad-capture
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/hardware-preset-airstar-2026-08-11.json"
     )
     set_tests_properties(
         music_rig_profile_schema_self_test

@@ -59,7 +59,7 @@ Documents:
 | Windows short-process resources | ✅ `music-rig --version`: 1,970,176-byte observed peak working set, 23 handles, 1 thread, clean exit |
 | Windows 60-second idle resources | ✅ 60.259 s, 0.000000% measured child CPU, 3,670,016-byte observed peak working set, 65 handles, 4 threads, zero events |
 | Windows resource cleanup | ✅ Zero remaining test processes; temporary directory removed and independently confirmed |
-| Portable profile schemas | ✅ [Linux 20/20, Windows 14/14, and Windows JSON 15/15](https://github.com/pedrofmj/music-studies/actions/runs/31472374983) pass; six schemas, five slots, five Hardware Presets (3 verified, 2 partial), five Device Profiles, five valid fixtures, ten invalid fixtures, and six catalogue cases |
+| Portable profile schemas | 🟡 Local schema and catalogue checks pass with five verified Hardware Presets, zero partial presets, five Device Profiles, five valid fixtures, eleven invalid fixtures, and six catalogue cases; hosted proof for this capture-backed slice remains |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -166,16 +166,18 @@ benchmarks.
 - ✅ Add the six versioned Rig, Rig Profile, Device Profile, Hardware Preset,
   Switch Trigger, and common schemas. The offline
   [validator](../../tools/music-rig/validate-performance-rig.py) checks each
-  Draft 2020-12 schema and fifteen positive/negative fixtures on the default
+  Draft 2020-12 schema and sixteen positive/negative fixtures on the default
   CTest path without activating any runtime component.
 - ✅ Define stable device slots and ordered physical selectors. The authored
   [rig catalogue](../../../src/performance-rigs/pedro-performance-rig/rig.json)
   records all five current controllers, required endpoint purposes, unique
   semantic aliases and local discriminators, and optional USB evidence.
-- 🟡 Extract the current Hardware Presets. All five
+- ✅ Extract the current Hardware Presets. All five
   [preset documents](../../../src/performance-rigs/pedro-performance-rig/hardware-presets/)
-  resolve from the Rig catalogue. Arturia, SMK-25, and SMC-Mixer are verified;
-  SMC-PAD and Pocket remain partial until every pad message is captured.
+  resolve from the Rig catalogue and are verified. The
+  [Airstar capture](../../tools/music-rig/benchmarks/hardware-preset-airstar-2026-08-11.json)
+  records every current SMC-PAD MIDI pad, the Pocket's eight MIDI pads and
+  eight silent internal controls, exact cleanup, and normal post-capture audio.
 - ✅ Extract the five current Device Profiles. The
   [portable definitions](../../../src/performance-rigs/pedro-performance-rig/device-profiles/)
   preserve the Arturia multi-instrument rack, SMK-25 ambient pad layers,

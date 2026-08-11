@@ -17,10 +17,11 @@ share USB ID `4353:4b4d`, so that ID is supporting evidence and cannot
 distinguish them by itself. Future platform bindings will resolve these
 portable selectors to Linux and Windows device identities.
 
-All five Hardware Preset IDs resolve to files in `hardware-presets`. Arturia,
-SMK-25, and SMC-Mixer assignments are verified. SMC-PAD and SMC-PAD Pocket are
-explicitly partial because the protected capture proves their routed note
-streams but does not contain each pad's exact channel and note number.
+All five Hardware Preset IDs resolve to verified files in `hardware-presets`.
+The SMC-PAD and SMC-PAD Pocket assignments are checked against the
+[2026-08-11 live capture](../../../docs/tools/music-rig/benchmarks/hardware-preset-airstar-2026-08-11.json),
+including exact per-pad channel/note assignments and the Pocket's eight
+hardware-internal control pads.
 
 The five current Device Profiles resolve under `device-profiles/<slot>/<id>`:
 
@@ -66,5 +67,7 @@ python3 -m pip install -r docs/tools/music-rig/requirements-schema.txt
 python3 docs/tools/music-rig/validate-performance-rig.py --self-test
 python3 docs/tools/music-rig/validate-performance-rig.py \
   --validate-root src/performance-rigs/pedro-performance-rig \
-  --authority-setup docs/tools/airstar-live-setup/setup.json
+  --authority-setup docs/tools/airstar-live-setup/setup.json \
+  --authority-pad-capture \
+    docs/tools/music-rig/benchmarks/hardware-preset-airstar-2026-08-11.json
 ```

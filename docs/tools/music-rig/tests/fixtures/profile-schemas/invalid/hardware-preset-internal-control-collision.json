@@ -2,7 +2,7 @@
   "schema": "music-studies/performance-rig/v1",
   "kind": "hardware-preset",
   "id": "fixture-preset",
-  "display_name": "Fixture Preset",
+  "display_name": "Fixture Preset With Internal Collision",
   "device_models": [
     "Fixture Controller Model"
   ],
@@ -12,14 +12,12 @@
       "fixture.observation"
     ]
   },
-  "preset_slot": "User 1",
-  "configuration_tool": "Fixture Editor",
   "internal_controls": [
     {
-      "id": "bank-next",
-      "physical_control": "Bank Next",
+      "id": "fader-1",
+      "physical_control": "Internal Control",
       "behavior": "momentary",
-      "action": "device.bank-next"
+      "action": "device.internal-action"
     }
   ],
   "controls": [

@@ -279,6 +279,18 @@ def validate_hardware_preset_semantics(
     message_controls: Dict[Tuple[Any, Any, Any], str] = {}
     verification_status = document["verification"]["status"]
 
+    for internal_index, internal_control in enumerate(
+        document.get("internal_controls", [])
+    ):
+        internal_path = f"$.internal_controls[{internal_index}]"
+        internal_id = internal_control["id"]
+        if internal_id in control_ids:
+            errors.append(
+                f"{internal_path}.id: duplicate hardware control ID "
+                f"{internal_id!r}"
+            )
+        control_ids.add(internal_id)
+
     for control_index, control in enumerate(document["controls"]):
         control_path = f"$.controls[{control_index}]"
         control_id = control["id"]
@@ -791,6 +803,128 @@ def validate_current_hardware_extraction(
     return errors
 
 
+def validate_current_pad_extraction(
+    rig_root: Path,
+    capture_path: Path,
+) -> List[str]:
+    """Compare the two pad presets with the raw Airstar capture evidence."""
+    capture = load_json(capture_path)
+    errors = []
+    expected_schema = "music-studies/hardware-preset-capture/v1"
+    if capture.get("schema") != expected_schema:
+        return [f"{capture_path}: expected schema {expected_schema!r}"]
+
+    safety = capture.get("safety", {})
+    pre_fingerprint = safety.get("pre_subscription_sha256")
+    post_fingerprint = safety.get("post_subscription_sha256")
+    if safety.get("temporary_subscription_only") is not True:
+        errors.append(f"{capture_path}: capture was not subscription-only")
+    if (
+        not isinstance(pre_fingerprint, str)
+        or len(pre_fingerprint) != 64
+        or pre_fingerprint != post_fingerprint
+    ):
+        errors.append(
+            f"{capture_path}: valid matching subscription fingerprints missing"
+        )
+    if safety.get("remaining_observers") != 0:
+        errors.append(f"{capture_path}: temporary observers remain")
+    if safety.get("operator_confirmed_audio_after_cleanup") is not True:
+        errors.append(
+            f"{capture_path}: post-cleanup operator audio confirmation missing"
+        )
+
+    source_ref = capture.get("source_ref")
+    device_entries = capture.get("devices")
+    if not isinstance(source_ref, str) or not source_ref:
+        errors.append(f"{capture_path}: source_ref is missing")
+    if not isinstance(device_entries, list):
+        errors.append(f"{capture_path}: devices must be an array")
+        return errors
+
+    expected_preset_ids = {
+        "smc-pad-current-notes",
+        "smc-pad-pocket-current-notes",
+    }
+    entries_by_id = {
+        entry.get("hardware_preset"): entry
+        for entry in device_entries
+        if isinstance(entry, dict)
+    }
+    if (
+        len(entries_by_id) != len(device_entries)
+        or set(entries_by_id) != expected_preset_ids
+    ):
+        errors.append(
+            f"{capture_path}: pad preset evidence mismatch; "
+            f"expected={sorted(expected_preset_ids)} "
+            f"actual={sorted(str(item) for item in entries_by_id)}"
+        )
+        return errors
+
+    for preset_id in sorted(expected_preset_ids):
+        entry = entries_by_id[preset_id]
+        preset_path = rig_root / "hardware-presets" / f"{preset_id}.json"
+        preset = load_json(preset_path)
+        if preset["verification"]["status"] != "verified":
+            errors.append(f"{preset_path}: live pad extraction must be verified")
+        if source_ref not in preset["verification"]["source_refs"]:
+            errors.append(
+                f"{preset_path}: missing capture source_ref {source_ref!r}"
+            )
+
+        expected_controls = {
+            pad["id"]: {
+                "behavior": "momentary",
+                "type": "note",
+                "channel": entry["midi_channel"],
+                "number": pad["note"],
+            }
+            for pad in entry["pads"]
+        }
+        raw_note_on_sequence = entry.get("raw_note_on_sequence", [])
+        if not all(
+            pad["note"] in raw_note_on_sequence for pad in entry["pads"]
+        ):
+            errors.append(
+                f"{capture_path}: raw note sequence does not cover every "
+                f"mapped pad for {preset_id!r}"
+            )
+        if entry.get("silent_control_press_count") != len(
+            entry["internal_controls"]
+        ):
+            errors.append(
+                f"{capture_path}: silent control count differs from "
+                f"internal controls for {preset_id!r}"
+            )
+        actual_controls = {
+            control["id"]: control_signature(control)
+            for control in preset["controls"]
+            if control["id"].startswith("performance-pad-")
+        }
+        if actual_controls != expected_controls:
+            errors.append(
+                f"{preset_path}: pad controls differ from live capture; "
+                f"expected={expected_controls} actual={actual_controls}"
+            )
+
+        expected_internal = {
+            control["id"]: control["action"]
+            for control in entry["internal_controls"]
+        }
+        actual_internal = {
+            control["id"]: control["action"]
+            for control in preset.get("internal_controls", [])
+        }
+        if actual_internal != expected_internal:
+            errors.append(
+                f"{preset_path}: internal controls differ from live capture; "
+                f"expected={expected_internal} actual={actual_internal}"
+            )
+
+    return errors
+
+
 def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
     schemas = load_schemas(schema_dir)
     registry = build_registry(schemas)
@@ -992,6 +1126,7 @@ def run_root_validation(
     schema_dir: Path,
     rig_root: Path,
     authority_setup: Optional[Path],
+    authority_pad_capture: Optional[Path],
 ) -> int:
     schemas = load_schemas(schema_dir)
     registry = build_registry(schemas)
@@ -1010,6 +1145,15 @@ def run_root_validation(
         extraction_errors = validate_current_hardware_extraction(
             rig_root,
             authority_setup,
+        )
+        if extraction_errors:
+            for error in extraction_errors:
+                print(error, file=sys.stderr)
+            return 1
+    if authority_pad_capture is not None:
+        extraction_errors = validate_current_pad_extraction(
+            rig_root,
+            authority_pad_capture,
         )
         if extraction_errors:
             for error in extraction_errors:
@@ -1042,6 +1186,11 @@ def parse_arguments() -> argparse.Namespace:
         type=Path,
         help="protected setup.json used for current-preset extraction parity",
     )
+    parser.add_argument(
+        "--authority-pad-capture",
+        type=Path,
+        help="live pad-capture JSON used for current-preset extraction parity",
+    )
     operation = parser.add_mutually_exclusive_group(required=True)
     operation.add_argument(
         "--self-test",
@@ -1067,8 +1216,11 @@ def parse_arguments() -> argparse.Namespace:
 def main() -> int:
     arguments = parse_arguments()
     try:
-        if arguments.authority_setup is not None and not arguments.validate_root:
-            raise ValueError("--authority-setup requires --validate-root")
+        if (
+            arguments.authority_setup is not None
+            or arguments.authority_pad_capture is not None
+        ) and not arguments.validate_root:
+            raise ValueError("authority evidence requires --validate-root")
         if arguments.self_test:
             return run_self_test(arguments.schema_dir, arguments.fixture_dir)
         if arguments.validate_root:
@@ -1076,6 +1228,7 @@ def main() -> int:
                 arguments.schema_dir,
                 arguments.validate_root,
                 arguments.authority_setup,
+                arguments.authority_pad_capture,
             )
         return run_validation(arguments.schema_dir, arguments.validate)
     except (OSError, ValueError, json.JSONDecodeError) as error:

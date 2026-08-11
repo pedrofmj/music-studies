@@ -9,17 +9,20 @@ service or connected to MIDI.
 | `arturia-current-rack` | Verified: 9 faders, 9 knobs, relative encoder, and click |
 | `smk25-current-pad-layers` | Verified: 8 knobs, 8 Side-A toggles, Stop, and Play |
 | `smc-mixer-current-cc` | Verified: 8 faders |
-| `smc-pad-current-notes` | Partial: routed notes plus measured Knob 1 and Knob 2 |
-| `smc-pad-pocket-current-notes` | Partial: routed notes |
+| `smc-pad-current-notes` | Verified: 16 channel-10 pads plus measured Knob 1 and Knob 2 |
+| `smc-pad-pocket-current-notes` | Verified: 8 internal controls and 8 channel-10 pads |
 
 Verified presets contain only exact MIDI type, channel, and number
-assignments. Partial pad presets use an explicit wildcard note stream and list
-what remains unknown. The validator rejects a wildcard in a preset marked
-`verified`.
+assignments. Hardware-internal controls that emit no MIDI use the separate
+`internal_controls` collection. The validator rejects wildcards in verified
+presets, control-ID collisions, and any difference from the captured pad
+evidence.
 
 The protected
 [`setup.json`](../../../../docs/tools/airstar-live-setup/setup.json) and
 [`controller-profiles.md`](../../../../docs/tools/airstar-live-setup/controller-profiles.md)
 remain authoritative. Promoting either pad preset requires a raw capture of
 every relevant pad's endpoint, channel, message type, note number, press and
-release values, preset, and bank.
+release values, preset, and bank. That promotion evidence is the
+[2026-08-11 Airstar capture](../../../../docs/tools/music-rig/benchmarks/hardware-preset-airstar-2026-08-11.json),
+which also records exact observer cleanup and post-capture audio confirmation.
