@@ -59,7 +59,7 @@ Documents:
 | Windows short-process resources | ✅ `music-rig --version`: 1,970,176-byte observed peak working set, 23 handles, 1 thread, clean exit |
 | Windows 60-second idle resources | ✅ 60.259 s, 0.000000% measured child CPU, 3,670,016-byte observed peak working set, 65 handles, 4 threads, zero events |
 | Windows resource cleanup | ✅ Zero remaining test processes; temporary directory removed and independently confirmed |
-| Portable profile schemas | ✅ Local GCC and Clang 20/20 pass; six schemas, five slots, five Hardware Presets (3 verified, 2 partial), five Device Profiles, five valid fixtures, ten invalid fixtures, and six catalogue cases; current hosted proof remains [run 31438942437](https://github.com/pedrofmj/music-studies/actions/runs/31438942437) pending this slice's run |
+| Portable profile schemas | ✅ [Linux 20/20, Windows 14/14, and Windows JSON 15/15](https://github.com/pedrofmj/music-studies/actions/runs/31472374983) pass; six schemas, five slots, five Hardware Presets (3 verified, 2 partial), five Device Profiles, five valid fixtures, ten invalid fixtures, and six catalogue cases |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
