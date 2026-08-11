@@ -388,6 +388,24 @@ def validate_device_profile_semantics(
     return errors
 
 
+def validate_rig_profile_semantics(
+    document: Mapping[str, Any],
+) -> List[str]:
+    """Validate ownership identities within one global profile."""
+    errors = []
+    ownership_keys = set()
+    for claim_index, claim in enumerate(document["ownership"]):
+        claim_path = f"$.ownership[{claim_index}]"
+        claim_key = (claim["kind"], claim["target"])
+        if claim_key in ownership_keys:
+            errors.append(
+                f"{claim_path}: duplicate ownership claim for "
+                f"{claim['kind']!r} target {claim['target']!r}"
+            )
+        ownership_keys.add(claim_key)
+    return errors
+
+
 def validate_document(
     document: Any,
     schemas: Mapping[str, Mapping[str, Any]],
@@ -414,6 +432,8 @@ def validate_document(
     ]
     if not formatted_errors and kind == "performance-rig":
         formatted_errors.extend(validate_rig_slot_semantics(document))
+    elif not formatted_errors and kind == "rig-profile":
+        formatted_errors.extend(validate_rig_profile_semantics(document))
     elif not formatted_errors and kind == "device-profile":
         formatted_errors.extend(validate_device_profile_semantics(document))
     elif not formatted_errors and kind == "hardware-preset":
@@ -589,27 +609,221 @@ def validate_device_profile_catalogue_documents(
     if len(selected_keys) == len(rig["device_slots"]) and all(
         key in profiles_by_key for key in selected_keys
     ):
-        claims: Dict[
-            Tuple[str, str], List[Tuple[Path, str]]
-        ] = defaultdict(list)
-        for profile_key in selected_keys:
-            path, profile = profiles_by_key[profile_key]
-            for claim in profile["ownership"]:
-                claims[(claim["kind"], claim["target"])].append(
-                    (path, claim["mode"])
-                )
-        for claim_key, claim_entries in claims.items():
-            profile_paths = {path for path, _ in claim_entries}
-            if len(profile_paths) > 1 and any(
-                mode == "exclusive" for _, mode in claim_entries
-            ):
-                rendered = ", ".join(
-                    f"{path} ({mode})" for path, mode in claim_entries
-                )
+        errors.extend(
+            validate_composed_ownership(
+                [profiles_by_key[key] for key in selected_keys],
+                "current Device Profile",
+            )
+        )
+
+    return errors
+
+
+def validate_composed_ownership(
+    profile_entries: Sequence[Tuple[Path, Mapping[str, Any]]],
+    composition_label: str,
+) -> List[str]:
+    """Reject exclusive ownership shared by distinct composed profiles."""
+    errors = []
+    claims: Dict[Tuple[str, str], List[Tuple[Path, str]]] = defaultdict(list)
+    for path, profile in profile_entries:
+        for claim in profile["ownership"]:
+            claims[(claim["kind"], claim["target"])].append(
+                (path, claim["mode"])
+            )
+    for claim_key, claim_entries in claims.items():
+        profile_paths = {path for path, _ in claim_entries}
+        if len(profile_paths) > 1 and any(
+            mode == "exclusive" for _, mode in claim_entries
+        ):
+            rendered = ", ".join(
+                f"{path} ({mode})" for path, mode in claim_entries
+            )
+            errors.append(
+                f"{composition_label} ownership conflict for "
+                f"{claim_key[0]!r} target {claim_key[1]!r}: {rendered}"
+            )
+    return errors
+
+
+def validate_rig_profile_catalogue_documents(
+    rig: Mapping[str, Any],
+    device_profile_entries: Sequence[Tuple[Path, Mapping[str, Any]]],
+    rig_profile_entries: Sequence[Tuple[Path, Mapping[str, Any]]],
+) -> List[str]:
+    """Resolve global compositions and validate their aggregate contracts."""
+    errors = []
+    slots_by_id = {slot["id"]: slot for slot in rig["device_slots"]}
+    device_profiles_by_key = {
+        (profile["slot"], profile["id"]): (path, profile)
+        for path, profile in device_profile_entries
+    }
+    rig_profiles_by_id: Dict[str, Tuple[Path, Mapping[str, Any]]] = {}
+
+    for path, profile in rig_profile_entries:
+        profile_id = profile["id"]
+        previous = rig_profiles_by_id.get(profile_id)
+        if previous is not None:
+            errors.append(
+                f"{path}: duplicate Rig Profile {profile_id!r}; "
+                f"already defined by {previous[0]}"
+            )
+        else:
+            rig_profiles_by_id[profile_id] = (path, profile)
+        if path.stem != profile_id or path.parent.name != "rig-profiles":
+            errors.append(
+                f"{path}: file layout must be rig-profiles/{profile_id}.json"
+            )
+
+    expected_ids = set(rig["rig_profiles"])
+    actual_ids = set(rig_profiles_by_id)
+    for profile_id in sorted(expected_ids - actual_ids):
+        errors.append(f"rig.json: unresolved Rig Profile {profile_id!r}")
+    for profile_id in sorted(actual_ids - expected_ids):
+        path = rig_profiles_by_id[profile_id][0]
+        errors.append(
+            f"{path}: Rig Profile {profile_id!r} is not declared by rig.json"
+        )
+
+    for field in ("default_rig_profile", "fallback_rig_profile"):
+        profile_id = rig.get(field)
+        if profile_id is not None and profile_id not in expected_ids:
+            errors.append(
+                f"rig.json: {field} {profile_id!r} is not declared in "
+                "rig_profiles"
+            )
+
+    readiness_rank = {"control-only": 0, "prepared": 1, "cold": 2}
+    dependency_kinds = {
+        "engines": "engine",
+        "effects": "effect",
+        "routes": "route",
+    }
+    for path, rig_profile in rig_profile_entries:
+        selected_entries = []
+        selected_slots = set(rig_profile["device_profiles"])
+        for slot_id, device_profile_id in rig_profile["device_profiles"].items():
+            slot = slots_by_id.get(slot_id)
+            if slot is None:
                 errors.append(
-                    "current Device Profile ownership conflict for "
-                    f"{claim_key[0]!r} target {claim_key[1]!r}: {rendered}"
+                    f"{path}: unresolved device slot {slot_id!r}"
                 )
+                continue
+            if device_profile_id not in slot["available_device_profiles"]:
+                errors.append(
+                    f"{path}: Device Profile {slot_id!r}/{device_profile_id!r} "
+                    "is not available from rig.json"
+                )
+                continue
+            selected = device_profiles_by_key.get((slot_id, device_profile_id))
+            if selected is None:
+                errors.append(
+                    f"{path}: unresolved Device Profile "
+                    f"{slot_id!r}/{device_profile_id!r}"
+                )
+                continue
+            selected_entries.append(selected)
+
+        for slot in rig["device_slots"]:
+            if slot.get("required", True) and slot["id"] not in selected_slots:
+                errors.append(
+                    f"{path}: required slot {slot['id']!r} is not selected"
+                )
+
+        selected_capabilities = {
+            capability
+            for _, profile in selected_entries
+            for capability in profile["required_capabilities"]
+        }
+        selected_capabilities.update(
+            endpoint
+            for _, profile in selected_entries
+            for endpoint in slots_by_id[profile["slot"]]["required_endpoints"]
+        )
+        missing_capabilities = selected_capabilities - set(
+            rig_profile["required_capabilities"]
+        )
+        if missing_capabilities:
+            errors.append(
+                f"{path}: required_capabilities omit selected Device Profile "
+                f"requirements {sorted(missing_capabilities)}"
+            )
+
+        selected_readiness = max(
+            (readiness_rank[profile["readiness"]] for _, profile in selected_entries),
+            default=0,
+        )
+        if readiness_rank[rig_profile["readiness"]] < selected_readiness:
+            errors.append(
+                f"{path}: readiness {rig_profile['readiness']!r} understates "
+                "a selected Device Profile"
+            )
+
+        errors.extend(
+            validate_composed_ownership(
+                selected_entries + [(path, rig_profile)],
+                f"Rig Profile {rig_profile['id']!r}",
+            )
+        )
+
+        state_keys = {
+            claim["target"]
+            for _, profile in selected_entries + [(path, rig_profile)]
+            for claim in profile["ownership"]
+            if claim["kind"] == "state-key"
+        }
+        for state_key in rig_profile.get("initial_state", {}):
+            if state_key not in state_keys:
+                errors.append(
+                    f"{path}: initial state key {state_key!r} has no "
+                    "state-key ownership claim"
+                )
+
+        dependency_counts: Dict[Tuple[str, str], int] = defaultdict(int)
+        available_resources = set()
+        for _, profile in selected_entries:
+            for category, resources in profile["dependencies"].items():
+                for resource in resources:
+                    available_resources.add(resource)
+                    if category in dependency_kinds:
+                        dependency_counts[(category, resource)] += 1
+
+        profile_ownership = {
+            (claim["kind"], claim["target"])
+            for claim in rig_profile["ownership"]
+        }
+        for category, resource_kind in dependency_kinds.items():
+            declared = set(rig_profile.get("shared_resources", {}).get(category, []))
+            required_shared = {
+                resource
+                for (resource_category, resource), count in dependency_counts.items()
+                if resource_category == category and count > 1
+            }
+            missing_shared = required_shared - declared
+            if missing_shared:
+                errors.append(
+                    f"{path}: shared_resources.{category} omit selected "
+                    f"resources {sorted(missing_shared)}"
+                )
+            for resource in sorted(declared):
+                if (
+                    (category, resource) not in dependency_counts
+                    and (resource_kind, resource) not in profile_ownership
+                ):
+                    errors.append(
+                        f"{path}: shared resource {resource!r} is neither a "
+                        "selected dependency nor owned by the Rig Profile"
+                    )
+
+        pin_targets = available_resources | set(rig_profile["required_capabilities"])
+        unknown_pins = set(
+            rig_profile["preparation"]["pinned_capabilities"]
+        ) - pin_targets
+        if unknown_pins:
+            errors.append(
+                f"{path}: pinned_capabilities contain unresolved targets "
+                f"{sorted(unknown_pins)}"
+            )
 
     return errors
 
@@ -618,7 +832,7 @@ def validate_authored_catalogue(
     rig_root: Path,
     schemas: Mapping[str, Mapping[str, Any]],
     registry: Registry,
-) -> Tuple[List[str], int, int, int]:
+) -> Tuple[List[str], int, int, int, int]:
     rig_path = rig_root / "rig.json"
     rig = load_json(rig_path)
     rig_kind, rig_errors = validate_document(rig, schemas, registry)
@@ -650,8 +864,20 @@ def validate_authored_catalogue(
         if not profile_errors and profile_kind == "device-profile":
             profile_entries.append((profile_path, profile))
 
+    rig_profile_entries = []
+    for profile_path in sorted((rig_root / "rig-profiles").glob("*.json")):
+        profile = load_json(profile_path)
+        profile_kind, profile_errors = validate_document(
+            profile, schemas, registry
+        )
+        errors.extend(f"{profile_path}: {error}" for error in profile_errors)
+        if profile_kind != "rig-profile":
+            errors.append(f"{profile_path}: expected a rig-profile document")
+        if not profile_errors and profile_kind == "rig-profile":
+            rig_profile_entries.append((profile_path, profile))
+
     if errors:
-        return errors, 0, 0, 0
+        return errors, 0, 0, 0, 0
     semantic_errors, verified_count, partial_count = (
         validate_hardware_catalogue_documents(rig, preset_entries)
     )
@@ -660,11 +886,17 @@ def validate_authored_catalogue(
             rig, preset_entries, profile_entries
         )
     )
+    semantic_errors.extend(
+        validate_rig_profile_catalogue_documents(
+            rig, profile_entries, rig_profile_entries
+        )
+    )
     return (
         semantic_errors,
         verified_count,
         partial_count,
         len(profile_entries),
+        len(rig_profile_entries),
     )
 
 
@@ -1003,6 +1235,10 @@ def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
     fixture_profile = load_json(
         fixture_dir / "valid" / "device-profile.json"
     )
+    fixture_rig_profile_path = Path("rig-profiles/fixture-live.json")
+    fixture_rig_profile = load_json(
+        fixture_dir / "valid" / "rig-profile.json"
+    )
     catalogue_errors, _, _ = validate_hardware_catalogue_documents(
         fixture_rig,
         [(fixture_preset_path, fixture_preset)],
@@ -1033,6 +1269,89 @@ def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
         failures.append(
             "valid Device Profile catalogue failed: "
             f"{'; '.join(catalogue_errors)}"
+        )
+
+    catalogue_errors = validate_rig_profile_catalogue_documents(
+        fixture_rig,
+        [(fixture_profile_path, fixture_profile)],
+        [(fixture_rig_profile_path, fixture_rig_profile)],
+    )
+    if catalogue_errors:
+        failures.append(
+            "valid Rig Profile catalogue failed: "
+            f"{'; '.join(catalogue_errors)}"
+        )
+
+    unresolved_rig_profile_rig = json.loads(json.dumps(fixture_rig))
+    unresolved_rig_profile_rig["rig_profiles"] = ["missing-rig-profile"]
+    catalogue_errors = validate_rig_profile_catalogue_documents(
+        unresolved_rig_profile_rig,
+        [(fixture_profile_path, fixture_profile)],
+        [(fixture_rig_profile_path, fixture_rig_profile)],
+    )
+    if not any("unresolved Rig Profile" in error for error in catalogue_errors):
+        failures.append(
+            "invalid Rig Profile catalogue did not reject an unresolved "
+            "global profile"
+        )
+
+    missing_slot_rig_profile = json.loads(json.dumps(fixture_rig_profile))
+    missing_slot_rig_profile["device_profiles"] = {}
+    catalogue_errors = validate_rig_profile_catalogue_documents(
+        fixture_rig,
+        [(fixture_profile_path, fixture_profile)],
+        [(fixture_rig_profile_path, missing_slot_rig_profile)],
+    )
+    if not any("required slot" in error for error in catalogue_errors):
+        failures.append(
+            "invalid Rig Profile catalogue did not reject a missing required "
+            "slot"
+        )
+
+    unresolved_selection_rig = json.loads(json.dumps(fixture_rig))
+    unresolved_selection_rig["device_slots"][0][
+        "available_device_profiles"
+    ] = ["missing-role"]
+    unresolved_selection_profile = json.loads(json.dumps(fixture_rig_profile))
+    unresolved_selection_profile["device_profiles"][
+        "fixture-controller"
+    ] = "missing-role"
+    catalogue_errors = validate_rig_profile_catalogue_documents(
+        unresolved_selection_rig,
+        [(fixture_profile_path, fixture_profile)],
+        [(fixture_rig_profile_path, unresolved_selection_profile)],
+    )
+    if not any("unresolved Device Profile" in error for error in catalogue_errors):
+        failures.append(
+            "invalid Rig Profile catalogue did not reject an unresolved "
+            "Device Profile selection"
+        )
+
+    missing_capability_profile = json.loads(json.dumps(fixture_rig_profile))
+    missing_capability_profile["required_capabilities"] = [
+        "midi.performance-input"
+    ]
+    catalogue_errors = validate_rig_profile_catalogue_documents(
+        fixture_rig,
+        [(fixture_profile_path, fixture_profile)],
+        [(fixture_rig_profile_path, missing_capability_profile)],
+    )
+    if not any("required_capabilities omit" in error for error in catalogue_errors):
+        failures.append(
+            "invalid Rig Profile catalogue did not reject an omitted selected "
+            "capability"
+        )
+
+    unowned_state_profile = json.loads(json.dumps(fixture_rig_profile))
+    unowned_state_profile["initial_state"]["unowned.state"] = True
+    catalogue_errors = validate_rig_profile_catalogue_documents(
+        fixture_rig,
+        [(fixture_profile_path, fixture_profile)],
+        [(fixture_rig_profile_path, unowned_state_profile)],
+    )
+    if not any("initial state key" in error for error in catalogue_errors):
+        failures.append(
+            "invalid Rig Profile catalogue did not reject unowned initial state"
         )
 
     unresolved_profile = dict(fixture_profile)
@@ -1093,6 +1412,42 @@ def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
             "ownership overlap"
         )
 
+    conflict_rig_profile = json.loads(json.dumps(fixture_rig_profile))
+    conflict_rig_profile["device_profiles"][
+        "fixture-controller-two"
+    ] = "fixture-role-two"
+    catalogue_errors = validate_rig_profile_catalogue_documents(
+        conflict_rig,
+        [
+            (fixture_profile_path, fixture_profile),
+            (conflict_profile_path, conflict_profile),
+        ],
+        [(fixture_rig_profile_path, conflict_rig_profile)],
+    )
+    if not any("Rig Profile" in error and "ownership conflict" in error
+               for error in catalogue_errors):
+        failures.append(
+            "invalid Rig Profile catalogue did not reject exclusive ownership "
+            "overlap"
+        )
+
+    missing_shared_profile = json.loads(json.dumps(conflict_rig_profile))
+    missing_shared_profile["shared_resources"]["engines"] = []
+    catalogue_errors = validate_rig_profile_catalogue_documents(
+        conflict_rig,
+        [
+            (fixture_profile_path, fixture_profile),
+            (conflict_profile_path, conflict_profile),
+        ],
+        [(fixture_rig_profile_path, missing_shared_profile)],
+    )
+    if not any("shared_resources.engines omit" in error
+               for error in catalogue_errors):
+        failures.append(
+            "invalid Rig Profile catalogue did not reject an undeclared "
+            "shared dependency"
+        )
+
     if failures:
         for failure in failures:
             print(f"FAIL: {failure}", file=sys.stderr)
@@ -1101,7 +1456,7 @@ def run_self_test(schema_dir: Path, fixture_dir: Path) -> int:
     print(
         "Performance Rig schemas: PASS "
         f"(schemas={len(schemas)}, valid={valid_count}, invalid={invalid_count}, "
-        "catalogues=6)"
+        "catalogues=14)"
     )
     return 0
 
@@ -1130,7 +1485,7 @@ def run_root_validation(
 ) -> int:
     schemas = load_schemas(schema_dir)
     registry = build_registry(schemas)
-    errors, verified_count, partial_count, profile_count = (
+    errors, verified_count, partial_count, profile_count, rig_profile_count = (
         validate_authored_catalogue(
             rig_root,
             schemas,
@@ -1162,7 +1517,8 @@ def run_root_validation(
     print(
         f"{rig_root}: OK (hardware-presets="
         f"{verified_count + partial_count}, verified={verified_count}, "
-        f"partial={partial_count}, device-profiles={profile_count})"
+        f"partial={partial_count}, device-profiles={profile_count}, "
+        f"rig-profiles={rig_profile_count})"
     )
     return 0
 
@@ -1208,7 +1564,7 @@ def parse_arguments() -> argparse.Namespace:
         "--validate-root",
         type=Path,
         metavar="RIG_ROOT",
-        help="validate the authored Rig, Hardware Presets, and Device Profiles",
+        help="validate the authored Rig, Hardware Presets, and profiles",
     )
     return parser.parse_args()
 

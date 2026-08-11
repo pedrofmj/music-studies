@@ -59,7 +59,7 @@ Documents:
 | Windows short-process resources | ✅ `music-rig --version`: 1,970,176-byte observed peak working set, 23 handles, 1 thread, clean exit |
 | Windows 60-second idle resources | ✅ 60.259 s, 0.000000% measured child CPU, 3,670,016-byte observed peak working set, 65 handles, 4 threads, zero events |
 | Windows resource cleanup | ✅ Zero remaining test processes; temporary directory removed and independently confirmed |
-| Portable profile schemas | ✅ [Linux 20/20, Windows 14/14, and Windows JSON 15/15](https://github.com/pedrofmj/music-studies/actions/runs/31474779377) pass with five verified Hardware Presets, zero partial presets, five Device Profiles, five valid fixtures, eleven invalid fixtures, and six catalogue cases |
+| Portable profile schemas | 🟡 Local checks pass with five verified Hardware Presets, zero partial presets, five Device Profiles, one Rig Profile, five valid fixtures, twelve invalid fixtures, and fourteen catalogue cases; hosted proof for this slice remains |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -73,7 +73,7 @@ benchmarks.
 | Milestone | State | Exit gate |
 | --- | --- | --- |
 | 0. Baseline and technical gates | ✅ | Baseline reproducible and technical gates passed |
-| 1. Schemas and current profile extraction | 🟡 | Five current Device Profiles pass; `full-live-rack` and bindings remain |
+| 1. Schemas and current profile extraction | 🟡 | `full-live-rack` and all five Device Profiles pass; platform bindings remain |
 | 2. Deterministic compiler and parity | ⬜ | Not started |
 | 3. Runtime, CLI, and shadow mode | ⬜ | Not started |
 | 4. Control-only switching | ⬜ | Not started |
@@ -166,7 +166,7 @@ benchmarks.
 - ✅ Add the six versioned Rig, Rig Profile, Device Profile, Hardware Preset,
   Switch Trigger, and common schemas. The offline
   [validator](../../tools/music-rig/validate-performance-rig.py) checks each
-  Draft 2020-12 schema and sixteen positive/negative fixtures on the default
+  Draft 2020-12 schema and seventeen positive/negative fixtures on the default
   CTest path without activating any runtime component.
 - ✅ Define stable device slots and ordered physical selectors. The authored
   [rig catalogue](../../../src/performance-rigs/pedro-performance-rig/rig.json)
@@ -183,19 +183,22 @@ benchmarks.
   preserve the Arturia multi-instrument rack, SMK-25 ambient pad layers,
   SMC-Mixer eight-band equalizer, and both SMC-PAD drum roles without platform
   paths or backend-specific identifiers.
-- ⬜ Add the `full-live-rack` Rig Profile.
-- 🟡 Model ownership, semantic capabilities, readiness, and takeover policies.
-  All five current profiles now declare and validate them. The implicit current
-  one-profile-per-slot composition accepts the pads' shared drum-note target
-  and rejects exclusive collisions; explicit Rig Profile composition checks
-  remain with `full-live-rack`.
+- ✅ Add the `full-live-rack` Rig Profile. The portable
+  [composition](../../../src/performance-rigs/pedro-performance-rig/rig-profiles/full-live-rack.json)
+  selects all five current Device Profiles, pins the eighteen current engines,
+  and records the shared drum engine and effects without activating a runtime.
+- ✅ Model ownership, semantic capabilities, readiness, and takeover policies.
+  Explicit Rig Profile validation now covers mandatory slots, selected-profile
+  references, aggregate capabilities and readiness, pinned and shared
+  resources, initial-state ownership, and composed ownership conflicts. The
+  pads' shared drum-note target remains valid while exclusive overlap fails.
 - ⬜ Add Linux bindings and Windows contract fixtures.
 - 🟡 Add schema, reference, collision, ownership, and ambiguity tests. Schema
   structure, portability-negative coverage, selector order, required endpoint
   coverage, shared USB ambiguity, Hardware Preset and Device Profile
   references, source controls, per-preset MIDI collisions, mapping ownership,
-  and current-profile ownership conflicts pass. Explicit Rig Profile and
-  trigger-versus-musical-mapping checks remain.
+  Rig Profile resolution and composition, and ownership conflicts pass.
+  Trigger-versus-musical-mapping checks remain.
 
 ## Milestone 2: Deterministic Compiler And Parity
 

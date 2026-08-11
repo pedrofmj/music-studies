@@ -87,9 +87,12 @@ management operations. All five current Hardware Presets are authored and
 verified. The SMC-PAD and SMC-PAD Pocket include exact live-captured pad
 messages; the Pocket's silent hardware-internal controls are modeled
 separately. A pinned authoring-only validator checks all schemas, five valid
-and eleven invalid fixtures, positive and negative catalogue semantics, and
-the concrete Rig catalogue against protected and live-capture evidence on
-Linux and Windows. No runtime or deployment path consumes these authored
+and twelve invalid fixtures, fourteen positive and negative catalogue
+scenarios, and the concrete Rig catalogue against protected and live-capture
+evidence on Linux and Windows. The initial `full-live-rack` Rig Profile now
+composes all five current Device Profiles, declares their aggregate
+capabilities and readiness, pins all eighteen current engines, and records
+shared resources. No runtime or deployment path consumes these authored
 documents yet.
 
 ## Objective

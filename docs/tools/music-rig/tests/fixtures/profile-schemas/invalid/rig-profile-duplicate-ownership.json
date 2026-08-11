@@ -21,25 +21,17 @@
       "kind": "route",
       "target": "route.main-output",
       "mode": "exclusive"
+    },
+    {
+      "kind": "route",
+      "target": "route.main-output",
+      "mode": "read-only"
     }
   ],
   "preparation": {
     "pinned_capabilities": [
       "engine.fixture"
-    ],
-    "memory_ceiling_bytes": 50000000
-  },
-  "shared_resources": {
-    "engines": [
-      "engine.fixture"
-    ],
-    "effects": [],
-    "routes": [
-      "route.main-output"
     ]
-  },
-  "initial_state": {
-    "master.volume": 0.75
   },
   "switch_safety": {
     "on_failure": "retain-active",

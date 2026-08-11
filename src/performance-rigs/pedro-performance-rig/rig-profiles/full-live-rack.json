@@ -1,0 +1,77 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "rig-profile",
+  "id": "full-live-rack",
+  "display_name": "Full Live Rack",
+  "description": "Portable composition of the current verified five-controller setup, kept as both the default and recovery profile.",
+  "device_profiles": {
+    "arturia-main": "multi-instrument-rack",
+    "smk25-main": "ambient-pad-layers",
+    "smc-mixer-main": "eight-band-eq",
+    "smc-pad-main": "drum-set",
+    "smc-pad-pocket": "drum-set"
+  },
+  "readiness": "control-only",
+  "takeover_policy": {
+    "default": "ignore-until-moved",
+    "volume": "pickup"
+  },
+  "state_policy": "persist",
+  "required_capabilities": [
+    "control.master-mute",
+    "control.pad-layer-latch",
+    "control.pad-layer-transport",
+    "effect.equalizer.eight-band",
+    "midi.control-input",
+    "midi.performance-input",
+    "midi.transport-input",
+    "notes.ambient-pad-layers",
+    "notes.drum-set",
+    "notes.layered-instruments",
+    "parameter.drum-set-output-gain",
+    "parameter.drum-set-volume",
+    "parameter.equalizer.band-gain",
+    "parameter.layer-reverb",
+    "parameter.layer-volume",
+    "parameter.master-volume",
+    "parameter.pad-layer-volume"
+  ],
+  "ownership": [],
+  "preparation": {
+    "pinned_capabilities": [
+      "engine.arturia.alt-strings",
+      "engine.arturia.atmosfera-pad",
+      "engine.arturia.basic-piano",
+      "engine.arturia.good-flute",
+      "engine.arturia.hammond-organ-fast",
+      "engine.arturia.nord-white-grand",
+      "engine.arturia.optik-synth",
+      "engine.arturia.pad-efeitos",
+      "engine.arturia.sax-lirakeys",
+      "engine.drum-set",
+      "engine.smk.cloud-shimmer",
+      "engine.smk.hillsong-pad",
+      "engine.smk.magic-ambient",
+      "engine.smk.majesty-pad",
+      "engine.smk.oceans-worship-pad",
+      "engine.smk.sanctorium-pad",
+      "engine.smk.warm-worship-pad",
+      "engine.smk.worship-shimmer"
+    ]
+  },
+  "shared_resources": {
+    "engines": [
+      "engine.drum-set"
+    ],
+    "effects": [
+      "effect.master.instrument-mixer",
+      "effect.pad.sustain-scale"
+    ],
+    "routes": []
+  },
+  "switch_safety": {
+    "on_failure": "retain-active",
+    "rollback": "required",
+    "transition": "preserve"
+  }
+}

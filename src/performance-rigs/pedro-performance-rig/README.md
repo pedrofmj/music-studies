@@ -4,11 +4,11 @@ This directory contains the portable authored definition of the first
 Performance Rig. Schema version `music-studies/performance-rig/v1` uses JSON
 Schema Draft 2020-12.
 
-Current status: schema, stable-slot, Hardware Preset, and current Device
-Profile extraction. No installer, service, runtime, or live audio/MIDI tool
-reads this directory. The protected `setup.json`, Carla project, services, and
-graph remain the production authority until the later parity and cutover gates
-pass.
+Current status: schema, stable-slot, Hardware Preset, Device Profile, and
+initial Rig Profile extraction. No installer, service, runtime, or live
+audio/MIDI tool reads this directory. The protected `setup.json`, Carla
+project, services, and graph remain the production authority until the later
+parity and cutover gates pass.
 
 `rig.json` records the five stable controller slots from the protected rack.
 Each slot orders selectors from model, semantic alias, and endpoint purpose to
@@ -35,8 +35,14 @@ They link semantic mappings to controls from the selected Hardware Preset and
 declare capabilities, ownership, dependencies, readiness, state, takeover, and
 switch safety without platform paths or backend identifiers. The two pad
 profiles intentionally share `drum-set.notes`; other current ownership remains
-exclusive or read-only. The Rig Profile and trigger IDs remain planned forward
-references.
+exclusive or read-only.
+
+[`rig-profiles/full-live-rack.json`](rig-profiles/full-live-rack.json) composes
+all five roles as the default and fallback Rig Profile. It declares the
+aggregate endpoint and musical capabilities, pins the eighteen current sound
+engines, identifies the shared drum engine and effects, and retains the safe
+takeover and rollback policies. It is authored data only; the protected setup
+remains the active default. The trigger ID remains a planned forward reference.
 
 The six schemas are:
 
@@ -54,10 +60,12 @@ paths, PipeWire/JACK port names, Carla parameter indices, Windows device IDs,
 and service identifiers belong in platform bindings, which are not part of
 this schema slice.
 
-Root validation checks the Rig, all Hardware Presets, all Device Profiles,
-slot/model/endpoint/preset/control references, and ownership conflicts in the
-current one-profile-per-slot composition. It reads authored files and protected
-evidence only; it does not connect to the live rig.
+Root validation checks the Rig, all Hardware Presets, Device Profiles, and Rig
+Profiles. It resolves slot/model/endpoint/preset/control/profile references and
+checks required-slot coverage, aggregate capabilities and readiness, pinned
+and shared resources, initial-state ownership, and explicit composition
+ownership conflicts. It reads authored files and protected evidence only; it
+does not connect to the live rig.
 
 Run the offline schema suite from the repository root after installing the
 authoring-only dependency:

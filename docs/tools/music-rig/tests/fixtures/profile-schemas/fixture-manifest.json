@@ -56,6 +56,12 @@
       "expected_error": "takeover_policy"
     },
     {
+      "path": "invalid/rig-profile-duplicate-ownership.json",
+      "kind": "rig-profile",
+      "valid": false,
+      "expected_error": "duplicate ownership claim"
+    },
+    {
       "path": "invalid/device-profile-backend-field.json",
       "kind": "device-profile",
       "valid": false,
