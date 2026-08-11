@@ -191,6 +191,13 @@ music_rig_result music_rig_runtime_init(
     if (result != MUSIC_RIG_RESULT_OK) {
         return result;
     }
+    result = music_rig_device_port_catalogue_build(
+        runtime->initial_generation.mapping,
+        &runtime->device_ports
+    );
+    if (result != MUSIC_RIG_RESULT_OK) {
+        return result;
+    }
     result = music_rig_generation_slot_init(
         &runtime->generations,
         &runtime->initial_generation
@@ -209,6 +216,7 @@ music_rig_result music_rig_runtime_publish_generation(
     uint64_t expected_generation
 )
 {
+    music_rig_device_port_catalogue next_ports;
     music_rig_result result;
 
     if (runtime == NULL || next_generation == NULL) {
@@ -223,6 +231,18 @@ music_rig_result music_rig_runtime_publish_generation(
         increment(&runtime->metrics.generation_conflicts);
         return MUSIC_RIG_RESULT_GENERATION_CONFLICT;
     }
+    result = music_rig_device_port_catalogue_build(
+        next_generation->mapping,
+        &next_ports
+    );
+    if (result != MUSIC_RIG_RESULT_OK ||
+        !music_rig_device_port_catalogues_match(
+            &runtime->device_ports,
+            &next_ports
+        )) {
+        increment(&runtime->metrics.port_identity_conflicts);
+        return MUSIC_RIG_RESULT_INVALID_DATA;
+    }
 
     result = music_rig_generation_slot_publish(
         &runtime->generations,
@@ -230,6 +250,10 @@ music_rig_result music_rig_runtime_publish_generation(
     );
     if (result == MUSIC_RIG_RESULT_GENERATION_CONFLICT) {
         increment(&runtime->metrics.generation_conflicts);
+        return result;
+    }
+    if (result == MUSIC_RIG_RESULT_INVALID_STATE) {
+        increment(&runtime->metrics.generation_backpressure);
         return result;
     }
     if (result != MUSIC_RIG_RESULT_OK) {
@@ -240,6 +264,32 @@ music_rig_result music_rig_runtime_publish_generation(
     runtime->control_generation = next_generation;
     increment(&runtime->metrics.generation_publications);
     return MUSIC_RIG_RESULT_OK;
+}
+
+const music_rig_generation *music_rig_runtime_reclaim_generation(
+    music_rig_runtime *runtime
+)
+{
+    const music_rig_generation *generation;
+
+    if (runtime == NULL ||
+        (runtime->state.lifecycle != MUSIC_RIG_RUNTIME_INITIALIZED &&
+         runtime->state.lifecycle != MUSIC_RIG_RUNTIME_RUNNING)) {
+        return NULL;
+    }
+
+    for (;;) {
+        generation = music_rig_generation_slot_reclaim(
+            &runtime->generations
+        );
+        if (generation == NULL) {
+            return NULL;
+        }
+        increment(&runtime->metrics.generation_reclamations);
+        if (generation != &runtime->initial_generation) {
+            return generation;
+        }
+    }
 }
 
 music_rig_result music_rig_runtime_run(music_rig_runtime *runtime)
@@ -405,4 +455,11 @@ const music_rig_runtime_metrics *music_rig_runtime_get_metrics(
 )
 {
     return runtime == NULL ? NULL : &runtime->metrics;
+}
+
+const music_rig_device_port_catalogue *music_rig_runtime_get_device_ports(
+    const music_rig_runtime *runtime
+)
+{
+    return runtime == NULL ? NULL : &runtime->device_ports;
 }

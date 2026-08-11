@@ -2,12 +2,14 @@
 #define MUSIC_RIG_CORE_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdatomic.h>
 #include <stdint.h>
 
 #define MUSIC_RIG_CORE_VERSION "0.1.0"
 #define MUSIC_RIG_PROTOCOL_VERSION UINT32_C(2)
 #define MUSIC_RIG_PROFILE_SCHEMA_VERSION UINT32_C(1)
+#define MUSIC_RIG_RETIRED_GENERATION_CAPACITY ((size_t)8)
 
 typedef enum music_rig_result {
     MUSIC_RIG_RESULT_OK = 0,
@@ -39,6 +41,9 @@ typedef struct music_rig_generation {
 typedef struct music_rig_generation_slot {
     _Atomic(const music_rig_generation *) published;
     _Atomic(const music_rig_generation *) adopted;
+    const music_rig_generation *retired[MUSIC_RIG_RETIRED_GENERATION_CAPACITY];
+    size_t retired_head;
+    size_t retired_count;
 } music_rig_generation_slot;
 
 const music_rig_build_info *music_rig_get_build_info(void);
@@ -62,6 +67,19 @@ const music_rig_generation *music_rig_generation_slot_adopt(
 );
 
 const music_rig_generation *music_rig_generation_slot_adopted(
+    const music_rig_generation_slot *slot
+);
+
+/*
+ * Called only by the publishing control thread. A returned generation is no
+ * longer observable by the real-time adopter and its caller-owned storage may
+ * be reused. NULL means adoption has not advanced far enough.
+ */
+const music_rig_generation *music_rig_generation_slot_reclaim(
+    music_rig_generation_slot *slot
+);
+
+size_t music_rig_generation_slot_retired_count(
     const music_rig_generation_slot *slot
 );
 

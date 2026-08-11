@@ -66,6 +66,7 @@ Documents:
 | Qualified definition and state loading | ✅ [Linux 34/34, Windows 28/28, and Windows JSON 30/30](https://github.com/pedrofmj/music-studies/actions/runs/31526121270) pass; bounded compiled metadata, 64-byte state integrity, restore/fallback, storage failures, and inert output behavior are covered |
 | Native explicit-path storage | ✅ [Linux 35/35, Windows 29/29, and Windows JSON 32/32](https://github.com/pedrofmj/music-studies/actions/runs/31531477956) pass; UTF-8 definition reads, native atomic state replacement, cleanup, missing paths, fingerprint mismatch, and offline daemon loading are covered |
 | Protocol v2 read-only/dry-run control | ✅ [Linux 38/38, Windows 32/32, and Windows JSON 35/35](https://github.com/pedrofmj/music-studies/actions/runs/31539454955) pass; fixed frames, nine operation IDs, fail-closed CLI, table-backed dispatch, and Linux/Windows mock transports are covered |
+| Bounded generations and stable ports | 🟡 Local GCC/Clang 39/39 and both JSON builds 42/42 pass; four slots sustain 9,999 publications with 9,999 reclamations and at most three retired; ten current-Rig port identities are stable; hosted Windows proof is pending |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -293,7 +294,17 @@ benchmarks.
   boundary tests pass, and the protected baseline remains 30/30. Hosted
   [run 31539454955](https://github.com/pedrofmj/music-studies/actions/runs/31539454955)
   passes Linux 38/38, Windows 32/32, and Windows JSON 35/35.
-- ⬜ Add immutable-generation reclamation and stable device-slot ports.
+- 🟡 Add immutable-generation reclamation and stable device-slot ports. A fixed
+  eight-entry retirement ring applies backpressure without publishing when
+  full, and control-thread reclamation makes caller storage reusable only after
+  real-time adoption advances. Linux recycles four entries across 9,999
+  publications, reclaims all 9,999 retired generations, and observes at most
+  three retired entries. Validated tables derive two stable semantic port IDs
+  per device slot; the current Rig has ten, profile-only changes preserve them,
+  and a changed slot set fails before publication. No backend port is
+  registered and output remains suppressed. Local GCC/Clang pass 39/39, both
+  JSON builds pass 42/42, eight ASan/UBSan boundary tests pass, and the
+  protected baseline remains 30/30. Hosted Windows proof remains pending.
 - ⬜ Extract reusable behavior without changing installed legacy services.
 - ⬜ Run the new adapter in output-suppressed shadow mode.
 - ⬜ Prove Linux and Windows protocol, state, parity, and resource behavior.

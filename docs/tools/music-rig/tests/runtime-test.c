@@ -7,6 +7,8 @@
 #define MOCK_EVENT_CAPACITY 8U
 #define MOCK_RESPONSE_CAPACITY 8U
 
+static music_rig_compiled_tables default_tables;
+
 typedef struct mock_adapter {
     music_rig_control_poll events[MOCK_EVENT_CAPACITY];
     music_rig_protocol_request requests[MOCK_EVENT_CAPACITY];
@@ -361,6 +363,9 @@ static int test_lifecycle_and_metrics(void)
         metrics->control_responses != UINT64_C(3) ||
         metrics->generation_publications != UINT64_C(1) ||
         metrics->generation_conflicts != UINT64_C(3) ||
+        metrics->generation_reclamations != UINT64_C(0) ||
+        metrics->generation_backpressure != UINT64_C(0) ||
+        metrics->port_identity_conflicts != UINT64_C(0) ||
         metrics->state_restores != UINT64_C(0) ||
         metrics->state_fallbacks != UINT64_C(0) ||
         metrics->state_writes != UINT64_C(1) ||
@@ -382,6 +387,138 @@ static int test_lifecycle_and_metrics(void)
     return 0;
 }
 
+static int test_generation_reclamation_and_ports(void)
+{
+    static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
+        0x50
+    };
+    static music_rig_compiled_tables changed_slots;
+    music_rig_generation generations[
+        MUSIC_RIG_RETIRED_GENERATION_CAPACITY + 2U
+    ];
+    music_rig_runtime runtime;
+    mock_adapter adapter;
+    music_rig_platform_interfaces interfaces;
+    music_rig_runtime_config config;
+    const music_rig_device_port_catalogue *ports;
+    const music_rig_generation *reclaimed;
+    size_t index;
+
+    for (index = 0U;
+         index < MUSIC_RIG_RETIRED_GENERATION_CAPACITY + 2U;
+         ++index) {
+        generations[index].id = (uint64_t)index + UINT64_C(1);
+        generations[index].mapping = &default_tables;
+    }
+    init_mock(&adapter);
+    interfaces = interfaces_for(&adapter);
+    generations[3].mapping = &default_tables;
+    config = config_for(&generations[0], fingerprint);
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+        MUSIC_RIG_RESULT_OK) {
+        fputs("reclamation runtime initialization failed\n", stderr);
+        return 1;
+    }
+    ports = music_rig_runtime_get_device_ports(&runtime);
+    if (ports == NULL || ports->count != 4U ||
+        strcmp(ports->ports[0].id,
+            "device.arturia-main.midi-input") != 0 ||
+        music_rig_runtime_get_device_ports(NULL) != NULL) {
+        fputs("runtime stable port catalogue is incorrect\n", stderr);
+        return 1;
+    }
+
+    if (music_rig_runtime_publish_generation(
+            &runtime,
+            &generations[1],
+            UINT64_C(1)
+        ) != MUSIC_RIG_RESULT_OK ||
+        music_rig_runtime_reclaim_generation(&runtime) != NULL ||
+        music_rig_generation_slot_adopt(&runtime.generations) !=
+            &generations[1] ||
+        music_rig_runtime_reclaim_generation(&runtime) != NULL ||
+        runtime.metrics.generation_reclamations != UINT64_C(1)) {
+        fputs("runtime initial generation reclamation failed\n", stderr);
+        return 1;
+    }
+    if (music_rig_runtime_publish_generation(
+            &runtime,
+            &generations[2],
+            UINT64_C(2)
+        ) != MUSIC_RIG_RESULT_OK ||
+        music_rig_generation_slot_adopt(&runtime.generations) !=
+            &generations[2]) {
+        fputs("runtime external generation publication failed\n", stderr);
+        return 1;
+    }
+    reclaimed = music_rig_runtime_reclaim_generation(&runtime);
+    if (reclaimed != &generations[1] ||
+        runtime.metrics.generation_reclamations != UINT64_C(2)) {
+        fputs("runtime external generation was not reclaimable\n", stderr);
+        return 1;
+    }
+
+    changed_slots = default_tables;
+    fixture_copy(changed_slots.device_profiles[0].slot, "arturia-secondary");
+    fixture_copy(changed_slots.input_bindings[0].slot, "arturia-secondary");
+    fixture_copy(changed_slots.ownership[0].owners[0].slot,
+        "arturia-secondary");
+    if (music_rig_compiled_tables_prepare(
+            &changed_slots,
+            UINT32_C(2), UINT32_C(2), UINT32_C(2), UINT32_C(2)
+        ) != MUSIC_RIG_RESULT_OK) {
+        fputs("changed-slot runtime fixture failed\n", stderr);
+        return 1;
+    }
+    generations[3].id = UINT64_C(4);
+    generations[3].mapping = &changed_slots;
+    if (music_rig_runtime_publish_generation(
+            &runtime,
+            &generations[3],
+            UINT64_C(3)
+        ) != MUSIC_RIG_RESULT_INVALID_DATA ||
+        runtime.state.generation_id != UINT64_C(3) ||
+        runtime.metrics.port_identity_conflicts != UINT64_C(1)) {
+        fputs("runtime accepted changed device-slot ports\n", stderr);
+        return 1;
+    }
+
+    init_mock(&adapter);
+    interfaces = interfaces_for(&adapter);
+    generations[3].mapping = &default_tables;
+    config = config_for(&generations[0], fingerprint);
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+        MUSIC_RIG_RESULT_OK) {
+        fputs("backpressure runtime initialization failed\n", stderr);
+        return 1;
+    }
+    for (index = 1U;
+         index <= MUSIC_RIG_RETIRED_GENERATION_CAPACITY;
+         ++index) {
+        if (music_rig_runtime_publish_generation(
+                &runtime,
+                &generations[index],
+                (uint64_t)index
+            ) != MUSIC_RIG_RESULT_OK) {
+            fputs("runtime retirement ring filled too early\n", stderr);
+            return 1;
+        }
+    }
+    if (music_rig_runtime_publish_generation(
+            &runtime,
+            &generations[MUSIC_RIG_RETIRED_GENERATION_CAPACITY + 1U],
+            (uint64_t)MUSIC_RIG_RETIRED_GENERATION_CAPACITY + UINT64_C(1)
+        ) != MUSIC_RIG_RESULT_INVALID_STATE ||
+        runtime.state.generation_id !=
+            (uint64_t)MUSIC_RIG_RETIRED_GENERATION_CAPACITY + UINT64_C(1) ||
+        runtime.metrics.generation_backpressure != UINT64_C(1) ||
+        music_rig_runtime_reclaim_generation(NULL) != NULL) {
+        fputs("runtime generation backpressure failed\n", stderr);
+        return 1;
+    }
+    return 0;
+}
+
 static int test_persisted_state(void)
 {
     static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
@@ -390,8 +527,8 @@ static int test_persisted_state(void)
     static const uint8_t changed_fingerprint[
         MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE
     ] = {0x40};
-    const music_rig_generation initial = {UINT64_C(7), NULL};
-    const music_rig_generation next = {UINT64_C(8), NULL};
+    const music_rig_generation initial = {UINT64_C(7), &default_tables};
+    const music_rig_generation next = {UINT64_C(8), &default_tables};
     music_rig_runtime runtime;
     music_rig_platform_interfaces interfaces;
     music_rig_runtime_config config;
@@ -498,7 +635,7 @@ static int run_failure_case(
     static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
         0x10
     };
-    const music_rig_generation initial = {UINT64_C(1), NULL};
+    const music_rig_generation initial = {UINT64_C(1), &default_tables};
     music_rig_runtime runtime;
     music_rig_platform_interfaces interfaces = interfaces_for(adapter);
     music_rig_runtime_config config = config_for(&initial, fingerprint);
@@ -569,7 +706,7 @@ static int test_invalid_configuration(void)
     static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
         0x20
     };
-    const music_rig_generation initial = {UINT64_C(1), NULL};
+    const music_rig_generation initial = {UINT64_C(1), &default_tables};
     music_rig_runtime runtime;
     mock_adapter adapter;
     music_rig_platform_interfaces interfaces;
@@ -604,12 +741,27 @@ static int test_invalid_configuration(void)
         fputs("invalid storage adapter ABI was accepted\n", stderr);
         return 1;
     }
+
+    interfaces = interfaces_for(&adapter);
+    {
+        const music_rig_generation missing_tables = {UINT64_C(1), NULL};
+
+        config = config_for(&missing_tables, fingerprint);
+        if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_INVALID_ARGUMENT) {
+            fputs("runtime accepted a generation without tables\n", stderr);
+            return 1;
+        }
+    }
     return 0;
 }
 
 int main(void)
 {
-    if (test_lifecycle_and_metrics() != 0 ||
+    if (init_compiled_tables_fixture(&default_tables) !=
+            MUSIC_RIG_RESULT_OK ||
+        test_lifecycle_and_metrics() != 0 ||
+        test_generation_reclamation_and_ports() != 0 ||
         test_persisted_state() != 0 ||
         test_adapter_failures() != 0 ||
         test_invalid_configuration() != 0) {

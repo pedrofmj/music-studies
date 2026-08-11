@@ -21,6 +21,15 @@ real-time callback reads only the separately published immutable generation
 pointer through the existing lock-free generation slot. State and metric
 accessors return live read-only views and are not cross-thread snapshots.
 
+The generation slot has a fixed eight-entry retirement ring. Publication
+retires the previous pointer; it never frees or reuses caller storage. The
+control thread may reclaim entries only after the real-time adopter has
+published a newer adopted pointer. A full ring returns invalid state without
+publishing, providing bounded backpressure instead of unbounded retention.
+`music_rig_runtime_reclaim_generation` consumes safe retired entries and hides
+the runtime-owned initial generation; every external pointer it returns may be
+reused by its caller.
+
 The runtime rejects `MUSIC_RIG_OUTPUT_ENABLED`. Only
 `MUSIC_RIG_OUTPUT_SUPPRESSED` can initialize until a later milestone adds and
 certifies output adapters through an explicit promotion path.
@@ -37,11 +46,12 @@ uninitialized -> initialized -> running -> stopped
 
 Initialization requires a nonzero generation, an exact 32-byte definition
 fingerprint, an active Rig Profile ID, output-suppressed mode, runtime adapter
-ABI version 3, and storage
-adapter ABI version 1. It reads qualified state before publishing the initial
-generation. `run` may be called exactly once. A normal stop closes the control
-adapter and records the monotonic stop time. Start, poll, wait, response, stop,
-state-read, or state-replace failures remain explicit.
+ABI version 4, storage adapter ABI version 1, and a prepared immutable table
+image with a valid stable device-port catalogue. It reads qualified state
+before publishing the initial generation. `run` may be called exactly once. A
+normal stop closes the control adapter and records the monotonic stop time.
+Start, poll, wait, response, stop, state-read, or state-replace failures remain
+explicit.
 
 The control adapter's `start` callback must leave itself closed when it returns
 failure. After a successful start, the runtime calls `stop` exactly once even
@@ -135,6 +145,26 @@ trusted fingerprint is supplied independently to the loader and compared with
 the document field. Output remains unavailable, so no decoded table can affect
 MIDI, audio, or graph behavior.
 
+## Stable Device-Slot Ports
+
+Every prepared table image derives exactly two portable identities per stable
+device slot, ordered by slot and direction:
+
+```text
+device.<slot>.midi-input
+device.<slot>.midi-output
+```
+
+For the current five-device Rig this is a fixed ten-port catalogue. Port IDs
+depend only on the stable slot, never on a Device Profile, physical locator,
+backend ID, or operating system. Profile-only generations therefore keep the
+same catalogue. Runtime publication fully validates the next table image and
+rejects a changed port catalogue before publishing the generation pointer.
+
+These are semantic identities only. This slice does not register JACK,
+PipeWire, WinMM, or other backend ports, connect links, open devices, or emit
+events. A later opt-in adapter may register them once for its process lifetime.
+
 ## State And Metrics
 
 Live versioned state records lifecycle, published generation ID, raw definition
@@ -151,8 +181,9 @@ mode, generation, or integrity tag fails closed. Persistence is explicit and
 uses the adapter's atomic-replace callback.
 
 Publishing a new caller-owned generation supports an optional
-expected-generation precondition. Stale preconditions and non-increasing
-generation IDs fail without changing state. Control inspection follows the
+expected-generation precondition. Stale preconditions, non-increasing
+generation IDs, retirement-ring saturation, invalid tables, and changed stable
+port catalogues fail without changing state. Control inspection follows the
 most recently published generation's immutable table pointer.
 
 All metrics are unsigned 64-bit saturating counters:
@@ -160,7 +191,8 @@ All metrics are unsigned 64-bit saturating counters:
 - loop iterations, idle polls, and control waits;
 - control, status, list, validation, dry-run, unsupported, invalid, and response
   counts;
-- generation publications and conflicts; and
+- generation publications, conflicts, reclamations, and backpressure;
+- stable port-identity conflicts;
 - state restores, qualified fallbacks, and writes; and
 - adapter failures.
 
@@ -194,15 +226,17 @@ restore/fallback, all 64 single-byte state corruptions, state I/O failures,
 definition source/decoder failures, the full compiled-envelope JSON decoder,
 native temporary-file definition reads and atomic state replacements, explicit
 daemon validation and fingerprint mismatch, invalid lifecycle/configuration,
-ABI rejection, CLI fail-closed behavior, and daemon inertness. Linux and Windows
+ABI rejection, bounded generation reuse, stable port identity, CLI fail-closed
+behavior, and daemon inertness. Linux and Windows
 mock transports carry 1,000 mixed v2 requests through the real table dispatcher.
 A source audit rejects allocation and C thread-lock calls from the compiled
-tables, control dispatcher, definition, runtime, and state core.
+tables, control dispatcher, definition, device-port catalogue, runtime, and
+state core.
 Existing portability tests continue to reject platform headers and backend
 identifiers from the complete core tree.
 
 ## Next Runtime Slice
 
-The next slice adds bounded immutable-generation reclamation and stable
-device-slot port identities. It remains output-suppressed and does not replace
-the protected single-rig deployment.
+The next slice extracts reusable mapping and state behavior from the legacy C
+services without changing their installed behavior. It remains
+output-suppressed and does not replace the protected single-rig deployment.

@@ -1,5 +1,6 @@
 #include "music_rig/definition.h"
 #include "music_rig/definition_json.h"
+#include "music_rig/device_ports.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -105,6 +106,7 @@ int main(int argc, char **argv)
     music_rig_definition_decoder decoder;
     music_rig_compiled_definition definition;
     music_rig_generation generation;
+    music_rig_device_port_catalogue ports;
     const music_rig_compiled_mapping *mapping;
     const music_rig_compiled_target_binding *target;
     const music_rig_compiled_ownership *ownership;
@@ -148,6 +150,8 @@ int main(int argc, char **argv)
             &generation
         ) !=
             MUSIC_RIG_RESULT_OK ||
+        music_rig_device_port_catalogue_build(&tables, &ports) !=
+            MUSIC_RIG_RESULT_OK ||
         generation.id != UINT64_C(1) || generation.mapping != &tables ||
         strcmp(definition.rig_id, "pedro-performance-rig") != 0 ||
         strcmp(definition.active_rig_profile, "full-live-rack") != 0 ||
@@ -158,7 +162,11 @@ int main(int argc, char **argv)
         definition.target_binding_count != UINT32_C(71) ||
         definition.ownership_count != UINT32_C(57) ||
         tables.prepared_version != MUSIC_RIG_COMPILED_TABLES_VERSION ||
-        tables.input_binding_count != UINT32_C(5)) {
+        tables.input_binding_count != UINT32_C(5) || ports.count != 10U ||
+        strcmp(ports.ports[0].id,
+            "device.arturia-main.midi-input") != 0 ||
+        strcmp(ports.ports[9].id,
+            "device.smk25-main.midi-output") != 0) {
         fputs("compiled definition load contract failed\n", stderr);
         return 1;
     }

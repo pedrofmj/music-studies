@@ -147,9 +147,15 @@ tests claims installed-asset or live-graph availability. See
 [`runtime/core/music_rig_runtime.c`](runtime/core/music_rig_runtime.c) provides
 the Milestone 3 daemon core: fixed-storage lifecycle state, a checksummed
 persistent-state frame, saturating metrics, expected-generation publication,
-and ABI-versioned clock/control/storage callbacks. Its event-driven loop handles
+bounded control-thread reclamation, stable device-slot port compatibility, and
+ABI-versioned clock/control/storage callbacks. Its event-driven loop handles
 decoded protocol v2 inspection and dry-run requests, idle waits, responses, and
 shutdown through mock adapters. Output-enabled mode is rejected.
+
+[`runtime/core/music_rig_device_ports.c`](runtime/core/music_rig_device_ports.c)
+derives fixed `device.<slot>.midi-input` and `.midi-output` identities from
+validated tables. The current Rig has ten identities. They are not registered
+with a backend and cannot change links or emit events.
 
 [`runtime/core/music_rig_definition.c`](runtime/core/music_rig_definition.c)
 loads bounded definition metadata and caller-owned tables through logical
@@ -212,10 +218,12 @@ library.
 ## Atomic Generation Spike
 
 The portable core publishes immutable mapping generations through lock-free
-atomic pointers. The synthetic callback test performs 9,999 control-side
-publications, verifies monotonic real-time adoption, rejects stale generation
-IDs, and enforces the 20 ms control-commit ceiling. It is an isolated process
-and has no audio, MIDI, graph, service, or state adapter.
+atomic pointers. Linux and Windows synthetic callback tests perform 9,999
+control-side publications while recycling only four storage entries. They
+verify monotonic real-time adoption, reclaim all 9,999 retired generations on
+the control thread, bound the observed retired set to three, reject stale IDs,
+and enforce the 20 ms control-commit ceiling. They are isolated processes with
+no audio, MIDI, graph, service, or state adapter.
 
 ## Switch Benchmark Contract
 

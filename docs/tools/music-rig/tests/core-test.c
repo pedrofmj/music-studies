@@ -69,10 +69,21 @@ static int test_generation_slot(void)
         fputs("generation publication failed\n", stderr);
         return 1;
     }
+    if (music_rig_generation_slot_retired_count(&slot) != 1U ||
+        music_rig_generation_slot_reclaim(&slot) != NULL) {
+        fputs("generation retired before adoption\n", stderr);
+        return 1;
+    }
 
     adopted = music_rig_generation_slot_adopt(&slot);
     if (adopted != &next || adopted->mapping != &next_mapping) {
         fputs("generation adoption returned the wrong mapping\n", stderr);
+        return 1;
+    }
+    if (music_rig_generation_slot_reclaim(&slot) != &initial ||
+        music_rig_generation_slot_retired_count(&slot) != 0U ||
+        music_rig_generation_slot_reclaim(&slot) != NULL) {
+        fputs("adopted generation was not reclaimed exactly once\n", stderr);
         return 1;
     }
     if (music_rig_generation_slot_adopted(&slot) != &next) {
@@ -93,10 +104,70 @@ static int test_generation_slot(void)
     return 0;
 }
 
+static int test_generation_backpressure(void)
+{
+    music_rig_generation generations[
+        MUSIC_RIG_RETIRED_GENERATION_CAPACITY + 2U
+    ];
+    music_rig_generation_slot slot;
+    size_t index;
+
+    for (index = 0U;
+         index < MUSIC_RIG_RETIRED_GENERATION_CAPACITY + 2U;
+         ++index) {
+        generations[index].id = (uint64_t)index + UINT64_C(1);
+        generations[index].mapping = &generations[index];
+    }
+    if (music_rig_generation_slot_init(&slot, &generations[0]) !=
+        MUSIC_RIG_RESULT_OK) {
+        fputs("backpressure slot initialization failed\n", stderr);
+        return 1;
+    }
+    for (index = 1U;
+         index <= MUSIC_RIG_RETIRED_GENERATION_CAPACITY;
+         ++index) {
+        if (music_rig_generation_slot_publish(&slot, &generations[index]) !=
+            MUSIC_RIG_RESULT_OK) {
+            fputs("retirement ring filled too early\n", stderr);
+            return 1;
+        }
+    }
+    if (music_rig_generation_slot_publish(
+            &slot,
+            &generations[MUSIC_RIG_RETIRED_GENERATION_CAPACITY + 1U]
+        ) != MUSIC_RIG_RESULT_INVALID_STATE ||
+        music_rig_generation_slot_adopted(&slot) != &generations[0]) {
+        fputs("full retirement ring did not apply backpressure\n", stderr);
+        return 1;
+    }
+    if (music_rig_generation_slot_adopt(&slot) !=
+        &generations[MUSIC_RIG_RETIRED_GENERATION_CAPACITY]) {
+        fputs("latest generation adoption failed\n", stderr);
+        return 1;
+    }
+    for (index = 0U; index < MUSIC_RIG_RETIRED_GENERATION_CAPACITY; ++index) {
+        if (music_rig_generation_slot_reclaim(&slot) != &generations[index]) {
+            fputs("retirement ring reclaimed out of order\n", stderr);
+            return 1;
+        }
+    }
+    if (music_rig_generation_slot_publish(
+            &slot,
+            &generations[MUSIC_RIG_RETIRED_GENERATION_CAPACITY + 1U]
+        ) != MUSIC_RIG_RESULT_OK) {
+        fputs("reclaimed retirement capacity was not reusable\n", stderr);
+        return 1;
+    }
+    return 0;
+}
+
 int main(void)
 {
     if (test_build_info() != 0) {
         return 1;
     }
-    return test_generation_slot();
+    if (test_generation_slot() != 0) {
+        return 1;
+    }
+    return test_generation_backpressure();
 }

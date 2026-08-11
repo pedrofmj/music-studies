@@ -182,6 +182,18 @@ Hosted
 passes Linux 38/38, Windows 32/32, and Windows JSON 35/35, including the
 current-user Windows named-pipe mock transport under `/W4 /WX`.
 
+Immutable generation publication now has an eight-entry retirement ring and
+explicit control-thread reclamation after real-time adoption. A full ring
+applies backpressure without publishing. Linux recycles four caller-owned
+entries through 9,999 publications, reclaims all 9,999 retired generations,
+and observes at most three retired entries. Validated compiled tables derive
+fixed `device.<slot>.midi-input` and `.midi-output` identities; all ten current
+Rig identities remain unchanged across profile-only generations, and slot-set
+drift fails before publication. No backend port is registered. Local GCC and
+Clang pass 39/39, both optional JSON builds pass 42/42, eight ASan/UBSan
+boundary tests pass, and the protected baseline remains 30/30. Hosted Windows
+proof is pending.
+
 ## Objective
 
 Implement the Performance Rig model defined by the feature proposal while

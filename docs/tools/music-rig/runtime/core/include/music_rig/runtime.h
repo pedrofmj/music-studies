@@ -2,6 +2,7 @@
 #define MUSIC_RIG_RUNTIME_H
 
 #include "music_rig/core.h"
+#include "music_rig/device_ports.h"
 #include "music_rig/protocol.h"
 #include "music_rig/state.h"
 #include "music_rig/storage.h"
@@ -10,7 +11,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define MUSIC_RIG_RUNTIME_ABI_VERSION UINT32_C(3)
+#define MUSIC_RIG_RUNTIME_ABI_VERSION UINT32_C(4)
 
 typedef enum music_rig_runtime_lifecycle {
     MUSIC_RIG_RUNTIME_UNINITIALIZED = 0,
@@ -51,6 +52,9 @@ typedef struct music_rig_runtime_metrics {
     uint64_t control_responses;
     uint64_t generation_publications;
     uint64_t generation_conflicts;
+    uint64_t generation_reclamations;
+    uint64_t generation_backpressure;
+    uint64_t port_identity_conflicts;
     uint64_t state_restores;
     uint64_t state_fallbacks;
     uint64_t state_writes;
@@ -99,6 +103,7 @@ typedef struct music_rig_runtime {
     music_rig_generation initial_generation;
     const music_rig_generation *control_generation;
     music_rig_generation_slot generations;
+    music_rig_device_port_catalogue device_ports;
     music_rig_platform_interfaces interfaces;
     char active_rig_profile[MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY];
     bool control_started;
@@ -116,6 +121,10 @@ music_rig_result music_rig_runtime_publish_generation(
     uint64_t expected_generation
 );
 
+const music_rig_generation *music_rig_runtime_reclaim_generation(
+    music_rig_runtime *runtime
+);
+
 music_rig_result music_rig_runtime_run(music_rig_runtime *runtime);
 
 music_rig_result music_rig_runtime_dispatch(
@@ -131,6 +140,10 @@ const music_rig_runtime_state *music_rig_runtime_get_state(
 );
 
 const music_rig_runtime_metrics *music_rig_runtime_get_metrics(
+    const music_rig_runtime *runtime
+);
+
+const music_rig_device_port_catalogue *music_rig_runtime_get_device_ports(
     const music_rig_runtime *runtime
 );
 

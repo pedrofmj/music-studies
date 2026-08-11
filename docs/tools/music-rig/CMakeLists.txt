@@ -14,6 +14,7 @@ add_library(music_rig_core STATIC
     runtime/core/music_rig_control.c
     runtime/core/music_rig_core.c
     runtime/core/music_rig_definition.c
+    runtime/core/music_rig_device_ports.c
     runtime/core/music_rig_protocol.c
     runtime/core/music_rig_runtime.c
     runtime/core/music_rig_state.c
@@ -185,6 +186,10 @@ if(BUILD_TESTING)
         tests/protocol-test.c
     )
     target_link_libraries(music_rig_protocol_test PRIVATE music_rig_core)
+    add_executable(music_rig_device_ports_test
+        tests/device-ports-test.c
+    )
+    target_link_libraries(music_rig_device_ports_test PRIVATE music_rig_core)
     add_executable(music_rig_runtime_test
         tests/runtime-test.c
     )
@@ -221,6 +226,9 @@ if(BUILD_TESTING)
         target_compile_options(music_rig_protocol_test PRIVATE
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
+        target_compile_options(music_rig_device_ports_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
         target_compile_options(music_rig_runtime_test PRIVATE
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
@@ -249,6 +257,12 @@ if(BUILD_TESTING)
             -Werror
         )
         target_compile_options(music_rig_protocol_test PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+        target_compile_options(music_rig_device_ports_test PRIVATE
             -Wall
             -Wextra
             -Wpedantic
@@ -296,6 +310,7 @@ if(BUILD_TESTING)
 
     add_test(NAME music_rig_core_test COMMAND music_rig_core_test)
     add_test(NAME music_rig_protocol_test COMMAND music_rig_protocol_test)
+    add_test(NAME music_rig_device_ports_test COMMAND music_rig_device_ports_test)
     add_test(NAME music_rig_runtime_test COMMAND music_rig_runtime_test)
     add_test(NAME music_rig_control_test COMMAND music_rig_control_test)
     add_test(NAME music_rig_cli_test COMMAND music_rig_cli_test)
