@@ -142,14 +142,22 @@ definition-fingerprint fallback, and atomic-replace failure through mock
 storage. It does not yet persist profile overrides, recompute the canonical JSON
 fingerprint emitted by the compiler, or decode executable mapping tables.
 
-The initial `music-rigd` executable remains deliberately inert: it exposes
-version/help only, rejects a no-argument start, and accepts no output-enabled
-mode. Local GCC and Clang pass 34/34, both optional Linux JSON builds pass 36/36,
-and hosted
-[run 31526121270](https://github.com/pedrofmj/music-studies/actions/runs/31526121270)
-passes Linux 34/34, Windows 28/28, and Windows JSON 30/30. No configured
-definition/state path, IPC endpoint, device, audio, graph, plugin host, service,
-or live activation path exists yet, and the protected baseline remains 30/30.
+Explicit-path file adapters now perform bounded definition/state reads and
+native same-directory atomic state replacement on Linux and Windows. They use
+caller-owned UTF-8 paths, create no parent or default location, own no worker
+thread, and are exercised only with ephemeral build-directory state files. The
+opt-in `music-rigd validate-definition` command loads one named envelope,
+requires its trusted fingerprint, reports bounded metadata, and exits with
+output suppressed and no state path.
+
+The daemon still rejects a no-argument start and accepts no output-enabled mode.
+Local GCC and Clang pass 35/35, both optional Linux JSON builds pass 38/38, and
+hosted
+[run 31531477956](https://github.com/pedrofmj/music-studies/actions/runs/31531477956)
+passes Linux 35/35, Windows 29/29, and Windows JSON 32/32. No production
+definition/state location, IPC endpoint, device, audio, graph, plugin host,
+service, or live activation path exists yet, and the protected baseline remains
+30/30.
 
 ## Objective
 
