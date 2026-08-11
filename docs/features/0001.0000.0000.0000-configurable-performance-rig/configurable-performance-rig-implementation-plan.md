@@ -177,7 +177,10 @@ and fails closed without sending. Ephemeral Linux `SOCK_SEQPACKET` and Windows
 current-user named-pipe tests carry 1,000 mixed requests through the real
 dispatcher. Local GCC/Clang pass 38/38, both optional JSON builds pass 41/41,
 eight ASan/UBSan boundary tests pass, and the protected baseline remains 30/30.
-Hosted proof is pending.
+Hosted
+[run 31539454955](https://github.com/pedrofmj/music-studies/actions/runs/31539454955)
+passes Linux 38/38, Windows 32/32, and Windows JSON 35/35, including the
+current-user Windows named-pipe mock transport under `/W4 /WX`.
 
 ## Objective
 

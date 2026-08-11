@@ -65,6 +65,7 @@ Documents:
 | Portable runtime control loop | ✅ [Linux 32/32, Windows 26/26, and Windows JSON 27/27](https://github.com/pedrofmj/music-studies/actions/runs/31521502726) pass; fixed-storage state, saturating metrics, generation conflicts, adapter failures, output suppression, and inert daemon startup are covered |
 | Qualified definition and state loading | ✅ [Linux 34/34, Windows 28/28, and Windows JSON 30/30](https://github.com/pedrofmj/music-studies/actions/runs/31526121270) pass; bounded compiled metadata, 64-byte state integrity, restore/fallback, storage failures, and inert output behavior are covered |
 | Native explicit-path storage | ✅ [Linux 35/35, Windows 29/29, and Windows JSON 32/32](https://github.com/pedrofmj/music-studies/actions/runs/31531477956) pass; UTF-8 definition reads, native atomic state replacement, cleanup, missing paths, fingerprint mismatch, and offline daemon loading are covered |
+| Protocol v2 read-only/dry-run control | ✅ [Linux 38/38, Windows 32/32, and Windows JSON 35/35](https://github.com/pedrofmj/music-studies/actions/runs/31539454955) pass; fixed frames, nine operation IDs, fail-closed CLI, table-backed dispatch, and Linux/Windows mock transports are covered |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -282,15 +283,16 @@ benchmarks.
   32/32. `music-rigd` remains output-suppressed and inert without an explicit
   command. Production XDG/Known Folder selection and the device/MIDI,
   audio/graph, plugin-host, service, and diagnostics adapters remain.
-- 🟡 Implement the complete versioned IPC and CLI read-only/dry-run commands.
+- ✅ Implement the complete versioned IPC and CLI read-only/dry-run commands.
   Protocol v2 freezes all nine operation IDs in fixed 176-byte requests and
   2,592-byte bounded responses. The portable dispatcher and CLI cover status,
   filtered profile listing, validation, and global/device dry-runs while
   rejecting every commit request. Ephemeral Linux and Windows transports carry
   real table-backed requests; the executable has no configured endpoint. Local
   GCC/Clang pass 38/38, both optional JSON builds pass 41/41, eight ASan/UBSan
-  boundary tests pass, and the protected baseline remains 30/30. Hosted Windows
-  proof is pending.
+  boundary tests pass, and the protected baseline remains 30/30. Hosted
+  [run 31539454955](https://github.com/pedrofmj/music-studies/actions/runs/31539454955)
+  passes Linux 38/38, Windows 32/32, and Windows JSON 35/35.
 - ⬜ Add immutable-generation reclamation and stable device-slot ports.
 - ⬜ Extract reusable behavior without changing installed legacy services.
 - ⬜ Run the new adapter in output-suppressed shadow mode.
