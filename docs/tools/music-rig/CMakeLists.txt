@@ -25,6 +25,51 @@ set_target_properties(music_rig_core PROPERTIES
     C_EXTENSIONS OFF
 )
 
+if(WIN32)
+    set(MUSIC_RIG_FILE_STORAGE_SOURCE
+        runtime/windows/music_rig_file_storage.c
+    )
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(MUSIC_RIG_FILE_STORAGE_SOURCE
+        runtime/linux/music_rig_file_storage.c
+    )
+endif()
+
+if(DEFINED MUSIC_RIG_FILE_STORAGE_SOURCE)
+    add_library(music_rig_file_storage STATIC
+        ${MUSIC_RIG_FILE_STORAGE_SOURCE}
+    )
+    target_include_directories(music_rig_file_storage
+        PUBLIC
+            "${CMAKE_CURRENT_SOURCE_DIR}/runtime/platform/include"
+    )
+    target_link_libraries(music_rig_file_storage PUBLIC music_rig_core)
+    target_compile_features(music_rig_file_storage PUBLIC c_std_17)
+    set_target_properties(music_rig_file_storage PROPERTIES
+        C_EXTENSIONS OFF
+    )
+endif()
+
+if(MUSIC_RIG_ENABLE_JSON_C_SPIKE)
+    if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT WIN32)
+        message(FATAL_ERROR
+            "The json-c adapter supports Linux and Windows"
+        )
+    endif()
+    find_package(json-c CONFIG REQUIRED)
+    add_library(music_rig_definition_json STATIC
+        runtime/json-c/music_rig_definition_json.c
+    )
+    target_compile_features(music_rig_definition_json PRIVATE c_std_17)
+    set_target_properties(music_rig_definition_json PROPERTIES
+        C_EXTENSIONS OFF
+    )
+    target_link_libraries(music_rig_definition_json
+        PUBLIC music_rig_core
+        PRIVATE json-c::json-c
+    )
+endif()
+
 add_executable(music-rig
     music-rig.c
 )
@@ -34,6 +79,18 @@ add_executable(music-rigd
     music-rigd.c
 )
 target_link_libraries(music-rigd PRIVATE music_rig_core)
+if(TARGET music_rig_file_storage)
+    target_compile_definitions(music-rigd PRIVATE
+        MUSIC_RIG_HAS_FILE_STORAGE=1
+    )
+    target_link_libraries(music-rigd PRIVATE music_rig_file_storage)
+endif()
+if(MUSIC_RIG_ENABLE_JSON_C_SPIKE)
+    target_compile_definitions(music-rigd PRIVATE
+        MUSIC_RIG_ENABLE_JSON_DEFINITION=1
+    )
+    target_link_libraries(music-rigd PRIVATE music_rig_definition_json)
+endif()
 
 if(MSVC)
     set(MUSIC_RIG_MSVC_COMPILE_OPTIONS
@@ -44,6 +101,16 @@ if(MSVC)
     target_compile_options(music_rig_core PRIVATE
         ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
     )
+    if(TARGET music_rig_file_storage)
+        target_compile_options(music_rig_file_storage PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+    endif()
+    if(TARGET music_rig_definition_json)
+        target_compile_options(music_rig_definition_json PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+    endif()
     target_compile_options(music-rig PRIVATE
         ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
     )
@@ -57,6 +124,22 @@ else()
         -Wpedantic
         -Werror
     )
+    if(TARGET music_rig_file_storage)
+        target_compile_options(music_rig_file_storage PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+    endif()
+    if(TARGET music_rig_definition_json)
+        target_compile_options(music_rig_definition_json PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+    endif()
     target_compile_options(music-rig PRIVATE
         -Wall
         -Wextra
@@ -92,6 +175,14 @@ if(BUILD_TESTING)
         tests/definition-test.c
     )
     target_link_libraries(music_rig_definition_test PRIVATE music_rig_core)
+    if(TARGET music_rig_file_storage)
+        add_executable(music_rig_file_storage_test
+            tests/file-storage-test.c
+        )
+        target_link_libraries(music_rig_file_storage_test
+            PRIVATE music_rig_file_storage
+        )
+    endif()
 
     if(MSVC)
         target_compile_options(music_rig_core_test PRIVATE
@@ -109,6 +200,11 @@ if(BUILD_TESTING)
         target_compile_options(music_rig_definition_test PRIVATE
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
+        if(TARGET music_rig_file_storage_test)
+            target_compile_options(music_rig_file_storage_test PRIVATE
+                ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+            )
+        endif()
     else()
         target_compile_options(music_rig_core_test PRIVATE
             -Wall
@@ -140,6 +236,14 @@ if(BUILD_TESTING)
             -Wpedantic
             -Werror
         )
+        if(TARGET music_rig_file_storage_test)
+            target_compile_options(music_rig_file_storage_test PRIVATE
+                -Wall
+                -Wextra
+                -Wpedantic
+                -Werror
+            )
+        endif()
     endif()
 
     add_test(NAME music_rig_core_test COMMAND music_rig_core_test)
@@ -147,6 +251,15 @@ if(BUILD_TESTING)
     add_test(NAME music_rig_runtime_test COMMAND music_rig_runtime_test)
     add_test(NAME music_rig_state_test COMMAND music_rig_state_test)
     add_test(NAME music_rig_definition_test COMMAND music_rig_definition_test)
+    if(TARGET music_rig_file_storage_test)
+        add_test(
+            NAME music_rig_file_storage_test
+            COMMAND music_rig_file_storage_test
+                "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-current-envelope.json"
+                "${CMAKE_CURRENT_BINARY_DIR}/file-storage-state.bin"
+                "${CMAKE_CURRENT_BINARY_DIR}/missing-storage-parent/state.bin"
+        )
+    endif()
     add_test(
         NAME music_rig_core_portability
         COMMAND "${CMAKE_COMMAND}"
@@ -331,22 +444,11 @@ if(BUILD_TESTING)
     )
 
     if(MUSIC_RIG_ENABLE_JSON_C_SPIKE)
-        if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT WIN32)
-            message(FATAL_ERROR
-                "The json-c footprint harness supports Linux and Windows"
-            )
-        endif()
-        find_package(json-c CONFIG REQUIRED)
-        add_library(music_rig_definition_json STATIC
-            runtime/json-c/music_rig_definition_json.c
+        set(MUSIC_RIG_JSON_DEFINITION_FIXTURE
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-current-envelope.json"
         )
-        target_compile_features(music_rig_definition_json PRIVATE c_std_17)
-        set_target_properties(music_rig_definition_json PROPERTIES
-            C_EXTENSIONS OFF
-        )
-        target_link_libraries(music_rig_definition_json
-            PUBLIC music_rig_core
-            PRIVATE json-c::json-c
+        set(MUSIC_RIG_JSON_DEFINITION_FINGERPRINT
+            "sha256:9be68993c164802f694f4d6359c208d9937fbfcf668781ce5a1c3bff5f30cb9e"
         )
         add_executable(music_rig_json_definition_test
             tests/json-definition-test.c
@@ -382,12 +484,6 @@ if(BUILD_TESTING)
                 -Wpedantic
                 -Werror
             )
-            target_compile_options(music_rig_definition_json PRIVATE
-                -Wall
-                -Wextra
-                -Wpedantic
-                -Werror
-            )
             target_compile_options(music_rig_json_definition_test PRIVATE
                 -Wall
                 -Wextra
@@ -404,9 +500,6 @@ if(BUILD_TESTING)
                 MUSIC_RIG_JSON_C_LINKAGE="static-vcpkg"
             )
             target_compile_options(music_rig_json_c_spike PRIVATE
-                ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
-            )
-            target_compile_options(music_rig_definition_json PRIVATE
                 ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
             )
             target_compile_options(music_rig_json_definition_test PRIVATE
@@ -427,10 +520,22 @@ if(BUILD_TESTING)
         add_test(
             NAME music_rig_json_definition
             COMMAND music_rig_json_definition_test
-                "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-current-envelope.json"
+                "${MUSIC_RIG_JSON_DEFINITION_FIXTURE}"
         )
         set_tests_properties(
             music_rig_json_definition
+            PROPERTIES TIMEOUT 10
+        )
+        add_test(
+            NAME music_rigd_definition_validation
+            COMMAND "${CMAKE_COMMAND}"
+                "-DDAEMON=$<TARGET_FILE:music-rigd>"
+                "-DDEFINITION=${MUSIC_RIG_JSON_DEFINITION_FIXTURE}"
+                "-DEXPECTED_FINGERPRINT=${MUSIC_RIG_JSON_DEFINITION_FINGERPRINT}"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-music-rigd-definition.cmake"
+        )
+        set_tests_properties(
+            music_rigd_definition_validation
             PROPERTIES TIMEOUT 10
         )
     endif()

@@ -15,10 +15,11 @@ result is an immutable runtime generation, and only that generation may be
 published to audio or MIDI callbacks. No callback may call `json-c`, allocate
 a JSON object, read a definition file, or serialize JSON.
 
-The portable core and current CLI/daemon skeletons remain independent of
-`json-c`. The opt-in build now contains both the Milestone 0 footprint probe and
-the Milestone 3 compiled-definition metadata decoder. Neither is installed or
-activated.
+The portable core, CLI, and default daemon remain independent of `json-c`. The
+opt-in build contains the Milestone 0 footprint probe, the Milestone 3
+compiled-definition metadata decoder, and an explicit read-only daemon command
+that validates one named document and exits. None is installed, started by
+default, or connected to runtime output.
 
 ## Linux Evidence
 
@@ -100,6 +101,6 @@ cmake --build build/music-rig-json-c --config Release
 ctest --test-dir build/music-rig-json-c -C Release --output-on-failure
 ```
 
-The probe, metadata decoder, and dependency remain opt-in. A version or
-package-path change must repeat the build, exact-fixture, linkage, license, and
-footprint checks.
+The probe, metadata decoder, offline daemon command, and dependency remain
+opt-in. A version or package-path change must repeat the build, exact-fixture,
+linkage, license, and footprint checks.

@@ -4,9 +4,10 @@ This directory contains the Configurable Performance Rig implementation.
 
 Status: Milestones 0 through 2 are complete. Milestone 3 is in progress with a
 portable, output-suppressed runtime control loop, qualified persistent-state
-contract, checked definition-metadata loader, and inert `music-rigd` binary. It
-does not implement platform storage paths, install a service, create an IPC
-endpoint, connect to MIDI or audio, or modify the stable Carla/PipeWire setup.
+contract, checked definition-metadata loader, explicit-path Linux/Windows file
+adapters, and inert `music-rigd` binary. It does not select production storage
+locations, install a service, create an IPC endpoint, connect to MIDI or audio,
+or modify the stable Carla/PipeWire setup.
 
 ## Safety Boundary
 
@@ -155,11 +156,28 @@ The optional `json-c` adapter validates the checked-in compiled
 `full-live-rack` envelope and hands its metadata to an immutable generation; it
 does not yet decode executable mapping tables.
 
+[`runtime/platform/include/music_rig/file_storage.h`](runtime/platform/include/music_rig/file_storage.h)
+defines explicit caller-owned UTF-8 paths. Linux and Windows implementations
+read definition/state files and atomically replace state with native APIs. They
+choose no default or installed path, create no directory, and are tested only
+with ephemeral build-directory state files.
+
 [`music-rigd`](music-rigd.c) is currently an inert build target. It supports
-version/help output but refuses a no-argument start and has no configured
-definition/state path, transport, installation, service, MIDI, audio, graph, or
-plugin-host path. See [RUNTIME.md](RUNTIME.md) for ownership, lifecycle, storage,
-adapter, metric, failure, and next-slice contracts.
+version/help output but refuses a no-argument start. An opt-in JSON build adds an
+explicit offline `validate-definition` command; it reads one named definition,
+reports validated metadata, and exits without a state path or output. The daemon
+has no configured definition/state path, transport, installation, service, MIDI,
+audio, graph, or plugin-host path. See [RUNTIME.md](RUNTIME.md) for ownership,
+lifecycle, storage, adapter, metric, failure, and next-slice contracts.
+
+Example for the opt-in build:
+
+~~~bash
+/tmp/music-rig-build-json-c/music-rigd validate-definition \
+  --definition docs/tools/music-rig/tests/fixtures/compiled-current-envelope.json \
+  --expected-fingerprint \
+  sha256:9be68993c164802f694f4d6359c208d9937fbfcf668781ce5a1c3bff5f30cb9e
+~~~
 
 Run the validator directly:
 

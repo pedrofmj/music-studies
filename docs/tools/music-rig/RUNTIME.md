@@ -3,8 +3,9 @@
 The Milestone 3 runtime is a platform-neutral, output-suppressed control
 dispatcher. It establishes the definition, qualified persistent state, metrics,
 generation, and adapter contracts that future Linux and Windows daemon hosts
-use. It does not create an IPC endpoint, implement platform storage paths, bind
-a device, inspect or change a graph, contact a plugin host, or control a service.
+use. It does not create an IPC endpoint, select production storage locations,
+bind a device, inspect or change a graph, contact a plugin host, or control a
+service.
 
 ## Ownership And Storage
 
@@ -64,12 +65,22 @@ adapters:
 - `stop`: complete a normal shutdown; or
 - `error`: fail the runtime and close the started adapter.
 
-Storage callbacks receive logical object identifiers, not paths. A platform
-adapter resolves configuration and state locations and must implement
-runtime-state replacement atomically. The interface contains no platform
-handles or backend names. IPC framing, authentication, actual paths, device I/O,
-graphs, plugin hosts, services, and diagnostics remain host implementations or
-later extensions.
+Storage callbacks receive logical object identifiers, not paths. The
+`music_rig_file_storage` host adapter accepts caller-owned explicit UTF-8
+definition and state paths. It reads both logical objects but permits atomic
+replacement only for runtime state. It never creates parent directories or
+selects XDG, Known Folder, installed, or protected-rig locations.
+
+Linux replacement writes and flushes a same-directory private temporary file
+before `rename`. Windows converts UTF-8 paths to native UTF-16, writes and flushes
+a uniquely created same-directory file, and commits it with replacement and
+write-through flags. Contract tests use build-directory state files and remove
+them after each run. The portable core still contains no platform handles,
+paths, or backend names. Production location resolution, IPC authentication,
+device I/O, graphs, plugin hosts, services, and diagnostics remain host work.
+The adapter owns no worker thread, polling loop, cache, or heap allocation; all
+file work is synchronous on the control path and prohibited from real-time
+callbacks.
 
 ## Compiled Definition Loading
 
@@ -85,6 +96,18 @@ generation, Rig and profile identities, platform binding, five selected Device
 Profiles, control-only readiness, empty/unapplied graph delta, authoring-only
 safety flags, and the 72-mapping, 71-target, and 57-ownership counts. Trailing
 data and malformed or unsafe documents fail.
+
+An opt-in JSON-enabled daemon build exposes one explicit offline command:
+
+```text
+music-rigd validate-definition --definition PATH \
+  --expected-fingerprint sha256:HEX
+```
+
+It reads only the named document through the native file adapter, validates the
+metadata and trusted fingerprint, initializes a caller-owned immutable
+generation, reports its bounded inventory, and exits. It has no state path and
+cannot write, activate, connect, or publish output.
 
 This slice decodes metadata only. It does not yet build bounded mapping lookup
 tables or recompute the compiler's canonical JSON SHA-256 inside the daemon.
@@ -125,19 +148,23 @@ generation equal. Invalid structured requests produce result code 2.
 
 ## Executable Boundary
 
-`music-rigd` is built on Linux and Windows but is deliberately inert. It
-supports only `--version` and `--help`; invoking it without a command exits with
-code 2. It reports the runtime and storage ABI versions but has no configuration,
-definition path, transport, installation, service, or default-start path.
+`music-rigd` is built on Linux and Windows but is deliberately inert. Every
+build supports `--version` and `--help`; invoking it without a command exits with
+code 2. The opt-in JSON build also supports the explicit read-only definition
+validation command above. It reports the runtime and storage ABIs and, when
+compiled, the native file-storage ABI. It has no configured definition/state
+path, transport, installation, service, or default-start path.
 
 CTest exercises successful idle/request/stop sequencing, status and stale
 generation responses, invalid requests, publication conflicts, qualified state
 restore/fallback, all 64 single-byte state corruptions, state I/O failures,
 definition source/decoder failures, the full compiled-envelope JSON decoder,
-invalid lifecycle/configuration, ABI rejection, and daemon inertness. A source
-audit rejects allocation and C thread-lock calls from the definition, runtime,
-and state core. Existing portability tests continue to reject platform headers
-and backend identifiers from the complete core tree.
+native temporary-file definition reads and atomic state replacements, explicit
+daemon validation and fingerprint mismatch, invalid lifecycle/configuration,
+ABI rejection, and daemon inertness. A source audit rejects allocation and C
+thread-lock calls from the definition, runtime, and state core. Existing
+portability tests continue to reject platform headers and backend identifiers
+from the complete core tree.
 
 ## Next Runtime Slice
 
