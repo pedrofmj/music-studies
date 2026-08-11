@@ -34,11 +34,11 @@ static uint8_t definition_document[DEFINITION_DOCUMENT_CAPACITY];
 
 static int validate_definition(const char *path, const char *fingerprint)
 {
-    music_rig_file_storage file_storage;
-    music_rig_storage_adapter storage;
+    music_rig_file_storage file_storage = {0};
+    music_rig_storage_adapter storage = {0};
     music_rig_definition_decoder decoder;
-    music_rig_compiled_definition definition;
-    music_rig_generation generation;
+    music_rig_compiled_definition definition = {0};
+    music_rig_generation generation = {0};
     uint8_t expected[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE];
     music_rig_result result;
 
