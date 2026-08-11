@@ -370,7 +370,7 @@ static bool decode_endpoints(
     music_rig_compiled_input_binding *binding
 )
 {
-    struct json_object_iter iterator;
+    struct json_object_iter iterator = {0};
     int count = json_object_object_length(endpoints);
     size_t index = 0;
 
@@ -403,7 +403,7 @@ static bool decode_input_bindings(
     music_rig_compiled_tables *tables
 )
 {
-    struct json_object_iter iterator;
+    struct json_object_iter iterator = {0};
     int count = json_object_object_length(inputs);
     size_t decoded = 0;
 
@@ -662,7 +662,7 @@ static bool validate_mapping_index(
     const music_rig_compiled_tables *tables
 )
 {
-    struct json_object_iter iterator;
+    struct json_object_iter iterator = {0};
     bool seen[MUSIC_RIG_MAPPING_CAPACITY] = {false};
     int count = json_object_object_length(mapping_index);
     size_t decoded = 0;
@@ -700,7 +700,7 @@ static bool decode_target_bindings(
     music_rig_compiled_tables *tables
 )
 {
-    struct json_object_iter iterator;
+    struct json_object_iter iterator = {0};
     int count = json_object_object_length(targets);
     size_t index = 0;
 
@@ -776,7 +776,7 @@ static bool decode_ownership(
     music_rig_compiled_tables *tables
 )
 {
-    struct json_object_iter iterator;
+    struct json_object_iter iterator = {0};
     int count = json_object_object_length(ownership_source);
     size_t index = 0;
 
