@@ -86,6 +86,7 @@ def run_materializer(
     output_root: Optional[Path] = None,
     target_home: str = TARGET_HOME,
     target_soundfont_root: str = TARGET_SOUNDFONT_ROOT,
+    repository_root: Path = REPOSITORY_ROOT,
 ) -> subprocess.CompletedProcess:
     command = [
         sys.executable,
@@ -103,7 +104,7 @@ def run_materializer(
         "--rig-root",
         str(RIG_ROOT),
         "--repository-root",
-        str(REPOSITORY_ROOT),
+        str(repository_root),
     ]
     if output_root is None:
         command.append("--check-only")
@@ -266,6 +267,31 @@ def main() -> int:
             if bundle_bytes(first_root) != bundle_bytes(second_root):
                 raise AssertionError("materialized bundles are not deterministic")
             completed_cases.append("repeatable-output")
+
+            crlf_repository = temporary_root / "crlf-repository"
+            source_paths = [
+                Path(
+                    "src/audio-software/carla/projects/pedro-live-rack/"
+                    "pedro.uproject"
+                ),
+                Path("src/midi-setup/pedro-live-rack-patchbay.json"),
+            ]
+            for relative_path in source_paths:
+                source = REPOSITORY_ROOT / relative_path
+                target = crlf_repository / relative_path
+                target.parent.mkdir(parents=True, exist_ok=True)
+                lf_content = source.read_bytes().replace(b"\r\n", b"\n")
+                target.write_bytes(lf_content.replace(b"\n", b"\r\n"))
+            crlf_root = temporary_root / "crlf-bundle"
+            crlf = run_materializer(
+                graph_path,
+                output_root=crlf_root,
+                repository_root=crlf_repository,
+            )
+            require_success(crlf, "CRLF checkout materialization")
+            if bundle_bytes(first_root) != bundle_bytes(crlf_root):
+                raise AssertionError("CRLF checkout changed materialized bytes")
+            completed_cases.append("crlf-checkout")
 
             existing_empty_root = temporary_root / "existing-empty-bundle"
             existing_empty_root.mkdir()

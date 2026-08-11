@@ -230,8 +230,8 @@ benchmarks.
 - 🟡 Materialize Carla and Patchbay output only in temporary test locations.
   The guarded authoring command produces a deterministic three-file bundle,
   refuses non-temporary and unsafe definitions before output creation, and
-  leaves the protected baseline at 30/30. Its ten-case self-test passes in the
-  full local GCC and Clang suites at 26/26; hosted Linux and Windows proof
+  leaves the protected baseline at 30/30. Its eleven-case self-test passes in
+  the full local GCC and Clang suites at 26/26; hosted Linux and Windows proof
   remains.
 - ⬜ Prove 49-plugin, 111-project-connection, and 115-link semantic parity.
 - ⬜ Add relocation, missing-capability, repeatability, and regression tests.

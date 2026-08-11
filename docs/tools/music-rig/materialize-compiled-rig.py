@@ -60,12 +60,9 @@ def fingerprint(document: Any) -> str:
     return "sha256:" + hashlib.sha256(canonical_json_bytes(document)).hexdigest()
 
 
-def file_sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
+def portable_text_sha256(path: Path) -> str:
+    content = path.read_bytes().replace(b"\r\n", b"\n")
+    return hashlib.sha256(content).hexdigest()
 
 
 def require(condition: bool, message: str) -> None:
@@ -235,7 +232,7 @@ def verified_repository_source(
         path_id,
     )
     require(
-        entry.get("sha256") == file_sha256(path),
+        entry.get("sha256") == portable_text_sha256(path),
         f"{path_id} checksum mismatch",
     )
     return path

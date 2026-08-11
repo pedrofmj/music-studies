@@ -25,7 +25,9 @@ Before rendering, the command verifies the complete compiled-definition
 fingerprint, the independent Platform Binding fingerprint, the two protected
 source-file checksums, the authoring-only safety flags, selected Carla and
 Patchbay targets, and an empty, unapplied graph delta. The checked-in protected
-Carla and Patchbay materializers remain unchanged.
+Carla and Patchbay materializers remain unchanged. Text-source checksums use
+canonical LF bytes so an existing Windows CRLF checkout cannot change their
+identity; repository attributes pin both sources to LF in new checkouts.
 
 ## Output Boundary
 

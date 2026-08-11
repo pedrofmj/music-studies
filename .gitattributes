@@ -1,2 +1,4 @@
 docs/tools/music-rig/vcpkg.json text eol=lf
 docs/tools/music-rig/tests/fixtures/*.json text eol=lf
+src/audio-software/carla/projects/pedro-live-rack/pedro.uproject text eol=lf
+src/midi-setup/pedro-live-rack-patchbay.json text eol=lf
