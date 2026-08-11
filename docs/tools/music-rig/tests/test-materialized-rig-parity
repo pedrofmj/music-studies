@@ -193,7 +193,8 @@ def main() -> int:
         baseline = verify(baseline_root)
         require_success(baseline, "baseline parity")
         expected_summary = (
-            "plugins=49, carla-connections=111, patchbay-links=115, "
+            "plugins=49, plugin-assets=18, carla-connections=111, "
+            "patchbay-links=115, "
             "activation=none"
         )
         if expected_summary not in baseline.stdout:
@@ -243,6 +244,53 @@ def main() -> int:
             f"Carla plugins changed: ['{plugin_name}']",
         )
         completed_cases.append("plugin-parameter-drift")
+
+        missing_plugin_root = temporary_root / "missing-plugin"
+        shutil.copytree(baseline_root, missing_plugin_root)
+        missing_plugin_path = missing_plugin_root / "carla" / "pedro.uproject"
+        missing_plugin_tree = ET.parse(missing_plugin_path)
+        missing_plugin = missing_plugin_tree.getroot().find("Plugin")
+        if missing_plugin is None:
+            raise AssertionError("fixture Carla project has no removable plugin")
+        missing_plugin_name = missing_plugin.findtext("Info/Name")
+        missing_plugin_tree.getroot().remove(missing_plugin)
+        write_carla(missing_plugin_path, missing_plugin_tree)
+        refresh_manifest(missing_plugin_root, "carla_project")
+        missing_plugin_result = verify(missing_plugin_root)
+        require_failure(
+            missing_plugin_result,
+            "missing plugin",
+            f"Carla plugins missing: ['{missing_plugin_name}']",
+        )
+        completed_cases.append("missing-plugin-diagnostic")
+
+        missing_asset_root = temporary_root / "missing-asset"
+        shutil.copytree(baseline_root, missing_asset_root)
+        missing_asset_path = missing_asset_root / "carla" / "pedro.uproject"
+        missing_asset_tree = ET.parse(missing_asset_path)
+        missing_asset_plugin = next(
+            (
+                plugin
+                for plugin in missing_asset_tree.getroot().findall("Plugin")
+                if plugin.find(".//Filename") is not None
+            ),
+            None,
+        )
+        if missing_asset_plugin is None:
+            raise AssertionError("fixture Carla project has no removable asset")
+        filename = missing_asset_plugin.find(".//Filename")
+        if filename is None:
+            raise AssertionError("fixture Carla plugin has no Filename")
+        filename.text = ""
+        write_carla(missing_asset_path, missing_asset_tree)
+        refresh_manifest(missing_asset_root, "carla_project")
+        missing_asset_result = verify(missing_asset_root)
+        require_failure(
+            missing_asset_result,
+            "missing asset",
+            "Carla plugin assets missing",
+        )
+        completed_cases.append("missing-asset-diagnostic")
 
         connection_root = temporary_root / "connection-count"
         shutil.copytree(baseline_root, connection_root)

@@ -212,6 +212,16 @@ if(BUILD_TESTING)
         PROPERTIES TIMEOUT 30
     )
 
+    add_test(
+        NAME music_rig_protected_single_rig_regression
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-protected-single-rig-regression"
+    )
+    set_tests_properties(
+        music_rig_protected_single_rig_regression
+        PROPERTIES TIMEOUT 30
+    )
+
     set(MUSIC_RIG_SWITCH_BENCHMARK_VALIDATOR
         "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/validate-switch-benchmark"
     )

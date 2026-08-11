@@ -246,6 +246,35 @@ def carla_plugin_inventory(
     return plugins
 
 
+def carla_asset_inventory(
+    root: ET.Element,
+    home: str,
+    soundfont_root: str,
+    label: str,
+) -> Counter[Tuple[str, str, str]]:
+    assets: Counter[Tuple[str, str, str]] = Counter()
+    errors = []
+    for plugin in root.findall("Plugin"):
+        name = plugin.findtext("Info/Name")
+        if not name:
+            errors.append(f"{label} Carla plugin lacks Info/Name")
+            continue
+        for tag in ("Binary", "Filename"):
+            for element in plugin.iter(tag):
+                value = (element.text or "").strip()
+                if value:
+                    assets[
+                        (
+                            name,
+                            tag,
+                            normalized_path(value, home, soundfont_root),
+                        )
+                    ] += 1
+    if errors:
+        raise ParityError(errors)
+    return assets
+
+
 def carla_connection_inventory(
     root: ET.Element,
     label: str,
@@ -424,6 +453,18 @@ def verify_parity(arguments: argparse.Namespace) -> Mapping[str, Any]:
         relocation["soundfont_root"],
         "materialized",
     )
+    reference_assets = carla_asset_inventory(
+        reference_carla,
+        REFERENCE_HOME,
+        REFERENCE_SOUNDFONT_ROOT,
+        "protected",
+    )
+    materialized_assets = carla_asset_inventory(
+        materialized_carla,
+        relocation["home"],
+        relocation["soundfont_root"],
+        "materialized",
+    )
     reference_connections = carla_connection_inventory(
         reference_carla,
         "protected",
@@ -490,6 +531,13 @@ def verify_parity(arguments: argparse.Namespace) -> Mapping[str, Any]:
     errors.extend(compare_plugins(reference_plugins, materialized_plugins))
     errors.extend(
         compare_counter(
+            "Carla plugin assets",
+            reference_assets,
+            materialized_assets,
+        )
+    )
+    errors.extend(
+        compare_counter(
             "Carla connections",
             reference_connections,
             materialized_connections,
@@ -510,11 +558,15 @@ def verify_parity(arguments: argparse.Namespace) -> Mapping[str, Any]:
         "definition_fingerprint": manifest["definition_fingerprint"],
         "counts": {
             "carla_plugins": len(reference_plugins),
+            "carla_plugin_assets": sum(reference_assets.values()),
             "carla_project_connections": sum(reference_connections.values()),
             "patchbay_links": sum(reference_links.values()),
         },
         "inventory_fingerprints": {
             "carla_plugins": fingerprint(plugin_records),
+            "carla_plugin_assets": fingerprint(
+                counter_records(reference_assets)
+            ),
             "carla_project_connections": fingerprint(
                 counter_records(reference_connections)
             ),
@@ -557,6 +609,7 @@ def main() -> int:
         print(
             "Materialized Rig semantic parity: PASS "
             f"(plugins={counts['carla_plugins']}, "
+            f"plugin-assets={counts['carla_plugin_assets']}, "
             f"carla-connections={counts['carla_project_connections']}, "
             f"patchbay-links={counts['patchbay_links']}, "
             "activation=none)"

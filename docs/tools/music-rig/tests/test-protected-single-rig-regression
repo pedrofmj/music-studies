@@ -1,0 +1,282 @@
+#!/usr/bin/env python3
+"""Exercise the protected single-rig validation boundary without activation."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path, PurePosixPath
+from typing import Mapping, Sequence
+
+
+sys.dont_write_bytecode = True
+
+
+SCRIPT_PATH = Path(__file__).resolve()
+TOOLS_ROOT = SCRIPT_PATH.parents[1]
+REPOSITORY_ROOT = SCRIPT_PATH.parents[4]
+AIRSTAR_ROOT = REPOSITORY_ROOT / "docs" / "tools" / "airstar-live-setup"
+BASELINE_PATH = AIRSTAR_ROOT / "protected-baseline.json"
+REFERENCE_CARLA = (
+    REPOSITORY_ROOT
+    / "src"
+    / "audio-software"
+    / "carla"
+    / "projects"
+    / "pedro-live-rack"
+    / "pedro.uproject"
+)
+REFERENCE_PATCHBAY = (
+    REPOSITORY_ROOT
+    / "src"
+    / "midi-setup"
+    / "pedro-live-rack-patchbay.json"
+)
+
+
+def portable_text_sha256(path: Path) -> str:
+    content = path.read_bytes().replace(b"\r\n", b"\n")
+    return hashlib.sha256(content).hexdigest()
+
+
+def protected_hashes() -> Mapping[str, str]:
+    baseline = json.loads(BASELINE_PATH.read_text(encoding="utf-8"))
+    return {
+        record["path"]: portable_text_sha256(REPOSITORY_ROOT / record["path"])
+        for record in baseline["protected_files"]
+    }
+
+
+def run(
+    command: Sequence[str],
+    cwd: Path,
+) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        list(command),
+        cwd=str(cwd),
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+
+
+def require_success(result: subprocess.CompletedProcess, label: str) -> None:
+    if result.returncode != 0:
+        raise AssertionError(
+            f"{label} failed ({result.returncode}): {result.stderr}"
+        )
+
+
+def require_failure(
+    result: subprocess.CompletedProcess,
+    label: str,
+    expected: str,
+) -> None:
+    if result.returncode == 0:
+        raise AssertionError(f"{label} unexpectedly succeeded")
+    if expected not in result.stderr:
+        raise AssertionError(
+            f"{label} omitted {expected!r}: {result.stderr!r}"
+        )
+
+
+def main() -> int:
+    completed_cases = []
+    baseline = json.loads(BASELINE_PATH.read_text(encoding="utf-8"))
+    if baseline.get("schema") != "music-studies/protected-live-rig-baseline/v1":
+        raise AssertionError("protected baseline schema changed")
+    if baseline.get("status") != "protected-production-default":
+        raise AssertionError("protected baseline is no longer the production default")
+    if baseline.get("activation_policy") != {
+        "remains_default": True,
+        "experimental_runtime_enabled_by_default": False,
+        "explicit_promotion_required": True,
+    }:
+        raise AssertionError("protected activation policy changed")
+
+    records = baseline.get("protected_files")
+    if not isinstance(records, list) or not records:
+        raise AssertionError("protected baseline has no file records")
+    paths = [record.get("path") for record in records]
+    if len(paths) != len(set(paths)):
+        raise AssertionError("protected baseline contains duplicate paths")
+    required_paths = {
+        "docs/tools/airstar-live-setup/install-airstar-live-setup",
+        "docs/tools/airstar-live-setup/validate-airstar-live-setup",
+        "docs/tools/airstar-live-setup/materialize-carla-project.py",
+        "docs/tools/airstar-live-setup/materialize-patchbay.py",
+        "src/audio-software/carla/projects/pedro-live-rack/pedro.uproject",
+        "src/midi-setup/pedro-live-rack-patchbay.json",
+    }
+    if not required_paths.issubset(set(paths)):
+        raise AssertionError("protected installer/validator coverage is incomplete")
+
+    expected_hashes = {}
+    for record in records:
+        relative = record.get("path")
+        expected = record.get("sha256")
+        if not isinstance(relative, str) or not isinstance(expected, str):
+            raise AssertionError("invalid protected file record")
+        portable = PurePosixPath(relative)
+        if portable.is_absolute() or ".." in portable.parts:
+            raise AssertionError(f"unsafe protected path: {relative}")
+        target = REPOSITORY_ROOT / relative
+        if not target.is_file():
+            raise AssertionError(f"protected artifact is missing: {relative}")
+        actual = portable_text_sha256(target)
+        if actual != expected:
+            raise AssertionError(f"protected artifact changed: {relative}")
+        expected_hashes[relative] = expected
+    completed_cases.append("all-protected-checksums")
+
+    python_tools = (
+        AIRSTAR_ROOT / "materialize-carla-project.py",
+        AIRSTAR_ROOT / "materialize-patchbay.py",
+    )
+    for tool in python_tools:
+        compile(tool.read_text(encoding="utf-8"), str(tool), "exec")
+    completed_cases.append("legacy-python-syntax")
+
+    with tempfile.TemporaryDirectory(
+        prefix="music-rig-protected-regression-"
+    ) as temporary:
+        temporary_root = Path(temporary)
+        for tool in python_tools:
+            help_result = run(
+                [sys.executable, str(tool), "--help"],
+                temporary_root,
+            )
+            require_success(help_result, f"{tool.name} help")
+        completed_cases.append("legacy-python-help")
+
+        graph_path = temporary_root / "current-graph.json"
+        graph_path.write_text(
+            json.dumps(
+                {
+                    "ports": [
+                        {
+                            "node_name": "Regression Sink",
+                            "name": "playback_FL",
+                            "direction": "in",
+                            "alias": "Regression Speakers:playback_FL",
+                            "name_selector": "regression_sink:playback_FL",
+                        },
+                        {
+                            "node_name": "Regression Sink",
+                            "name": "playback_FR",
+                            "direction": "in",
+                            "alias": "Regression Speakers:playback_FR",
+                            "name_selector": "regression_sink:playback_FR",
+                        },
+                    ]
+                },
+                ensure_ascii=True,
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        patchbay_target = temporary_root / "must-not-be-created.json"
+        patchbay_command = [
+            sys.executable,
+            str(AIRSTAR_ROOT / "materialize-patchbay.py"),
+            str(REFERENCE_PATCHBAY),
+            str(graph_path),
+            str(patchbay_target),
+            "--default-node-name",
+            "Regression Sink",
+            "--reference-left-alias",
+            "Speaker + Headphones:playback_FL",
+            "--reference-right-alias",
+            "Speaker + Headphones:playback_FR",
+            "--check-only",
+        ]
+        first_patchbay = run(patchbay_command, REPOSITORY_ROOT)
+        second_patchbay = run(patchbay_command, temporary_root)
+        require_success(first_patchbay, "legacy Patchbay check-only")
+        require_success(second_patchbay, "relocated legacy Patchbay check-only")
+        if first_patchbay.stdout != second_patchbay.stdout:
+            raise AssertionError(
+                "legacy Patchbay diagnostics depend on working directory"
+            )
+        if patchbay_target.exists():
+            raise AssertionError("legacy Patchbay check-only created output")
+        completed_cases.append("legacy-patchbay-check-only")
+
+        carla_target = temporary_root / "must-not-be-created.uproject"
+        missing_asset_result = run(
+            [
+                sys.executable,
+                str(AIRSTAR_ROOT / "materialize-carla-project.py"),
+                str(REFERENCE_CARLA),
+                str(carla_target),
+                "--home",
+                str(temporary_root / "missing-home"),
+                "--soundfont-root",
+                str(temporary_root / "missing-soundfonts"),
+                "--check-only",
+            ],
+            temporary_root,
+        )
+        require_failure(
+            missing_asset_result,
+            "legacy Carla missing asset",
+            "missing project assets",
+        )
+        if carla_target.exists():
+            raise AssertionError("legacy Carla check-only created output")
+        completed_cases.append("legacy-missing-asset-diagnostic")
+
+        if os.name != "nt":
+            bash = shutil.which("bash")
+            if bash is None:
+                raise AssertionError("Bash is required for the Linux regression")
+            shell_tools = [
+                REPOSITORY_ROOT / relative
+                for relative in paths
+                if (REPOSITORY_ROOT / relative)
+                .read_bytes()
+                .startswith(b"#!/usr/bin/env bash")
+            ]
+            for tool in shell_tools:
+                syntax = run([bash, "-n", str(tool)], temporary_root)
+                require_success(syntax, f"{tool.name} syntax")
+            for name in (
+                "install-airstar-live-setup",
+                "validate-airstar-live-setup",
+            ):
+                help_result = run(
+                    [bash, str(AIRSTAR_ROOT / name), "--help"],
+                    temporary_root,
+                )
+                require_success(help_result, f"{name} help")
+            completed_cases.append("legacy-shell-syntax-and-help")
+
+            if shutil.which("jq") and shutil.which("sha256sum"):
+                verifier = run(
+                    [bash, str(AIRSTAR_ROOT / "verify-protected-baseline"), "--quiet"],
+                    temporary_root,
+                )
+                require_success(verifier, "protected baseline verifier")
+                completed_cases.append("protected-verifier")
+
+    if protected_hashes() != expected_hashes:
+        raise AssertionError("read-only regression changed protected artifacts")
+    completed_cases.append("protected-artifacts-unchanged")
+
+    print(
+        "Protected single-rig regression: PASS "
+        f"({len(completed_cases)} cases: {', '.join(completed_cases)})"
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

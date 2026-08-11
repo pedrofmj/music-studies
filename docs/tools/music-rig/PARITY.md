@@ -9,7 +9,8 @@ It does not install or activate the bundle.
 
 The verifier reads four protected repository sources:
 
-- `pedro.uproject` as the Carla plugin and project-connection authority;
+- `pedro.uproject` as the Carla plugin, plugin-asset, and project-connection
+  authority;
 - its `project.json` metadata as the 49-plugin and 111-connection count
   authority;
 - `pedro-live-rack-patchbay.json` as the deployment-link authority; and
@@ -33,6 +34,13 @@ parameters, MIDI mappings, custom data, state chunks, and their ordering.
 `Binary` and `Filename` values are normalized to `<home>` and
 `<soundfont-root>` tokens before fingerprinting. That permits the intended
 relocation while rejecting every other plugin or parameter change.
+
+### Carla Plugin Assets
+
+The 18 nonempty `Binary` and `Filename` records form a multiset keyed by plugin
+name, XML field, and normalized path. A removed path, unexpected path, changed
+owning plugin, or changed multiplicity therefore produces a direct asset
+diagnostic in addition to the full-plugin fingerprint mismatch.
 
 ### Carla Connections
 
@@ -58,9 +66,9 @@ selectors must match exactly.
 ## Acceptance
 
 Passing requires both the protected and materialized inventories to contain
-exactly 49 plugins, 111 Carla project connections, and 115 Patchbay links. The
-plugin map and both multisets must then match exactly. Count-only equality is
-not sufficient.
+exactly 49 plugins, 18 plugin asset references, 111 Carla project connections,
+and 115 Patchbay links. The plugin map and all three multisets must then match
+exactly. Count-only equality is not sufficient.
 
 Run the verifier after temporary materialization:
 
@@ -69,17 +77,22 @@ python3 docs/tools/music-rig/verify-materialized-rig-parity.py \
   --materialized-root "$work_root/bundle"
 ~~~
 
-A passing invocation prints the three protected counts and
+A passing invocation prints the four protected counts and
 `activation=none`. It writes no report, state, cache, service, project, or graph
 data.
 
 The self-test proves the passing inventory and rejects manifest corruption,
 incorrect Rig identity, count-preserving plugin-parameter mapping drift, a
-removed Carla connection, a removed Patchbay link, and count-preserving
-Patchbay selector drift. These tests operate only on temporary copies and
-confirm that the protected sources remain unchanged.
+missing plugin, a missing plugin asset, a removed Carla connection, a removed
+Patchbay link, and count-preserving Patchbay selector drift. These tests
+operate only on temporary copies and confirm that the protected sources remain
+unchanged.
 
 This gate does not prove that external assets or plugins are installed, that
 services are available, or that a live Carla/PipeWire graph matches the bundle.
-Those diagnostics remain in the following Milestone 2 regression task and
-later platform-validation milestones.
+The portable protected-single-rig regression separately proves that the legacy
+materializer reports controlled missing assets and endpoints, that its
+read-only output is independent of the working directory, and that every
+protected installer, validator, helper, service, project, and graph artifact
+retains its baseline checksum. Actual host capability and live-graph evidence
+remain later platform-validation milestones.

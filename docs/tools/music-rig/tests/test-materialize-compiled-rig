@@ -28,6 +28,9 @@ RIG_ROOT = (
     REPOSITORY_ROOT / "src" / "performance-rigs" / "pedro-performance-rig"
 )
 REFERENCE_HOME = "/home/ldap/pedro.ferreira"
+REFERENCE_SOUNDFONT_ROOT = (
+    REFERENCE_HOME + "/Flash/PED/MIDI/Pack de Timbres/Library"
+)
 TARGET_HOME = "/portable-test/home"
 TARGET_SOUNDFONT_ROOT = "/portable-test/soundfonts"
 SINK_NODE = "Portable Test Sink"
@@ -188,7 +191,42 @@ def protected_hashes() -> Mapping[Path, str]:
     return {path: file_sha256(path) for path in paths}
 
 
-def verify_bundle(root: Path) -> None:
+def carla_asset_paths(path: Path) -> list[str]:
+    root = ET.parse(path).getroot()
+    return [
+        element.text
+        for tag in ("Binary", "Filename")
+        for element in root.iter(tag)
+        if element.text
+    ]
+
+
+def relocated_asset_paths(target_home: str, target_soundfont_root: str) -> list[str]:
+    expected = []
+    for value in carla_asset_paths(
+        REPOSITORY_ROOT
+        / "src"
+        / "audio-software"
+        / "carla"
+        / "projects"
+        / "pedro-live-rack"
+        / "pedro.uproject"
+    ):
+        if value == REFERENCE_SOUNDFONT_ROOT or value.startswith(
+            REFERENCE_SOUNDFONT_ROOT + "/"
+        ):
+            value = target_soundfont_root + value[len(REFERENCE_SOUNDFONT_ROOT) :]
+        if value == REFERENCE_HOME or value.startswith(REFERENCE_HOME + "/"):
+            value = target_home + value[len(REFERENCE_HOME) :]
+        expected.append(value)
+    return expected
+
+
+def verify_bundle(
+    root: Path,
+    target_home: str = TARGET_HOME,
+    target_soundfont_root: str = TARGET_SOUNDFONT_ROOT,
+) -> None:
     files = bundle_bytes(root)
     expected = {
         "carla/pedro.uproject",
@@ -199,12 +237,11 @@ def verify_bundle(root: Path) -> None:
         raise AssertionError(f"unexpected bundle files: {sorted(files)}")
 
     carla_path = root / "carla" / "pedro.uproject"
-    carla_text = carla_path.read_text(encoding="utf-8")
     ET.parse(carla_path)
-    if TARGET_HOME not in carla_text or TARGET_SOUNDFONT_ROOT not in carla_text:
-        raise AssertionError("Carla output omitted relocated target roots")
-    if REFERENCE_HOME in carla_text:
-        raise AssertionError("Carla output retained the reference home")
+    actual_paths = carla_asset_paths(carla_path)
+    expected_paths = relocated_asset_paths(target_home, target_soundfont_root)
+    if actual_paths != expected_paths:
+        raise AssertionError("Carla output contains incorrect relocated paths")
 
     patchbay = json.loads(
         (root / "patchbay" / "pedro-live-rack-patchbay.json").read_text(
@@ -268,6 +305,62 @@ def main() -> int:
                 raise AssertionError("materialized bundles are not deterministic")
             completed_cases.append("repeatable-output")
 
+            home_root = temporary_root / "home-relocation-bundle"
+            home_target = "/portable-test/home-relocation"
+            home_soundfont_target = (
+                home_target + "/Flash/PED/MIDI/Pack de Timbres/Library"
+            )
+            home_result = run_materializer(
+                graph_path,
+                output_root=home_root,
+                target_home=home_target,
+                target_soundfont_root=home_soundfont_target,
+            )
+            require_success(home_result, "home relocation")
+            verify_bundle(
+                home_root,
+                target_home=home_target,
+                target_soundfont_root=home_soundfont_target,
+            )
+            home_manifest = json.loads(
+                (home_root / "materialization.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            if home_manifest["relocation"]["carla_path_replacements"] != 18:
+                raise AssertionError("home relocation changed the wrong paths")
+            completed_cases.append("home-relocation")
+
+            soundfont_only_root = temporary_root / "soundfont-only-bundle"
+            soundfont_only_target = "/portable-test/soundfonts-only"
+            soundfont_only = run_materializer(
+                graph_path,
+                output_root=soundfont_only_root,
+                target_home=REFERENCE_HOME,
+                target_soundfont_root=soundfont_only_target,
+            )
+            require_success(soundfont_only, "SoundFont-only relocation")
+            verify_bundle(
+                soundfont_only_root,
+                target_home=REFERENCE_HOME,
+                target_soundfont_root=soundfont_only_target,
+            )
+            soundfont_only_manifest = json.loads(
+                (soundfont_only_root / "materialization.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            if (
+                soundfont_only_manifest["relocation"][
+                    "carla_path_replacements"
+                ]
+                != 15
+            ):
+                raise AssertionError(
+                    "SoundFont-only relocation changed the wrong paths"
+                )
+            completed_cases.append("soundfont-only-relocation")
+
             crlf_repository = temporary_root / "crlf-repository"
             source_paths = [
                 Path(
@@ -308,12 +401,14 @@ def main() -> int:
                 graph_path,
                 output_root=identity_root,
                 target_home=REFERENCE_HOME,
-                target_soundfont_root=(
-                    REFERENCE_HOME
-                    + "/Flash/PED/MIDI/Pack de Timbres/Library"
-                ),
+                target_soundfont_root=REFERENCE_SOUNDFONT_ROOT,
             )
             require_success(identity, "identity relocation")
+            verify_bundle(
+                identity_root,
+                target_home=REFERENCE_HOME,
+                target_soundfont_root=REFERENCE_SOUNDFONT_ROOT,
+            )
             identity_manifest = json.loads(
                 (identity_root / "materialization.json").read_text(
                     encoding="utf-8"
@@ -376,7 +471,7 @@ def main() -> int:
             require_failure(broken, "missing sink", "expected one")
             if broken_root.exists():
                 raise AssertionError("missing-sink failure created an output root")
-            completed_cases.append("missing-sink-rejected")
+            completed_cases.append("missing-endpoint-diagnostic")
     finally:
         if forbidden_root.exists():
             shutil.rmtree(forbidden_root)
