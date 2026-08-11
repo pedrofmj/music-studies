@@ -3,19 +3,14 @@
 
 #include "music_rig/core.h"
 #include "music_rig/protocol.h"
+#include "music_rig/state.h"
+#include "music_rig/storage.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#define MUSIC_RIG_RUNTIME_ABI_VERSION UINT32_C(1)
-#define MUSIC_RIG_RUNTIME_STATE_VERSION UINT32_C(1)
-#define MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE ((size_t)32)
-
-typedef enum music_rig_output_mode {
-    MUSIC_RIG_OUTPUT_SUPPRESSED = 0,
-    MUSIC_RIG_OUTPUT_ENABLED = 1
-} music_rig_output_mode;
+#define MUSIC_RIG_RUNTIME_ABI_VERSION UINT32_C(2)
 
 typedef enum music_rig_runtime_lifecycle {
     MUSIC_RIG_RUNTIME_UNINITIALIZED = 0,
@@ -52,6 +47,9 @@ typedef struct music_rig_runtime_metrics {
     uint64_t control_responses;
     uint64_t generation_publications;
     uint64_t generation_conflicts;
+    uint64_t state_restores;
+    uint64_t state_fallbacks;
+    uint64_t state_writes;
     uint64_t adapter_failures;
 } music_rig_runtime_metrics;
 
@@ -79,6 +77,7 @@ typedef struct music_rig_platform_interfaces {
     uint32_t abi_version;
     music_rig_clock_adapter clock;
     music_rig_control_adapter control;
+    music_rig_storage_adapter storage;
 } music_rig_platform_interfaces;
 
 typedef struct music_rig_runtime_config {
@@ -92,6 +91,7 @@ typedef struct music_rig_runtime_config {
 typedef struct music_rig_runtime {
     music_rig_runtime_state state;
     music_rig_runtime_metrics metrics;
+    music_rig_generation initial_generation;
     music_rig_generation_slot generations;
     music_rig_platform_interfaces interfaces;
     bool control_started;
@@ -110,6 +110,8 @@ music_rig_result music_rig_runtime_publish_generation(
 );
 
 music_rig_result music_rig_runtime_run(music_rig_runtime *runtime);
+
+music_rig_result music_rig_runtime_persist_state(music_rig_runtime *runtime);
 
 const music_rig_runtime_state *music_rig_runtime_get_state(
     const music_rig_runtime *runtime

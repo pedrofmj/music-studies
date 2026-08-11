@@ -3,10 +3,10 @@
 This directory contains the Configurable Performance Rig implementation.
 
 Status: Milestones 0 through 2 are complete. Milestone 3 is in progress with a
-portable, output-suppressed runtime control loop and an inert `music-rigd`
-binary. It does not install a service, read or write persistent runtime state,
-create an IPC endpoint, connect to MIDI or audio, or modify the stable
-Carla/PipeWire setup.
+portable, output-suppressed runtime control loop, qualified persistent-state
+contract, checked definition-metadata loader, and inert `music-rigd` binary. It
+does not implement platform storage paths, install a service, create an IPC
+endpoint, connect to MIDI or audio, or modify the stable Carla/PipeWire setup.
 
 ## Safety Boundary
 
@@ -143,17 +143,23 @@ tests claims installed-asset or live-graph availability. See
 ## Portable Runtime Control Loop
 
 [`runtime/core/music_rig_runtime.c`](runtime/core/music_rig_runtime.c) provides
-the first Milestone 3 daemon core: fixed-storage lifecycle state, saturating
-metrics, expected-generation publication, and ABI-versioned clock/control
-adapter callbacks. Its event-driven loop handles decoded status requests,
-idle waits, responses, and shutdown through mock adapters. Output-enabled mode
-is rejected.
+the Milestone 3 daemon core: fixed-storage lifecycle state, a checksummed
+persistent-state frame, saturating metrics, expected-generation publication,
+and ABI-versioned clock/control/storage callbacks. Its event-driven loop handles
+decoded status requests, idle waits, responses, and shutdown through mock
+adapters. Output-enabled mode is rejected.
+
+[`runtime/core/music_rig_definition.c`](runtime/core/music_rig_definition.c)
+loads bounded definition metadata through logical storage and decoder adapters.
+The optional `json-c` adapter validates the checked-in compiled
+`full-live-rack` envelope and hands its metadata to an immutable generation; it
+does not yet decode executable mapping tables.
 
 [`music-rigd`](music-rigd.c) is currently an inert build target. It supports
-version/help output but refuses a no-argument start and has no definition,
-transport, state, installation, service, MIDI, audio, graph, or plugin-host
-path. See [RUNTIME.md](RUNTIME.md) for ownership, lifecycle, adapter, metric,
-failure, and next-slice contracts.
+version/help output but refuses a no-argument start and has no configured
+definition/state path, transport, installation, service, MIDI, audio, graph, or
+plugin-host path. See [RUNTIME.md](RUNTIME.md) for ownership, lifecycle, storage,
+adapter, metric, failure, and next-slice contracts.
 
 Run the validator directly:
 

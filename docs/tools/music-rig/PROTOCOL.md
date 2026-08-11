@@ -43,6 +43,9 @@ The runtime implements only the `status` operation. Its result codes are:
 | 3 | Invalid runtime lifecycle state |
 | 4 | Platform adapter failure |
 | 5 | Expected-generation conflict |
+| 6 | Requested storage object not found |
+| 7 | Invalid or corrupt structured data |
+| 8 | Caller-owned buffer is too small |
 
 For status, a zero expected generation means no precondition. A nonzero value
 must match the current published generation or the response returns code 5.

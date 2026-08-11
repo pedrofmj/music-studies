@@ -29,7 +29,10 @@ static int test_build_info(void)
         MUSIC_RIG_RESULT_INVALID_ARGUMENT != 2 ||
         MUSIC_RIG_RESULT_INVALID_STATE != 3 ||
         MUSIC_RIG_RESULT_ADAPTER_FAILURE != 4 ||
-        MUSIC_RIG_RESULT_GENERATION_CONFLICT != 5) {
+        MUSIC_RIG_RESULT_GENERATION_CONFLICT != 5 ||
+        MUSIC_RIG_RESULT_NOT_FOUND != 6 ||
+        MUSIC_RIG_RESULT_INVALID_DATA != 7 ||
+        MUSIC_RIG_RESULT_BUFFER_TOO_SMALL != 8) {
         fputs("result code contract mismatch\n", stderr);
         return 1;
     }

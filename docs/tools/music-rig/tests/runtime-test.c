@@ -10,18 +10,25 @@ typedef struct mock_adapter {
     music_rig_control_poll events[MOCK_EVENT_CAPACITY];
     music_rig_protocol_request requests[MOCK_EVENT_CAPACITY];
     music_rig_protocol_response responses[MOCK_RESPONSE_CAPACITY];
+    uint8_t state_frame[MUSIC_RIG_RUNTIME_STATE_FRAME_SIZE];
     size_t event_count;
     size_t event_index;
     size_t response_count;
+    size_t state_size;
     uint64_t now_ns;
     unsigned int start_calls;
     unsigned int wait_calls;
     unsigned int respond_calls;
     unsigned int stop_calls;
+    unsigned int state_read_calls;
+    unsigned int state_replace_calls;
+    bool state_exists;
     music_rig_result start_result;
     music_rig_result wait_result;
     music_rig_result respond_result;
     music_rig_result stop_result;
+    music_rig_result state_read_result;
+    music_rig_result state_replace_result;
 } mock_adapter;
 
 static uint64_t mock_now_ns(void *opaque)
@@ -93,6 +100,57 @@ static music_rig_result mock_stop(void *opaque)
     return adapter->stop_result;
 }
 
+static music_rig_result mock_storage_read(
+    void *opaque,
+    music_rig_storage_object object,
+    uint8_t *output,
+    size_t output_capacity,
+    size_t *output_size
+)
+{
+    mock_adapter *adapter = opaque;
+
+    adapter->state_read_calls += 1U;
+    if (object != MUSIC_RIG_STORAGE_RUNTIME_STATE) {
+        return MUSIC_RIG_RESULT_NOT_FOUND;
+    }
+    if (adapter->state_read_result != MUSIC_RIG_RESULT_OK) {
+        return adapter->state_read_result;
+    }
+    if (!adapter->state_exists) {
+        return MUSIC_RIG_RESULT_NOT_FOUND;
+    }
+    if (output_capacity < adapter->state_size) {
+        return MUSIC_RIG_RESULT_BUFFER_TOO_SMALL;
+    }
+    memcpy(output, adapter->state_frame, adapter->state_size);
+    *output_size = adapter->state_size;
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result mock_storage_replace(
+    void *opaque,
+    music_rig_storage_object object,
+    const uint8_t *input,
+    size_t input_size
+)
+{
+    mock_adapter *adapter = opaque;
+
+    adapter->state_replace_calls += 1U;
+    if (adapter->state_replace_result != MUSIC_RIG_RESULT_OK) {
+        return adapter->state_replace_result;
+    }
+    if (object != MUSIC_RIG_STORAGE_RUNTIME_STATE ||
+        input_size != sizeof(adapter->state_frame)) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+    memcpy(adapter->state_frame, input, input_size);
+    adapter->state_size = input_size;
+    adapter->state_exists = true;
+    return MUSIC_RIG_RESULT_OK;
+}
+
 static void init_mock(mock_adapter *adapter)
 {
     memset(adapter, 0, sizeof(*adapter));
@@ -100,6 +158,8 @@ static void init_mock(mock_adapter *adapter)
     adapter->wait_result = MUSIC_RIG_RESULT_OK;
     adapter->respond_result = MUSIC_RIG_RESULT_OK;
     adapter->stop_result = MUSIC_RIG_RESULT_OK;
+    adapter->state_read_result = MUSIC_RIG_RESULT_OK;
+    adapter->state_replace_result = MUSIC_RIG_RESULT_OK;
 }
 
 static music_rig_platform_interfaces interfaces_for(mock_adapter *adapter)
@@ -115,6 +175,10 @@ static music_rig_platform_interfaces interfaces_for(mock_adapter *adapter)
     interfaces.control.wait = mock_wait;
     interfaces.control.respond = mock_respond;
     interfaces.control.stop = mock_stop;
+    interfaces.storage.abi_version = MUSIC_RIG_STORAGE_ABI_VERSION;
+    interfaces.storage.context = adapter;
+    interfaces.storage.read = mock_storage_read;
+    interfaces.storage.atomic_replace = mock_storage_replace;
     return interfaces;
 }
 
@@ -215,7 +279,8 @@ static int test_lifecycle_and_metrics(void)
             &runtime,
             &next,
             UINT64_C(8)
-        ) != MUSIC_RIG_RESULT_GENERATION_CONFLICT) {
+        ) != MUSIC_RIG_RESULT_GENERATION_CONFLICT ||
+        music_rig_runtime_persist_state(&runtime) != MUSIC_RIG_RESULT_OK) {
         fputs("runtime generation publication failed\n", stderr);
         return 1;
     }
@@ -232,7 +297,8 @@ static int test_lifecycle_and_metrics(void)
         state->stopped_at_ns != UINT64_C(20) ||
         adapter.start_calls != 1U || adapter.wait_calls != 1U ||
         adapter.respond_calls != 3U || adapter.stop_calls != 1U ||
-        adapter.response_count != 3U) {
+        adapter.response_count != 3U || adapter.state_read_calls != 1U ||
+        adapter.state_replace_calls != 1U) {
         fputs("runtime lifecycle state is incorrect\n", stderr);
         return 1;
     }
@@ -257,17 +323,128 @@ static int test_lifecycle_and_metrics(void)
         metrics->control_responses != UINT64_C(3) ||
         metrics->generation_publications != UINT64_C(1) ||
         metrics->generation_conflicts != UINT64_C(3) ||
+        metrics->state_restores != UINT64_C(0) ||
+        metrics->state_fallbacks != UINT64_C(0) ||
+        metrics->state_writes != UINT64_C(1) ||
         metrics->adapter_failures != UINT64_C(0)) {
         fputs("runtime metrics are incorrect\n", stderr);
         return 1;
     }
     if (music_rig_runtime_run(&runtime) != MUSIC_RIG_RESULT_INVALID_STATE ||
+        music_rig_runtime_persist_state(&runtime) !=
+            MUSIC_RIG_RESULT_INVALID_STATE ||
         music_rig_runtime_publish_generation(
             &runtime,
             &next,
             UINT64_C(8)
         ) != MUSIC_RIG_RESULT_INVALID_STATE) {
         fputs("stopped runtime accepted work\n", stderr);
+        return 1;
+    }
+    return 0;
+}
+
+static int test_persisted_state(void)
+{
+    static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
+        0x30, 0x31, 0x32, 0x33
+    };
+    static const uint8_t changed_fingerprint[
+        MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE
+    ] = {0x40};
+    const music_rig_generation initial = {UINT64_C(7), NULL};
+    const music_rig_generation next = {UINT64_C(8), NULL};
+    music_rig_runtime runtime;
+    music_rig_platform_interfaces interfaces;
+    music_rig_runtime_config config;
+    music_rig_persisted_state older;
+    mock_adapter adapter;
+
+    init_mock(&adapter);
+    interfaces = interfaces_for(&adapter);
+    config = config_for(&initial, fingerprint);
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_OK ||
+        music_rig_runtime_publish_generation(
+            &runtime,
+            &next,
+            UINT64_C(7)
+        ) != MUSIC_RIG_RESULT_OK ||
+        music_rig_runtime_persist_state(&runtime) != MUSIC_RIG_RESULT_OK) {
+        fputs("runtime state setup failed\n", stderr);
+        return 1;
+    }
+
+    interfaces = interfaces_for(&adapter);
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_OK ||
+        runtime.state.generation_id != UINT64_C(8) ||
+        runtime.metrics.state_restores != UINT64_C(1)) {
+        fputs("qualified runtime state was not restored\n", stderr);
+        return 1;
+    }
+
+    config = config_for(&initial, changed_fingerprint);
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_OK ||
+        runtime.state.generation_id != UINT64_C(7) ||
+        runtime.metrics.state_fallbacks != UINT64_C(1)) {
+        fputs("changed definition did not fall back safely\n", stderr);
+        return 1;
+    }
+
+    adapter.state_frame[20] ^= UINT8_C(1);
+    config = config_for(&initial, fingerprint);
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+        MUSIC_RIG_RESULT_INVALID_DATA) {
+        fputs("corrupt runtime state was accepted\n", stderr);
+        return 1;
+    }
+
+    memset(&older, 0, sizeof(older));
+    older.generation_id = UINT64_C(6);
+    memcpy(
+        older.definition_fingerprint,
+        fingerprint,
+        MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE
+    );
+    older.output_mode = MUSIC_RIG_OUTPUT_SUPPRESSED;
+    if (music_rig_state_encode(
+            &older,
+            adapter.state_frame,
+            sizeof(adapter.state_frame)
+        ) != MUSIC_RIG_RESULT_OK) {
+        fputs("older runtime state fixture failed\n", stderr);
+        return 1;
+    }
+    adapter.state_size = sizeof(adapter.state_frame);
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_OK ||
+        runtime.state.generation_id != UINT64_C(7) ||
+        runtime.metrics.state_fallbacks != UINT64_C(1)) {
+        fputs("older runtime state did not fall back safely\n", stderr);
+        return 1;
+    }
+
+    init_mock(&adapter);
+    adapter.state_read_result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    interfaces = interfaces_for(&adapter);
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_ADAPTER_FAILURE ||
+        runtime.metrics.adapter_failures != UINT64_C(1)) {
+        fputs("runtime state read failure was hidden\n", stderr);
+        return 1;
+    }
+
+    init_mock(&adapter);
+    adapter.state_replace_result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    interfaces = interfaces_for(&adapter);
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_OK ||
+        music_rig_runtime_persist_state(&runtime) !=
+            MUSIC_RIG_RESULT_ADAPTER_FAILURE ||
+        runtime.metrics.adapter_failures != UINT64_C(1)) {
+        fputs("runtime state replace failure was hidden\n", stderr);
         return 1;
     }
     return 0;
@@ -381,12 +558,21 @@ static int test_invalid_configuration(void)
         fputs("invalid runtime configuration was accepted\n", stderr);
         return 1;
     }
+
+    interfaces = interfaces_for(&adapter);
+    interfaces.storage.abi_version += UINT32_C(1);
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+        MUSIC_RIG_RESULT_INVALID_ARGUMENT) {
+        fputs("invalid storage adapter ABI was accepted\n", stderr);
+        return 1;
+    }
     return 0;
 }
 
 int main(void)
 {
     if (test_lifecycle_and_metrics() != 0 ||
+        test_persisted_state() != 0 ||
         test_adapter_failures() != 0 ||
         test_invalid_configuration() != 0) {
         return 1;

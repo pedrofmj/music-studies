@@ -1,8 +1,12 @@
-if(NOT DEFINED RUNTIME_SOURCE)
-    message(FATAL_ERROR "RUNTIME_SOURCE is required")
+if(NOT DEFINED RUNTIME_DIR)
+    message(FATAL_ERROR "RUNTIME_DIR is required")
 endif()
 
-file(READ "${RUNTIME_SOURCE}" CONTENTS)
+set(RUNTIME_SOURCES
+    "${RUNTIME_DIR}/music_rig_definition.c"
+    "${RUNTIME_DIR}/music_rig_runtime.c"
+    "${RUNTIME_DIR}/music_rig_state.c"
+)
 set(FORBIDDEN_CALLS
     malloc
     calloc
@@ -17,16 +21,20 @@ set(FORBIDDEN_CALLS
     call_once
 )
 
-foreach(FORBIDDEN_CALL IN LISTS FORBIDDEN_CALLS)
-    string(
-        REGEX MATCH
-        "(^|[^A-Za-z0-9_])${FORBIDDEN_CALL}[ \t\r\n]*\\("
-        MATCHED_CALL
-        "${CONTENTS}"
-    )
-    if(MATCHED_CALL)
-        message(FATAL_ERROR
-            "Portable runtime contains forbidden call ${FORBIDDEN_CALL}"
+foreach(RUNTIME_SOURCE IN LISTS RUNTIME_SOURCES)
+    file(READ "${RUNTIME_SOURCE}" CONTENTS)
+    foreach(FORBIDDEN_CALL IN LISTS FORBIDDEN_CALLS)
+        string(
+            REGEX MATCH
+            "(^|[^A-Za-z0-9_])${FORBIDDEN_CALL}[ \t\r\n]*\\("
+            MATCHED_CALL
+            "${CONTENTS}"
         )
-    endif()
+        if(MATCHED_CALL)
+            message(FATAL_ERROR
+                "Portable runtime source ${RUNTIME_SOURCE} contains forbidden "
+                "call ${FORBIDDEN_CALL}"
+            )
+        endif()
+    endforeach()
 endforeach()

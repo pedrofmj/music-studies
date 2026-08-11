@@ -21,7 +21,55 @@ static bool interfaces_are_valid(
         interfaces->control.poll != NULL &&
         interfaces->control.wait != NULL &&
         interfaces->control.respond != NULL &&
-        interfaces->control.stop != NULL;
+        interfaces->control.stop != NULL &&
+        interfaces->storage.abi_version == MUSIC_RIG_STORAGE_ABI_VERSION &&
+        interfaces->storage.read != NULL &&
+        interfaces->storage.atomic_replace != NULL;
+}
+
+static music_rig_result restore_state(music_rig_runtime *runtime)
+{
+    uint8_t frame[MUSIC_RIG_RUNTIME_STATE_FRAME_SIZE];
+    size_t frame_size = 0;
+    music_rig_persisted_state persisted;
+    music_rig_result result;
+
+    result = runtime->interfaces.storage.read(
+        runtime->interfaces.storage.context,
+        MUSIC_RIG_STORAGE_RUNTIME_STATE,
+        frame,
+        sizeof(frame),
+        &frame_size
+    );
+    if (result == MUSIC_RIG_RESULT_NOT_FOUND) {
+        return MUSIC_RIG_RESULT_OK;
+    }
+    if (result == MUSIC_RIG_RESULT_BUFFER_TOO_SMALL) {
+        return MUSIC_RIG_RESULT_INVALID_DATA;
+    }
+    if (result != MUSIC_RIG_RESULT_OK) {
+        increment(&runtime->metrics.adapter_failures);
+        return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    }
+
+    result = music_rig_state_decode(frame, frame_size, &persisted);
+    if (result != MUSIC_RIG_RESULT_OK) {
+        return result;
+    }
+    if (memcmp(
+            persisted.definition_fingerprint,
+            runtime->state.definition_fingerprint,
+            MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE
+        ) != 0 ||
+        persisted.generation_id < runtime->initial_generation.id) {
+        increment(&runtime->metrics.state_fallbacks);
+        return MUSIC_RIG_RESULT_OK;
+    }
+
+    runtime->initial_generation.id = persisted.generation_id;
+    runtime->state.generation_id = persisted.generation_id;
+    increment(&runtime->metrics.state_restores);
+    return MUSIC_RIG_RESULT_OK;
 }
 
 static music_rig_result finish(
@@ -94,6 +142,7 @@ music_rig_result music_rig_runtime_init(
 
     if (runtime == NULL || config == NULL ||
         config->initial_generation == NULL ||
+        config->initial_generation->id == UINT64_C(0) ||
         config->definition_fingerprint == NULL ||
         config->definition_fingerprint_size !=
             MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE ||
@@ -105,16 +154,9 @@ music_rig_result music_rig_runtime_init(
     }
 
     memset(runtime, 0, sizeof(*runtime));
-    result = music_rig_generation_slot_init(
-        &runtime->generations,
-        config->initial_generation
-    );
-    if (result != MUSIC_RIG_RESULT_OK) {
-        return result;
-    }
-
+    runtime->interfaces = *interfaces;
+    runtime->initial_generation = *config->initial_generation;
     runtime->state.schema_version = MUSIC_RIG_RUNTIME_STATE_VERSION;
-    runtime->state.lifecycle = MUSIC_RIG_RUNTIME_INITIALIZED;
     runtime->state.generation_id = config->initial_generation->id;
     memcpy(
         runtime->state.definition_fingerprint,
@@ -122,7 +164,18 @@ music_rig_result music_rig_runtime_init(
         MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE
     );
     runtime->state.output_mode = config->output_mode;
-    runtime->interfaces = *interfaces;
+    result = restore_state(runtime);
+    if (result != MUSIC_RIG_RESULT_OK) {
+        return result;
+    }
+    result = music_rig_generation_slot_init(
+        &runtime->generations,
+        &runtime->initial_generation
+    );
+    if (result != MUSIC_RIG_RESULT_OK) {
+        return result;
+    }
+    runtime->state.lifecycle = MUSIC_RIG_RUNTIME_INITIALIZED;
     return MUSIC_RIG_RESULT_OK;
 }
 
@@ -225,6 +278,45 @@ music_rig_result music_rig_runtime_run(music_rig_runtime *runtime)
             return adapter_failure(runtime);
         }
     }
+}
+
+music_rig_result music_rig_runtime_persist_state(music_rig_runtime *runtime)
+{
+    uint8_t frame[MUSIC_RIG_RUNTIME_STATE_FRAME_SIZE];
+    music_rig_persisted_state persisted;
+    music_rig_result result;
+
+    if (runtime == NULL) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+    if (runtime->state.lifecycle != MUSIC_RIG_RUNTIME_INITIALIZED &&
+        runtime->state.lifecycle != MUSIC_RIG_RUNTIME_RUNNING) {
+        return MUSIC_RIG_RESULT_INVALID_STATE;
+    }
+
+    persisted.generation_id = runtime->state.generation_id;
+    memcpy(
+        persisted.definition_fingerprint,
+        runtime->state.definition_fingerprint,
+        MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE
+    );
+    persisted.output_mode = runtime->state.output_mode;
+    result = music_rig_state_encode(&persisted, frame, sizeof(frame));
+    if (result != MUSIC_RIG_RESULT_OK) {
+        return result;
+    }
+    result = runtime->interfaces.storage.atomic_replace(
+        runtime->interfaces.storage.context,
+        MUSIC_RIG_STORAGE_RUNTIME_STATE,
+        frame,
+        sizeof(frame)
+    );
+    if (result != MUSIC_RIG_RESULT_OK) {
+        increment(&runtime->metrics.adapter_failures);
+        return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    }
+    increment(&runtime->metrics.state_writes);
+    return MUSIC_RIG_RESULT_OK;
 }
 
 const music_rig_runtime_state *music_rig_runtime_get_state(

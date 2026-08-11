@@ -15,9 +15,10 @@ result is an immutable runtime generation, and only that generation may be
 published to audio or MIDI callbacks. No callback may call `json-c`, allocate
 a JSON object, read a definition file, or serialize JSON.
 
-The portable core and the current CLI skeleton remain independent of
-`json-c`. The Milestone 0 target that links it is an opt-in measurement probe,
-not an installed runtime.
+The portable core and current CLI/daemon skeletons remain independent of
+`json-c`. The opt-in build now contains both the Milestone 0 footprint probe and
+the Milestone 3 compiled-definition metadata decoder. Neither is installed or
+activated.
 
 ## Linux Evidence
 
@@ -52,8 +53,9 @@ ctest --test-dir /tmp/music-rig-build-json-c -V \
   -R '^music_rig_json_c_spike$'
 ~~~
 
-The probe rejects headers or a loaded runtime older than 0.17. The option is
-off by default, so a normal build neither discovers nor links `json-c`.
+The probe and definition decoder reject headers or a loaded runtime older than
+0.17. The option is off by default, so a normal build neither discovers nor
+links `json-c`.
 
 ## Windows Evidence
 
@@ -98,5 +100,6 @@ cmake --build build/music-rig-json-c --config Release
 ctest --test-dir build/music-rig-json-c -C Release --output-on-failure
 ```
 
-The probe and dependency remain opt-in. A version or package-path change must
-repeat the build, exact-fixture, linkage, license, and footprint checks.
+The probe, metadata decoder, and dependency remain opt-in. A version or
+package-path change must repeat the build, exact-fixture, linkage, license, and
+footprint checks.

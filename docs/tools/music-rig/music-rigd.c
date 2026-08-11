@@ -18,7 +18,9 @@ int main(int argc, char **argv)
         build_info = music_rig_get_build_info();
         printf("music-rigd %s\n", build_info->core_version);
         printf("protocol %u\n", build_info->protocol_version);
+        printf("runtime-abi %u\n", MUSIC_RIG_RUNTIME_ABI_VERSION);
         printf("runtime-state %u\n", MUSIC_RIG_RUNTIME_STATE_VERSION);
+        printf("storage-abi %u\n", MUSIC_RIG_STORAGE_ABI_VERSION);
         printf("output-mode suppressed-only\n");
         return MUSIC_RIG_RESULT_OK;
     }

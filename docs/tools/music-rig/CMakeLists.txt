@@ -5,14 +5,16 @@ project(music_rig VERSION 0.1.0 LANGUAGES C)
 include(CTest)
 option(
     MUSIC_RIG_ENABLE_JSON_C_SPIKE
-    "Build the optional json-c dependency and footprint probe"
+    "Build the optional json-c definition adapter and footprint probe"
     OFF
 )
 
 add_library(music_rig_core STATIC
     runtime/core/music_rig_core.c
+    runtime/core/music_rig_definition.c
     runtime/core/music_rig_protocol.c
     runtime/core/music_rig_runtime.c
+    runtime/core/music_rig_state.c
 )
 target_include_directories(music_rig_core
     PUBLIC
@@ -82,6 +84,14 @@ if(BUILD_TESTING)
         tests/runtime-test.c
     )
     target_link_libraries(music_rig_runtime_test PRIVATE music_rig_core)
+    add_executable(music_rig_state_test
+        tests/state-test.c
+    )
+    target_link_libraries(music_rig_state_test PRIVATE music_rig_core)
+    add_executable(music_rig_definition_test
+        tests/definition-test.c
+    )
+    target_link_libraries(music_rig_definition_test PRIVATE music_rig_core)
 
     if(MSVC)
         target_compile_options(music_rig_core_test PRIVATE
@@ -91,6 +101,12 @@ if(BUILD_TESTING)
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
         target_compile_options(music_rig_runtime_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+        target_compile_options(music_rig_state_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+        target_compile_options(music_rig_definition_test PRIVATE
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
     else()
@@ -112,11 +128,25 @@ if(BUILD_TESTING)
             -Wpedantic
             -Werror
         )
+        target_compile_options(music_rig_state_test PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+        target_compile_options(music_rig_definition_test PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
     endif()
 
     add_test(NAME music_rig_core_test COMMAND music_rig_core_test)
     add_test(NAME music_rig_protocol_test COMMAND music_rig_protocol_test)
     add_test(NAME music_rig_runtime_test COMMAND music_rig_runtime_test)
+    add_test(NAME music_rig_state_test COMMAND music_rig_state_test)
+    add_test(NAME music_rig_definition_test COMMAND music_rig_definition_test)
     add_test(
         NAME music_rig_core_portability
         COMMAND "${CMAKE_COMMAND}"
@@ -155,7 +185,7 @@ if(BUILD_TESTING)
     add_test(
         NAME music_rig_runtime_boundary
         COMMAND "${CMAKE_COMMAND}"
-            "-DRUNTIME_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}/runtime/core/music_rig_runtime.c"
+            "-DRUNTIME_DIR=${CMAKE_CURRENT_SOURCE_DIR}/runtime/core"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-runtime-boundary.cmake"
     )
 
@@ -307,6 +337,23 @@ if(BUILD_TESTING)
             )
         endif()
         find_package(json-c CONFIG REQUIRED)
+        add_library(music_rig_definition_json STATIC
+            runtime/json-c/music_rig_definition_json.c
+        )
+        target_compile_features(music_rig_definition_json PRIVATE c_std_17)
+        set_target_properties(music_rig_definition_json PROPERTIES
+            C_EXTENSIONS OFF
+        )
+        target_link_libraries(music_rig_definition_json
+            PUBLIC music_rig_core
+            PRIVATE json-c::json-c
+        )
+        add_executable(music_rig_json_definition_test
+            tests/json-definition-test.c
+        )
+        target_link_libraries(music_rig_json_definition_test
+            PRIVATE music_rig_definition_json
+        )
         if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
             set(MUSIC_RIG_JSON_C_SPIKE_SOURCE tests/linux-json-c-spike.c)
         else()
@@ -335,6 +382,18 @@ if(BUILD_TESTING)
                 -Wpedantic
                 -Werror
             )
+            target_compile_options(music_rig_definition_json PRIVATE
+                -Wall
+                -Wextra
+                -Wpedantic
+                -Werror
+            )
+            target_compile_options(music_rig_json_definition_test PRIVATE
+                -Wall
+                -Wextra
+                -Wpedantic
+                -Werror
+            )
             add_test(
                 NAME music_rig_json_c_spike
                 COMMAND music_rig_json_c_spike
@@ -345,6 +404,12 @@ if(BUILD_TESTING)
                 MUSIC_RIG_JSON_C_LINKAGE="static-vcpkg"
             )
             target_compile_options(music_rig_json_c_spike PRIVATE
+                ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+            )
+            target_compile_options(music_rig_definition_json PRIVATE
+                ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+            )
+            target_compile_options(music_rig_json_definition_test PRIVATE
                 ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
             )
             target_link_libraries(music_rig_json_c_spike PRIVATE Psapi)
@@ -358,6 +423,15 @@ if(BUILD_TESTING)
         set_tests_properties(
             music_rig_json_c_spike
             PROPERTIES TIMEOUT 30
+        )
+        add_test(
+            NAME music_rig_json_definition
+            COMMAND music_rig_json_definition_test
+                "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-current-envelope.json"
+        )
+        set_tests_properties(
+            music_rig_json_definition
+            PROPERTIES TIMEOUT 10
         )
     endif()
 
