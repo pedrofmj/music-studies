@@ -176,7 +176,14 @@ static int test_full_definition_shadow(
         metrics->mapping_decisions == UINT64_C(5) &&
         metrics->unmapped_events == UINT64_C(0) &&
         metrics->malformed_events == UINT64_C(0) &&
-        metrics->suppressed_midi_events == UINT64_C(2);
+        metrics->suppressed_midi_events == UINT64_C(2) &&
+        metrics->slots[0].mapping_decisions == UINT64_C(1) &&
+        metrics->slots[1].mapping_decisions == UINT64_C(1) &&
+        metrics->slots[2].mapping_decisions == UINT64_C(1) &&
+        metrics->slots[3].mapping_decisions == UINT64_C(1) &&
+        metrics->slots[4].mapping_decisions == UINT64_C(1) &&
+        metrics->slots[0].suppressed_midi_events == UINT64_C(1) &&
+        metrics->slots[4].suppressed_midi_events == UINT64_C(1);
 }
 
 int main(int argc, char **argv)

@@ -795,6 +795,21 @@ if(BUILD_TESTING)
         target_link_libraries(music_rig_json_definition_test
             PRIVATE music_rig_definition_json music_rig_device_midi_shadow
         )
+        add_executable(music_rig_shadow_idle_workload
+            tests/shadow-idle-workload.c
+        )
+        target_link_libraries(music_rig_shadow_idle_workload
+            PRIVATE
+                music_rig_definition_json
+                music_rig_device_midi_shadow
+                music_rig_file_storage
+        )
+        target_compile_features(
+            music_rig_shadow_idle_workload PRIVATE c_std_17
+        )
+        set_target_properties(music_rig_shadow_idle_workload PROPERTIES
+            C_EXTENSIONS OFF
+        )
         if(TARGET music_rig_jack_midi_shadow)
             add_library(music_rig_fake_jack_midi_shadow SHARED
                 tests/fake-jack-midi-shadow.c
@@ -865,6 +880,12 @@ if(BUILD_TESTING)
                 -Wpedantic
                 -Werror
             )
+            target_compile_options(music_rig_shadow_idle_workload PRIVATE
+                -Wall
+                -Wextra
+                -Wpedantic
+                -Werror
+            )
             add_test(
                 NAME music_rig_json_c_spike
                 COMMAND music_rig_json_c_spike
@@ -878,6 +899,9 @@ if(BUILD_TESTING)
                 ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
             )
             target_compile_options(music_rig_json_definition_test PRIVATE
+                ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+            )
+            target_compile_options(music_rig_shadow_idle_workload PRIVATE
                 ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
             )
             target_link_libraries(music_rig_json_c_spike PRIVATE Psapi)
@@ -896,6 +920,52 @@ if(BUILD_TESTING)
             NAME music_rig_json_definition
             COMMAND music_rig_json_definition_test
                 "${MUSIC_RIG_JSON_DEFINITION_FIXTURE}"
+        )
+        add_test(
+            NAME music_rig_shadow_idle_workload
+            COMMAND music_rig_shadow_idle_workload
+                --definition "${MUSIC_RIG_JSON_DEFINITION_FIXTURE}"
+                --expected-fingerprint
+                "${MUSIC_RIG_JSON_DEFINITION_FINGERPRINT}"
+                --duration-ms 50
+        )
+        set_tests_properties(
+            music_rig_shadow_idle_workload PROPERTIES TIMEOUT 5
+        )
+        if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+            add_test(
+                NAME music_rig_shadow_idle_resource_mechanics
+                COMMAND "${Python3_EXECUTABLE}"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/measure-shadow-idle-linux"
+                    --workload $<TARGET_FILE:music_rig_shadow_idle_workload>
+                    --definition "${MUSIC_RIG_JSON_DEFINITION_FIXTURE}"
+                    --expected-fingerprint
+                    "${MUSIC_RIG_JSON_DEFINITION_FINGERPRINT}"
+                    --source-commit self-test
+                    --duration-ms 250
+                    --self-test
+            )
+        else()
+            add_test(
+                NAME music_rig_shadow_idle_resource_mechanics
+                COMMAND powershell
+                    -NoProfile
+                    -ExecutionPolicy Bypass
+                    -File
+                    "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/measure-shadow-idle-windows.ps1"
+                    -WorkloadPath
+                    $<TARGET_FILE:music_rig_shadow_idle_workload>
+                    -DefinitionPath
+                    "${MUSIC_RIG_JSON_DEFINITION_FIXTURE}"
+                    -ExpectedFingerprint
+                    "${MUSIC_RIG_JSON_DEFINITION_FINGERPRINT}"
+                    -SourceCommit self-test
+                    -DurationMs 250
+                    -SelfTest
+            )
+        endif()
+        set_tests_properties(
+            music_rig_shadow_idle_resource_mechanics PROPERTIES TIMEOUT 10
         )
         if(TARGET music_rig_midi_shadow_process_test)
             add_test(

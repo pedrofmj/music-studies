@@ -137,6 +137,9 @@ static void observe_suppressed(
     music_rig_device_midi_suppressed_event event;
 
     increment(&shadow->metrics.suppressed_midi_events);
+    increment(
+        &shadow->metrics.slots[slot_index].suppressed_midi_events
+    );
     if (shadow->observer.suppressed_midi == NULL) {
         return;
     }
@@ -345,6 +348,7 @@ music_rig_result music_rig_device_midi_shadow_process(
     }
     slot = &shadow->slots[slot_index];
     increment(&shadow->metrics.input_events);
+    increment(&shadow->metrics.slots[slot_index].input_events);
     parsed = parse_event(message, message_size, &event);
     if (parsed == PARSED_EVENT_MALFORMED) {
         increment(&shadow->metrics.malformed_events);
@@ -374,6 +378,9 @@ music_rig_result music_rig_device_midi_shadow_process(
             decision.released = event.released;
             decision.mapping = mapping;
             increment(&shadow->metrics.mapping_decisions);
+            increment(
+                &shadow->metrics.slots[slot_index].mapping_decisions
+            );
             if (shadow->observer.mapping_decision != NULL) {
                 shadow->observer.mapping_decision(
                     shadow->observer.context,
@@ -441,6 +448,17 @@ const char *music_rig_device_midi_shadow_input_port_id(
         return NULL;
     }
     return shadow->slots[slot_index].input_port_id;
+}
+
+const char *music_rig_device_midi_shadow_slot_name(
+    const music_rig_device_midi_shadow *shadow,
+    size_t slot_index
+)
+{
+    if (!valid_shadow(shadow) || slot_index >= shadow->slot_count) {
+        return NULL;
+    }
+    return shadow->slots[slot_index].slot;
 }
 
 const music_rig_device_midi_shadow_metrics *

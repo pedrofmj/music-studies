@@ -238,6 +238,7 @@ static int run_midi_shadow(const char *path, const char *fingerprint)
     const music_rig_device_midi_shadow_metrics *metrics;
     music_rig_result result;
     music_rig_result stop_result = MUSIC_RIG_RESULT_OK;
+    size_t index;
 
     result = load_definition(path, fingerprint, &definition, &generation);
     if (result == MUSIC_RIG_RESULT_OK) {
@@ -291,6 +292,16 @@ static int run_midi_shadow(const char *path, const char *fingerprint)
     printf("mapping-decisions %" PRIu64 "\n", metrics->mapping_decisions);
     printf("suppressed-midi-events %" PRIu64 "\n",
         metrics->suppressed_midi_events);
+    for (index = 0U; index < host.port_count; ++index) {
+        printf(
+            "slot %s input-events %" PRIu64 " mapping-decisions %" PRIu64
+            " suppressed-midi-events %" PRIu64 "\n",
+            music_rig_device_midi_shadow_slot_name(&shadow, index),
+            metrics->slots[index].input_events,
+            metrics->slots[index].mapping_decisions,
+            metrics->slots[index].suppressed_midi_events
+        );
+    }
     puts("output-mode suppressed");
     return MUSIC_RIG_RESULT_OK;
 }

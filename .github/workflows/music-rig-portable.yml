@@ -110,7 +110,16 @@ jobs:
             -LiteralPath 'build/music-rig-json-c/Release/music-rig.exe' `
             -Destination "$bundle/music-rig-json-c-baseline.exe"
           Copy-Item `
+            -LiteralPath 'build/music-rig-json-c/Release/music_rig_shadow_idle_workload.exe' `
+            -Destination $bundle
+          Copy-Item `
             -LiteralPath 'docs/tools/music-rig/tests/fixtures/compiled-runtime-minimal.json' `
+            -Destination $bundle
+          Copy-Item `
+            -LiteralPath 'docs/tools/music-rig/tests/fixtures/compiled-current-envelope.json' `
+            -Destination $bundle
+          Copy-Item `
+            -LiteralPath 'docs/tools/music-rig/benchmarks/measure-shadow-idle-windows.ps1' `
             -Destination $bundle
           $jsonLibraries = @(
             Get-ChildItem `

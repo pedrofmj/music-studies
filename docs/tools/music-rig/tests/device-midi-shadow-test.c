@@ -249,6 +249,12 @@ static int test_shadow_processing(void)
         metrics->unmapped_events != UINT64_C(1) ||
         metrics->malformed_events != UINT64_C(1) ||
         metrics->suppressed_midi_events != capture.suppressed_count ||
+        metrics->slots[0].input_events != UINT64_C(2) ||
+        metrics->slots[0].mapping_decisions != UINT64_C(2) ||
+        metrics->slots[0].suppressed_midi_events != UINT64_C(2) ||
+        metrics->slots[1].input_events != UINT64_C(3) ||
+        metrics->slots[1].mapping_decisions != UINT64_C(1) ||
+        metrics->slots[1].suppressed_midi_events != UINT64_C(9) ||
         capture.overflow) {
         fputs("shadow metrics failed\n", stderr);
         return 1;
@@ -289,7 +295,8 @@ static int test_fail_closed_boundaries(void)
             &config, &tables, "missing",
             MUSIC_RIG_DEVICE_MIDI_SHADOW_BEHAVIOR_NONE
         ) != MUSIC_RIG_RESULT_NOT_FOUND ||
-        music_rig_device_midi_shadow_input_port_id(NULL, 0U) != NULL) {
+        music_rig_device_midi_shadow_input_port_id(NULL, 0U) != NULL ||
+        music_rig_device_midi_shadow_slot_name(NULL, 0U) != NULL) {
         fputs("invalid shadow boundary was accepted\n", stderr);
         return 1;
     }

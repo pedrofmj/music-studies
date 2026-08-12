@@ -10,7 +10,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define MUSIC_RIG_DEVICE_MIDI_SHADOW_ABI_VERSION UINT32_C(1)
+#define MUSIC_RIG_DEVICE_MIDI_SHADOW_ABI_VERSION UINT32_C(2)
 #define MUSIC_RIG_DEVICE_MIDI_SHADOW_OBSERVER_ABI_VERSION UINT32_C(1)
 #define MUSIC_RIG_DEVICE_MIDI_SHADOW_STORAGE_MAX ((size_t)65536)
 
@@ -72,6 +72,12 @@ typedef struct music_rig_device_midi_shadow_config {
     int32_t arturia_initial_mute;
 } music_rig_device_midi_shadow_config;
 
+typedef struct music_rig_device_midi_shadow_slot_metrics {
+    uint64_t input_events;
+    uint64_t mapping_decisions;
+    uint64_t suppressed_midi_events;
+} music_rig_device_midi_shadow_slot_metrics;
+
 typedef struct music_rig_device_midi_shadow_metrics {
     uint64_t cycles;
     uint64_t generation_adoptions;
@@ -81,6 +87,9 @@ typedef struct music_rig_device_midi_shadow_metrics {
     uint64_t unmapped_events;
     uint64_t malformed_events;
     uint64_t suppressed_midi_events;
+    music_rig_device_midi_shadow_slot_metrics slots[
+        MUSIC_RIG_DEVICE_PROFILE_CAPACITY
+    ];
 } music_rig_device_midi_shadow_metrics;
 
 typedef union music_rig_device_midi_shadow_behavior_state {
@@ -141,6 +150,11 @@ size_t music_rig_device_midi_shadow_slot_count(
 );
 
 const char *music_rig_device_midi_shadow_input_port_id(
+    const music_rig_device_midi_shadow *shadow,
+    size_t slot_index
+);
+
+const char *music_rig_device_midi_shadow_slot_name(
     const music_rig_device_midi_shadow *shadow,
     size_t slot_index
 );

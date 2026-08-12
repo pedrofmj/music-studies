@@ -1,0 +1,287 @@
+#!/usr/bin/env python3
+
+import argparse
+import hashlib
+import json
+import os
+import platform
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+
+SCHEMA = "music-studies/shadow-idle-resource/v1"
+CPU_LIMIT = 0.5
+RSS_LIMIT = 50_000_000
+PHYSICAL_DURATION_MS = 60_000
+SAMPLE_INTERVAL_SECONDS = 0.25
+FINGERPRINT = (
+    "sha256:9be68993c164802f694f4d6359c208d9"
+    "937fbfcf668781ce5a1c3bff5f30cb9e"
+)
+
+
+def sha256(path):
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def proc_sample(pid):
+    status = {}
+    with open(f"/proc/{pid}/status", encoding="ascii") as stream:
+        for line in stream:
+            key, separator, value = line.partition(":")
+            if separator:
+                status[key] = value.strip()
+    stat_text = Path(f"/proc/{pid}/stat").read_text(encoding="ascii")
+    close = stat_text.rfind(")")
+    if close < 0:
+        raise RuntimeError("invalid /proc stat")
+    fields = stat_text[close + 2 :].split()
+    ticks = int(fields[11]) + int(fields[12])
+
+    def kibibytes(name, fallback):
+        if name not in status:
+            return fallback
+        value = status[name].split()
+        if len(value) != 2 or value[1] != "kB":
+            raise RuntimeError(f"invalid {name} in /proc status")
+        return int(value[0]) * 1024
+
+    resident_pages = int(
+        Path(f"/proc/{pid}/statm").read_text(encoding="ascii").split()[1]
+    )
+    resident_bytes = resident_pages * os.sysconf("SC_PAGE_SIZE")
+    try:
+        descriptors = len(os.listdir(f"/proc/{pid}/fd"))
+        descriptor_measurement = "proc-fd-count"
+    except PermissionError:
+        descriptors = int(status["FDSize"])
+        descriptor_measurement = "proc-fd-table-slots"
+    return {
+        "cpu_ticks": ticks,
+        "rss_bytes": kibibytes("VmRSS", resident_bytes),
+        "rss_lifetime_peak_bytes": kibibytes("VmHWM", resident_bytes),
+        "threads": int(status["Threads"]),
+        "descriptors": descriptors,
+        "descriptor_measurement": descriptor_measurement,
+        "voluntary_context_switches": int(status["voluntary_ctxt_switches"]),
+        "involuntary_context_switches": int(
+            status["nonvoluntary_ctxt_switches"]
+        ),
+    }
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--workload", type=Path, required=True)
+    parser.add_argument("--definition", type=Path, required=True)
+    parser.add_argument("--expected-fingerprint", default=FINGERPRINT)
+    parser.add_argument("--source-commit", required=True)
+    parser.add_argument("--duration-ms", type=int, default=PHYSICAL_DURATION_MS)
+    parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--output", type=Path)
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    if sys.platform != "linux":
+        raise SystemExit("Linux shadow measurement requires Linux")
+    if args.duration_ms <= 0:
+        raise SystemExit("duration must be positive")
+    if not args.self_test and args.duration_ms < PHYSICAL_DURATION_MS:
+        raise SystemExit("physical measurement requires at least 60000 ms")
+    for path in (args.workload, args.definition):
+        if not path.is_file():
+            raise SystemExit(f"missing input: {path}")
+
+    temporary = Path(tempfile.mkdtemp(prefix="music-rig-shadow-idle-"))
+    ready = temporary / "ready"
+    command = [
+        str(args.workload.resolve()),
+        "--definition",
+        str(args.definition.resolve()),
+        "--expected-fingerprint",
+        args.expected_fingerprint,
+        "--duration-ms",
+        str(args.duration_ms),
+        "--ready-file",
+        str(ready),
+    ]
+    process = None
+    samples = []
+    captured_at = datetime.now(timezone.utc).isoformat()
+    try:
+        process = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        deadline = time.monotonic() + 5.0
+        while not ready.is_file() and process.poll() is None:
+            if time.monotonic() >= deadline:
+                raise RuntimeError("shadow workload readiness timed out")
+            time.sleep(0.01)
+        if not ready.is_file():
+            stdout, stderr = process.communicate(timeout=1)
+            raise RuntimeError(
+                f"shadow workload exited before readiness: {stdout}{stderr}"
+            )
+
+        started_ns = time.monotonic_ns()
+        samples.append(proc_sample(process.pid))
+        while process.poll() is None:
+            time.sleep(SAMPLE_INTERVAL_SECONDS)
+            try:
+                samples.append(proc_sample(process.pid))
+            except (FileNotFoundError, ProcessLookupError):
+                break
+        stdout, stderr = process.communicate(timeout=5)
+        finished_ns = time.monotonic_ns()
+        if process.returncode != 0 or stderr:
+            raise RuntimeError(
+                f"shadow workload failed ({process.returncode}): {stderr}"
+            )
+        workload = json.loads(stdout)
+    finally:
+        if process is not None and process.poll() is None:
+            process.kill()
+            process.wait(timeout=5)
+        shutil.rmtree(temporary, ignore_errors=True)
+
+    if len(samples) < 1:
+        raise RuntimeError("shadow workload produced no resource samples")
+    first = samples[0]
+    last = samples[-1]
+    ticks_per_second = os.sysconf("SC_CLK_TCK")
+    cpu_ticks = max(0, last["cpu_ticks"] - first["cpu_ticks"])
+    cpu_time_ns = cpu_ticks * 1_000_000_000 // ticks_per_second
+    observation_ns = int(workload["observed_duration_ns"])
+    cpu_percent = cpu_time_ns * 100.0 / observation_ns
+    peak_rss = max(sample["rss_bytes"] for sample in samples)
+    lifetime_peak_rss = max(
+        sample["rss_lifetime_peak_bytes"] for sample in samples
+    )
+    scheduler_switches = max(
+        0,
+        last["voluntary_context_switches"]
+        + last["involuntary_context_switches"]
+        - first["voluntary_context_switches"]
+        - first["involuntary_context_switches"],
+    )
+    duration_pass = observation_ns >= args.duration_ms * 1_000_000
+    cpu_pass = cpu_percent < CPU_LIMIT
+    rss_pass = peak_rss < RSS_LIMIT
+    zero_activity_pass = (
+        workload["schema"] == "music-studies/shadow-idle-workload/v1"
+        and workload["platform"] == "linux"
+        and workload["generation"] == 1
+        and workload["device_profiles"] == 5
+        and workload["output_mode"] == "suppressed"
+        and workload["control_requests"] == 0
+        and workload["midi_events"] == 0
+        and workload["cycles"] == 0
+        and workload["mapping_decisions"] == 0
+        and workload["suppressed_midi_events"] == 0
+    )
+    physical = not args.self_test
+    passed = duration_pass and zero_activity_pass and (
+        not physical or (cpu_pass and rss_pass)
+    )
+    result = {
+        "schema": SCHEMA,
+        "measurement_kind": "self-test" if args.self_test else "physical-reference",
+        "captured_at": captured_at,
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "source_commit": args.source_commit,
+        "platform": "linux",
+        "reference_machine": {
+            "hostname": platform.node(),
+            "operating_system": platform.system(),
+            "release": platform.release(),
+            "architecture": platform.machine(),
+        },
+        "definition": {
+            "bytes": args.definition.stat().st_size,
+            "sha256": sha256(args.definition),
+            "fingerprint": args.expected_fingerprint,
+        },
+        "workload_artifact": {
+            "bytes": args.workload.stat().st_size,
+            "sha256": sha256(args.workload),
+        },
+        "idle_observation": {
+            "adapter": "portable-definition-backed-mock-input",
+            "wait_primitive": workload["wait_primitive"],
+            "requested_zero_event_duration_ms": args.duration_ms,
+            "observed_duration_ns": observation_ns,
+            "measurement_window_ns": finished_ns - started_ns,
+            "control_requests": 0,
+            "midi_events": 0,
+            "mapping_decisions": 0,
+            "suppressed_midi_events": 0,
+            "cpu_time_ns": cpu_time_ns,
+            "cpu_one_core_percent": round(cpu_percent, 6),
+            "wakeups": int(workload["wait_calls"]),
+            "wakeup_measurement": "instrumented-native-wait-completions",
+            "scheduler_context_switches_observed": scheduler_switches,
+            "rss_start_bytes": first["rss_bytes"],
+            "rss_peak_observed_bytes": peak_rss,
+            "rss_lifetime_peak_bytes": lifetime_peak_rss,
+            "threads_start": first["threads"],
+            "threads_peak": max(sample["threads"] for sample in samples),
+            "descriptors_start": first["descriptors"],
+            "descriptors_peak": max(
+                sample["descriptors"] for sample in samples
+            ),
+            "descriptor_measurement": first["descriptor_measurement"],
+            "samples": len(samples),
+            "exit_code": process.returncode,
+        },
+        "thresholds": {
+            "physical_gates_enforced": physical,
+            "idle_cpu_one_core_percent_max_exclusive": CPU_LIMIT,
+            "idle_rss_bytes_max_exclusive": RSS_LIMIT,
+        },
+        "evaluation": {
+            "idle_duration_pass": duration_pass,
+            "idle_cpu_pass": cpu_pass,
+            "idle_rss_pass": rss_pass,
+            "zero_activity_pass": zero_activity_pass,
+            "cleanup_pass": not ready.exists() and process.poll() is not None,
+            "passed": passed,
+        },
+        "scope": {
+            "compiled_current_definition_loaded": True,
+            "output_suppressed": True,
+            "mock_input_adapter": True,
+            "audio_or_midi_apis_opened": False,
+            "audio_or_midi_routes_changed": False,
+            "service_installed": False,
+            "live_rig_changes": False,
+            "stability_counters_observed": False,
+        },
+    }
+    rendered = json.dumps(result, indent=2, sort_keys=True) + "\n"
+    if args.output:
+        args.output.write_text(rendered, encoding="utf-8")
+    else:
+        sys.stdout.write(rendered)
+    return 0 if passed else 1
+
+
+if __name__ == "__main__":
+    try:
+        raise SystemExit(main())
+    except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as error:
+        print(f"shadow idle measurement failed: {error}", file=sys.stderr)
+        raise SystemExit(1)
