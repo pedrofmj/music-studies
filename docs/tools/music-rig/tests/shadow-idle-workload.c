@@ -161,10 +161,15 @@ static int idle_wait(
     LARGE_INTEGER finished;
     HANDLE event;
     DWORD wait_result;
+    DWORD wait_ms;
+    uint64_t deadline_ticks;
+    uint64_t remaining_ticks;
+    uint64_t requested_ticks;
+    uint64_t started_ticks;
     uint64_t ticks;
     uint64_t ticks_per_second;
 
-    if (!QueryPerformanceFrequency(&frequency) ||
+    if (!QueryPerformanceFrequency(&frequency) || frequency.QuadPart <= 0 ||
         !QueryPerformanceCounter(&started)) {
         return 0;
     }
@@ -172,16 +177,44 @@ static int idle_wait(
     if (event == NULL) {
         return 0;
     }
-    *wait_calls = UINT64_C(1);
-    wait_result = WaitForSingleObject(event, duration_ms);
-    CloseHandle(event);
-    if (wait_result != WAIT_TIMEOUT ||
-        !QueryPerformanceCounter(&finished) ||
-        finished.QuadPart < started.QuadPart || frequency.QuadPart <= 0) {
-        return 0;
-    }
-    ticks = (uint64_t)(finished.QuadPart - started.QuadPart);
     ticks_per_second = (uint64_t)frequency.QuadPart;
+    started_ticks = (uint64_t)started.QuadPart;
+    requested_ticks = (
+        (uint64_t)duration_ms * ticks_per_second + UINT64_C(999)
+    ) / UINT64_C(1000);
+    if (requested_ticks == UINT64_C(0)) {
+        requested_ticks = UINT64_C(1);
+    }
+    deadline_ticks = started_ticks + requested_ticks;
+    *wait_calls = UINT64_C(0);
+    for (;;) {
+        if (!QueryPerformanceCounter(&finished) ||
+            finished.QuadPart < started.QuadPart) {
+            CloseHandle(event);
+            return 0;
+        }
+        if ((uint64_t)finished.QuadPart >= deadline_ticks) {
+            break;
+        }
+        remaining_ticks = deadline_ticks - (uint64_t)finished.QuadPart;
+        wait_ms = (DWORD)(
+            remaining_ticks / ticks_per_second * UINT64_C(1000) +
+            (remaining_ticks % ticks_per_second * UINT64_C(1000) +
+                ticks_per_second - UINT64_C(1)) /
+                ticks_per_second
+        );
+        if (wait_ms == 0U) {
+            wait_ms = 1U;
+        }
+        *wait_calls += UINT64_C(1);
+        wait_result = WaitForSingleObject(event, wait_ms);
+        if (wait_result != WAIT_TIMEOUT) {
+            CloseHandle(event);
+            return 0;
+        }
+    }
+    CloseHandle(event);
+    ticks = (uint64_t)(finished.QuadPart - started.QuadPart);
     *duration_ns = ticks / ticks_per_second * UINT64_C(1000000000) +
         ticks % ticks_per_second * UINT64_C(1000000000) / ticks_per_second;
     return 1;
@@ -196,38 +229,40 @@ static int idle_wait(
     struct timespec started;
     struct timespec finished;
     struct timespec remaining;
+    uint64_t deadline_ns;
+    uint64_t finished_ns;
+    uint64_t started_ns;
 
-    if (clock_gettime(CLOCK_MONOTONIC_RAW, &started) != 0) {
+    if (clock_gettime(CLOCK_MONOTONIC, &started) != 0) {
         return 0;
     }
-    remaining.tv_sec = (time_t)(duration_ms / UINT32_C(1000));
-    remaining.tv_nsec =
-        (long)(duration_ms % UINT32_C(1000)) * 1000000L;
+    started_ns =
+        (uint64_t)started.tv_sec * UINT64_C(1000000000) +
+        (uint64_t)started.tv_nsec;
+    deadline_ns = started_ns + (uint64_t)duration_ms * UINT64_C(1000000);
     *wait_calls = UINT64_C(0);
     for (;;) {
-        *wait_calls += UINT64_C(1);
-        if (nanosleep(&remaining, &remaining) == 0) {
+        if (clock_gettime(CLOCK_MONOTONIC, &finished) != 0) {
+            return 0;
+        }
+        finished_ns =
+            (uint64_t)finished.tv_sec * UINT64_C(1000000000) +
+            (uint64_t)finished.tv_nsec;
+        if (finished_ns >= deadline_ns) {
             break;
         }
-        if (errno != EINTR) {
+        remaining.tv_sec = (time_t)(
+            (deadline_ns - finished_ns) / UINT64_C(1000000000)
+        );
+        remaining.tv_nsec = (long)(
+            (deadline_ns - finished_ns) % UINT64_C(1000000000)
+        );
+        *wait_calls += UINT64_C(1);
+        if (nanosleep(&remaining, NULL) != 0 && errno != EINTR) {
             return 0;
         }
     }
-    if (clock_gettime(CLOCK_MONOTONIC_RAW, &finished) != 0 ||
-        finished.tv_sec < started.tv_sec) {
-        return 0;
-    }
-    *duration_ns =
-        (uint64_t)(finished.tv_sec - started.tv_sec) * UINT64_C(1000000000);
-    if (finished.tv_nsec >= started.tv_nsec) {
-        *duration_ns += (uint64_t)(finished.tv_nsec - started.tv_nsec);
-    } else {
-        *duration_ns -= UINT64_C(1000000000);
-        *duration_ns += (uint64_t)(
-            UINT64_C(1000000000) + (uint64_t)finished.tv_nsec -
-            (uint64_t)started.tv_nsec
-        );
-    }
+    *duration_ns = finished_ns - started_ns;
     return 1;
 }
 #endif
