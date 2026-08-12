@@ -1,0 +1,79 @@
+{
+  "schema": "music-studies/shadow-idle-resource/v1",
+  "measurement_kind": "physical-reference",
+  "captured_at": "2026-08-12T17:27:24.8694011Z",
+  "completed_at": "2026-08-12T17:28:25.8822869Z",
+  "source_commit": "20c069e43837478e73b840e0515b39163257f9d9",
+  "platform": "windows",
+  "reference_machine": {
+    "hostname": "BEANSTAR",
+    "operating_system": "Microsoft Windows 11 Pro",
+    "release": "10.0.26200",
+    "architecture": "64-bit"
+  },
+  "hosted_build": {
+    "workflow_run": 31622122149,
+    "artifact_id": 9151714787
+  },
+  "definition": {
+    "bytes": 86617,
+    "sha256": "34ca6684a8fe2823ba706bd071a01cd5b60b9fbb3ca6ceb1e6a7c5095b543f64",
+    "fingerprint": "sha256:9be68993c164802f694f4d6359c208d9937fbfcf668781ce5a1c3bff5f30cb9e"
+  },
+  "workload_artifact": {
+    "bytes": 60416,
+    "sha256": "d9b2ff345626115403f2f27256f1c217427f70dc68cbe9f494c51623f32b9961"
+  },
+  "runner": {
+    "name": "measure-shadow-idle-windows.ps1",
+    "sha256": "4a6a0615ead8a52980eff87bbd00dce2acdef468c32a51d9cc0c7a110d9a142c"
+  },
+  "idle_observation": {
+    "adapter": "portable-definition-backed-mock-input",
+    "wait_primitive": "WaitForSingleObject-event-timeout",
+    "requested_zero_event_duration_ms": 60000,
+    "workload_requested_duration_ms": 60500,
+    "observed_duration_ns": 60504932100,
+    "measurement_window_ns": 60492125900,
+    "control_requests": 0,
+    "midi_events": 0,
+    "mapping_decisions": 0,
+    "suppressed_midi_events": 0,
+    "cpu_time_ns": 0,
+    "cpu_one_core_percent": 0,
+    "wakeups": 1,
+    "wakeup_measurement": "instrumented-native-wait-completions",
+    "rss_start_bytes": 6332416,
+    "rss_peak_observed_bytes": 6381568,
+    "rss_lifetime_peak_bytes": 6778880,
+    "handles_start": 94,
+    "handles_peak": 94,
+    "threads_start": 4,
+    "threads_peak": 4,
+    "samples": 237,
+    "exit_code": 0
+  },
+  "thresholds": {
+    "physical_gates_enforced": true,
+    "idle_cpu_one_core_percent_max_exclusive": 0.5,
+    "idle_rss_bytes_max_exclusive": 50000000
+  },
+  "evaluation": {
+    "idle_duration_pass": true,
+    "idle_cpu_pass": true,
+    "idle_rss_pass": true,
+    "zero_activity_pass": true,
+    "cleanup_pass": true,
+    "passed": true
+  },
+  "scope": {
+    "compiled_current_definition_loaded": true,
+    "output_suppressed": true,
+    "mock_input_adapter": true,
+    "audio_or_midi_apis_opened": false,
+    "audio_or_midi_routes_changed": false,
+    "service_installed": false,
+    "live_rig_changes": false,
+    "stability_counters_observed": false
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "captured_at": "2026-08-12T17:20:39.936094+00:00",
+  "completed_at": "2026-08-12T17:21:40.592556+00:00",
+  "definition": {
+    "bytes": 86617,
+    "fingerprint": "sha256:9be68993c164802f694f4d6359c208d9937fbfcf668781ce5a1c3bff5f30cb9e",
+    "sha256": "34ca6684a8fe2823ba706bd071a01cd5b60b9fbb3ca6ceb1e6a7c5095b543f64"
+  },
+  "evaluation": {
+    "cleanup_pass": true,
+    "idle_cpu_pass": true,
+    "idle_duration_pass": true,
+    "idle_rss_pass": true,
+    "passed": true,
+    "zero_activity_pass": true
+  },
+  "idle_observation": {
+    "adapter": "portable-definition-backed-mock-input",
+    "control_requests": 0,
+    "cpu_one_core_percent": 0.0,
+    "cpu_time_ns": 0,
+    "descriptor_measurement": "proc-fd-count",
+    "descriptors_peak": 3,
+    "descriptors_start": 3,
+    "exit_code": 0,
+    "mapping_decisions": 0,
+    "measurement_window_ns": 60644750302,
+    "midi_events": 0,
+    "observed_duration_ns": 60500137439,
+    "requested_zero_event_duration_ms": 60000,
+    "rss_lifetime_peak_bytes": 3162112,
+    "rss_peak_observed_bytes": 3162112,
+    "rss_start_bytes": 3162112,
+    "samples": 243,
+    "scheduler_context_switches_observed": 1,
+    "suppressed_midi_events": 0,
+    "threads_peak": 1,
+    "threads_start": 1,
+    "wait_primitive": "nanosleep-monotonic-timeout",
+    "wakeup_measurement": "instrumented-native-wait-completions",
+    "wakeups": 1,
+    "workload_requested_duration_ms": 60500
+  },
+  "measurement_kind": "physical-reference",
+  "platform": "linux",
+  "reference_machine": {
+    "architecture": "x86_64",
+    "hostname": "centralstar",
+    "operating_system": "Linux",
+    "release": "7.0.0-28-generic"
+  },
+  "schema": "music-studies/shadow-idle-resource/v1",
+  "scope": {
+    "audio_or_midi_apis_opened": false,
+    "audio_or_midi_routes_changed": false,
+    "compiled_current_definition_loaded": true,
+    "live_rig_changes": false,
+    "mock_input_adapter": true,
+    "output_suppressed": true,
+    "service_installed": false,
+    "stability_counters_observed": false
+  },
+  "source_commit": "20c069e43837478e73b840e0515b39163257f9d9",
+  "thresholds": {
+    "idle_cpu_one_core_percent_max_exclusive": 0.5,
+    "idle_rss_bytes_max_exclusive": 50000000,
+    "physical_gates_enforced": true
+  },
+  "workload_artifact": {
+    "bytes": 63544,
+    "sha256": "876166361c6c5ad338f02fe1549dd477e7606d8dc7696b0c32a5324f41feefa1"
+  }
+}
