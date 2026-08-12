@@ -205,8 +205,10 @@ handles clean `SIGINT`/`SIGTERM` shutdown, and opens no definition, state,
 transport, MIDI, audio, graph, or plugin-host resource. Its checked-in systemd
 user unit is not installed or enabled and requires a separate per-user
 `shadow-enabled` marker. Local GCC and Clang pass 44/44, both optional JSON
-builds pass 47/47, and 18 ASan/UBSan runtime boundaries pass. Hosted proof is
-recorded in the tracker before this slice is closed.
+builds pass 47/47, 18 ASan/UBSan runtime boundaries pass, and the protected
+baseline remains 30/30. Hosted
+[run 31549413339](https://github.com/pedrofmj/music-studies/actions/runs/31549413339)
+passes Linux 44/44, Windows 34/34, and Windows JSON 37/37.
 
 ## Objective
 

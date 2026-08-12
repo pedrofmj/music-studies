@@ -82,7 +82,7 @@ benchmarks.
 | 0. Baseline and technical gates | ✅ | Baseline reproducible and technical gates passed |
 | 1. Schemas and current profile extraction | ✅ | `full-live-rack` describes every current role and dependency; all known conflict classes are rejected |
 | 2. Deterministic compiler and parity | ✅ | Authored definitions deterministically materialize an equivalent temporary deployment on Linux and Windows; the protected live setup remains unchanged |
-| 3. Runtime, CLI, and shadow mode | 🟡 | Portable output-suppressed control loop, qualified state/definition contracts, explicit-path native storage, and inert daemon target pass on Linux and Windows; production path selection, complete adapters, CLI/IPC, mapping tables, and shadow execution remain |
+| 3. Runtime, CLI, and shadow mode | 🟡 | Portable control/CLI/IPC, immutable mappings, native storage, and Linux XDG/lifecycle/diagnostics pass; reusable legacy extraction, device/MIDI shadow execution, and final cross-platform resource proof remain |
 | 4. Control-only switching | ⬜ | Not started |
 | 5. MIDI management triggers | ⬜ | Not started |
 | 6. Prepared engines and graph deltas | ⬜ | Not started |
@@ -310,7 +310,7 @@ benchmarks.
   [run 31546338374](https://github.com/pedrofmj/music-studies/actions/runs/31546338374)
   passes Linux 39/39, Windows 33/33, and Windows JSON 36/36, including the
   bounded Windows reclamation and stable-port tests under `/W4 /WX`.
-- 🟡 Add production per-user path selection plus Linux lifecycle and
+- ✅ Add production per-user path selection plus Linux lifecycle and
   rate-limited diagnostics adapters. The allocation-free resolver selects
   bounded XDG configuration, cache, state, and runtime paths without filesystem
   I/O. The fixed-storage portable limiter feeds an ABI-versioned structured
@@ -319,9 +319,11 @@ benchmarks.
   definition, state, transport, MIDI, audio, graph, or plugin-host resource.
   The checked-in user unit is uninstalled and guarded by a separate opt-in
   marker. Local GCC/Clang pass 44/44, both optional JSON builds pass 47/47,
-  18 ASan/UBSan runtime boundaries pass, and hosted Linux/Windows proof remains
-  before completion. Windows Known Folder and lifecycle completion remains part
-  of Milestone 7.
+  18 ASan/UBSan runtime boundaries pass, and the protected baseline remains
+  30/30. Hosted
+  [run 31549413339](https://github.com/pedrofmj/music-studies/actions/runs/31549413339)
+  passes Linux 44/44, Windows 34/34, and Windows JSON 37/37. Windows Known Folder
+  and lifecycle completion remains part of Milestone 7.
 - ⬜ Extract reusable behavior without changing installed legacy services.
 - ⬜ Implement the device/MIDI adapter and run it in output-suppressed shadow
   mode.
