@@ -71,11 +71,30 @@ jobs:
         shell: pwsh
         env:
           VCPKG_DISABLE_METRICS: 1
-        run: >-
-          cmake -S docs/tools/music-rig -B build/music-rig-json-c
-          "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
-          -DVCPKG_TARGET_TRIPLET=x64-windows-static-md
-          -DMUSIC_RIG_ENABLE_JSON_C_SPIKE=ON
+        run: |
+          $arguments = @(
+            '-S', 'docs/tools/music-rig',
+            '-B', 'build/music-rig-json-c',
+            "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake",
+            '-DVCPKG_TARGET_TRIPLET=x64-windows-static-md',
+            '-DMUSIC_RIG_ENABLE_JSON_C_SPIKE=ON'
+          )
+          $maximumAttempts = 3
+          for ($attempt = 1; $attempt -le $maximumAttempts; $attempt++) {
+            & cmake @arguments
+            if ($LASTEXITCODE -eq 0) {
+              exit 0
+            }
+            if ($attempt -eq $maximumAttempts) {
+              exit $LASTEXITCODE
+            }
+            $delaySeconds = 15 * $attempt
+            Write-Warning (
+              "Windows JSON configure attempt $attempt failed; " +
+              "retrying in $delaySeconds seconds"
+            )
+            Start-Sleep -Seconds $delaySeconds
+          }
 
       - name: Build Windows JSON dependency probe
         if: runner.os == 'Windows'
