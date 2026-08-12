@@ -27,6 +27,7 @@ $ErrorActionPreference = 'Stop'
 $cpuLimit = 0.5
 $rssLimit = 50000000
 $minimumPhysicalDurationMs = 60000
+$workloadStartupMarginMs = 500
 $process = $null
 $processStarted = $false
 $readyPath = Join-Path $env:TEMP (
@@ -87,10 +88,11 @@ try {
         throw 'Transferred file hash does not match the approved input'
     }
 
+    $workloadDurationMs = $DurationMs + $workloadStartupMarginMs
     $arguments = @(
         '--definition', (Quote-ProcessArgument $DefinitionPath),
         '--expected-fingerprint', $ExpectedFingerprint,
-        '--duration-ms', $DurationMs.ToString([Globalization.CultureInfo]::InvariantCulture),
+        '--duration-ms', $workloadDurationMs.ToString([Globalization.CultureInfo]::InvariantCulture),
         '--ready-file', (Quote-ProcessArgument $readyPath)
     ) -join ' '
     $startInfo = [Diagnostics.ProcessStartInfo]::new()
@@ -143,7 +145,12 @@ try {
     $lifetimePeakRss = [long](
         ($samples | Measure-Object rss_lifetime_peak_bytes -Maximum).Maximum
     )
-    $durationPass = $observationNs -ge ([long]$DurationMs * 1000000)
+    $measurementWindowNs = [long]($window.Elapsed.TotalMilliseconds * 1000000)
+    $durationPass = (
+        $observationNs -ge ([long]$DurationMs * 1000000) -and
+        $measurementWindowNs -ge ([long]$DurationMs * 1000000) -and
+        [long]$workload.requested_duration_ms -eq $workloadDurationMs
+    )
     $cpuPass = $cpuPercent -lt $cpuLimit
     $rssPass = $peakRss -lt $rssLimit
     $zeroActivityPass = (
@@ -197,8 +204,9 @@ try {
             adapter = 'portable-definition-backed-mock-input'
             wait_primitive = $workload.wait_primitive
             requested_zero_event_duration_ms = $DurationMs
+            workload_requested_duration_ms = $workloadDurationMs
             observed_duration_ns = $observationNs
-            measurement_window_ns = [long]($window.Elapsed.TotalMilliseconds * 1000000)
+            measurement_window_ns = $measurementWindowNs
             control_requests = 0
             midi_events = 0
             mapping_decisions = 0

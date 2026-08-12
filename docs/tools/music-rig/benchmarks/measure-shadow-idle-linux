@@ -18,6 +18,7 @@ SCHEMA = "music-studies/shadow-idle-resource/v1"
 CPU_LIMIT = 0.5
 RSS_LIMIT = 50_000_000
 PHYSICAL_DURATION_MS = 60_000
+WORKLOAD_STARTUP_MARGIN_MS = 500
 SAMPLE_INTERVAL_SECONDS = 0.25
 FINGERPRINT = (
     "sha256:9be68993c164802f694f4d6359c208d9"
@@ -105,6 +106,7 @@ def main():
 
     temporary = Path(tempfile.mkdtemp(prefix="music-rig-shadow-idle-"))
     ready = temporary / "ready"
+    workload_duration_ms = args.duration_ms + WORKLOAD_STARTUP_MARGIN_MS
     command = [
         str(args.workload.resolve()),
         "--definition",
@@ -112,7 +114,7 @@ def main():
         "--expected-fingerprint",
         args.expected_fingerprint,
         "--duration-ms",
-        str(args.duration_ms),
+        str(workload_duration_ms),
         "--ready-file",
         str(ready),
     ]
@@ -178,7 +180,12 @@ def main():
         - first["voluntary_context_switches"]
         - first["involuntary_context_switches"],
     )
-    duration_pass = observation_ns >= args.duration_ms * 1_000_000
+    measurement_window_ns = finished_ns - started_ns
+    duration_pass = (
+        observation_ns >= args.duration_ms * 1_000_000
+        and measurement_window_ns >= args.duration_ms * 1_000_000
+        and workload["requested_duration_ms"] == workload_duration_ms
+    )
     cpu_pass = cpu_percent < CPU_LIMIT
     rss_pass = peak_rss < RSS_LIMIT
     zero_activity_pass = (
@@ -223,8 +230,9 @@ def main():
             "adapter": "portable-definition-backed-mock-input",
             "wait_primitive": workload["wait_primitive"],
             "requested_zero_event_duration_ms": args.duration_ms,
+            "workload_requested_duration_ms": workload_duration_ms,
             "observed_duration_ns": observation_ns,
-            "measurement_window_ns": finished_ns - started_ns,
+            "measurement_window_ns": measurement_window_ns,
             "control_requests": 0,
             "midi_events": 0,
             "mapping_decisions": 0,
