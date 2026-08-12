@@ -2,10 +2,11 @@
 
 The Milestone 3 runtime is a platform-neutral, output-suppressed control
 dispatcher. It establishes the definition, qualified persistent state, metrics,
-generation, and adapter contracts that future Linux and Windows daemon hosts
-use. It does not create an IPC endpoint, select production storage locations,
-bind a device, inspect or change a graph, contact a plugin host, or control a
-service.
+generation, and adapter contracts that Linux and Windows daemon hosts use. It
+does not create an IPC endpoint, bind a device, inspect or change a graph,
+contact a plugin host, install a service, or start by default. The Linux host
+now resolves per-user locations and provides an explicit output-suppressed
+lifecycle without using those paths for I/O.
 
 ## Ownership And Storage
 
@@ -88,11 +89,48 @@ before `rename`. Windows converts UTF-8 paths to native UTF-16, writes and flush
 a uniquely created same-directory file, and commits it with replacement and
 write-through flags. Contract tests use build-directory state files and remove
 them after each run. The portable core still contains no platform handles,
-paths, or backend names. Production location resolution, IPC authentication,
-device I/O, graphs, plugin hosts, services, and diagnostics remain host work.
+paths, or backend names. IPC authentication, device I/O, graphs, plugin hosts,
+service installation, and production activation remain host work.
 The adapter owns no worker thread, polling loop, cache, or heap allocation; all
 file work is synchronous on the control path and prohibited from real-time
 callbacks.
+
+## Linux Host Boundary
+
+The ABI-versioned Linux resolver chooses these logical locations without
+calling filesystem APIs or creating a directory:
+
+```text
+$XDG_CONFIG_HOME/music-rig/config.json
+$XDG_CACHE_HOME/music-rig/compiled
+$XDG_STATE_HOME/music-rig/active.state
+$XDG_STATE_HOME/music-rig/device-state
+$XDG_RUNTIME_DIR/music-rig/control.sock
+```
+
+Unset or relative configuration, cache, and state roots fall back below an
+absolute `HOME` as required by the XDG conventions. `XDG_RUNTIME_DIR` must be
+present and absolute because it has no safe persistent fallback. Resolution is
+bounded to 4,096-byte buffers and fails closed on invalid or oversized input.
+The reported control-socket path is only a future location; no socket is
+created.
+
+The portable diagnostic dispatcher owns fixed control-thread storage, validates
+bounded printable codes and messages, applies a fixed-window burst limit, and
+keeps saturating attempted, emitted, suppressed, and sink-failure counters. It
+allocates no memory, starts no thread, takes no lock, and is prohibited from
+real-time callbacks. The Linux sink formats one bounded structured line and
+writes it synchronously to an injected descriptor. The service contract uses
+stderr with `StandardError=journal`.
+
+The explicit Linux lifecycle installs only `SIGINT` and `SIGTERM` handlers,
+emits start/stop records through that limiter, blocks in a race-free
+`sigsuspend` wait, restores the previous handlers and signal mask, and exits. It
+opens no definition, state, IPC, MIDI, audio, graph, or plugin-host resource.
+The checked-in
+`packaging/linux/music-rigd.service` is not installed by this project, calls
+only the read-only path preflight and output-suppressed lifecycle, and remains
+guarded by `%E/music-rig/shadow-enabled`.
 
 ## Compiled Definition Loading
 
@@ -206,12 +244,14 @@ result code 5 before operation evaluation.
 
 ## Executable Boundary
 
-`music-rigd` is built on Linux and Windows but is deliberately inert. Every
-build supports `--version` and `--help`; invoking it without a command exits with
-code 2. The opt-in JSON build also supports the explicit read-only definition
-validation command above. It reports the runtime and storage ABIs and, when
-compiled, the native file-storage ABI. It has no configured definition/state
-path, transport, installation, service, or default-start path.
+`music-rigd` is built on Linux and Windows and remains inert without an
+explicit command. Every build supports `--version` and `--help`; invoking it
+without a command exits with code 2. Linux adds the read-only `resolve-paths
+--check-only` preflight and the explicit `run-shadow --output-suppressed`
+lifecycle described above. The opt-in JSON build also supports the explicit
+read-only definition validation command. It reports the runtime, storage,
+diagnostic, and compiled host ABIs. It has no configured IPC transport,
+installation target, default-start path, or output-enabled mode.
 
 `music-rig` now has a portable parser, transport interface, and human/JSON
 renderer for `status`, `profiles list`, `validate`, and explicit global/device
@@ -227,11 +267,13 @@ definition source/decoder failures, the full compiled-envelope JSON decoder,
 native temporary-file definition reads and atomic state replacements, explicit
 daemon validation and fingerprint mismatch, invalid lifecycle/configuration,
 ABI rejection, bounded generation reuse, stable port identity, CLI fail-closed
-behavior, and daemon inertness. Linux and Windows
+behavior, daemon inertness, XDG resolution without writes, bounded journal
+records, rate limiting, clean Linux signal shutdown, and the guarded uninstalled
+user-unit contract. Linux and Windows
 mock transports carry 1,000 mixed v2 requests through the real table dispatcher.
 A source audit rejects allocation and C thread-lock calls from the compiled
-tables, control dispatcher, definition, device-port catalogue, runtime, and
-state core.
+tables, control dispatcher, definition, device-port catalogue, diagnostics,
+runtime, and state core.
 Existing portability tests continue to reject platform headers and backend
 identifiers from the complete core tree.
 

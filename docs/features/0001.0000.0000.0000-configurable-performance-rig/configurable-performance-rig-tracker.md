@@ -310,12 +310,18 @@ benchmarks.
   [run 31546338374](https://github.com/pedrofmj/music-studies/actions/runs/31546338374)
   passes Linux 39/39, Windows 33/33, and Windows JSON 36/36, including the
   bounded Windows reclamation and stable-port tests under `/W4 /WX`.
-- ⬜ Add production per-user path selection plus Linux lifecycle and
-  rate-limited diagnostics adapters. This covers XDG configuration, cache,
-  state, and runtime paths, the opt-in systemd user-service boundary, and
-  journal diagnostics without installing, starting, or replacing the protected
-  deployment during implementation tests. Windows Known Folder and lifecycle
-  completion remains part of Milestone 7.
+- 🟡 Add production per-user path selection plus Linux lifecycle and
+  rate-limited diagnostics adapters. The allocation-free resolver selects
+  bounded XDG configuration, cache, state, and runtime paths without filesystem
+  I/O. The fixed-storage portable limiter feeds an ABI-versioned structured
+  stderr sink for journald. The explicit output-suppressed lifecycle blocks
+  without polling, handles clean `SIGINT`/`SIGTERM` shutdown, and opens no
+  definition, state, transport, MIDI, audio, graph, or plugin-host resource.
+  The checked-in user unit is uninstalled and guarded by a separate opt-in
+  marker. Local GCC/Clang pass 44/44, both optional JSON builds pass 47/47,
+  18 ASan/UBSan runtime boundaries pass, and hosted Linux/Windows proof remains
+  before completion. Windows Known Folder and lifecycle completion remains part
+  of Milestone 7.
 - ⬜ Extract reusable behavior without changing installed legacy services.
 - ⬜ Implement the device/MIDI adapter and run it in output-suppressed shadow
   mode.

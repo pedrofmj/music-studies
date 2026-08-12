@@ -15,6 +15,7 @@ add_library(music_rig_core STATIC
     runtime/core/music_rig_core.c
     runtime/core/music_rig_definition.c
     runtime/core/music_rig_device_ports.c
+    runtime/core/music_rig_diagnostics.c
     runtime/core/music_rig_protocol.c
     runtime/core/music_rig_runtime.c
     runtime/core/music_rig_state.c
@@ -64,6 +65,21 @@ if(DEFINED MUSIC_RIG_FILE_STORAGE_SOURCE)
     )
 endif()
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_library(music_rig_linux_host STATIC
+        runtime/linux/music_rig_host_paths.c
+        runtime/linux/music_rig_journal_diagnostics.c
+        runtime/linux/music_rig_linux_lifecycle.c
+    )
+    target_include_directories(music_rig_linux_host
+        PUBLIC
+            "${CMAKE_CURRENT_SOURCE_DIR}/runtime/platform/include"
+    )
+    target_link_libraries(music_rig_linux_host PUBLIC music_rig_core)
+    target_compile_features(music_rig_linux_host PUBLIC c_std_17)
+    set_target_properties(music_rig_linux_host PROPERTIES C_EXTENSIONS OFF)
+endif()
+
 if(MUSIC_RIG_ENABLE_JSON_C_SPIKE)
     if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT WIN32)
         message(FATAL_ERROR
@@ -98,6 +114,12 @@ if(TARGET music_rig_file_storage)
         MUSIC_RIG_HAS_FILE_STORAGE=1
     )
     target_link_libraries(music-rigd PRIVATE music_rig_file_storage)
+endif()
+if(TARGET music_rig_linux_host)
+    target_compile_definitions(music-rigd PRIVATE
+        MUSIC_RIG_HAS_LINUX_HOST=1
+    )
+    target_link_libraries(music-rigd PRIVATE music_rig_linux_host)
 endif()
 if(MUSIC_RIG_ENABLE_JSON_C_SPIKE)
     target_compile_definitions(music-rigd PRIVATE
@@ -155,6 +177,14 @@ else()
             -Werror
         )
     endif()
+    if(TARGET music_rig_linux_host)
+        target_compile_options(music_rig_linux_host PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+    endif()
     if(TARGET music_rig_definition_json)
         target_compile_options(music_rig_definition_json PRIVATE
             -Wall
@@ -190,6 +220,10 @@ if(BUILD_TESTING)
         tests/device-ports-test.c
     )
     target_link_libraries(music_rig_device_ports_test PRIVATE music_rig_core)
+    add_executable(music_rig_diagnostics_test
+        tests/diagnostics-test.c
+    )
+    target_link_libraries(music_rig_diagnostics_test PRIVATE music_rig_core)
     add_executable(music_rig_runtime_test
         tests/runtime-test.c
     )
@@ -218,6 +252,23 @@ if(BUILD_TESTING)
             PRIVATE music_rig_file_storage
         )
     endif()
+    if(TARGET music_rig_linux_host)
+        add_executable(music_rig_linux_host_test
+            tests/linux-host-test.c
+        )
+        target_link_libraries(music_rig_linux_host_test
+            PRIVATE music_rig_linux_host
+        )
+        add_executable(music_rig_linux_lifecycle_process_test
+            tests/linux-lifecycle-process-test.c
+        )
+        target_compile_features(
+            music_rig_linux_lifecycle_process_test PRIVATE c_std_17
+        )
+        set_target_properties(
+            music_rig_linux_lifecycle_process_test PROPERTIES C_EXTENSIONS OFF
+        )
+    endif()
 
     if(MSVC)
         target_compile_options(music_rig_core_test PRIVATE
@@ -227,6 +278,9 @@ if(BUILD_TESTING)
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
         target_compile_options(music_rig_device_ports_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+        target_compile_options(music_rig_diagnostics_test PRIVATE
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
         target_compile_options(music_rig_runtime_test PRIVATE
@@ -263,6 +317,12 @@ if(BUILD_TESTING)
             -Werror
         )
         target_compile_options(music_rig_device_ports_test PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+        target_compile_options(music_rig_diagnostics_test PRIVATE
             -Wall
             -Wextra
             -Wpedantic
@@ -306,11 +366,27 @@ if(BUILD_TESTING)
                 -Werror
             )
         endif()
+        if(TARGET music_rig_linux_host_test)
+            target_compile_options(music_rig_linux_host_test PRIVATE
+                -Wall
+                -Wextra
+                -Wpedantic
+                -Werror
+            )
+            target_compile_options(
+                music_rig_linux_lifecycle_process_test PRIVATE
+                -Wall
+                -Wextra
+                -Wpedantic
+                -Werror
+            )
+        endif()
     endif()
 
     add_test(NAME music_rig_core_test COMMAND music_rig_core_test)
     add_test(NAME music_rig_protocol_test COMMAND music_rig_protocol_test)
     add_test(NAME music_rig_device_ports_test COMMAND music_rig_device_ports_test)
+    add_test(NAME music_rig_diagnostics_test COMMAND music_rig_diagnostics_test)
     add_test(NAME music_rig_runtime_test COMMAND music_rig_runtime_test)
     add_test(NAME music_rig_control_test COMMAND music_rig_control_test)
     add_test(NAME music_rig_cli_test COMMAND music_rig_cli_test)
@@ -323,6 +399,34 @@ if(BUILD_TESTING)
                 "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-current-envelope.json"
                 "${CMAKE_CURRENT_BINARY_DIR}/file-storage-state.bin"
                 "${CMAKE_CURRENT_BINARY_DIR}/missing-storage-parent/state.bin"
+        )
+    endif()
+    if(TARGET music_rig_linux_host_test)
+        add_test(
+            NAME music_rig_linux_host_test
+            COMMAND music_rig_linux_host_test
+        )
+        add_test(
+            NAME music_rig_linux_lifecycle_process_test
+            COMMAND music_rig_linux_lifecycle_process_test
+                $<TARGET_FILE:music-rigd>
+        )
+        set_tests_properties(
+            music_rig_linux_lifecycle_process_test
+            PROPERTIES TIMEOUT 5
+        )
+        add_test(
+            NAME music_rigd_linux_host_paths
+            COMMAND "${CMAKE_COMMAND}"
+                "-DDAEMON=$<TARGET_FILE:music-rigd>"
+                "-DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/host-path-check"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-music-rigd-host-paths.cmake"
+        )
+        add_test(
+            NAME music_rig_systemd_shadow_unit
+            COMMAND "${CMAKE_COMMAND}"
+                "-DUNIT=${CMAKE_CURRENT_SOURCE_DIR}/packaging/linux/music-rigd.service"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-systemd-shadow-unit.cmake"
         )
     endif()
     add_test(

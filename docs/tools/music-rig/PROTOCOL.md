@@ -136,8 +136,9 @@ mixed status, filtered-list, validation, and device dry-run requests through
 the real immutable-table dispatcher. They create no filesystem socket, default
 pipe, service, runtime state, device connection, or musical output.
 
-A future production Linux adapter still requires an XDG runtime path, peer
-credential checks, permissions, bounded timeouts, and oversized-message
-rejection. The Windows production adapter requires the equivalent lifecycle
-and timeout handling described in
+The Linux host now resolves the XDG runtime location but deliberately creates
+no socket. A future production IPC adapter still requires peer credential
+checks, permissions, bounded timeouts, and oversized-message rejection. The
+Windows production adapter requires the equivalent lifecycle and timeout
+handling described in
 [ADR 0004](../../features/0001.0000.0000.0000-configurable-performance-rig/architecture-decisions/0004-windows-local-ipc-named-pipes.md).

@@ -197,6 +197,17 @@ proof is complete:
 passes Linux 39/39, Windows 33/33, and Windows JSON 36/36, including bounded
 reclamation and stable-port tests under `/W4 /WX`.
 
+The Linux host boundary now resolves bounded XDG configuration, cache, state,
+and runtime paths without filesystem I/O. A fixed-storage portable diagnostic
+limiter feeds an ABI-versioned structured stderr sink for journald. The
+explicit `run-shadow --output-suppressed` lifecycle waits without polling,
+handles clean `SIGINT`/`SIGTERM` shutdown, and opens no definition, state,
+transport, MIDI, audio, graph, or plugin-host resource. Its checked-in systemd
+user unit is not installed or enabled and requires a separate per-user
+`shadow-enabled` marker. Local GCC and Clang pass 44/44, both optional JSON
+builds pass 47/47, and 18 ASan/UBSan runtime boundaries pass. Hosted proof is
+recorded in the tracker before this slice is closed.
+
 ## Objective
 
 Implement the Performance Rig model defined by the feature proposal while

@@ -1,0 +1,16 @@
+[Unit]
+Description=Music Rig output-suppressed shadow host
+ConditionPathExists=%E/music-rig/shadow-enabled
+
+[Service]
+Type=simple
+ExecStartPre=%h/.local/bin/music-rigd resolve-paths --check-only
+ExecStart=%h/.local/bin/music-rigd run-shadow --output-suppressed
+Restart=on-failure
+RestartSec=2s
+StandardOutput=null
+StandardError=journal
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

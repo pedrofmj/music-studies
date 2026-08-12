@@ -6,9 +6,10 @@ Status: Milestones 0 through 2 are complete. Milestone 3 is in progress with a
 portable, output-suppressed runtime control loop, qualified persistent-state
 contract, bounded immutable definition tables, explicit-path Linux/Windows file
 adapters, protocol v2 read-only/dry-run dispatch, portable CLI contract, and
-inert `music-rigd` binary. It does not select production storage
-locations, install a service, create an IPC endpoint, connect to MIDI or audio,
-or modify the stable Carla/PipeWire setup.
+Linux XDG path, diagnostics, and opt-in shadow-lifecycle adapters. `music-rigd`
+still refuses a no-argument start. It does not install or enable a service,
+create an IPC endpoint, connect to MIDI or audio, or modify the stable
+Carla/PipeWire setup.
 
 ## Safety Boundary
 
@@ -172,14 +173,22 @@ read definition/state files and atomically replace state with native APIs. They
 choose no default or installed path, create no directory, and are tested only
 with ephemeral build-directory state files.
 
-[`music-rigd`](music-rigd.c) is currently an inert build target. It supports
-version/help output but refuses a no-argument start. An opt-in JSON build adds an
-explicit offline `validate-definition` command; it reads one named definition,
+The Linux host library resolves configuration, cache, state, and runtime
+locations through XDG with standard per-user fallbacks. Its portable
+diagnostic dispatcher uses fixed storage and a bounded fixed-window limiter;
+the Linux sink writes structured records to a supplied descriptor. The
+uninstalled [systemd user-unit contract](packaging/linux/README.md) routes that
+descriptor to the journal and requires an explicit opt-in marker.
+
+[`music-rigd`](music-rigd.c) supports version/help output and refuses a
+no-argument start. `resolve-paths --check-only` reports the selected Linux paths
+without creating them. The explicit `run-shadow --output-suppressed` command
+emits bounded lifecycle diagnostics and waits for `SIGINT` or `SIGTERM`; it
+reads no definition, opens no endpoint, and writes no state. An opt-in JSON
+build also adds `validate-definition`, which reads one named definition,
 reports validated metadata, table counts, and fixed storage size, and exits
-without a state path or output. The daemon has no configured definition/state
-path, transport, installation, service, MIDI, audio, graph, or plugin-host path.
-See [RUNTIME.md](RUNTIME.md) for ownership, lifecycle, storage, adapter, metric,
-failure, and next-slice contracts.
+without a state path or output. See [RUNTIME.md](RUNTIME.md) for ownership,
+lifecycle, storage, adapter, metric, failure, and next-slice contracts.
 
 [`music-rig`](music-rig.c) recognizes `status`, `profiles list`, `validate`, and
 global/device switches only with `--dry-run`. The portable client library
