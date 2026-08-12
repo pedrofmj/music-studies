@@ -2,7 +2,7 @@
 
 Feature: `0001.0000.0000.0000`
 
-Updated: 2026-08-11
+Updated: 2026-08-12
 
 Documents:
 
@@ -33,10 +33,10 @@ Documents:
 
 | Check | Result |
 | --- | --- |
-| GCC isolated suite | ✅ 35/35 passed |
-| Clang isolated suite | ✅ 35/35 passed |
-| GCC with Linux JSON adapter | ✅ 38/38 passed |
-| Clang with Linux JSON adapter | ✅ 38/38 passed |
+| GCC isolated suite | ✅ 53/53 passed |
+| Clang isolated suite | ✅ 53/53 passed |
+| GCC with Linux JSON/JACK adapters | ✅ 59/59 passed |
+| Clang with Linux JSON/JACK adapters | ✅ 59/59 passed |
 | Arturia offline parity | ✅ MIDI, state, replay, and stereo ramp passed |
 | SMK-25 offline parity | ✅ Self-test, config, and JACK guard passed |
 | Startup contract | ✅ Protected authority and read-only boundaries pass |
@@ -68,6 +68,9 @@ Documents:
 | Protocol v2 read-only/dry-run control | ✅ [Linux 38/38, Windows 32/32, and Windows JSON 35/35](https://github.com/pedrofmj/music-studies/actions/runs/31539454955) pass; fixed frames, nine operation IDs, fail-closed CLI, table-backed dispatch, and Linux/Windows mock transports are covered |
 | Bounded generations and stable ports | ✅ [Linux 39/39, Windows 33/33, and Windows JSON 36/36](https://github.com/pedrofmj/music-studies/actions/runs/31546338374) pass; four slots sustain 9,999 publications with 9,999 reclamations and at most three retired; ten current-Rig port identities are stable |
 | Device/MIDI output-suppressed shadow | ✅ [Linux 51/51, Windows 38/38, and Windows JSON 41/41](https://github.com/pedrofmj/music-studies/actions/runs/31596967924) pass; five-slot numeric dispatch, input-only JACK lifecycle, and suppressed Arturia/SMK-25 decisions are covered |
+| Milestone 3 cross-platform closure | ✅ [Run 31637953686](https://github.com/pedrofmj/music-studies/actions/runs/31637953686) passes Linux 53/53, Windows 40/40, and Windows JSON 45/45; the checksummed evidence and seven-mutation validator pass on both platforms |
+| Shadow idle resources | ✅ Linux: 0.000% CPU, 3,162,112 B peak observed RSS, 1 thread, 3 descriptors; Windows `beanstar`: 0.000% CPU, 6,381,568 B peak observed RSS, 4 threads, 94 handles; both complete the external 60-second zero-event window with one wait completion and clean shutdown |
+| Airstar five-slot live shadow | ✅ 413-second normal-sound practice plus independent same-source Pocket comparison; every slot has input and mapping evidence, zero shadow output, zero attributable errors, and exact cleanup |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -83,7 +86,7 @@ benchmarks.
 | 0. Baseline and technical gates | ✅ | Baseline reproducible and technical gates passed |
 | 1. Schemas and current profile extraction | ✅ | `full-live-rack` describes every current role and dependency; all known conflict classes are rejected |
 | 2. Deterministic compiler and parity | ✅ | Authored definitions deterministically materialize an equivalent temporary deployment on Linux and Windows; the protected live setup remains unchanged |
-| 3. Runtime, CLI, and shadow mode | 🟡 | Portable control/CLI/IPC, immutable mappings and behaviors, native storage, Linux host lifecycle, and input-only MIDI shadow execution pass; final cross-platform parity/resource proof remains |
+| 3. Runtime, CLI, and shadow mode | ✅ | Portable control/CLI/IPC, immutable mappings and behaviors, native storage, Linux host lifecycle, five-slot input-only live shadow, and Linux/Windows parity/resource proof pass; the protected rig is restored |
 | 4. Control-only switching | ⬜ | Not started |
 | 5. MIDI management triggers | ⬜ | Not started |
 | 6. Prepared engines and graph deltas | ⬜ | Not started |
@@ -351,7 +354,27 @@ benchmarks.
   [run 31596967924](https://github.com/pedrofmj/music-studies/actions/runs/31596967924)
   passes Linux 51/51, Windows 38/38, and Windows JSON 41/41 under strict
   `/W4 /WX`, including portable shadow compilation and five-slot JSON dispatch.
-- ⬜ Prove Linux and Windows protocol, state, parity, and resource behavior.
+- ✅ Prove Linux and Windows protocol, state, parity, and resource behavior.
+  The checksummed
+  [Milestone 3 evidence](../../tools/music-rig/benchmarks/M3-SHADOW-EVIDENCE.md)
+  binds the protocol v2 and 64-byte state contracts, the complete 5-input,
+  72-mapping, 71-target, and 57-ownership compiled inventory, physical Linux
+  and `beanstar` 60-second idle results, and the approved Airstar shadow session
+  to one source commit and definition fingerprint. Both idle runs measured
+  0.000% CPU and remained below 6.4 MB observed peak RSS, with zero input,
+  mappings, or control work and one native wait completion. The 413-second live
+  interval proved Arturia, SMK-25, SMC-Mixer, and SMC-PAD; its zero Pocket
+  observation was rejected, then a same-source comparison independently proved
+  Pocket input and mapping with every other shadow slot at zero. Shadow output
+  remained unavailable, production sound remained normal, and zero PipeWire
+  errors or dropouts were observed. All temporary links, ports, processes, and
+  directories were removed; the Carla checksum, 117 graph links, 67 MIDI links,
+  services, and restart counts remained unchanged; the protected post-check
+  passed 30/30. Local GCC and Clang pass 53/53 and both JSON/JACK builds pass
+  59/59. Hosted
+  [run 31637953686](https://github.com/pedrofmj/music-studies/actions/runs/31637953686)
+  passes Linux 53/53, Windows 40/40, and Windows JSON 45/45, including the
+  cross-platform evidence validator and all seven negative mutations.
 
 ## Milestone 4: Control-Only Switching
 

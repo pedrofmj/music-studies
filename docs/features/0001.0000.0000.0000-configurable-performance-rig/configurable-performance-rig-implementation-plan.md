@@ -252,6 +252,10 @@ Milestone 3 is complete. No runtime was installed or enabled, no output path
 exists, and the protected setup remains the default. The next sequential task
 is the Milestone 4 SMC-Mixer independent parity gate; ownership cutover still
 requires a rehearsed rollback and explicit live approval.
+Hosted
+[closure run 31637953686](https://github.com/pedrofmj/music-studies/actions/runs/31637953686)
+passes the checksummed evidence gate on Linux 53/53, Windows 40/40, and Windows
+JSON 45/45.
 
 ## Objective
 

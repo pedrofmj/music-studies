@@ -81,4 +81,7 @@ CTest runs both checks on Linux and Windows. The validator recomputes every
 referenced checksum and inventory total, enforces the exclusive resource
 limits, requires positive evidence for every device slot, and requires exact
 post-session restoration. Its self-test proves seven negative mutations are
-rejected.
+rejected. Hosted
+[closure run 31637953686](https://github.com/pedrofmj/music-studies/actions/runs/31637953686)
+passes Linux 53/53, Windows 40/40, and Windows JSON 45/45 with these checks
+enabled.
