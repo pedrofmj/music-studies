@@ -36,7 +36,15 @@ $capturedAt = (Get-Date).ToUniversalTime().ToString('o')
 $samples = [Collections.Generic.List[object]]::new()
 
 function Get-LowerHash([string] $Path) {
-    return (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToLowerInvariant()
+    $stream = [IO.File]::OpenRead($Path)
+    $algorithm = [Security.Cryptography.SHA256]::Create()
+    try {
+        $bytes = $algorithm.ComputeHash($stream)
+        return [BitConverter]::ToString($bytes).Replace('-', '').ToLowerInvariant()
+    } finally {
+        $algorithm.Dispose()
+        $stream.Dispose()
+    }
 }
 
 function Quote-ProcessArgument([string] $Value) {
