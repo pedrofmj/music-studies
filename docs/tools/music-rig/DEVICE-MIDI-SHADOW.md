@@ -105,6 +105,12 @@ Local evidence for this slice:
 - focused ASan/UBSan: 8/8; and
 - protected baseline before and after the guarded host attempt: 30/30.
 
+Hosted
+[run 31596967924](https://github.com/pedrofmj/music-studies/actions/runs/31596967924)
+passes Linux 51/51, Windows 38/38, and Windows JSON 41/41. Both Windows builds
+compile and test the portable event engine under strict `/W4 /WX`; the optional
+Windows JSON build also exercises all five current device slots.
+
 The guarded Airstar attempt found no available JACK server and returned adapter
 failure before registering a port. It did not start a server, create a link,
 change a service, or leave a client behind. Live duplicated-input session and

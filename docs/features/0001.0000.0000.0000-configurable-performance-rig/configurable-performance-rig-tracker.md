@@ -67,7 +67,7 @@ Documents:
 | Native explicit-path storage | ✅ [Linux 35/35, Windows 29/29, and Windows JSON 32/32](https://github.com/pedrofmj/music-studies/actions/runs/31531477956) pass; UTF-8 definition reads, native atomic state replacement, cleanup, missing paths, fingerprint mismatch, and offline daemon loading are covered |
 | Protocol v2 read-only/dry-run control | ✅ [Linux 38/38, Windows 32/32, and Windows JSON 35/35](https://github.com/pedrofmj/music-studies/actions/runs/31539454955) pass; fixed frames, nine operation IDs, fail-closed CLI, table-backed dispatch, and Linux/Windows mock transports are covered |
 | Bounded generations and stable ports | ✅ [Linux 39/39, Windows 33/33, and Windows JSON 36/36](https://github.com/pedrofmj/music-studies/actions/runs/31546338374) pass; four slots sustain 9,999 publications with 9,999 reclamations and at most three retired; ten current-Rig port identities are stable |
-| Device/MIDI output-suppressed shadow | 🟡 Portable five-slot dispatch and Linux input-only JACK lifecycle pass locally; hosted Linux/Windows proof pending |
+| Device/MIDI output-suppressed shadow | ✅ [Linux 51/51, Windows 38/38, and Windows JSON 41/41](https://github.com/pedrofmj/music-studies/actions/runs/31596967924) pass; five-slot numeric dispatch, input-only JACK lifecycle, and suppressed Arturia/SMK-25 decisions are covered |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -336,7 +336,7 @@ benchmarks.
   `/W4 /WX`. Linux offline differential tests compare the complete relevant
   state and emitted decisions directly with the protected sources, which remain
   unchanged.
-- 🟡 Implement the device/MIDI adapter and run it in output-suppressed shadow
+- ✅ Implement the device/MIDI adapter and run it in output-suppressed shadow
   mode. The fixed 40,456-byte portable engine adopts immutable generations,
   dispatches numeric MIDI for all five current slots, and terminates Arturia and
   SMK-25 calculated messages at a suppression observer. Its event path has no
@@ -348,7 +348,9 @@ benchmarks.
   51/51 and JSON/JACK 55/55, focused Clang and ASan/UBSan pass 8/8, and the
   protected baseline remains 30/30. The guarded local host attempt failed
   closed because no JACK server was available and left no port or link. Hosted
-  Linux and Windows results remain before closure.
+  [run 31596967924](https://github.com/pedrofmj/music-studies/actions/runs/31596967924)
+  passes Linux 51/51, Windows 38/38, and Windows JSON 41/41 under strict
+  `/W4 /WX`, including portable shadow compilation and five-slot JSON dispatch.
 - ⬜ Prove Linux and Windows protocol, state, parity, and resource behavior.
 
 ## Milestone 4: Control-Only Switching
