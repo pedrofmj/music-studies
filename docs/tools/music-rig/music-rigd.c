@@ -1,5 +1,6 @@
 #include "music_rig/core.h"
 #include "music_rig/compiled_tables.h"
+#include "music_rig/diagnostics.h"
 #include "music_rig/runtime.h"
 
 #if defined(MUSIC_RIG_HAS_FILE_STORAGE)
