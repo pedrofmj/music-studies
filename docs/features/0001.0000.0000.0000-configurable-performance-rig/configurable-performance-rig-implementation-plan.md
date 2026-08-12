@@ -218,8 +218,12 @@ or filesystem calls, JSON traversal, or string comparison. On the current
 64-bit Linux build the caller-owned states occupy 24 and 2,352 bytes, guarded by
 64-byte and 4,096-byte compile-time ceilings. Portable unit/boundary tests pass
 locally; Linux differential fixtures compare output and state directly against
-the unchanged protected sources. Hosted Linux/MSVC proof is pending before this
-slice is closed.
+the unchanged protected sources. Local GCC/Clang pass 47/47, both optional JSON
+builds pass 50/50, 12 ASan/UBSan behavior/runtime boundaries pass, and the
+protected baseline remains 30/30. Hosted
+[run 31551820903](https://github.com/pedrofmj/music-studies/actions/runs/31551820903)
+passes Linux 47/47, Windows 36/36, and Windows JSON 39/39 under strict
+`/W4 /WX`.
 
 ## Objective
 

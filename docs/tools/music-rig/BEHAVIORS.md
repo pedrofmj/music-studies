@@ -98,6 +98,14 @@ replay, Play/Stop behavior, and legacy-state recall. The protected source files
 remain unchanged and the forbidden JACK stub terminates a test if the SMK-25
 fixture attempts any backend call.
 
+Local GCC and Clang pass 47/47 tests, both optional JSON builds pass 50/50,
+twelve selected ASan/UBSan behavior and runtime boundaries pass, and the
+protected baseline remains 30/30. Hosted
+[run 31551820903](https://github.com/pedrofmj/music-studies/actions/runs/31551820903)
+passes Linux 47/47, Windows 36/36, and Windows JSON 39/39; both Windows builds
+compile the library and execute its portable unit and boundary tests under
+strict `/W4 /WX`.
+
 The next integration step is an opt-in device/MIDI adapter that observes copied
 input in output-suppressed shadow mode. It must not install a service, connect a
 live graph, emit MIDI, or replace the protected services.
