@@ -324,7 +324,13 @@ benchmarks.
   [run 31549413339](https://github.com/pedrofmj/music-studies/actions/runs/31549413339)
   passes Linux 44/44, Windows 34/34, and Windows JSON 37/37. Windows Known Folder
   and lifecycle completion remains part of Milestone 7.
-- ⬜ Extract reusable behavior without changing installed legacy services.
+- 🟡 Extract reusable behavior without changing installed legacy services.
+  Caller-owned Arturia and SMK-25 engines reproduce current event, connection,
+  audio-gate, latch, transport, passthrough, and legacy-state transitions with
+  fixed storage and no backend or host dependency. Portable unit and boundary
+  checks plus Linux offline differential tests pass locally; hosted Linux/MSVC
+  proof remains before closure. The protected services and sources are
+  unchanged.
 - ⬜ Implement the device/MIDI adapter and run it in output-suppressed shadow
   mode.
 - ⬜ Prove Linux and Windows protocol, state, parity, and resource behavior.

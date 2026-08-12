@@ -277,8 +277,31 @@ runtime, and state core.
 Existing portability tests continue to reject platform headers and backend
 identifiers from the complete core tree.
 
+## Reusable Current Behaviors
+
+The separate `music_rig_current_behaviors` library reproduces the protected
+Arturia relative-volume, mute, connection-replay, and audio-gate transitions and
+the protected SMK-25 pad, knob, layer-latch, Play, Stop, transport,
+connection-replay, passthrough, and state-recall transitions. Configuration and
+mutable state are fixed-size and caller-owned. The library opens no resource and
+has no platform, backend, thread, allocation, lock, filesystem, or JSON
+dependency.
+
+The event path contains no string comparison or unbounded work. Arturia work is
+constant per MIDI event or audio frame; SMK-25 work is bounded by the fixed
+eight-layer and 128-note capacities. Current 64-bit Linux sizes are 24-byte and
+2,352-byte behavior states, with compile-time ceilings of 64 and 4,096 bytes.
+Versioned logical snapshots are in-memory values, not a serialized persistent
+ABI.
+
+Portable unit and source-boundary tests run on Linux and Windows. Linux-only
+differential fixtures compile the unchanged protected sources offline and
+compare emitted decisions and complete relevant state, including legacy text
+recall. See [BEHAVIORS.md](BEHAVIORS.md) for the full contract.
+
 ## Next Runtime Slice
 
-The next slice extracts reusable mapping and state behavior from the legacy C
-services without changing their installed behavior. It remains
-output-suppressed and does not replace the protected single-rig deployment.
+The next slice implements the device/MIDI adapter and runs it in
+output-suppressed shadow mode. It must observe only explicitly duplicated input,
+record decisions without emitting them, and leave the protected single-rig
+deployment installed and active.

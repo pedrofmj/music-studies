@@ -29,6 +29,18 @@ set_target_properties(music_rig_core PROPERTIES
     C_EXTENSIONS OFF
 )
 
+add_library(music_rig_current_behaviors STATIC
+    runtime/behaviors/music_rig_current_arturia.c
+    runtime/behaviors/music_rig_current_smk25.c
+)
+target_include_directories(music_rig_current_behaviors
+    PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}/runtime/behaviors/include"
+)
+target_link_libraries(music_rig_current_behaviors PUBLIC music_rig_core)
+target_compile_features(music_rig_current_behaviors PUBLIC c_std_17)
+set_target_properties(music_rig_current_behaviors PROPERTIES C_EXTENSIONS OFF)
+
 add_library(music_rig_cli STATIC
     runtime/client/music_rig_cli.c
 )
@@ -137,6 +149,9 @@ if(MSVC)
     target_compile_options(music_rig_core PRIVATE
         ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
     )
+    target_compile_options(music_rig_current_behaviors PRIVATE
+        ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+    )
     target_compile_options(music_rig_cli PRIVATE
         ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
     )
@@ -158,6 +173,12 @@ if(MSVC)
     )
 else()
     target_compile_options(music_rig_core PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Werror
+    )
+    target_compile_options(music_rig_current_behaviors PRIVATE
         -Wall
         -Wextra
         -Wpedantic
@@ -224,6 +245,12 @@ if(BUILD_TESTING)
         tests/diagnostics-test.c
     )
     target_link_libraries(music_rig_diagnostics_test PRIVATE music_rig_core)
+    add_executable(music_rig_current_behaviors_test
+        tests/current-behaviors-test.c
+    )
+    target_link_libraries(music_rig_current_behaviors_test
+        PRIVATE music_rig_current_behaviors
+    )
     add_executable(music_rig_runtime_test
         tests/runtime-test.c
     )
@@ -283,6 +310,9 @@ if(BUILD_TESTING)
         target_compile_options(music_rig_diagnostics_test PRIVATE
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
+        target_compile_options(music_rig_current_behaviors_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
         target_compile_options(music_rig_runtime_test PRIVATE
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
@@ -323,6 +353,12 @@ if(BUILD_TESTING)
             -Werror
         )
         target_compile_options(music_rig_diagnostics_test PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+        target_compile_options(music_rig_current_behaviors_test PRIVATE
             -Wall
             -Wextra
             -Wpedantic
@@ -387,6 +423,10 @@ if(BUILD_TESTING)
     add_test(NAME music_rig_protocol_test COMMAND music_rig_protocol_test)
     add_test(NAME music_rig_device_ports_test COMMAND music_rig_device_ports_test)
     add_test(NAME music_rig_diagnostics_test COMMAND music_rig_diagnostics_test)
+    add_test(
+        NAME music_rig_current_behaviors_test
+        COMMAND music_rig_current_behaviors_test
+    )
     add_test(NAME music_rig_runtime_test COMMAND music_rig_runtime_test)
     add_test(NAME music_rig_control_test COMMAND music_rig_control_test)
     add_test(NAME music_rig_cli_test COMMAND music_rig_cli_test)
@@ -476,6 +516,12 @@ if(BUILD_TESTING)
         COMMAND "${CMAKE_COMMAND}"
             "-DRUNTIME_DIR=${CMAKE_CURRENT_SOURCE_DIR}/runtime/core"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-runtime-boundary.cmake"
+    )
+    add_test(
+        NAME music_rig_current_behaviors_boundary
+        COMMAND "${CMAKE_COMMAND}"
+            "-DBEHAVIOR_DIR=${CMAKE_CURRENT_SOURCE_DIR}/runtime/behaviors"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-current-behaviors-boundary.cmake"
     )
 
     find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter)
@@ -764,6 +810,10 @@ if(BUILD_TESTING)
             add_executable(music_rig_arturia_helper_offline_test
                 tests/arturia-main-volume-encoder-offline-test.c
             )
+            target_link_libraries(
+                music_rig_arturia_helper_offline_test
+                PRIVATE music_rig_current_behaviors
+            )
             target_compile_features(
                 music_rig_arturia_helper_offline_test
                 PRIVATE c_std_17
@@ -822,9 +872,36 @@ if(BUILD_TESTING)
                 music_rig_smk25_helper
                 PRIVATE music_rig_forbidden_jack
             )
+            add_executable(music_rig_smk25_behavior_parity_test
+                tests/smk25-current-behavior-parity-test.c
+            )
+            target_link_libraries(
+                music_rig_smk25_behavior_parity_test
+                PRIVATE
+                    music_rig_current_behaviors
+                    music_rig_forbidden_jack
+            )
+            target_compile_features(
+                music_rig_smk25_behavior_parity_test PRIVATE c_std_17
+            )
+            set_target_properties(
+                music_rig_smk25_behavior_parity_test
+                PROPERTIES C_EXTENSIONS OFF
+            )
+            target_compile_options(
+                music_rig_smk25_behavior_parity_test PRIVATE
+                    -Wall
+                    -Wextra
+                    -Wpedantic
+                    -Werror
+            )
             add_test(
                 NAME music_rig_smk25_helper_self_test
                 COMMAND music_rig_smk25_helper --self-test
+            )
+            add_test(
+                NAME music_rig_smk25_behavior_parity
+                COMMAND music_rig_smk25_behavior_parity_test
             )
             add_test(
                 NAME music_rig_smk25_helper_config
@@ -842,6 +919,7 @@ if(BUILD_TESTING)
             set_tests_properties(
                 music_rig_arturia_helper_offline
                 music_rig_smk25_helper_self_test
+                music_rig_smk25_behavior_parity
                 music_rig_smk25_helper_config
                 music_rig_smk25_helper_jack_guard
                 PROPERTIES TIMEOUT 10

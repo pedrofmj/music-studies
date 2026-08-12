@@ -210,6 +210,17 @@ baseline remains 30/30. Hosted
 [run 31549413339](https://github.com/pedrofmj/music-studies/actions/runs/31549413339)
 passes Linux 44/44, Windows 34/34, and Windows JSON 37/37.
 
+Reusable fixed-storage Arturia and SMK-25 behavior engines now reproduce the
+current relative-volume, mute, audio-gate, pad, knob, layer-latch, Play, Stop,
+transport, connection-replay, passthrough, and legacy-state transitions without
+linking to a backend. Their event paths contain no allocation, locks, platform
+or filesystem calls, JSON traversal, or string comparison. On the current
+64-bit Linux build the caller-owned states occupy 24 and 2,352 bytes, guarded by
+64-byte and 4,096-byte compile-time ceilings. Portable unit/boundary tests pass
+locally; Linux differential fixtures compare output and state directly against
+the unchanged protected sources. Hosted Linux/MSVC proof is pending before this
+slice is closed.
+
 ## Objective
 
 Implement the Performance Rig model defined by the feature proposal while

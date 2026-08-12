@@ -6,10 +6,12 @@ Status: Milestones 0 through 2 are complete. Milestone 3 is in progress with a
 portable, output-suppressed runtime control loop, qualified persistent-state
 contract, bounded immutable definition tables, explicit-path Linux/Windows file
 adapters, protocol v2 read-only/dry-run dispatch, portable CLI contract, and
-Linux XDG path, diagnostics, and opt-in shadow-lifecycle adapters. `music-rigd`
-still refuses a no-argument start. It does not install or enable a service,
-create an IPC endpoint, connect to MIDI or audio, or modify the stable
-Carla/PipeWire setup.
+Linux XDG path, diagnostics, and opt-in shadow-lifecycle adapters. Portable
+fixed-storage behavior engines now reproduce the protected Arturia and SMK-25
+state transitions through offline differential tests. `music-rigd` still
+refuses a no-argument start. It does not install or enable a service, create an
+IPC endpoint, connect to MIDI or audio, or modify the stable Carla/PipeWire
+setup.
 
 ## Safety Boundary
 
@@ -166,6 +168,13 @@ mappings and compiler dispatch index, 71 targets, and 57 ownership entries, and
 hands the prepared immutable table image to a generation. Event lookup uses a
 fixed numeric dispatch index with no allocation, lock, JSON traversal, or
 string comparison.
+
+[`runtime/behaviors`](runtime/behaviors) contains the caller-owned Arturia and
+SMK-25 current-behavior engines. They perform no allocation, locking, I/O, or
+backend access. Portable tests cover their fixed state and Linux-only offline
+tests compare decisions directly with the unchanged protected services. See
+[BEHAVIORS.md](BEHAVIORS.md) for ownership, storage, persistence, parity, and
+shadow-integration boundaries.
 
 [`runtime/platform/include/music_rig/file_storage.h`](runtime/platform/include/music_rig/file_storage.h)
 defines explicit caller-owned UTF-8 paths. Linux and Windows implementations

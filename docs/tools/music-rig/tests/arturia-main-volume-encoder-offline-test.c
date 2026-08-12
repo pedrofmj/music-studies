@@ -2,6 +2,8 @@
 #include "../../arturia-main-volume-encoder/arturia-main-volume-encoder.c"
 #undef main
 
+#include "music_rig/current_arturia.h"
+
 #include <string.h>
 
 #define TEST_EVENT_CAPACITY 16
@@ -243,12 +245,122 @@ static int test_mute_edge_and_audio_ramp(void)
     return 0;
 }
 
+static int test_reusable_behavior_parity(void)
+{
+    music_rig_current_arturia_config config;
+    music_rig_current_arturia_behavior behavior;
+    music_rig_current_arturia_decision decision;
+    const unsigned char trace[][3] = {
+        {0xb0, VOLUME_INPUT_CC, 65},
+        {0xb0, VOLUME_INPUT_CC, 64},
+        {0xb0, BUTTON_INPUT_CC, 127},
+        {0xb0, BUTTON_INPUT_CC, 127},
+        {0xb0, BUTTON_INPUT_CC, 0},
+        {0xb0, BUTTON_INPUT_CC, 127},
+        {0xb1, VOLUME_INPUT_CC, 65},
+    };
+    size_t event_index;
+
+    reset_runtime();
+    music_rig_current_arturia_config_init(&config);
+    CHECK(
+        music_rig_current_arturia_init(&behavior, &config, 64, 0) ==
+            MUSIC_RIG_RESULT_OK,
+        "reusable Arturia initialization failed"
+    );
+
+    fake_output_connections = 1;
+    CHECK(process_midi(4, NULL) == 0, "legacy connection parity failed");
+    CHECK(
+        music_rig_current_arturia_output_connections(
+            &behavior, 1, &decision
+        ) == MUSIC_RIG_RESULT_OK,
+        "reusable connection parity failed"
+    );
+    CHECK(
+        fake_midi_output.count == 1 && decision.output_ready &&
+        memcmp(fake_midi_output.events[0].data, decision.output, 3) == 0,
+        "connection replay parity diverged"
+    );
+    fake_output_connections = 0;
+    CHECK(
+        music_rig_current_arturia_output_connections(
+            &behavior, 0, &decision
+        ) == MUSIC_RIG_RESULT_OK && !decision.output_ready,
+        "connection decrease parity failed"
+    );
+
+    for (event_index = 0;
+         event_index < sizeof(trace) / sizeof(trace[0]);
+         ++event_index) {
+        size_t frame;
+
+        set_input(
+            (jack_nframes_t)(event_index + 1U),
+            trace[event_index][0],
+            trace[event_index][1],
+            trace[event_index][2]
+        );
+        CHECK(process_midi(4, NULL) == 0, "legacy event parity failed");
+        CHECK(
+            music_rig_current_arturia_process_midi(
+                &behavior,
+                trace[event_index],
+                sizeof(trace[event_index]),
+                &decision
+            ) == MUSIC_RIG_RESULT_OK,
+            "reusable event parity failed"
+        );
+        CHECK(
+            atomic_load(&volume_value) == behavior.volume &&
+            atomic_load(&mute_value) == behavior.mute &&
+            atomic_load(&button_down) == (behavior.button_down ? 1 : 0) &&
+            atomic_load(&generation) == behavior.generation,
+            "Arturia state parity diverged"
+        );
+        CHECK(
+            fake_midi_output.count == (decision.output_ready ? 1U : 0U),
+            "Arturia output count parity diverged"
+        );
+        if (decision.output_ready) {
+            CHECK(
+                memcmp(fake_midi_output.events[0].data, decision.output, 3) == 0,
+                "Arturia MIDI output parity diverged"
+            );
+        }
+        for (frame = 0U; frame < 4U; ++frame) {
+            float left;
+            float right;
+
+            CHECK(
+                music_rig_current_arturia_apply_audio_frame(
+                    &behavior,
+                    0.25f,
+                    fake_audio_input_left[frame],
+                    fake_audio_input_right[frame],
+                    &left,
+                    &right
+                ) == MUSIC_RIG_RESULT_OK,
+                "reusable audio parity failed"
+            );
+            CHECK(
+                left == fake_audio_output_left[frame] &&
+                right == fake_audio_output_right[frame],
+                "Arturia audio output parity diverged"
+            );
+        }
+        CHECK(audio_gain == behavior.audio_gain, "Arturia gain parity diverged");
+    }
+    return 0;
+}
+
 int main(void)
 {
     if (test_clamping_and_state() != 0 ||
         test_connection_replay() != 0 ||
         test_relative_volume() != 0 ||
-        test_mute_edge_and_audio_ramp() != 0)
+        test_mute_edge_and_audio_ramp() != 0 ||
+        test_reusable_behavior_parity() != 0)
         return 1;
 
     puts("Offline Arturia helper test: OK");
