@@ -106,6 +106,8 @@ passes Linux 47/47, Windows 36/36, and Windows JSON 39/39; both Windows builds
 compile the library and execute its portable unit and boundary tests under
 strict `/W4 /WX`.
 
-The next integration step is an opt-in device/MIDI adapter that observes copied
-input in output-suppressed shadow mode. It must not install a service, connect a
-live graph, emit MIDI, or replace the protected services.
+The opt-in [Device/MIDI shadow adapter](DEVICE-MIDI-SHADOW.md) now consumes the
+extracted decisions for compiled Arturia and SMK-25 profiles and terminates
+every calculated message at a suppression observer. It installs no service,
+creates no graph link, emits no MIDI, and does not replace the protected
+services. Live parity and resource evidence remain the next Milestone 3 gate.

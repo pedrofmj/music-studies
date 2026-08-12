@@ -1,5 +1,6 @@
 #include "music_rig/definition.h"
 #include "music_rig/definition_json.h"
+#include "music_rig/device_midi_shadow.h"
 #include "music_rig/device_ports.h"
 
 #include <stdio.h>
@@ -92,6 +93,90 @@ static music_rig_result source_replace(
     (void)input;
     (void)input_size;
     return MUSIC_RIG_RESULT_UNSUPPORTED;
+}
+
+static int test_full_definition_shadow(
+    const music_rig_compiled_tables *tables,
+    const music_rig_generation *generation
+)
+{
+    music_rig_generation_slot generations;
+    music_rig_device_midi_shadow_config config;
+    music_rig_device_midi_shadow shadow;
+    const music_rig_device_midi_shadow_metrics *metrics;
+    static const char *const expected_ports[] = {
+        "device.arturia-main.midi-input",
+        "device.smc-mixer-main.midi-input",
+        "device.smc-pad-main.midi-input",
+        "device.smc-pad-pocket.midi-input",
+        "device.smk25-main.midi-input"
+    };
+    static const uint8_t events[][3] = {
+        {UINT8_C(0xb0), UINT8_C(114), UINT8_C(65)},
+        {UINT8_C(0xb0), UINT8_C(40), UINT8_C(64)},
+        {UINT8_C(0x99), UINT8_C(36), UINT8_C(100)},
+        {UINT8_C(0x99), UINT8_C(36), UINT8_C(100)},
+        {UINT8_C(0xb0), UINT8_C(20), UINT8_C(91)}
+    };
+    size_t index;
+
+    if (music_rig_generation_slot_init(&generations, generation) !=
+            MUSIC_RIG_RESULT_OK) {
+        return 0;
+    }
+    music_rig_device_midi_shadow_config_init(&config);
+    config.generations = &generations;
+    if (music_rig_device_midi_shadow_configure_behavior(
+            &config,
+            tables,
+            "arturia-main",
+            MUSIC_RIG_DEVICE_MIDI_SHADOW_BEHAVIOR_CURRENT_ARTURIA
+        ) != MUSIC_RIG_RESULT_OK ||
+        music_rig_device_midi_shadow_configure_behavior(
+            &config,
+            tables,
+            "smk25-main",
+            MUSIC_RIG_DEVICE_MIDI_SHADOW_BEHAVIOR_CURRENT_SMK25
+        ) != MUSIC_RIG_RESULT_OK ||
+        music_rig_device_midi_shadow_init(&shadow, &config) !=
+            MUSIC_RIG_RESULT_OK ||
+        music_rig_device_midi_shadow_slot_count(&shadow) !=
+            sizeof(expected_ports) / sizeof(expected_ports[0])) {
+        return 0;
+    }
+    for (index = 0U;
+         index < sizeof(expected_ports) / sizeof(expected_ports[0]);
+         ++index) {
+        if (strcmp(
+                music_rig_device_midi_shadow_input_port_id(&shadow, index),
+                expected_ports[index]
+            ) != 0) {
+            return 0;
+        }
+    }
+    if (music_rig_device_midi_shadow_begin_cycle(&shadow) !=
+            MUSIC_RIG_RESULT_OK) {
+        return 0;
+    }
+    for (index = 0U; index < sizeof(events) / sizeof(events[0]); ++index) {
+        if (music_rig_device_midi_shadow_process(
+                &shadow,
+                index,
+                (uint32_t)index,
+                events[index],
+                sizeof(events[index])
+            ) != MUSIC_RIG_RESULT_OK) {
+            return 0;
+        }
+    }
+    metrics = music_rig_device_midi_shadow_metrics_read(&shadow);
+    return metrics != NULL && metrics->cycles == UINT64_C(1) &&
+        metrics->input_events == UINT64_C(5) &&
+        metrics->parsed_events == UINT64_C(5) &&
+        metrics->mapping_decisions == UINT64_C(5) &&
+        metrics->unmapped_events == UINT64_C(0) &&
+        metrics->malformed_events == UINT64_C(0) &&
+        metrics->suppressed_midi_events == UINT64_C(2);
 }
 
 int main(int argc, char **argv)
@@ -241,6 +326,10 @@ int main(int argc, char **argv)
         strcmp(tables.input_bindings[4].slot, "smk25-main") != 0) {
         fputs("compiled target, ownership, or input table is invalid\n",
             stderr);
+        return 1;
+    }
+    if (!test_full_definition_shadow(&tables, &generation)) {
+        fputs("full five-device shadow processing failed\n", stderr);
         return 1;
     }
 

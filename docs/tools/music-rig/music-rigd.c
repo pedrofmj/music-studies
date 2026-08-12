@@ -13,6 +13,11 @@
 #include "music_rig/linux_lifecycle.h"
 #endif
 
+#if defined(MUSIC_RIG_HAS_JACK_MIDI_SHADOW)
+#include "music_rig/device_midi_shadow.h"
+#include "music_rig/jack_midi_shadow.h"
+#endif
+
 #if defined(MUSIC_RIG_ENABLE_JSON_DEFINITION)
 #include "music_rig/definition.h"
 #include "music_rig/definition_json.h"
@@ -42,6 +47,15 @@ static void print_usage(FILE *stream, const char *program)
         stream,
         "       %s validate-definition --definition PATH "
         "--expected-fingerprint SHA256\n",
+        program
+    );
+#endif
+#if defined(MUSIC_RIG_ENABLE_JSON_DEFINITION) && \
+    defined(MUSIC_RIG_HAS_JACK_MIDI_SHADOW)
+    fprintf(
+        stream,
+        "       %s run-midi-shadow --definition PATH "
+        "--expected-fingerprint SHA256 --output-suppressed\n",
         program
     );
 #endif
@@ -104,13 +118,16 @@ static int run_shadow(void)
 static uint8_t definition_document[DEFINITION_DOCUMENT_CAPACITY];
 static music_rig_compiled_tables definition_tables;
 
-static int validate_definition(const char *path, const char *fingerprint)
+static music_rig_result load_definition(
+    const char *path,
+    const char *fingerprint,
+    music_rig_compiled_definition *definition,
+    music_rig_generation *generation
+)
 {
     music_rig_file_storage file_storage = {0};
     music_rig_storage_adapter storage = {0};
     music_rig_definition_decoder decoder;
-    music_rig_compiled_definition definition = {0};
-    music_rig_generation generation = {0};
     uint8_t expected[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE];
     music_rig_result result;
 
@@ -138,17 +155,31 @@ static int validate_definition(const char *path, const char *fingerprint)
             sizeof(definition_document),
             expected,
             sizeof(expected),
-            &definition,
+            definition,
             &definition_tables
         );
     }
     if (result == MUSIC_RIG_RESULT_OK) {
         result = music_rig_definition_generation_init(
-            &definition,
+            definition,
             &definition_tables,
-            &generation
+            generation
         );
     }
+    return result;
+}
+
+static int validate_definition(const char *path, const char *fingerprint)
+{
+    music_rig_compiled_definition definition = {0};
+    music_rig_generation generation = {0};
+    music_rig_result result = load_definition(
+        path,
+        fingerprint,
+        &definition,
+        &generation
+    );
+
     if (result != MUSIC_RIG_RESULT_OK) {
         fprintf(stderr, "definition validation failed: result %d\n", (int)result);
         return (int)result;
@@ -172,6 +203,98 @@ static int validate_definition(const char *path, const char *fingerprint)
     puts("output-mode suppressed");
     return MUSIC_RIG_RESULT_OK;
 }
+
+#if defined(MUSIC_RIG_HAS_JACK_MIDI_SHADOW)
+static void configure_current_behaviors(
+    music_rig_device_midi_shadow_config *config
+)
+{
+    size_t index;
+
+    for (index = 0U; index < definition_tables.device_profile_count; ++index) {
+        const char *preset =
+            definition_tables.device_profiles[index].hardware_preset;
+
+        if (strcmp(preset, "arturia-current-rack") == 0) {
+            config->behaviors[index] =
+                MUSIC_RIG_DEVICE_MIDI_SHADOW_BEHAVIOR_CURRENT_ARTURIA;
+        } else if (strcmp(preset, "smk25-current-pad-layers") == 0) {
+            config->behaviors[index] =
+                MUSIC_RIG_DEVICE_MIDI_SHADOW_BEHAVIOR_CURRENT_SMK25;
+        }
+    }
+}
+
+static int run_midi_shadow(const char *path, const char *fingerprint)
+{
+    music_rig_compiled_definition definition = {0};
+    music_rig_generation generation = {0};
+    music_rig_generation_slot generations;
+    music_rig_device_midi_shadow_config config;
+    music_rig_device_midi_shadow shadow;
+    music_rig_jack_midi_shadow host;
+    music_rig_journal_diagnostics journal;
+    music_rig_diagnostic_sink sink;
+    const music_rig_device_midi_shadow_metrics *metrics;
+    music_rig_result result;
+    music_rig_result stop_result = MUSIC_RIG_RESULT_OK;
+
+    result = load_definition(path, fingerprint, &definition, &generation);
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_generation_slot_init(&generations, &generation);
+    }
+    music_rig_device_midi_shadow_config_init(&config);
+    config.generations = &generations;
+    if (result == MUSIC_RIG_RESULT_OK) {
+        configure_current_behaviors(&config);
+        result = music_rig_device_midi_shadow_init(&shadow, &config);
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_jack_midi_shadow_init(&host, &shadow);
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_journal_diagnostics_init(
+            &journal,
+            STDERR_FILENO,
+            &sink
+        );
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_jack_midi_shadow_start(&host);
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_linux_shadow_lifecycle_run(&sink);
+        stop_result = music_rig_jack_midi_shadow_stop(&host);
+        if (result == MUSIC_RIG_RESULT_OK) {
+            result = stop_result;
+        }
+        if (result == MUSIC_RIG_RESULT_OK &&
+            atomic_load_explicit(
+                &host.last_process_result,
+                memory_order_acquire
+            ) != MUSIC_RIG_RESULT_OK) {
+            result = atomic_load_explicit(
+                &host.last_process_result,
+                memory_order_relaxed
+            );
+        }
+    }
+    if (result != MUSIC_RIG_RESULT_OK) {
+        fprintf(stderr, "MIDI shadow failed: result %d\n", (int)result);
+        return (int)result;
+    }
+    metrics = music_rig_device_midi_shadow_metrics_read(&shadow);
+    printf("definition-generation %" PRIu64 "\n", generation.id);
+    printf("input-ports %zu\n", host.port_count);
+    printf("cycles %" PRIu64 "\n", metrics->cycles);
+    printf("input-events %" PRIu64 "\n", metrics->input_events);
+    printf("mapping-decisions %" PRIu64 "\n", metrics->mapping_decisions);
+    printf("suppressed-midi-events %" PRIu64 "\n",
+        metrics->suppressed_midi_events);
+    puts("output-mode suppressed");
+    return MUSIC_RIG_RESULT_OK;
+}
+#endif
 #endif
 
 int main(int argc, char **argv)
@@ -198,6 +321,10 @@ int main(int argc, char **argv)
             MUSIC_RIG_LINUX_LIFECYCLE_ABI_VERSION);
         printf("journal-diagnostics-abi %u\n",
             MUSIC_RIG_JOURNAL_DIAGNOSTICS_ABI_VERSION);
+#endif
+#if defined(MUSIC_RIG_HAS_JACK_MIDI_SHADOW)
+        printf("jack-midi-shadow-abi %u\n",
+            MUSIC_RIG_JACK_MIDI_SHADOW_ABI_VERSION);
 #endif
         printf("output-mode suppressed-only\n");
         return MUSIC_RIG_RESULT_OK;
@@ -226,6 +353,14 @@ int main(int argc, char **argv)
         strcmp(argv[4], "--expected-fingerprint") == 0) {
         return validate_definition(argv[3], argv[5]);
     }
+#if defined(MUSIC_RIG_HAS_JACK_MIDI_SHADOW)
+    if (argc == 7 && strcmp(argv[1], "run-midi-shadow") == 0 &&
+        strcmp(argv[2], "--definition") == 0 &&
+        strcmp(argv[4], "--expected-fingerprint") == 0 &&
+        strcmp(argv[6], "--output-suppressed") == 0) {
+        return run_midi_shadow(argv[3], argv[5]);
+    }
+#endif
 #endif
 
     print_usage(stderr, argv[0]);

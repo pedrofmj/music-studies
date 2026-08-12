@@ -199,9 +199,10 @@ backend ID, or operating system. Profile-only generations therefore keep the
 same catalogue. Runtime publication fully validates the next table image and
 rejects a changed port catalogue before publishing the generation pointer.
 
-These are semantic identities only. This slice does not register JACK,
-PipeWire, WinMM, or other backend ports, connect links, open devices, or emit
-events. A later opt-in adapter may register them once for its process lifetime.
+The portable catalogue remains semantic and backend-neutral. The opt-in Linux
+JACK shadow host now registers only the five `.midi-input` identities for its
+process lifetime. It does not register output ports, discover devices, create
+links, or emit events. WinMM and other host bindings remain later work.
 
 ## State And Metrics
 
@@ -249,9 +250,11 @@ explicit command. Every build supports `--version` and `--help`; invoking it
 without a command exits with code 2. Linux adds the read-only `resolve-paths
 --check-only` preflight and the explicit `run-shadow --output-suppressed`
 lifecycle described above. The opt-in JSON build also supports the explicit
-read-only definition validation command. It reports the runtime, storage,
-diagnostic, and compiled host ABIs. It has no configured IPC transport,
-installation target, default-start path, or output-enabled mode.
+read-only definition validation command. A Linux build with a JACK runtime
+additionally supports `run-midi-shadow` only with a named definition, expected
+fingerprint, and `--output-suppressed`. It reports the runtime, storage,
+diagnostic, compiled, and JACK-shadow host ABIs. It has no configured IPC
+transport, installation target, default-start path, or output-enabled mode.
 
 `music-rig` now has a portable parser, transport interface, and human/JSON
 renderer for `status`, `profiles list`, `validate`, and explicit global/device
@@ -299,9 +302,23 @@ differential fixtures compile the unchanged protected sources offline and
 compare emitted decisions and complete relevant state, including legacy text
 recall. See [BEHAVIORS.md](BEHAVIORS.md) for the full contract.
 
+## Device/MIDI Shadow Execution
+
+The separate fixed-storage event engine owns per-slot parser and behavior state,
+adopts immutable table generations once per callback cycle, and resolves MIDI
+through the numeric dispatch index. Current Arturia and SMK-25 calculated
+messages terminate at a suppression observer; the engine has no output adapter.
+
+The Linux JACK host opens with no-server-start, registers only stable input
+ports, and contains no connect or output API. Fake-backend and complete
+five-device definition tests exercise its process lifecycle without a live
+graph. See [DEVICE-MIDI-SHADOW.md](DEVICE-MIDI-SHADOW.md) for the command,
+ownership, hot-path, metric, failure, and verification contracts.
+
 ## Next Runtime Slice
 
-The next slice implements the device/MIDI adapter and runs it in
-output-suppressed shadow mode. It must observe only explicitly duplicated input,
-record decisions without emitting them, and leave the protected single-rig
-deployment installed and active.
+The next slice proves Linux and Windows protocol, state, parity, and resource
+behavior for the completed Milestone 3 surfaces. Linux live evidence may use
+only explicitly approved temporary duplicated input and must remove it before
+the protected 30/30 post-check. Windows proof remains mock/input-host work until
+the selected Milestone 7 backend is implemented.

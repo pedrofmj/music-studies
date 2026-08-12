@@ -67,6 +67,7 @@ Documents:
 | Native explicit-path storage | ✅ [Linux 35/35, Windows 29/29, and Windows JSON 32/32](https://github.com/pedrofmj/music-studies/actions/runs/31531477956) pass; UTF-8 definition reads, native atomic state replacement, cleanup, missing paths, fingerprint mismatch, and offline daemon loading are covered |
 | Protocol v2 read-only/dry-run control | ✅ [Linux 38/38, Windows 32/32, and Windows JSON 35/35](https://github.com/pedrofmj/music-studies/actions/runs/31539454955) pass; fixed frames, nine operation IDs, fail-closed CLI, table-backed dispatch, and Linux/Windows mock transports are covered |
 | Bounded generations and stable ports | ✅ [Linux 39/39, Windows 33/33, and Windows JSON 36/36](https://github.com/pedrofmj/music-studies/actions/runs/31546338374) pass; four slots sustain 9,999 publications with 9,999 reclamations and at most three retired; ten current-Rig port identities are stable |
+| Device/MIDI output-suppressed shadow | 🟡 Portable five-slot dispatch and Linux input-only JACK lifecycle pass locally; hosted Linux/Windows proof pending |
 | Protected baseline | ✅ 30/30 checks passed |
 | Linux IPC round trips | ✅ 1,000 requests, zero failures |
 | Linux IPC latency | ✅ p99 39,153 ns; maximum 395,453 ns |
@@ -82,7 +83,7 @@ benchmarks.
 | 0. Baseline and technical gates | ✅ | Baseline reproducible and technical gates passed |
 | 1. Schemas and current profile extraction | ✅ | `full-live-rack` describes every current role and dependency; all known conflict classes are rejected |
 | 2. Deterministic compiler and parity | ✅ | Authored definitions deterministically materialize an equivalent temporary deployment on Linux and Windows; the protected live setup remains unchanged |
-| 3. Runtime, CLI, and shadow mode | 🟡 | Portable control/CLI/IPC, immutable mappings, native storage, and Linux XDG/lifecycle/diagnostics pass; reusable legacy extraction, device/MIDI shadow execution, and final cross-platform resource proof remain |
+| 3. Runtime, CLI, and shadow mode | 🟡 | Portable control/CLI/IPC, immutable mappings and behaviors, native storage, Linux host lifecycle, and input-only MIDI shadow execution pass; final cross-platform parity/resource proof remains |
 | 4. Control-only switching | ⬜ | Not started |
 | 5. MIDI management triggers | ⬜ | Not started |
 | 6. Prepared engines and graph deltas | ⬜ | Not started |
@@ -335,8 +336,19 @@ benchmarks.
   `/W4 /WX`. Linux offline differential tests compare the complete relevant
   state and emitted decisions directly with the protected sources, which remain
   unchanged.
-- ⬜ Implement the device/MIDI adapter and run it in output-suppressed shadow
-  mode.
+- 🟡 Implement the device/MIDI adapter and run it in output-suppressed shadow
+  mode. The fixed 40,456-byte portable engine adopts immutable generations,
+  dispatches numeric MIDI for all five current slots, and terminates Arturia and
+  SMK-25 calculated messages at a suppression observer. Its event path has no
+  allocation, lock, filesystem, JSON, or string lookup. The Linux JACK host
+  opens with no-server-start, registers input ports only, and has no graph or
+  MIDI-output API. Fake-JACK callback and end-to-end daemon processes cover
+  activation, input, signal shutdown, failure cleanup, and zero output; the
+  complete compiled envelope maps one event per current device. Local GCC passes
+  51/51 and JSON/JACK 55/55, focused Clang and ASan/UBSan pass 8/8, and the
+  protected baseline remains 30/30. The guarded local host attempt failed
+  closed because no JACK server was available and left no port or link. Hosted
+  Linux and Windows results remain before closure.
 - ⬜ Prove Linux and Windows protocol, state, parity, and resource behavior.
 
 ## Milestone 4: Control-Only Switching

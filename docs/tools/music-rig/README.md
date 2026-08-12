@@ -6,12 +6,13 @@ Status: Milestones 0 through 2 are complete. Milestone 3 is in progress with a
 portable, output-suppressed runtime control loop, qualified persistent-state
 contract, bounded immutable definition tables, explicit-path Linux/Windows file
 adapters, protocol v2 read-only/dry-run dispatch, portable CLI contract, and
-Linux XDG path, diagnostics, and opt-in shadow-lifecycle adapters. Portable
-fixed-storage behavior engines now reproduce the protected Arturia and SMK-25
-state transitions through offline differential tests. `music-rigd` still
-refuses a no-argument start. It does not install or enable a service, create an
-IPC endpoint, connect to MIDI or audio, or modify the stable Carla/PipeWire
-setup.
+Linux XDG path, diagnostics, lifecycle, and input-only JACK shadow adapters.
+Portable fixed-storage event and behavior engines now dispatch all five current
+device slots and reproduce protected Arturia and SMK-25 state transitions while
+suppressing calculated output. `music-rigd` still refuses a no-argument start
+and installs or enables nothing. Its existing service command opens no device;
+the separate explicit MIDI shadow command registers inputs only, never creates
+links, and cannot emit MIDI or modify the stable Carla/PipeWire setup.
 
 ## Safety Boundary
 
@@ -157,8 +158,9 @@ shutdown through mock adapters. Output-enabled mode is rejected.
 
 [`runtime/core/music_rig_device_ports.c`](runtime/core/music_rig_device_ports.c)
 derives fixed `device.<slot>.midi-input` and `.midi-output` identities from
-validated tables. The current Rig has ten identities. They are not registered
-with a backend and cannot change links or emit events.
+validated tables. The current Rig has ten semantic identities. The opt-in Linux
+shadow host registers only the five input identities; neither the catalogue nor
+that host can change links or emit events.
 
 [`runtime/core/music_rig_definition.c`](runtime/core/music_rig_definition.c)
 loads bounded definition metadata and caller-owned tables through logical
@@ -175,6 +177,14 @@ backend access. Portable tests cover their fixed state and Linux-only offline
 tests compare decisions directly with the unchanged protected services. See
 [BEHAVIORS.md](BEHAVIORS.md) for ownership, storage, persistence, parity, and
 shadow-integration boundaries.
+
+[`runtime/adapters/music_rig_device_midi_shadow.c`](runtime/adapters/music_rig_device_midi_shadow.c)
+adopts immutable generations and dispatches numeric MIDI events for every
+stable slot without allocation, locks, JSON traversal, filesystem access, or
+hot-path string comparison. Calculated behavior messages are counted and
+observable only as suppressed decisions. The optional Linux JACK host opens
+with `JackNoStartServer`, registers only stable input ports, and has no output
+or graph-connect symbol. See [DEVICE-MIDI-SHADOW.md](DEVICE-MIDI-SHADOW.md).
 
 [`runtime/platform/include/music_rig/file_storage.h`](runtime/platform/include/music_rig/file_storage.h)
 defines explicit caller-owned UTF-8 paths. Linux and Windows implementations
@@ -196,8 +206,11 @@ emits bounded lifecycle diagnostics and waits for `SIGINT` or `SIGTERM`; it
 reads no definition, opens no endpoint, and writes no state. An opt-in JSON
 build also adds `validate-definition`, which reads one named definition,
 reports validated metadata, table counts, and fixed storage size, and exits
-without a state path or output. See [RUNTIME.md](RUNTIME.md) for ownership,
-lifecycle, storage, adapter, metric, failure, and next-slice contracts.
+without a state path or output. On Linux with a JACK runtime, the same opt-in
+build adds `run-midi-shadow`, which requires a named definition, trusted
+fingerprint, and explicit suppressed mode, then registers input-only stable
+ports until a signal. See [RUNTIME.md](RUNTIME.md) for ownership, lifecycle,
+storage, adapter, metric, failure, and next-slice contracts.
 
 [`music-rig`](music-rig.c) recognizes `status`, `profiles list`, `validate`, and
 global/device switches only with `--dry-run`. The portable client library
