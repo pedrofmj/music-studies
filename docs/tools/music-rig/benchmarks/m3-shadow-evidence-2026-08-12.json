@@ -1,0 +1,105 @@
+{
+  "schema": "music-studies/m3-shadow-evidence/v1",
+  "recorded_on": "2026-08-12",
+  "source_commit": "20c069e43837478e73b840e0515b39163257f9d9",
+  "definition": {
+    "path": "../tests/fixtures/compiled-current-envelope.json",
+    "sha256": "34ca6684a8fe2823ba706bd071a01cd5b60b9fbb3ca6ceb1e6a7c5095b543f64",
+    "fingerprint": "sha256:9be68993c164802f694f4d6359c208d9937fbfcf668781ce5a1c3bff5f30cb9e",
+    "generation": 1
+  },
+  "protocol": {
+    "version": 2,
+    "request_frame_bytes": 176,
+    "response_frame_bytes": 2592,
+    "operation_count": 9,
+    "golden_frames_passed": true,
+    "all_responses_output_suppressed": true,
+    "transports": {
+      "linux": {
+        "implementation": "SOCK_SEQPACKET",
+        "round_trip_requests": 1000,
+        "failures": 0
+      },
+      "windows": {
+        "implementation": "current-user-named-pipe",
+        "round_trip_requests": 1000,
+        "failures": 0
+      }
+    }
+  },
+  "state": {
+    "frame_bytes": 64,
+    "single_byte_corruptions_rejected": 64,
+    "integrity_round_trip_passed": true,
+    "qualified_restore_passed": true,
+    "definition_fingerprint_fallback_passed": true,
+    "atomic_replace_failure_passed": true,
+    "native_storage_passed": {
+      "linux": true,
+      "windows": true
+    }
+  },
+  "parity": {
+    "device_profiles": 5,
+    "input_bindings": 5,
+    "mappings": 72,
+    "mapping_index_entries": 72,
+    "target_bindings": 71,
+    "ownership_entries": 57,
+    "stable_device_ports": 10,
+    "graph_delta_empty": true,
+    "arturia_differential_passed": true,
+    "smk25_differential_passed": true,
+    "five_slot_dispatch_passed": true
+  },
+  "hosted_build": {
+    "workflow_run": 31622122149,
+    "artifact_id": 9151714787,
+    "source_commit": "20c069e43837478e73b840e0515b39163257f9d9",
+    "results": {
+      "linux": {
+        "passed": 51,
+        "failed": 0
+      },
+      "windows": {
+        "passed": 38,
+        "failed": 0
+      },
+      "windows_json": {
+        "passed": 43,
+        "failed": 0
+      }
+    },
+    "windows_strict_warnings_passed": true
+  },
+  "resources": {
+    "minimum_zero_event_duration_ns": 60000000000,
+    "idle_cpu_one_core_percent_max_exclusive": 0.5,
+    "idle_rss_bytes_max_exclusive": 50000000,
+    "observations": {
+      "linux": {
+        "path": "shadow-idle-linux-2026-08-12.json",
+        "sha256": "b41c4602f12e5ea076de68d065169d987eb17db28ef932ed55454dc21d6b7a7f"
+      },
+      "windows": {
+        "path": "shadow-idle-windows-2026-08-12.json",
+        "sha256": "102d0ac380c9546c7b9b7e40c8cef785166818ecaef8b2821e9dfab55afce85d"
+      }
+    }
+  },
+  "live_shadow": {
+    "path": "shadow-live-airstar-2026-08-12.json",
+    "sha256": "1a385a63eecbb7deeeb88779e6e1ca79471b363e1276a24798b4afd8f8257a3b"
+  },
+  "evaluation": {
+    "protocol_pass": true,
+    "state_pass": true,
+    "parity_pass": true,
+    "linux_resource_pass": true,
+    "windows_resource_pass": true,
+    "five_slot_live_shadow_pass": true,
+    "protected_rig_restored_pass": true,
+    "passed": true
+  }
+}

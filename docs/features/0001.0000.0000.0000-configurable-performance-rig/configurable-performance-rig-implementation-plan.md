@@ -2,7 +2,7 @@
 
 Language: **English**
 
-Status: Milestones 0 through 2 complete. Milestone 3 is in progress. The
+Status: Milestones 0 through 3 complete. Milestone 4 has not started. The
 protected single-rig deployment remains the production default.
 
 Related documents:
@@ -11,7 +11,7 @@ Related documents:
 - [Proposta de Funcionalidade (pt-BR)](configurable-performance-rig.pt-BR.md)
 - [Implementation Tracker](configurable-performance-rig-tracker.md)
 
-## Implementation Checkpoint: 2026-08-11
+## Implementation Checkpoint: 2026-08-12
 
 Completed Milestone 0 work:
 
@@ -224,6 +224,34 @@ protected baseline remains 30/30. Hosted
 [run 31551820903](https://github.com/pedrofmj/music-studies/actions/runs/31551820903)
 passes Linux 47/47, Windows 36/36, and Windows JSON 39/39 under strict
 `/W4 /WX`.
+
+The fixed-storage Device/MIDI adapter and Linux input-only JACK host complete
+the Milestone 3 execution boundary. Per-slot metrics prevent an aggregate count
+from hiding an unobserved controller. Hosted
+[run 31622122149](https://github.com/pedrofmj/music-studies/actions/runs/31622122149)
+passes the final source commit on Linux 51/51, Windows 38/38, and Windows JSON
+43/43. Physical Linux and Windows definition-backed mock-input workloads each
+complete a full external 60-second zero-event window with 0.000% measured CPU,
+3,162,112-byte and 6,381,568-byte observed peak RSS respectively, one native
+wait completion, zero activity, clean shutdown, and no media API or live route.
+
+The explicitly approved Airstar shadow session retained five input ports and
+zero output ports beside the protected rack. A 413-second practice interval
+recorded 2,054 events and 1,621 mapping decisions across Arturia, SMK-25,
+SMC-Mixer, and SMC-PAD while production sound remained normal. Its zero Pocket
+counter was rejected; a later same-source comparison independently recorded
+two Pocket inputs and two Pocket mappings with all other shadow slots at zero.
+The combined gate therefore proves all five slots without treating audible
+production output as shadow evidence. All temporary resources were removed,
+the Carla checksum, 117 graph links, 67 MIDI links, services, and restart counts
+were unchanged, and the protected post-check passed 30/30. The checksummed,
+machine-validated result is
+[Milestone 3 shadow evidence](../../tools/music-rig/benchmarks/M3-SHADOW-EVIDENCE.md).
+
+Milestone 3 is complete. No runtime was installed or enabled, no output path
+exists, and the protected setup remains the default. The next sequential task
+is the Milestone 4 SMC-Mixer independent parity gate; ownership cutover still
+requires a rehearsed rollback and explicit live approval.
 
 ## Objective
 

@@ -782,6 +782,28 @@ if(BUILD_TESTING)
         PROPERTIES TIMEOUT 10
     )
 
+    set(MUSIC_RIG_M3_SHADOW_EVIDENCE_VALIDATOR
+        "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/validate-m3-shadow-evidence"
+    )
+    add_test(
+        NAME music_rig_m3_shadow_evidence
+        COMMAND "${Python3_EXECUTABLE}"
+            "${MUSIC_RIG_M3_SHADOW_EVIDENCE_VALIDATOR}"
+            --validate
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/m3-shadow-evidence-2026-08-12.json"
+    )
+    add_test(
+        NAME music_rig_m3_shadow_evidence_validator_self_test
+        COMMAND "${Python3_EXECUTABLE}"
+            "${MUSIC_RIG_M3_SHADOW_EVIDENCE_VALIDATOR}"
+            --self-test
+    )
+    set_tests_properties(
+        music_rig_m3_shadow_evidence
+        music_rig_m3_shadow_evidence_validator_self_test
+        PROPERTIES TIMEOUT 10
+    )
+
     if(MUSIC_RIG_ENABLE_JSON_C_SPIKE)
         set(MUSIC_RIG_JSON_DEFINITION_FIXTURE
             "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-current-envelope.json"

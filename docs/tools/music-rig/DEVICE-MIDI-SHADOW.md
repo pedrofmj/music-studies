@@ -34,8 +34,9 @@ reported only as a suppressed event and increments a saturating counter. No
 output backend exists in this library.
 
 Metrics cover callback cycles, generation adoptions, input, parsed, mapped,
-unmapped, malformed, and suppressed events. They are written by the single
-callback thread and read only after the host has stopped.
+unmapped, malformed, and suppressed events. Input, mapping, and suppressed
+counts are also retained separately for every stable device slot. They are
+written by the single callback thread and read only after the host has stopped.
 
 ## Linux JACK Host
 
@@ -111,7 +112,10 @@ passes Linux 51/51, Windows 38/38, and Windows JSON 41/41. Both Windows builds
 compile and test the portable event engine under strict `/W4 /WX`; the optional
 Windows JSON build also exercises all five current device slots.
 
-The guarded Airstar attempt found no available JACK server and returned adapter
-failure before registering a port. It did not start a server, create a link,
-change a service, or leave a client behind. Live duplicated-input session and
-resource evidence belong to the next Milestone 3 proof task.
+The completed
+[Milestone 3 evidence](benchmarks/M3-SHADOW-EVIDENCE.md) supersedes that guarded
+attempt. An explicitly approved Airstar session proved input and mapping for all
+five current slots with zero output ports and normal production sound. Physical
+Linux and Windows 60-second zero-event measurements pass the CPU/RSS gates.
+Every temporary live resource was removed and the protected post-check passed
+30/30.

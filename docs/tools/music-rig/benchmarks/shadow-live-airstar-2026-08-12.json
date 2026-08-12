@@ -1,0 +1,171 @@
+{
+  "schema": "music-studies/m3-shadow-live-session/v1",
+  "captured_on": "2026-08-12",
+  "source_commit": "20c069e43837478e73b840e0515b39163257f9d9",
+  "reference_machine": {
+    "hostname": "airstar",
+    "operating_system": "Ubuntu 24.04.4 LTS",
+    "kernel": "7.0.0-28-generic",
+    "architecture": "x86_64"
+  },
+  "definition": {
+    "path": "../tests/fixtures/compiled-current-envelope.json",
+    "bytes": 86617,
+    "sha256": "34ca6684a8fe2823ba706bd071a01cd5b60b9fbb3ca6ceb1e6a7c5095b543f64",
+    "fingerprint": "sha256:9be68993c164802f694f4d6359c208d9937fbfcf668781ce5a1c3bff5f30cb9e",
+    "generation": 1,
+    "device_profiles": 5,
+    "mappings": 72
+  },
+  "artifact": {
+    "name": "music-rigd",
+    "sha256": "32a4185e23c9177eaae1e88a28e40fbda5e95f6b6a6bc9bfce61f1ea7dae75e0",
+    "hash_verified_on_reference_machine": true,
+    "output_mode": "suppressed-only",
+    "input_ports": 5,
+    "output_ports": 0,
+    "installed": false,
+    "service_created": false
+  },
+  "practice_session": {
+    "elapsed_seconds": 413,
+    "temporary_duplicate_input_links": 5,
+    "output_ports": 0,
+    "process": {
+      "cpu_percent_snapshot": 0.1,
+      "rss_kib_snapshot": 9752,
+      "threads_snapshot": 5
+    },
+    "metrics": {
+      "cycles": 9692,
+      "input_events": 2054,
+      "mapping_decisions": 1621,
+      "suppressed_midi_events": 842,
+      "slots": {
+        "arturia-main": {
+          "input_events": 840,
+          "mapping_decisions": 494,
+          "suppressed_midi_events": 12
+        },
+        "smk25-main": {
+          "input_events": 225,
+          "mapping_decisions": 138,
+          "suppressed_midi_events": 830
+        },
+        "smc-mixer-main": {
+          "input_events": 617,
+          "mapping_decisions": 617,
+          "suppressed_midi_events": 0
+        },
+        "smc-pad-main": {
+          "input_events": 372,
+          "mapping_decisions": 372,
+          "suppressed_midi_events": 0
+        },
+        "smc-pad-pocket": {
+          "input_events": 0,
+          "mapping_decisions": 0,
+          "suppressed_midi_events": 0,
+          "accepted_for_slot_proof": false
+        }
+      }
+    },
+    "pipewire_error_total": 0,
+    "operator": {
+      "all_devices_audible_through_production_rack": true,
+      "sound_remained_normal": true,
+      "dropouts_observed": false
+    }
+  },
+  "pocket_comparison": {
+    "reason": "The practice-session Pocket slot was zero, so it was rejected and isolated instead of inferred from audible production output.",
+    "source": "SINCO:SINCO SMC-PAD Pocket-Master",
+    "expected_performance_notes": [40, 41, 42, 43, 36, 37, 38, 39],
+    "alsa_capture": {
+      "tool": "aseqdump",
+      "channel_zero_based": 9,
+      "notes_observed": [40, 41, 42, 43, 36, 37, 38, 39],
+      "note_on_and_off_for_every_note": true
+    },
+    "same_source_jack_comparison": {
+      "system_monitor_events": [
+        "99 28 7d",
+        "89 28 40"
+      ],
+      "temporary_shadow_input_links": 1,
+      "shadow_output_ports": 0,
+      "pipewire_error_total": 0,
+      "shadow_metrics": {
+        "cycles": 1209,
+        "input_events": 2,
+        "mapping_decisions": 2,
+        "suppressed_midi_events": 0,
+        "slot": "smc-pad-pocket",
+        "other_slot_input_events": 0,
+        "other_slot_mapping_decisions": 0
+      },
+      "passed": true
+    }
+  },
+  "combined_slot_gate": {
+    "required_slots": [
+      "arturia-main",
+      "smk25-main",
+      "smc-mixer-main",
+      "smc-pad-main",
+      "smc-pad-pocket"
+    ],
+    "every_slot_has_input_and_mapping_evidence": true,
+    "output_suppressed_throughout": true,
+    "passed": true
+  },
+  "stability_and_restoration": {
+    "pre_observed_at": "2026-08-12T14:30:40-03:00",
+    "post_observed_at": "2026-08-12T17:04:12-03:00",
+    "pre_observation_status": "complete",
+    "post_observation_status": "complete",
+    "protected_source_checks_before": 30,
+    "protected_source_checks_after": 30,
+    "protected_source_failures_before": 0,
+    "protected_source_failures_after": 0,
+    "pipewire_errors_before": 0,
+    "pipewire_errors_after": 0,
+    "attributable_pipewire_errors": 0,
+    "graph_links_before": 117,
+    "graph_links_after": 117,
+    "midi_links_before": 67,
+    "midi_links_after": 67,
+    "carla_project_sha256_before": "48ea4f777c68ebd39105902739258795edfa96fefd8820b62fb31d4efe329974",
+    "carla_project_sha256_after": "48ea4f777c68ebd39105902739258795edfa96fefd8820b62fb31d4efe329974",
+    "services_unchanged": true,
+    "service_restarts": 0,
+    "remaining_experimental_input_ports": 0,
+    "remaining_experimental_output_ports": 0,
+    "remaining_experimental_processes": 0,
+    "remaining_experimental_directories": 0,
+    "protected_gain_monitor_preserved": true,
+    "passed": true
+  },
+  "rejected_observations": [
+    {
+      "reason": "The 10-minute fail-safe expired before operator input, leaving all shadow counters at zero.",
+      "used_as_evidence": false,
+      "restoration_verified": true
+    },
+    {
+      "reason": "The first Pocket-only operator interval recorded zero shadow events; it was superseded by the same-source JACK comparison.",
+      "used_as_evidence": false,
+      "restoration_verified": true
+    }
+  ],
+  "evaluation": {
+    "minimum_live_duration_pass": true,
+    "five_slot_input_pass": true,
+    "five_slot_mapping_pass": true,
+    "zero_output_pass": true,
+    "zero_attributable_error_pass": true,
+    "operator_acceptance_pass": true,
+    "cleanup_pass": true,
+    "passed": true
+  }
+}

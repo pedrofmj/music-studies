@@ -1,0 +1,619 @@
+#!/usr/bin/env python3
+"""Validate the complete, historical Milestone 3 shadow evidence bundle."""
+
+from __future__ import annotations
+
+import argparse
+import copy
+import hashlib
+import json
+import math
+import re
+import sys
+from pathlib import Path
+from typing import Any, Callable
+
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+MUSIC_RIG_DIR = SCRIPT_DIR.parent
+DEFAULT_EVIDENCE = SCRIPT_DIR / "m3-shadow-evidence-2026-08-12.json"
+SHA256_PATTERN = re.compile(r"[0-9a-f]{64}\Z")
+COMMIT_PATTERN = re.compile(r"[0-9a-f]{40}\Z")
+EXPECTED_SLOTS = [
+    "arturia-main",
+    "smk25-main",
+    "smc-mixer-main",
+    "smc-pad-main",
+    "smc-pad-pocket",
+]
+PRACTICE_SLOTS = EXPECTED_SLOTS[:-1]
+
+
+class ValidationError(RuntimeError):
+    """Raised when evidence is incomplete, inconsistent, or out of bounds."""
+
+
+def require(condition: bool, message: str) -> None:
+    if not condition:
+        raise ValidationError(message)
+
+
+def require_object(value: Any, label: str) -> dict[str, Any]:
+    require(isinstance(value, dict), f"{label} must be an object")
+    return value
+
+
+def require_integer(value: Any, label: str, minimum: int = 0) -> int:
+    require(
+        isinstance(value, int) and not isinstance(value, bool),
+        f"{label} must be an integer",
+    )
+    require(value >= minimum, f"{label} must be at least {minimum}")
+    return value
+
+
+def require_number(value: Any, label: str, minimum: float = 0.0) -> float:
+    require(
+        isinstance(value, (int, float)) and not isinstance(value, bool),
+        f"{label} must be a number",
+    )
+    result = float(value)
+    require(math.isfinite(result), f"{label} must be finite")
+    require(result >= minimum, f"{label} must be at least {minimum}")
+    return result
+
+
+def require_true(value: Any, label: str) -> None:
+    require(value is True, f"{label} must be true")
+
+
+def require_all_true(value: Any, label: str) -> None:
+    document = require_object(value, label)
+    require(bool(document), f"{label} must not be empty")
+    for name, result in document.items():
+        require_true(result, f"{label}.{name}")
+
+
+def load_json(path: Path) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise ValidationError(f"Cannot load {path}: {error}") from error
+    return require_object(value, str(path))
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    try:
+        with path.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(65536), b""):
+                digest.update(chunk)
+    except OSError as error:
+        raise ValidationError(f"Cannot hash {path}: {error}") from error
+    return digest.hexdigest()
+
+
+def resolve_reference(reference: Any, label: str) -> tuple[Path, str]:
+    value = require_object(reference, label)
+    relative = value.get("path")
+    digest = value.get("sha256")
+    require(
+        isinstance(relative, str) and bool(relative),
+        f"{label}.path must be a nonempty string",
+    )
+    require(
+        isinstance(digest, str) and SHA256_PATTERN.fullmatch(digest) is not None,
+        f"{label}.sha256 must be a lowercase SHA-256",
+    )
+    candidate = (SCRIPT_DIR / relative).resolve()
+    require(
+        candidate == MUSIC_RIG_DIR or MUSIC_RIG_DIR in candidate.parents,
+        f"{label}.path escapes the music-rig tree",
+    )
+    require(candidate.is_file(), f"{label}.path does not name a file")
+    require(sha256_file(candidate) == digest, f"{label} checksum mismatch")
+    return candidate, digest
+
+
+def validate_definition(
+    evidence: dict[str, Any], definition: dict[str, Any]
+) -> None:
+    expected = require_object(evidence.get("definition"), "definition")
+    require(
+        definition.get("schema") == "music-studies/compiled-performance-rig/v1",
+        "Compiled definition schema drift",
+    )
+    require(
+        definition.get("definition_fingerprint") == expected.get("fingerprint"),
+        "Compiled definition fingerprint mismatch",
+    )
+    require(definition.get("generation") == expected.get("generation") == 1,
+            "Compiled definition generation drift")
+
+    parity = require_object(evidence.get("parity"), "parity")
+    collections = {
+        "device_profiles": "device_profiles",
+        "input_bindings": "input_bindings",
+        "mappings": "mappings",
+        "mapping_index_entries": "mapping_index",
+        "target_bindings": "target_bindings",
+        "ownership_entries": "ownership",
+    }
+    for evidence_name, definition_name in collections.items():
+        collection = definition.get(definition_name)
+        require(
+            isinstance(collection, (dict, list)),
+            f"Compiled {definition_name} must be a collection",
+        )
+        require(
+            len(collection) == parity.get(evidence_name),
+            f"Compiled {definition_name} count drift",
+        )
+    graph_delta = require_object(definition.get("graph_delta"), "graph delta")
+    require_true(graph_delta.get("empty"), "Compiled graph delta empty flag")
+    require_true(parity.get("graph_delta_empty"), "Parity graph delta gate")
+
+
+def validate_protocol_state_and_parity(evidence: dict[str, Any]) -> None:
+    protocol = require_object(evidence.get("protocol"), "protocol")
+    require(protocol.get("version") == 2, "Protocol version drift")
+    require(protocol.get("request_frame_bytes") == 176, "Request frame drift")
+    require(protocol.get("response_frame_bytes") == 2592,
+            "Response frame drift")
+    require(protocol.get("operation_count") == 9, "Operation inventory drift")
+    require_true(protocol.get("golden_frames_passed"), "Protocol golden frames")
+    require_true(protocol.get("all_responses_output_suppressed"),
+                 "Protocol output suppression")
+    transports = require_object(protocol.get("transports"), "protocol transports")
+    expected_transports = {
+        "linux": "SOCK_SEQPACKET",
+        "windows": "current-user-named-pipe",
+    }
+    require(set(transports) == set(expected_transports), "Transport set drift")
+    for platform, implementation in expected_transports.items():
+        transport = require_object(transports.get(platform), platform)
+        require(transport.get("implementation") == implementation,
+                f"{platform} transport drift")
+        require(transport.get("round_trip_requests") == 1000,
+                f"{platform} round-trip count drift")
+        require(transport.get("failures") == 0,
+                f"{platform} protocol failures are nonzero")
+
+    state = require_object(evidence.get("state"), "state")
+    require(state.get("frame_bytes") == 64, "Persistent state frame drift")
+    require(state.get("single_byte_corruptions_rejected") == 64,
+            "State corruption coverage drift")
+    for name in (
+        "integrity_round_trip_passed",
+        "qualified_restore_passed",
+        "definition_fingerprint_fallback_passed",
+        "atomic_replace_failure_passed",
+    ):
+        require_true(state.get(name), f"state.{name}")
+    require_all_true(state.get("native_storage_passed"), "native storage")
+
+    parity = require_object(evidence.get("parity"), "parity")
+    expected_counts = {
+        "device_profiles": 5,
+        "input_bindings": 5,
+        "mappings": 72,
+        "mapping_index_entries": 72,
+        "target_bindings": 71,
+        "ownership_entries": 57,
+        "stable_device_ports": 10,
+    }
+    for name, expected in expected_counts.items():
+        require(parity.get(name) == expected, f"Parity {name} drift")
+    for name in (
+        "graph_delta_empty",
+        "arturia_differential_passed",
+        "smk25_differential_passed",
+        "five_slot_dispatch_passed",
+    ):
+        require_true(parity.get(name), f"parity.{name}")
+
+
+def validate_hosted_build(evidence: dict[str, Any]) -> None:
+    source_commit = evidence.get("source_commit")
+    require(
+        isinstance(source_commit, str)
+        and COMMIT_PATTERN.fullmatch(source_commit) is not None,
+        "source_commit must be a lowercase 40-character commit",
+    )
+    hosted = require_object(evidence.get("hosted_build"), "hosted build")
+    require(hosted.get("source_commit") == source_commit,
+            "Hosted source commit mismatch")
+    require(hosted.get("workflow_run") == 31622122149,
+            "Hosted workflow provenance drift")
+    require(hosted.get("artifact_id") == 9151714787,
+            "Hosted artifact provenance drift")
+    expected_results = {"linux": 51, "windows": 38, "windows_json": 43}
+    results = require_object(hosted.get("results"), "hosted results")
+    require(set(results) == set(expected_results), "Hosted platform set drift")
+    for platform, passed in expected_results.items():
+        result = require_object(results.get(platform), platform)
+        require(result.get("passed") == passed, f"{platform} pass count drift")
+        require(result.get("failed") == 0, f"{platform} has test failures")
+    require_true(hosted.get("windows_strict_warnings_passed"),
+                 "Windows strict warning gate")
+
+
+def validate_resource(
+    document: dict[str, Any],
+    platform: str,
+    evidence: dict[str, Any],
+) -> None:
+    require(document.get("schema") == "music-studies/shadow-idle-resource/v1",
+            f"{platform} resource schema drift")
+    require(document.get("measurement_kind") == "physical-reference",
+            f"{platform} resource is not physical-reference evidence")
+    require(document.get("platform") == platform,
+            f"{platform} resource platform mismatch")
+    require(document.get("source_commit") == evidence.get("source_commit"),
+            f"{platform} resource source commit mismatch")
+
+    expected_definition = require_object(evidence.get("definition"), "definition")
+    definition = require_object(document.get("definition"),
+                                f"{platform} resource definition")
+    require(definition.get("sha256") == expected_definition.get("sha256"),
+            f"{platform} resource definition checksum mismatch")
+    require(definition.get("fingerprint") == expected_definition.get("fingerprint"),
+            f"{platform} resource definition fingerprint mismatch")
+
+    resources = require_object(evidence.get("resources"), "resources")
+    cpu_limit = require_number(
+        resources.get("idle_cpu_one_core_percent_max_exclusive"), "CPU limit"
+    )
+    rss_limit = require_integer(
+        resources.get("idle_rss_bytes_max_exclusive"), "RSS limit", 1
+    )
+    minimum_duration = require_integer(
+        resources.get("minimum_zero_event_duration_ns"), "duration limit", 1
+    )
+    thresholds = require_object(document.get("thresholds"),
+                                f"{platform} thresholds")
+    require_true(thresholds.get("physical_gates_enforced"),
+                 f"{platform} physical gates")
+    require(thresholds.get("idle_cpu_one_core_percent_max_exclusive") == cpu_limit,
+            f"{platform} CPU threshold drift")
+    require(thresholds.get("idle_rss_bytes_max_exclusive") == rss_limit,
+            f"{platform} RSS threshold drift")
+
+    idle = require_object(document.get("idle_observation"),
+                          f"{platform} idle observation")
+    require(idle.get("adapter") == "portable-definition-backed-mock-input",
+            f"{platform} adapter drift")
+    require_integer(idle.get("requested_zero_event_duration_ms"),
+                    f"{platform} requested duration", 60000)
+    require_integer(idle.get("workload_requested_duration_ms"),
+                    f"{platform} workload duration", 60500)
+    require_integer(idle.get("measurement_window_ns"),
+                    f"{platform} measurement window", minimum_duration)
+    require_integer(idle.get("observed_duration_ns"),
+                    f"{platform} observed duration", minimum_duration)
+    cpu = require_number(idle.get("cpu_one_core_percent"),
+                         f"{platform} CPU")
+    require(cpu < cpu_limit, f"{platform} idle CPU is not below its limit")
+    for name in (
+        "rss_start_bytes",
+        "rss_peak_observed_bytes",
+        "rss_lifetime_peak_bytes",
+    ):
+        rss = require_integer(idle.get(name), f"{platform} {name}")
+        require(rss < rss_limit, f"{platform} {name} is not below its limit")
+    for name in (
+        "control_requests",
+        "midi_events",
+        "mapping_decisions",
+        "suppressed_midi_events",
+        "cpu_time_ns",
+    ):
+        require(idle.get(name) == 0, f"{platform} {name} must be zero")
+    require_integer(idle.get("samples"), f"{platform} samples", 120)
+    require_integer(idle.get("wakeups"), f"{platform} wakeups")
+    require(idle.get("wakeups") <= 1, f"{platform} wakeups exceed one")
+    require(idle.get("exit_code") == 0, f"{platform} workload exit failed")
+    if platform == "linux":
+        require_integer(idle.get("descriptors_peak"), "Linux descriptors", 1)
+    else:
+        require_integer(idle.get("handles_peak"), "Windows handles", 1)
+        require_integer(idle.get("threads_peak"), "Windows threads", 1)
+        hosted = require_object(document.get("hosted_build"),
+                                "Windows resource hosted build")
+        authority = require_object(evidence.get("hosted_build"), "hosted build")
+        require(hosted.get("workflow_run") == authority.get("workflow_run"),
+                "Windows resource workflow mismatch")
+        require(hosted.get("artifact_id") == authority.get("artifact_id"),
+                "Windows resource artifact mismatch")
+
+    scope = require_object(document.get("scope"), f"{platform} scope")
+    for name in ("compiled_current_definition_loaded", "output_suppressed",
+                 "mock_input_adapter"):
+        require_true(scope.get(name), f"{platform} scope.{name}")
+    for name in (
+        "audio_or_midi_apis_opened",
+        "audio_or_midi_routes_changed",
+        "service_installed",
+        "live_rig_changes",
+        "stability_counters_observed",
+    ):
+        require(scope.get(name) is False, f"{platform} scope.{name} must be false")
+    require_all_true(document.get("evaluation"), f"{platform} evaluation")
+
+
+def validate_live(document: dict[str, Any], evidence: dict[str, Any]) -> None:
+    require(document.get("schema") == "music-studies/m3-shadow-live-session/v1",
+            "Live evidence schema drift")
+    require(document.get("source_commit") == evidence.get("source_commit"),
+            "Live evidence source commit mismatch")
+    expected_definition = require_object(evidence.get("definition"), "definition")
+    definition = require_object(document.get("definition"), "live definition")
+    require(definition.get("sha256") == expected_definition.get("sha256"),
+            "Live definition checksum mismatch")
+    require(definition.get("fingerprint") == expected_definition.get("fingerprint"),
+            "Live definition fingerprint mismatch")
+    require(definition.get("device_profiles") == 5, "Live profile count drift")
+    require(definition.get("mappings") == 72, "Live mapping count drift")
+
+    artifact = require_object(document.get("artifact"), "live artifact")
+    require_true(artifact.get("hash_verified_on_reference_machine"),
+                 "Live artifact hash verification")
+    require(artifact.get("output_mode") == "suppressed-only",
+            "Live artifact output mode drift")
+    require(artifact.get("input_ports") == 5, "Live input-port count drift")
+    require(artifact.get("output_ports") == 0, "Live output ports are nonzero")
+    require(artifact.get("installed") is False, "Live artifact was installed")
+    require(artifact.get("service_created") is False, "Live service was created")
+
+    practice = require_object(document.get("practice_session"), "practice session")
+    require_integer(practice.get("elapsed_seconds"), "practice duration", 60)
+    require(practice.get("temporary_duplicate_input_links") == 5,
+            "Practice input-link count drift")
+    require(practice.get("output_ports") == 0, "Practice output ports are nonzero")
+    require(practice.get("pipewire_error_total") == 0,
+            "Practice PipeWire errors are nonzero")
+    operator = require_object(practice.get("operator"), "operator acceptance")
+    require_true(operator.get("all_devices_audible_through_production_rack"),
+                 "Production rack audibility")
+    require_true(operator.get("sound_remained_normal"), "Normal sound gate")
+    require(operator.get("dropouts_observed") is False, "Dropouts were observed")
+
+    metrics = require_object(practice.get("metrics"), "practice metrics")
+    slots = require_object(metrics.get("slots"), "practice slot metrics")
+    require(set(slots) == set(EXPECTED_SLOTS), "Practice slot set drift")
+    for name in PRACTICE_SLOTS:
+        slot = require_object(slots.get(name), f"practice slot {name}")
+        require_integer(slot.get("input_events"), f"{name} input events", 1)
+        require_integer(slot.get("mapping_decisions"),
+                        f"{name} mapping decisions", 1)
+    pocket_practice = require_object(slots.get("smc-pad-pocket"),
+                                     "practice Pocket slot")
+    require(pocket_practice.get("input_events") == 0,
+            "Zero Pocket practice observation was changed")
+    require(pocket_practice.get("mapping_decisions") == 0,
+            "Zero Pocket practice mapping observation was changed")
+    require(pocket_practice.get("accepted_for_slot_proof") is False,
+            "Zero Pocket practice interval cannot prove the slot")
+    for field in ("input_events", "mapping_decisions", "suppressed_midi_events"):
+        total = sum(require_integer(require_object(slots[name], name).get(field),
+                                    f"{name}.{field}") for name in EXPECTED_SLOTS)
+        require(metrics.get(field) == total, f"Practice {field} aggregate mismatch")
+
+    pocket = require_object(document.get("pocket_comparison"), "Pocket comparison")
+    expected_notes = [40, 41, 42, 43, 36, 37, 38, 39]
+    require(pocket.get("expected_performance_notes") == expected_notes,
+            "Pocket expected-note inventory drift")
+    alsa = require_object(pocket.get("alsa_capture"), "Pocket ALSA capture")
+    require(alsa.get("channel_zero_based") == 9, "Pocket MIDI channel drift")
+    require(alsa.get("notes_observed") == expected_notes,
+            "Pocket observed-note inventory drift")
+    require_true(alsa.get("note_on_and_off_for_every_note"),
+                 "Pocket note-on/off coverage")
+    comparison = require_object(pocket.get("same_source_jack_comparison"),
+                                "Pocket same-source comparison")
+    require(comparison.get("shadow_output_ports") == 0,
+            "Pocket comparison output ports are nonzero")
+    require(comparison.get("pipewire_error_total") == 0,
+            "Pocket comparison PipeWire errors are nonzero")
+    require_true(comparison.get("passed"), "Pocket comparison gate")
+    shadow = require_object(comparison.get("shadow_metrics"),
+                            "Pocket comparison metrics")
+    require(shadow.get("slot") == "smc-pad-pocket", "Pocket slot identity drift")
+    require_integer(shadow.get("input_events"), "Pocket comparison input", 1)
+    require_integer(shadow.get("mapping_decisions"),
+                    "Pocket comparison mappings", 1)
+    require(shadow.get("other_slot_input_events") == 0,
+            "Pocket comparison has other-slot input")
+    require(shadow.get("other_slot_mapping_decisions") == 0,
+            "Pocket comparison has other-slot mappings")
+
+    combined = require_object(document.get("combined_slot_gate"),
+                              "combined slot gate")
+    require(combined.get("required_slots") == EXPECTED_SLOTS,
+            "Combined slot order or inventory drift")
+    require_all_true(
+        {name: combined.get(name) for name in (
+            "every_slot_has_input_and_mapping_evidence",
+            "output_suppressed_throughout",
+            "passed",
+        )},
+        "combined slot gate",
+    )
+
+    restoration = require_object(document.get("stability_and_restoration"),
+                                 "stability and restoration")
+    require(restoration.get("pre_observation_status") == "complete",
+            "Pre-observation was incomplete")
+    require(restoration.get("post_observation_status") == "complete",
+            "Post-observation was incomplete")
+    require(restoration.get("protected_source_checks_before") == 30,
+            "Pre-check count drift")
+    require(restoration.get("protected_source_checks_after") == 30,
+            "Post-check count drift")
+    for name in (
+        "protected_source_failures_before",
+        "protected_source_failures_after",
+        "pipewire_errors_before",
+        "pipewire_errors_after",
+        "attributable_pipewire_errors",
+        "service_restarts",
+        "remaining_experimental_input_ports",
+        "remaining_experimental_output_ports",
+        "remaining_experimental_processes",
+        "remaining_experimental_directories",
+    ):
+        require(restoration.get(name) == 0, f"Restoration {name} is nonzero")
+    require(restoration.get("graph_links_before") ==
+            restoration.get("graph_links_after") == 117,
+            "Graph link restoration mismatch")
+    require(restoration.get("midi_links_before") ==
+            restoration.get("midi_links_after") == 67,
+            "MIDI link restoration mismatch")
+    require(restoration.get("carla_project_sha256_before") ==
+            restoration.get("carla_project_sha256_after"),
+            "Carla project checksum changed")
+    for name in ("services_unchanged", "protected_gain_monitor_preserved", "passed"):
+        require_true(restoration.get(name), f"restoration.{name}")
+    rejected = document.get("rejected_observations")
+    require(isinstance(rejected, list) and bool(rejected),
+            "Rejected observations must be retained")
+    for index, observation_value in enumerate(rejected):
+        observation = require_object(observation_value,
+                                     f"rejected observation {index}")
+        require(observation.get("used_as_evidence") is False,
+                "Rejected observation was used as evidence")
+        require_true(observation.get("restoration_verified"),
+                     "Rejected-observation restoration")
+    require_all_true(document.get("evaluation"), "live evaluation")
+
+
+def load_and_validate(path: Path) -> tuple[
+    dict[str, Any], dict[str, Any], dict[str, dict[str, Any]], dict[str, Any]
+]:
+    evidence = load_json(path)
+    require(evidence.get("schema") == "music-studies/m3-shadow-evidence/v1",
+            "Unsupported Milestone 3 evidence schema")
+    validate_protocol_state_and_parity(evidence)
+    validate_hosted_build(evidence)
+
+    definition_path, _ = resolve_reference(evidence.get("definition"), "definition")
+    definition = load_json(definition_path)
+    validate_definition(evidence, definition)
+
+    resources_value = require_object(evidence.get("resources"), "resources")
+    observations = require_object(resources_value.get("observations"),
+                                  "resource observations")
+    require(set(observations) == {"linux", "windows"},
+            "Resource platform set drift")
+    resource_documents: dict[str, dict[str, Any]] = {}
+    for platform in ("linux", "windows"):
+        resource_path, _ = resolve_reference(observations.get(platform),
+                                             f"{platform} resource")
+        resource_documents[platform] = load_json(resource_path)
+        validate_resource(resource_documents[platform], platform, evidence)
+
+    live_path, _ = resolve_reference(evidence.get("live_shadow"), "live shadow")
+    live = load_json(live_path)
+    validate_live(live, evidence)
+    require_all_true(evidence.get("evaluation"), "bundle evaluation")
+    return evidence, definition, resource_documents, live
+
+
+def expect_failure(name: str, action: Callable[[], None]) -> None:
+    try:
+        action()
+    except ValidationError:
+        return
+    raise AssertionError(f"Mutation was accepted: {name}")
+
+
+def run_self_test() -> None:
+    evidence, definition, resources, live = load_and_validate(DEFAULT_EVIDENCE)
+
+    cpu_boundary = copy.deepcopy(resources["linux"])
+    cpu_boundary["idle_observation"]["cpu_one_core_percent"] = 0.5
+    expect_failure(
+        "exclusive CPU boundary",
+        lambda: validate_resource(cpu_boundary, "linux", evidence),
+    )
+
+    rss_boundary = copy.deepcopy(resources["windows"])
+    rss_boundary["idle_observation"]["rss_peak_observed_bytes"] = 50000000
+    expect_failure(
+        "exclusive RSS boundary",
+        lambda: validate_resource(rss_boundary, "windows", evidence),
+    )
+
+    source_drift = copy.deepcopy(resources["windows"])
+    source_drift["source_commit"] = "0" * 40
+    expect_failure(
+        "cross-platform source mismatch",
+        lambda: validate_resource(source_drift, "windows", evidence),
+    )
+
+    pocket_claim = copy.deepcopy(live)
+    pocket_claim["practice_session"]["metrics"]["slots"]["smc-pad-pocket"][
+        "accepted_for_slot_proof"
+    ] = True
+    expect_failure(
+        "zero-event Pocket claim",
+        lambda: validate_live(pocket_claim, evidence),
+    )
+
+    cleanup_failure = copy.deepcopy(live)
+    cleanup_failure["stability_and_restoration"][
+        "remaining_experimental_processes"
+    ] = 1
+    expect_failure(
+        "incomplete live cleanup",
+        lambda: validate_live(cleanup_failure, evidence),
+    )
+
+    protocol_drift = copy.deepcopy(evidence)
+    protocol_drift["protocol"]["operation_count"] = 8
+    expect_failure(
+        "protocol operation drift",
+        lambda: validate_protocol_state_and_parity(protocol_drift),
+    )
+
+    definition_drift = copy.deepcopy(definition)
+    definition_drift["mappings"] = definition_drift["mappings"][:-1]
+    expect_failure(
+        "compiled parity drift",
+        lambda: validate_definition(evidence, definition_drift),
+    )
+    print("Milestone 3 shadow evidence validator self-test passed (7 mutations)")
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--validate", type=Path, metavar="PATH")
+    group.add_argument("--self-test", action="store_true")
+    return parser.parse_args()
+
+
+def main() -> int:
+    arguments = parse_args()
+    try:
+        if arguments.self_test:
+            run_self_test()
+        else:
+            evidence, _, resources, live = load_and_validate(
+                arguments.validate.resolve()
+            )
+            print(
+                "Milestone 3 shadow evidence passed: "
+                f"source {evidence['source_commit']}, "
+                f"Linux RSS {resources['linux']['idle_observation']['rss_peak_observed_bytes']} B, "
+                f"Windows RSS {resources['windows']['idle_observation']['rss_peak_observed_bytes']} B, "
+                f"live {live['practice_session']['elapsed_seconds']} s, five slots, zero output"
+            )
+    except (ValidationError, AssertionError) as error:
+        print(f"Milestone 3 shadow evidence failed: {error}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

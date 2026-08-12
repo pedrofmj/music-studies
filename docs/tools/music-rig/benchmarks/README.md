@@ -6,6 +6,20 @@ Pocket's non-MIDI hardware controls, and matching pre/post subscription
 fingerprints. The temporary observers were removed and the operator confirmed
 normal drum audio after cleanup.
 
+## Milestone 3 Shadow Closure
+
+[M3-SHADOW-EVIDENCE.md](M3-SHADOW-EVIDENCE.md) explains the consolidated
+portable protocol, state, parity, physical resource, and approved live-shadow
+proof. Its machine-readable manifest binds all raw records and the compiled
+definition by SHA-256. The validator and its mutation self-test run through
+CTest on Linux and Windows:
+
+~~~bash
+docs/tools/music-rig/benchmarks/validate-m3-shadow-evidence \
+  --validate docs/tools/music-rig/benchmarks/m3-shadow-evidence-2026-08-12.json
+docs/tools/music-rig/benchmarks/validate-m3-shadow-evidence --self-test
+~~~
+
 ## Airstar Baseline
 
 The baseline collector observes the protected Airstar setup without changing

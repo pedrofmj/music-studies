@@ -235,6 +235,11 @@ All metrics are unsigned 64-bit saturating counters:
 - state restores, qualified fallbacks, and writes; and
 - adapter failures.
 
+The Device/MIDI shadow adapter separately records input, mapping, and
+suppressed calculated-event counters for every stable device slot. This makes a
+five-device aggregate insufficient by itself: each slot must have its own
+positive evidence before parity is accepted.
+
 Protocol v2 dispatch implements status, filtered profile listing, active
 validation, and dry-run prepare/switch/reset/reload planning over the immutable
 table image. Every response remains output-suppressed. Dry-runs report
@@ -315,10 +320,17 @@ five-device definition tests exercise its process lifecycle without a live
 graph. See [DEVICE-MIDI-SHADOW.md](DEVICE-MIDI-SHADOW.md) for the command,
 ownership, hot-path, metric, failure, and verification contracts.
 
+## Milestone 3 Evidence
+
+The consolidated [evidence](benchmarks/M3-SHADOW-EVIDENCE.md) proves protocol,
+state, compiled parity, and 60-second idle resource behavior on Linux and
+Windows. The approved Airstar input-only session proved all five current slots,
+normal production sound, zero output, zero attributable errors, and exact
+cleanup with a protected 30/30 post-check. Windows remains a portable
+mock/input-host proof until the selected Milestone 7 backend is implemented.
+
 ## Next Runtime Slice
 
-The next slice proves Linux and Windows protocol, state, parity, and resource
-behavior for the completed Milestone 3 surfaces. Linux live evidence may use
-only explicitly approved temporary duplicated input and must remove it before
-the protected 30/30 post-check. Windows proof remains mock/input-host work until
-the selected Milestone 7 backend is implemented.
+Milestone 4 starts with independent SMC-Mixer parity validation before any
+input ownership cutover. The protected deployment remains authoritative until
+that separate cutover gate has a rehearsed rollback and explicit approval.

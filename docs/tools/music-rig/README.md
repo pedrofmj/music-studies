@@ -2,8 +2,8 @@
 
 This directory contains the Configurable Performance Rig implementation.
 
-Status: Milestones 0 through 2 are complete. Milestone 3 is in progress with a
-portable, output-suppressed runtime control loop, qualified persistent-state
+Status: Milestones 0 through 3 are complete. Milestone 3 delivered a portable,
+output-suppressed runtime control loop, qualified persistent-state
 contract, bounded immutable definition tables, explicit-path Linux/Windows file
 adapters, protocol v2 read-only/dry-run dispatch, portable CLI contract, and
 Linux XDG path, diagnostics, lifecycle, and input-only JACK shadow adapters.
@@ -13,6 +13,9 @@ suppressing calculated output. `music-rigd` still refuses a no-argument start
 and installs or enables nothing. Its existing service command opens no device;
 the separate explicit MIDI shadow command registers inputs only, never creates
 links, and cannot emit MIDI or modify the stable Carla/PipeWire setup.
+The cross-platform resource and approved five-slot live-shadow exit gate is
+recorded in [benchmarks/M3-SHADOW-EVIDENCE.md](benchmarks/M3-SHADOW-EVIDENCE.md).
+Milestone 4 has not started; the protected deployment remains authoritative.
 
 ## Safety Boundary
 
