@@ -134,6 +134,8 @@ int main(int argc, char **argv)
         strstr(output, "input-ports 1") == NULL ||
         strstr(output, "output-ports 1") == NULL ||
         strstr(output, "input-events 0") == NULL ||
+        strstr(output, "control-cc-40-mapped-events 0") == NULL ||
+        strstr(output, "control-cc-47-mapped-events 0") == NULL ||
         strstr(output, "emitted-events 0") == NULL ||
         strstr(output, "output-mode enabled-smc-mixer-only") == NULL ||
         access(root, F_OK) == 0 || errno != ENOENT) {

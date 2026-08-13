@@ -30,9 +30,9 @@ the original three MIDI bytes at the original JACK frame.
 It performs no allocation, lock, JSON traversal, filesystem operation, string
 comparison, scaling, or graph operation. Unmapped, non-channel-1, non-CC, and
 malformed messages produce no output. Saturating metrics separate input,
-mapped, emitted, unmapped, malformed, and adapter-failure counts. The JACK host
-latches the first callback failure until shutdown so a later quiet cycle cannot
-hide it.
+mapped, emitted, unmapped, malformed, and adapter-failure counts, with separate
+mapped-event counters for CC 40 through 47. The JACK host latches the first
+callback failure until shutdown so a later quiet cycle cannot hide it.
 
 The exhaustive portable test compares all 1,024 CC/value combinations. The
 fake-JACK test proves exact frame and byte preservation, one input and one
@@ -100,7 +100,8 @@ changing ownership:
 3. Stage only a checksummed daemon, compiled definition, link tool, and evidence
    directory under `/tmp`; install and enable nothing.
 4. Start the relay without links and verify its exact two-port inventory.
-5. Run `--cutover`, exercise all eight faders, and confirm sound and stability.
+5. Run `--cutover`, exercise all eight faders, confirm sound and stability, and
+   require every per-CC counter to be positive in the shutdown transcript.
 6. Run `--rollback` while the relay is alive and verify all eight direct links.
 7. Stop the relay, remove every temporary artifact, and rerun protected live
    validation.

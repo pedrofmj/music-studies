@@ -266,6 +266,12 @@ static int test_exhaustive_parity(void)
         "non-parity generation fail-closed");
 
     metrics = music_rig_smc_mixer_relay_metrics_read(&relay);
+    for (control = 0U; control < 8U; ++control) {
+        CHECK(metrics != NULL &&
+            metrics->control_mapped_events[control] ==
+                (control == 0U ? UINT64_C(129) : UINT64_C(128)),
+            "per-control parity metrics");
+    }
     CHECK(metrics != NULL && metrics->cycles == UINT64_C(3) &&
         metrics->generation_adoptions == UINT64_C(1) &&
         metrics->input_events == UINT64_C(1028) &&

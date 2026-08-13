@@ -333,6 +333,7 @@ static int run_smc_mixer_relay(const char *path, const char *fingerprint)
     const music_rig_smc_mixer_relay_metrics *metrics;
     music_rig_result result;
     music_rig_result stop_result = MUSIC_RIG_RESULT_OK;
+    size_t index;
 
     result = load_definition(path, fingerprint, &definition, &generation);
     if (result == MUSIC_RIG_RESULT_OK) {
@@ -380,6 +381,13 @@ static int run_smc_mixer_relay(const char *path, const char *fingerprint)
     printf("cycles %" PRIu64 "\n", metrics->cycles);
     printf("input-events %" PRIu64 "\n", metrics->input_events);
     printf("mapped-events %" PRIu64 "\n", metrics->mapped_events);
+    for (index = 0U; index < 8U; ++index) {
+        printf(
+            "control-cc-%zu-mapped-events %" PRIu64 "\n",
+            index + 40U,
+            metrics->control_mapped_events[index]
+        );
+    }
     printf("emitted-events %" PRIu64 "\n", metrics->emitted_events);
     printf("unmapped-events %" PRIu64 "\n", metrics->unmapped_events);
     printf("malformed-events %" PRIu64 "\n", metrics->malformed_events);

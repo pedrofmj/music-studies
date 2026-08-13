@@ -31,6 +31,7 @@ typedef struct music_rig_smc_mixer_relay_metrics {
     uint64_t generation_adoptions;
     uint64_t input_events;
     uint64_t mapped_events;
+    uint64_t control_mapped_events[8];
     uint64_t emitted_events;
     uint64_t unmapped_events;
     uint64_t malformed_events;

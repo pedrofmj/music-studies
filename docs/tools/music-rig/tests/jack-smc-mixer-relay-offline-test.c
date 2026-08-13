@@ -244,6 +244,7 @@ static int test_relay_lifecycle(void)
     CHECK(metrics != NULL && metrics->cycles == UINT64_C(1) &&
         metrics->input_events == UINT64_C(2) &&
         metrics->mapped_events == UINT64_C(1) &&
+        metrics->control_mapped_events[0] == UINT64_C(1) &&
         metrics->emitted_events == UINT64_C(1) &&
         metrics->unmapped_events == UINT64_C(1),
         "relay metrics");

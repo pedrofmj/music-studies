@@ -325,6 +325,11 @@ music_rig_result music_rig_smc_mixer_relay_process(
         return MUSIC_RIG_RESULT_OK;
     }
     increment(&relay->metrics.mapped_events);
+    increment(
+        &relay->metrics.control_mapped_events[
+            (size_t)(message[1] - UINT8_C(40))
+        ]
+    );
     result = relay->emit(
         relay->emit_context,
         frame,
