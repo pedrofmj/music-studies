@@ -15,7 +15,10 @@ the separate explicit MIDI shadow command registers inputs only, never creates
 links, and cannot emit MIDI or modify the stable Carla/PipeWire setup.
 The cross-platform resource and approved five-slot live-shadow exit gate is
 recorded in [benchmarks/M3-SHADOW-EVIDENCE.md](benchmarks/M3-SHADOW-EVIDENCE.md).
-Milestone 4 has not started; the protected deployment remains authoritative.
+Milestone 4 has started with an isolated, explicit SMC-Mixer parity relay and
+failure-safe link transaction. It is not installed or active; the protected
+deployment remains authoritative. See
+[SMC-MIXER-CUTOVER.md](SMC-MIXER-CUTOVER.md).
 
 ## Safety Boundary
 
@@ -165,6 +168,13 @@ validated tables. The current Rig has ten semantic identities. The opt-in Linux
 shadow host registers only the five input identities; neither the catalogue nor
 that host can change links or emit events.
 
+The Milestone 4 SMC-Mixer relay is a separate portable event engine. It accepts
+only the exact compiled current EQ contract and relays mapped CC bytes through
+one stable input/output pair. Its explicit Linux JACK host can emit MIDI but
+contains no discovery, connect, disconnect, audio, allocation, or lock surface.
+The separate deployment transaction owns the reversible fixed links; neither
+profile activation nor the real-time callback can mutate the graph.
+
 [`runtime/core/music_rig_definition.c`](runtime/core/music_rig_definition.c)
 loads bounded definition metadata and caller-owned tables through logical
 storage and decoder adapters. The optional `json-c` adapter validates the
@@ -212,8 +222,10 @@ reports validated metadata, table counts, and fixed storage size, and exits
 without a state path or output. On Linux with a JACK runtime, the same opt-in
 build adds `run-midi-shadow`, which requires a named definition, trusted
 fingerprint, and explicit suppressed mode, then registers input-only stable
-ports until a signal. See [RUNTIME.md](RUNTIME.md) for ownership, lifecycle,
-storage, adapter, metric, failure, and next-slice contracts.
+ports until a signal. It also adds the fully explicit, acknowledged
+`run-smc-mixer-relay` command. That command registers only the mixer relay
+ports and never creates links. See [RUNTIME.md](RUNTIME.md) for ownership,
+lifecycle, storage, adapter, metric, failure, and next-slice contracts.
 
 [`music-rig`](music-rig.c) recognizes `status`, `profiles list`, `validate`, and
 global/device switches only with `--dry-run`. The portable client library

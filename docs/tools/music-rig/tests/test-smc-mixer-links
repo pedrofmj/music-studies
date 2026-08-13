@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly TOOL="${SCRIPT_DIR}/../deployment/smc-mixer-links"
+readonly WORK="${TMPDIR:-/tmp}/music-rig-smc-mixer-links-test-$$"
+readonly STATE="${WORK}/links"
+readonly CALLS="${WORK}/calls"
+readonly FAKE="${WORK}/pw-link"
+readonly PHYSICAL='Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-4- full speed:(capture_1) SINCO SMC-Mixer-Master'
+readonly RELAY_INPUT='music-rigd-smc-mixer:device.smc-mixer-main.midi-input'
+readonly RELAY_OUTPUT='music-rigd-smc-mixer:device.smc-mixer-main.midi-output'
+
+cleanup() {
+    rm -rf -- "$WORK"
+}
+trap cleanup EXIT
+mkdir -p -- "$WORK"
+: >"$STATE"
+printf '0\n' >"$CALLS"
+
+cat >"$FAKE" <<'FAKE'
+#!/usr/bin/env bash
+set -euo pipefail
+state="${MUSIC_RIG_FAKE_STATE:?}"
+calls="${MUSIC_RIG_FAKE_CALLS:?}"
+if [[ "$1" == '-l' ]]; then
+    output="$2"
+    input="$3"
+    while IFS= read -r link; do
+        if [[ "$link" == "$output|$input" ]]; then
+            printf '%s\n  |<- %s\n' "$input" "$output"
+            break
+        fi
+    done <"$state"
+    exit 0
+fi
+IFS= read -r count <"$calls" || count=0
+printf '%s\n' "$((count + 1))" >"$calls"
+if [[ -n "${MUSIC_RIG_FAKE_FAIL_AT:-}" &&
+    "$((count + 1))" == "$MUSIC_RIG_FAKE_FAIL_AT" ]]; then
+    exit 1
+fi
+if [[ "$1" == '-d' ]]; then
+    output="$2"
+    input="$3"
+    mapfile -t links <"$state"
+    : >"$state"
+    for link in "${links[@]}"; do
+        if [[ "$link" != "$output|$input" ]]; then
+            printf '%s\n' "$link" >>"$state"
+        fi
+    done
+else
+    output="$1"
+    input="$2"
+    found=0
+    while IFS= read -r link; do
+        if [[ "$link" == "$output|$input" ]]; then
+            found=1
+            break
+        fi
+    done <"$state"
+    if [[ "$found" == 0 ]]; then
+        printf '%s|%s\n' "$output" "$input" >>"$state"
+    fi
+fi
+FAKE
+chmod +x -- "$FAKE"
+
+seed_legacy() {
+    local index
+
+    : >"$STATE"
+    printf '0\n' >"$CALLS"
+    for index in {1..8}; do
+        printf '%s|SMC-EQ-%s CC Scale:events-in\n' "$PHYSICAL" "$index" \
+            >>"$STATE"
+    done
+}
+
+run_tool() {
+    MUSIC_RIG_PW_LINK="$FAKE" \
+    MUSIC_RIG_FAKE_STATE="$STATE" \
+    MUSIC_RIG_FAKE_CALLS="$CALLS" \
+        "$TOOL" "$@"
+}
+
+seed_legacy
+run_tool --verify-legacy >/dev/null
+run_tool --cutover >/dev/null
+[[ "$(grep -Fc -- "$RELAY_OUTPUT|" "$STATE")" == 8 ]]
+grep -Fqx -- "$PHYSICAL|$RELAY_INPUT" "$STATE"
+if grep -Fq -- "$PHYSICAL|SMC-EQ-" "$STATE"; then
+    printf '%s\n' 'Legacy links remained after cutover.' >&2
+    exit 1
+fi
+run_tool --rollback >/dev/null
+run_tool --verify-legacy >/dev/null
+
+for failure in 5 12 17; do
+    seed_legacy
+    if MUSIC_RIG_FAKE_FAIL_AT="$failure" \
+        run_tool --cutover >/dev/null 2>&1; then
+        printf 'Injected cutover failure %s unexpectedly succeeded.\n' \
+            "$failure" >&2
+        exit 1
+    fi
+    run_tool --verify-legacy >/dev/null
+    if grep -Fq -- "$RELAY_OUTPUT|" "$STATE" ||
+        grep -Fqx -- "$PHYSICAL|$RELAY_INPUT" "$STATE"; then
+        printf 'Injected failure %s left relay links behind.\n' \
+            "$failure" >&2
+        exit 1
+    fi
+done
+
+printf '%s\n' 'SMC-Mixer link transaction test: OK'

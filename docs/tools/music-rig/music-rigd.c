@@ -18,6 +18,10 @@
 #include "music_rig/jack_midi_shadow.h"
 #endif
 
+#if defined(MUSIC_RIG_HAS_JACK_SMC_MIXER_RELAY)
+#include "music_rig/jack_smc_mixer_relay.h"
+#endif
+
 #if defined(MUSIC_RIG_ENABLE_JSON_DEFINITION)
 #include "music_rig/definition.h"
 #include "music_rig/definition_json.h"
@@ -56,6 +60,16 @@ static void print_usage(FILE *stream, const char *program)
         stream,
         "       %s run-midi-shadow --definition PATH "
         "--expected-fingerprint SHA256 --output-suppressed\n",
+        program
+    );
+#endif
+#if defined(MUSIC_RIG_ENABLE_JSON_DEFINITION) && \
+    defined(MUSIC_RIG_HAS_JACK_SMC_MIXER_RELAY)
+    fprintf(
+        stream,
+        "       %s run-smc-mixer-relay --definition PATH "
+        "--expected-fingerprint SHA256 --output-enabled "
+        "--acknowledge-smc-mixer-cutover\n",
         program
     );
 #endif
@@ -306,6 +320,74 @@ static int run_midi_shadow(const char *path, const char *fingerprint)
     return MUSIC_RIG_RESULT_OK;
 }
 #endif
+
+#if defined(MUSIC_RIG_HAS_JACK_SMC_MIXER_RELAY)
+static int run_smc_mixer_relay(const char *path, const char *fingerprint)
+{
+    music_rig_compiled_definition definition = {0};
+    music_rig_generation generation = {0};
+    music_rig_generation_slot generations;
+    music_rig_jack_smc_mixer_relay host;
+    music_rig_journal_diagnostics journal;
+    music_rig_diagnostic_sink sink;
+    const music_rig_smc_mixer_relay_metrics *metrics;
+    music_rig_result result;
+    music_rig_result stop_result = MUSIC_RIG_RESULT_OK;
+
+    result = load_definition(path, fingerprint, &definition, &generation);
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_generation_slot_init(&generations, &generation);
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_jack_smc_mixer_relay_init(&host, &generations);
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_journal_diagnostics_init(
+            &journal,
+            STDERR_FILENO,
+            &sink
+        );
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_jack_smc_mixer_relay_start(&host);
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_linux_shadow_lifecycle_run(&sink);
+        stop_result = music_rig_jack_smc_mixer_relay_stop(&host);
+        if (result == MUSIC_RIG_RESULT_OK) {
+            result = stop_result;
+        }
+        if (result == MUSIC_RIG_RESULT_OK &&
+            atomic_load_explicit(
+                &host.last_process_result,
+                memory_order_acquire
+            ) != MUSIC_RIG_RESULT_OK) {
+            result = atomic_load_explicit(
+                &host.last_process_result,
+                memory_order_relaxed
+            );
+        }
+    }
+    if (result != MUSIC_RIG_RESULT_OK) {
+        fprintf(stderr, "SMC-Mixer relay failed: result %d\n", (int)result);
+        return (int)result;
+    }
+    metrics = music_rig_smc_mixer_relay_metrics_read(&host.relay);
+    printf("definition-generation %" PRIu64 "\n", generation.id);
+    puts("slot smc-mixer-main");
+    puts("input-ports 1");
+    puts("output-ports 1");
+    printf("cycles %" PRIu64 "\n", metrics->cycles);
+    printf("input-events %" PRIu64 "\n", metrics->input_events);
+    printf("mapped-events %" PRIu64 "\n", metrics->mapped_events);
+    printf("emitted-events %" PRIu64 "\n", metrics->emitted_events);
+    printf("unmapped-events %" PRIu64 "\n", metrics->unmapped_events);
+    printf("malformed-events %" PRIu64 "\n", metrics->malformed_events);
+    printf("adapter-failures %" PRIu64 "\n", metrics->adapter_failures);
+    puts("output-mode enabled-smc-mixer-only");
+    return MUSIC_RIG_RESULT_OK;
+}
+#endif
 #endif
 
 int main(int argc, char **argv)
@@ -337,7 +419,13 @@ int main(int argc, char **argv)
         printf("jack-midi-shadow-abi %u\n",
             MUSIC_RIG_JACK_MIDI_SHADOW_ABI_VERSION);
 #endif
+#if defined(MUSIC_RIG_HAS_JACK_SMC_MIXER_RELAY)
+        printf("jack-smc-mixer-relay-abi %u\n",
+            MUSIC_RIG_JACK_SMC_MIXER_RELAY_ABI_VERSION);
+        printf("output-mode suppressed-default-explicit-smc-mixer\n");
+#else
         printf("output-mode suppressed-only\n");
+#endif
         return MUSIC_RIG_RESULT_OK;
     }
 
@@ -370,6 +458,15 @@ int main(int argc, char **argv)
         strcmp(argv[4], "--expected-fingerprint") == 0 &&
         strcmp(argv[6], "--output-suppressed") == 0) {
         return run_midi_shadow(argv[3], argv[5]);
+    }
+#endif
+#if defined(MUSIC_RIG_HAS_JACK_SMC_MIXER_RELAY)
+    if (argc == 8 && strcmp(argv[1], "run-smc-mixer-relay") == 0 &&
+        strcmp(argv[2], "--definition") == 0 &&
+        strcmp(argv[4], "--expected-fingerprint") == 0 &&
+        strcmp(argv[6], "--output-enabled") == 0 &&
+        strcmp(argv[7], "--acknowledge-smc-mixer-cutover") == 0) {
+        return run_smc_mixer_relay(argv[3], argv[5]);
     }
 #endif
 #endif

@@ -257,9 +257,15 @@ without a command exits with code 2. Linux adds the read-only `resolve-paths
 lifecycle described above. The opt-in JSON build also supports the explicit
 read-only definition validation command. A Linux build with a JACK runtime
 additionally supports `run-midi-shadow` only with a named definition, expected
-fingerprint, and `--output-suppressed`. It reports the runtime, storage,
-diagnostic, compiled, and JACK-shadow host ABIs. It has no configured IPC
-transport, installation target, default-start path, or output-enabled mode.
+fingerprint, and `--output-suppressed`. Only the JSON-enabled Linux JACK build
+also exposes `run-smc-mixer-relay`, requiring a named definition, independently
+supplied fingerprint, `--output-enabled`, and
+`--acknowledge-smc-mixer-cutover`. That command registers the exact
+`smc-mixer-main` input/output pair but cannot discover or change links; the
+separate reversible transaction owns the topology. It reports the runtime,
+storage, diagnostic, compiled, and applicable JACK host ABIs. No build has a
+configured IPC transport, installation target, or default-start path, and
+ordinary builds contain no output-capable command.
 
 `music-rig` now has a portable parser, transport interface, and human/JSON
 renderer for `status`, `profiles list`, `validate`, and explicit global/device

@@ -54,6 +54,17 @@ target_link_libraries(music_rig_device_midi_shadow
 target_compile_features(music_rig_device_midi_shadow PUBLIC c_std_17)
 set_target_properties(music_rig_device_midi_shadow PROPERTIES C_EXTENSIONS OFF)
 
+add_library(music_rig_smc_mixer_relay STATIC
+    runtime/adapters/music_rig_smc_mixer_relay.c
+)
+target_include_directories(music_rig_smc_mixer_relay
+    PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}/runtime/adapters/include"
+)
+target_link_libraries(music_rig_smc_mixer_relay PUBLIC music_rig_core)
+target_compile_features(music_rig_smc_mixer_relay PUBLIC c_std_17)
+set_target_properties(music_rig_smc_mixer_relay PROPERTIES C_EXTENSIONS OFF)
+
 add_library(music_rig_cli STATIC
     runtime/client/music_rig_cli.c
 )
@@ -121,6 +132,24 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         set_target_properties(music_rig_jack_midi_shadow PROPERTIES
             C_EXTENSIONS OFF
         )
+
+        add_library(music_rig_jack_smc_mixer_relay STATIC
+            runtime/linux/music_rig_jack_smc_mixer_relay.c
+        )
+        target_include_directories(music_rig_jack_smc_mixer_relay
+            PUBLIC
+                "${CMAKE_CURRENT_SOURCE_DIR}/runtime/platform/include"
+        )
+        target_link_libraries(music_rig_jack_smc_mixer_relay
+            PUBLIC music_rig_smc_mixer_relay
+            PRIVATE "${MUSIC_RIG_JACK_LIBRARY}"
+        )
+        target_compile_features(
+            music_rig_jack_smc_mixer_relay PUBLIC c_std_17
+        )
+        set_target_properties(music_rig_jack_smc_mixer_relay PROPERTIES
+            C_EXTENSIONS OFF
+        )
     endif()
 endif()
 
@@ -171,6 +200,15 @@ if(TARGET music_rig_jack_midi_shadow)
     )
     target_link_libraries(music-rigd PRIVATE music_rig_jack_midi_shadow)
 endif()
+set(MUSIC_RIG_SMC_MIXER_RELAY_COMMAND_ENABLED OFF)
+if(TARGET music_rig_jack_smc_mixer_relay AND
+    MUSIC_RIG_ENABLE_JSON_C_SPIKE)
+    set(MUSIC_RIG_SMC_MIXER_RELAY_COMMAND_ENABLED ON)
+    target_compile_definitions(music-rigd PRIVATE
+        MUSIC_RIG_HAS_JACK_SMC_MIXER_RELAY=1
+    )
+    target_link_libraries(music-rigd PRIVATE music_rig_jack_smc_mixer_relay)
+endif()
 if(MUSIC_RIG_ENABLE_JSON_C_SPIKE)
     target_compile_definitions(music-rigd PRIVATE
         MUSIC_RIG_ENABLE_JSON_DEFINITION=1
@@ -191,6 +229,9 @@ if(MSVC)
         ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
     )
     target_compile_options(music_rig_device_midi_shadow PRIVATE
+        ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+    )
+    target_compile_options(music_rig_smc_mixer_relay PRIVATE
         ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
     )
     target_compile_options(music_rig_cli PRIVATE
@@ -231,6 +272,12 @@ else()
         -Wpedantic
         -Werror
     )
+    target_compile_options(music_rig_smc_mixer_relay PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Werror
+    )
     target_compile_options(music_rig_cli PRIVATE
         -Wall
         -Wextra
@@ -255,6 +302,14 @@ else()
     endif()
     if(TARGET music_rig_jack_midi_shadow)
         target_compile_options(music_rig_jack_midi_shadow PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+    endif()
+    if(TARGET music_rig_jack_smc_mixer_relay)
+        target_compile_options(music_rig_jack_smc_mixer_relay PRIVATE
             -Wall
             -Wextra
             -Wpedantic
@@ -311,6 +366,12 @@ if(BUILD_TESTING)
     )
     target_link_libraries(music_rig_device_midi_shadow_test
         PRIVATE music_rig_device_midi_shadow
+    )
+    add_executable(music_rig_smc_mixer_relay_test
+        tests/smc-mixer-relay-test.c
+    )
+    target_link_libraries(music_rig_smc_mixer_relay_test
+        PRIVATE music_rig_smc_mixer_relay
     )
     add_executable(music_rig_runtime_test
         tests/runtime-test.c
@@ -374,6 +435,25 @@ if(BUILD_TESTING)
             music_rig_jack_midi_shadow_offline_test PROPERTIES
                 C_EXTENSIONS OFF
         )
+        add_executable(music_rig_jack_smc_mixer_relay_offline_test
+            tests/jack-smc-mixer-relay-offline-test.c
+            runtime/linux/music_rig_jack_smc_mixer_relay.c
+        )
+        target_include_directories(
+            music_rig_jack_smc_mixer_relay_offline_test
+            PRIVATE
+                "${CMAKE_CURRENT_SOURCE_DIR}/runtime/platform/include"
+        )
+        target_link_libraries(music_rig_jack_smc_mixer_relay_offline_test
+            PRIVATE music_rig_smc_mixer_relay
+        )
+        target_compile_features(
+            music_rig_jack_smc_mixer_relay_offline_test PRIVATE c_std_17
+        )
+        set_target_properties(
+            music_rig_jack_smc_mixer_relay_offline_test PROPERTIES
+                C_EXTENSIONS OFF
+        )
     endif()
 
     if(MSVC)
@@ -393,6 +473,9 @@ if(BUILD_TESTING)
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
         target_compile_options(music_rig_device_midi_shadow_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+        target_compile_options(music_rig_smc_mixer_relay_test PRIVATE
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
         target_compile_options(music_rig_runtime_test PRIVATE
@@ -447,6 +530,12 @@ if(BUILD_TESTING)
             -Werror
         )
         target_compile_options(music_rig_device_midi_shadow_test PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+        target_compile_options(music_rig_smc_mixer_relay_test PRIVATE
             -Wall
             -Wextra
             -Wpedantic
@@ -511,6 +600,13 @@ if(BUILD_TESTING)
                 -Wpedantic
                 -Werror
             )
+            target_compile_options(
+                music_rig_jack_smc_mixer_relay_offline_test PRIVATE
+                -Wall
+                -Wextra
+                -Wpedantic
+                -Werror
+            )
         endif()
     endif()
 
@@ -525,6 +621,10 @@ if(BUILD_TESTING)
     add_test(
         NAME music_rig_device_midi_shadow_test
         COMMAND music_rig_device_midi_shadow_test
+    )
+    add_test(
+        NAME music_rig_smc_mixer_relay_test
+        COMMAND music_rig_smc_mixer_relay_test
     )
     add_test(NAME music_rig_runtime_test COMMAND music_rig_runtime_test)
     add_test(NAME music_rig_control_test COMMAND music_rig_control_test)
@@ -557,6 +657,10 @@ if(BUILD_TESTING)
         add_test(
             NAME music_rig_jack_midi_shadow_offline_test
             COMMAND music_rig_jack_midi_shadow_offline_test
+        )
+        add_test(
+            NAME music_rig_jack_smc_mixer_relay_offline_test
+            COMMAND music_rig_jack_smc_mixer_relay_offline_test
         )
         add_test(
             NAME music_rigd_linux_host_paths
@@ -615,6 +719,17 @@ if(BUILD_TESTING)
         PROPERTIES TIMEOUT 5
     )
     add_test(
+        NAME music_rigd_smc_mixer_activation_boundary
+        COMMAND "${CMAKE_COMMAND}"
+            "-DDAEMON=$<TARGET_FILE:music-rigd>"
+            "-DEXPECT_RELAY=${MUSIC_RIG_SMC_MIXER_RELAY_COMMAND_ENABLED}"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-music-rigd-smc-mixer-boundary.cmake"
+    )
+    set_tests_properties(
+        music_rigd_smc_mixer_activation_boundary
+        PROPERTIES TIMEOUT 5
+    )
+    add_test(
         NAME music_rig_runtime_boundary
         COMMAND "${CMAKE_COMMAND}"
             "-DRUNTIME_DIR=${CMAKE_CURRENT_SOURCE_DIR}/runtime/core"
@@ -632,12 +747,31 @@ if(BUILD_TESTING)
             "-DSHADOW_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}/runtime/adapters/music_rig_device_midi_shadow.c"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-device-midi-shadow-boundary.cmake"
     )
+    add_test(
+        NAME music_rig_smc_mixer_relay_boundary
+        COMMAND "${CMAKE_COMMAND}"
+            "-DRELAY_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}/runtime/adapters/music_rig_smc_mixer_relay.c"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-smc-mixer-relay-boundary.cmake"
+    )
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         add_test(
             NAME music_rig_jack_midi_shadow_boundary
             COMMAND "${CMAKE_COMMAND}"
                 "-DJACK_SHADOW_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}/runtime/linux/music_rig_jack_midi_shadow.c"
                 -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-jack-midi-shadow-boundary.cmake"
+        )
+        add_test(
+            NAME music_rig_jack_smc_mixer_relay_boundary
+            COMMAND "${CMAKE_COMMAND}"
+                "-DJACK_RELAY_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}/runtime/linux/music_rig_jack_smc_mixer_relay.c"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-jack-smc-mixer-relay-boundary.cmake"
+        )
+        add_test(
+            NAME music_rig_smc_mixer_links_transaction
+            COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-smc-mixer-links"
+        )
+        set_tests_properties(
+            music_rig_smc_mixer_links_transaction PROPERTIES TIMEOUT 60
         )
     endif()
 
@@ -868,6 +1002,46 @@ if(BUILD_TESTING)
                 -Werror
             )
         endif()
+        if(TARGET music_rig_jack_smc_mixer_relay)
+            add_library(music_rig_fake_jack_smc_mixer_relay SHARED
+                tests/fake-jack-smc-mixer-relay.c
+            )
+            target_compile_features(
+                music_rig_fake_jack_smc_mixer_relay PRIVATE c_std_17
+            )
+            set_target_properties(
+                music_rig_fake_jack_smc_mixer_relay PROPERTIES
+                    C_EXTENSIONS OFF
+            )
+            target_compile_options(
+                music_rig_fake_jack_smc_mixer_relay PRIVATE
+                -Wall
+                -Wextra
+                -Wpedantic
+                -Werror
+                -fno-sanitize=all
+            )
+            target_link_options(music_rig_fake_jack_smc_mixer_relay PRIVATE
+                -fno-sanitize=all
+            )
+            add_executable(music_rig_smc_mixer_relay_process_test
+                tests/smc-mixer-relay-process-test.c
+            )
+            target_compile_features(
+                music_rig_smc_mixer_relay_process_test PRIVATE c_std_17
+            )
+            set_target_properties(
+                music_rig_smc_mixer_relay_process_test PROPERTIES
+                    C_EXTENSIONS OFF
+            )
+            target_compile_options(
+                music_rig_smc_mixer_relay_process_test PRIVATE
+                -Wall
+                -Wextra
+                -Wpedantic
+                -Werror
+            )
+        endif()
         if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
             set(MUSIC_RIG_JSON_C_SPIKE_SOURCE tests/linux-json-c-spike.c)
         else()
@@ -1000,6 +1174,19 @@ if(BUILD_TESTING)
             )
             set_tests_properties(
                 music_rig_midi_shadow_process PROPERTIES TIMEOUT 5
+            )
+        endif()
+        if(TARGET music_rig_smc_mixer_relay_process_test)
+            add_test(
+                NAME music_rig_smc_mixer_relay_process
+                COMMAND music_rig_smc_mixer_relay_process_test
+                    $<TARGET_FILE:music-rigd>
+                    "${MUSIC_RIG_JSON_DEFINITION_FIXTURE}"
+                    "${MUSIC_RIG_JSON_DEFINITION_FINGERPRINT}"
+                    $<TARGET_FILE:music_rig_fake_jack_smc_mixer_relay>
+            )
+            set_tests_properties(
+                music_rig_smc_mixer_relay_process PROPERTIES TIMEOUT 5
             )
         endif()
         set_tests_properties(

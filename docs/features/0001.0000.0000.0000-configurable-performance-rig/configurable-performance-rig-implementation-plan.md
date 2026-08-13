@@ -2,8 +2,9 @@
 
 Language: **English**
 
-Status: Milestones 0 through 3 complete. Milestone 4 has not started. The
-protected single-rig deployment remains the production default.
+Status: Milestones 0 through 3 complete. Milestone 4 is active at the first
+SMC-Mixer parity cutover gate. The protected single-rig deployment remains the
+production default.
 
 Related documents:
 

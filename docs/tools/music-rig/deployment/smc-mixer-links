@@ -1,0 +1,225 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly PHYSICAL_OUTPUT='Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-4- full speed:(capture_1) SINCO SMC-Mixer-Master'
+readonly RELAY_INPUT='music-rigd-smc-mixer:device.smc-mixer-main.midi-input'
+readonly RELAY_OUTPUT='music-rigd-smc-mixer:device.smc-mixer-main.midi-output'
+readonly TARGETS=(
+    'SMC-EQ-1 CC Scale:events-in'
+    'SMC-EQ-2 CC Scale:events-in'
+    'SMC-EQ-3 CC Scale:events-in'
+    'SMC-EQ-4 CC Scale:events-in'
+    'SMC-EQ-5 CC Scale:events-in'
+    'SMC-EQ-6 CC Scale:events-in'
+    'SMC-EQ-7 CC Scale:events-in'
+    'SMC-EQ-8 CC Scale:events-in'
+)
+readonly PW_LINK_BIN="${MUSIC_RIG_PW_LINK:-pw-link}"
+
+usage() {
+    printf '%s\n' \
+        'Usage: smc-mixer-links --preview|--verify-legacy|--verify-relay' \
+        '                       --cutover|--rollback'
+}
+
+link_exists() {
+    local output="$1"
+    local input="$2"
+    local listing
+
+    listing="$($PW_LINK_BIN -l "$output" "$input")" || return 2
+    [[ "$listing" == *"$input"* && "$listing" == *"$output"* ]]
+}
+
+connect_if_missing() {
+    local output="$1"
+    local input="$2"
+    local result
+
+    if link_exists "$output" "$input"; then
+        return 0
+    else
+        result="$?"
+    fi
+    [[ "$result" == 1 ]] || return "$result"
+    "$PW_LINK_BIN" "$output" "$input"
+}
+
+disconnect_if_present() {
+    local output="$1"
+    local input="$2"
+    local result
+
+    if link_exists "$output" "$input"; then
+        "$PW_LINK_BIN" -d "$output" "$input"
+        return
+    else
+        result="$?"
+    fi
+    [[ "$result" == 1 ]] || return "$result"
+}
+
+legacy_count() {
+    local target
+    local count=0
+    local result
+
+    for target in "${TARGETS[@]}"; do
+        if link_exists "$PHYSICAL_OUTPUT" "$target"; then
+            count=$((count + 1))
+        else
+            result="$?"
+            [[ "$result" == 1 ]] || return "$result"
+        fi
+    done
+    printf '%s\n' "$count"
+}
+
+relay_output_count() {
+    local target
+    local count=0
+    local result
+
+    for target in "${TARGETS[@]}"; do
+        if link_exists "$RELAY_OUTPUT" "$target"; then
+            count=$((count + 1))
+        else
+            result="$?"
+            [[ "$result" == 1 ]] || return "$result"
+        fi
+    done
+    printf '%s\n' "$count"
+}
+
+relay_input_count() {
+    local result
+
+    if link_exists "$PHYSICAL_OUTPUT" "$RELAY_INPUT"; then
+        printf '1\n'
+    else
+        result="$?"
+        [[ "$result" == 1 ]] || return "$result"
+        printf '0\n'
+    fi
+}
+
+report() {
+    printf 'legacy-links %s/8\n' "$(legacy_count)"
+    printf 'relay-input-links %s/1\n' "$(relay_input_count)"
+    printf 'relay-output-links %s/8\n' "$(relay_output_count)"
+}
+
+verify_legacy() {
+    local legacy
+    local relay_input
+    local relay_output
+
+    legacy="$(legacy_count)"
+    relay_input="$(relay_input_count)"
+    relay_output="$(relay_output_count)"
+    if [[ "$legacy" != 8 || "$relay_input" != 0 ||
+        "$relay_output" != 0 ]]; then
+        report >&2
+        return 1
+    fi
+}
+
+verify_relay() {
+    local legacy
+    local relay_input
+    local relay_output
+
+    legacy="$(legacy_count)"
+    relay_input="$(relay_input_count)"
+    relay_output="$(relay_output_count)"
+    if [[ "$legacy" != 0 || "$relay_input" != 1 ||
+        "$relay_output" != 8 ]]; then
+        report >&2
+        return 1
+    fi
+}
+
+rollback_to_legacy() {
+    local target
+    local failed=0
+
+    disconnect_if_present "$PHYSICAL_OUTPUT" "$RELAY_INPUT" || failed=1
+    for target in "${TARGETS[@]}"; do
+        connect_if_missing "$PHYSICAL_OUTPUT" "$target" || failed=1
+    done
+    for target in "${TARGETS[@]}"; do
+        disconnect_if_present "$RELAY_OUTPUT" "$target" || failed=1
+    done
+    if [[ "$failed" != 0 ]] || ! verify_legacy; then
+        printf '%s\n' 'SMC-Mixer rollback did not restore the legacy route.' >&2
+        report >&2
+        return 1
+    fi
+    printf '%s\n' 'SMC-Mixer legacy route restored.'
+}
+
+cutover_to_relay() {
+    local target
+
+    if ! verify_legacy || [[ "$(relay_output_count)" != 0 ]]; then
+        printf '%s\n' 'Cutover requires the complete legacy route and no relay links.' >&2
+        report >&2
+        return 1
+    fi
+    for target in "${TARGETS[@]}"; do
+        if ! connect_if_missing "$RELAY_OUTPUT" "$target"; then
+            rollback_to_legacy
+            return 1
+        fi
+    done
+    for target in "${TARGETS[@]}"; do
+        if ! disconnect_if_present "$PHYSICAL_OUTPUT" "$target"; then
+            rollback_to_legacy
+            return 1
+        fi
+    done
+    if ! connect_if_missing "$PHYSICAL_OUTPUT" "$RELAY_INPUT" ||
+        ! verify_relay; then
+        rollback_to_legacy
+        return 1
+    fi
+    printf '%s\n' 'SMC-Mixer relay route active.'
+}
+
+main() {
+    if [[ "$#" != 1 ]]; then
+        usage >&2
+        return 2
+    fi
+    command -v "$PW_LINK_BIN" >/dev/null 2>&1 || {
+        printf 'Missing pw-link command: %s\n' "$PW_LINK_BIN" >&2
+        return 2
+    }
+    case "$1" in
+    --preview)
+        report
+        ;;
+    --verify-legacy)
+        verify_legacy
+        report
+        ;;
+    --verify-relay)
+        verify_relay
+        report
+        ;;
+    --cutover)
+        cutover_to_relay
+        report
+        ;;
+    --rollback)
+        rollback_to_legacy
+        report
+        ;;
+    *)
+        usage >&2
+        return 2
+        ;;
+    esac
+}
+
+main "$@"

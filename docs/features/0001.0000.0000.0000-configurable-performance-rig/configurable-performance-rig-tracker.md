@@ -378,7 +378,20 @@ benchmarks.
 
 ## Milestone 4: Control-Only Switching
 
-- ⬜ Cut over SMC-Mixer only after independent parity validation.
+- 🟡 Cut over SMC-Mixer only after independent parity validation. The portable
+  relay exhaustively preserves all 1,024 mapped CC/value combinations from the
+  exact compiled `eight-band-eq` contract. Its Linux JACK host exposes one
+  fixed input/output pair without graph APIs, while a separate failure-safe
+  transaction proves normal rollback plus injected failures in all three
+  cutover phases. The ordinary daemon build has no output-capable command; only
+  the explicit JSON/JACK build accepts the named definition, independently
+  supplied fingerprint, output acknowledgement, and cutover acknowledgement.
+  GCC passes 59/59, JSON/JACK passes 66/66, Clang passes 59/59, and the focused
+  ASan/UBSan boundary passes 5/5. The protected baseline remains 30/30, and the
+  Airstar preflight remains at eight legacy links and zero relay links. Hosted
+  cross-platform validation, the required production restore rehearsal, and the
+  explicitly approved live eight-fader cutover/rollback evidence remain in this
+  same item.
 - ⬜ Implement `eight-band-eq` and `multilevel-volume`.
 - ⬜ Support independent SMC-PAD and SMC-PAD Pocket profiles.
 - ⬜ Implement device and global CLI switching with overrides and reset.
