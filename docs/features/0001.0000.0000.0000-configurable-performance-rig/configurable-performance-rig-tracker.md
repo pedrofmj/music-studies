@@ -389,11 +389,12 @@ benchmarks.
   GCC passes 59/59, JSON/JACK passes 66/66, Clang passes 59/59, and the focused
   ASan/UBSan boundary passes 5/5. The protected baseline remains 30/30, and the
   Airstar preflight remains at eight legacy links and zero relay links. Hosted
-  [run 31698251412](https://github.com/pedrofmj/music-studies/actions/runs/31698251412)
+  [run 31698846886](https://github.com/pedrofmj/music-studies/actions/runs/31698846886)
   passes Linux 59/59, Windows 43/43, and Windows JSON 48/48 under strict
-  `/W4 /WX`, including the portable relay and absence of an output-capable
-  command on Windows. The required production restore rehearsal and explicitly
-  approved live eight-fader cutover/rollback evidence remain in this same item.
+  `/W4 /WX`, including the portable relay, all eight per-fader evidence
+  counters, and absence of an output-capable command on Windows. The required
+  production restore rehearsal and explicitly approved live eight-fader
+  cutover/rollback evidence remain in this same item.
 - ⬜ Implement `eight-band-eq` and `multilevel-volume`.
 - ⬜ Support independent SMC-PAD and SMC-PAD Pocket profiles.
 - ⬜ Implement device and global CLI switching with overrides and reset.
