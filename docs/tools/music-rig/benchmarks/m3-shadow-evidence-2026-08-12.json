@@ -4,8 +4,8 @@
   "source_commit": "20c069e43837478e73b840e0515b39163257f9d9",
   "definition": {
     "path": "../tests/fixtures/compiled-current-envelope.json",
-    "sha256": "34ca6684a8fe2823ba706bd071a01cd5b60b9fbb3ca6ceb1e6a7c5095b543f64",
-    "fingerprint": "sha256:9be68993c164802f694f4d6359c208d9937fbfcf668781ce5a1c3bff5f30cb9e",
+    "sha256": "0aba0defa098437599a78e24c133d479733b15fe0e38270a99c9619daffc8fbd",
+    "fingerprint": "sha256:02ee1bba5fbd5982c2f3f8e2df0ef81f265afe93a7c13b7a7bd59129e952d628",
     "generation": 1
   },
   "protocol": {
@@ -80,17 +80,17 @@
     "observations": {
       "linux": {
         "path": "shadow-idle-linux-2026-08-12.json",
-        "sha256": "b41c4602f12e5ea076de68d065169d987eb17db28ef932ed55454dc21d6b7a7f"
+        "sha256": "0249e29942552942101915f01310bbf11c777a1df444b4a8f935ec8c7729b36c"
       },
       "windows": {
         "path": "shadow-idle-windows-2026-08-12.json",
-        "sha256": "102d0ac380c9546c7b9b7e40c8cef785166818ecaef8b2821e9dfab55afce85d"
+        "sha256": "dbeb36d596c34c74f12d8fe55644529facf18d9c5b26072bc2d39c77f3fe8f6b"
       }
     }
   },
   "live_shadow": {
     "path": "shadow-live-airstar-2026-08-12.json",
-    "sha256": "1a385a63eecbb7deeeb88779e6e1ca79471b363e1276a24798b4afd8f8257a3b"
+    "sha256": "b13b2e6e991c8da0f2e1afc686c89d93b89a8c55bbfc2287f79e4c4308e8783f"
   },
   "evaluation": {
     "protocol_pass": true,

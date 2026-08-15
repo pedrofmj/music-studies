@@ -17,8 +17,8 @@
   },
   "definition": {
     "bytes": 86617,
-    "sha256": "34ca6684a8fe2823ba706bd071a01cd5b60b9fbb3ca6ceb1e6a7c5095b543f64",
-    "fingerprint": "sha256:9be68993c164802f694f4d6359c208d9937fbfcf668781ce5a1c3bff5f30cb9e"
+    "sha256": "0aba0defa098437599a78e24c133d479733b15fe0e38270a99c9619daffc8fbd",
+    "fingerprint": "sha256:02ee1bba5fbd5982c2f3f8e2df0ef81f265afe93a7c13b7a7bd59129e952d628"
   },
   "workload_artifact": {
     "bytes": 60416,

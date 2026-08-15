@@ -943,7 +943,7 @@ if(BUILD_TESTING)
             "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-current-envelope.json"
         )
         set(MUSIC_RIG_JSON_DEFINITION_FINGERPRINT
-            "sha256:9be68993c164802f694f4d6359c208d9937fbfcf668781ce5a1c3bff5f30cb9e"
+            "sha256:02ee1bba5fbd5982c2f3f8e2df0ef81f265afe93a7c13b7a7bd59129e952d628"
         )
         add_executable(music_rig_json_definition_test
             tests/json-definition-test.c
