@@ -125,6 +125,15 @@ int main(void)
         "music-rig", "prepare", "--device", "smc-mixer-main",
         "--profile", "eight-band-eq", "--dry-run"
     };
+    char *device_generation[] = {
+        "music-rig", "switch", "--device", "smc-mixer-main",
+        "--profile", "eight-band-eq", "--dry-run",
+        "--expected-generation", "41"
+    };
+    char *reset_generation[] = {
+        "music-rig", "reset", "--device", "smc-mixer-main", "--dry-run",
+        "--expected-generation", "41"
+    };
     char *device[] = {
         "music-rig", "switch", "--device", "smc-mixer-main",
         "--profile", "eight-band-eq", "--dry-run"
@@ -166,6 +175,14 @@ int main(void)
             MUSIC_RIG_RESULT_OK ||
         command.request.operation != MUSIC_RIG_OPERATION_PREPARE_DEVICE ||
         command.request.flags != MUSIC_RIG_REQUEST_DRY_RUN ||
+        music_rig_cli_parse(9, device_generation, UINT64_C(75), &command) !=
+            MUSIC_RIG_RESULT_OK ||
+        command.request.expected_generation != UINT64_C(41) ||
+        command.request.operation != MUSIC_RIG_OPERATION_SWITCH_DEVICE ||
+        music_rig_cli_parse(7, reset_generation, UINT64_C(76), &command) !=
+            MUSIC_RIG_RESULT_OK ||
+        command.request.expected_generation != UINT64_C(41) ||
+        command.request.operation != MUSIC_RIG_OPERATION_RESET_DEVICE_OVERRIDE ||
         run_command(3, validate, &mock, MUSIC_RIG_RESULT_OK,
             "\"valid\":true") ||
         run_command(6, global, &mock, MUSIC_RIG_RESULT_OK,
