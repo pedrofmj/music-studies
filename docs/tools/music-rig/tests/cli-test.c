@@ -152,6 +152,17 @@ int main(void)
         "music-rig", "switch", "--global", "full-live-rack",
         "--device", "smc-mixer-main", "--dry-run"
     };
+    char *duplicate_global[] = {
+        "music-rig", "switch", "--global", "full-live-rack",
+        "--global", "full-live-rack", "--dry-run"
+    };
+    char *duplicate_dry_run[] = {
+        "music-rig", "switch", "--global", "full-live-rack",
+        "--dry-run", "--dry-run"
+    };
+    char *unsafe_reset[] = {
+        "music-rig", "reset", "--device", "smc-mixer-main"
+    };
 
     if (init_compiled_tables_fixture(&tables) != MUSIC_RIG_RESULT_OK) {
         return 1;
@@ -199,6 +210,12 @@ int main(void)
     if (music_rig_cli_parse(4, unsafe, UINT64_C(1), &command) !=
             MUSIC_RIG_RESULT_INVALID_ARGUMENT ||
         music_rig_cli_parse(7, ambiguous, UINT64_C(1), &command) !=
+            MUSIC_RIG_RESULT_INVALID_ARGUMENT ||
+        music_rig_cli_parse(7, duplicate_global, UINT64_C(1), &command) !=
+            MUSIC_RIG_RESULT_INVALID_ARGUMENT ||
+        music_rig_cli_parse(6, duplicate_dry_run, UINT64_C(1), &command) !=
+            MUSIC_RIG_RESULT_INVALID_ARGUMENT ||
+        music_rig_cli_parse(5, unsafe_reset, UINT64_C(1), &command) !=
             MUSIC_RIG_RESULT_INVALID_ARGUMENT) {
         fputs("unsafe CLI switch was accepted\n", stderr);
         return 1;
