@@ -132,7 +132,8 @@
         }
       ],
       "available_device_profiles": [
-        "eight-band-eq"
+        "eight-band-eq",
+        "multilevel-volume"
       ],
       "required": true
     },

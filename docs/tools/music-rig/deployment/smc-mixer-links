@@ -135,6 +135,7 @@ verify_legacy() {
         report >&2
         return 1
     fi
+    return 0
 }
 
 verify_relay() {

@@ -4,7 +4,7 @@
     "id": "music-rig-authoring-compiler",
     "version": "0.2.0"
   },
-  "definition_fingerprint": "sha256:d09299d526f36052b6af8b6647e0ffa3f3dfa28da0000c3fad990bd738a25c83",
+  "definition_fingerprint": "sha256:89db2e6635579c7b9c5dd1bbcb927a6951ac8e686167c706c8d1a31f8978ba18",
   "device_profiles": [
     {
       "hardware_preset": "arturia-current-rack",
@@ -40,7 +40,7 @@
   "fingerprints": {
     "algorithm": "sha256",
     "platform_binding": "sha256:7ecbfc77df4d75cac23add768800d488f2b4ead78aaf6b965c423958727f326b",
-    "portable_source": "sha256:dceb0d635c1816c2228cd3cd191691161052a1c9ec21ae266b7742f1158a2f95",
+    "portable_source": "sha256:160e36473a19e442c2a2ffeb38e667f82a40a19433d29b875b31fd2eb4cbebf3",
     "schema_set": "sha256:2c1de2ba9a3a7b519eb758b688d874cdd1060b94d83a2ba469cf7fda65f63e06"
   },
   "generation": 1,
@@ -2708,6 +2708,10 @@
         "path": "device-profiles/smc-mixer-main/eight-band-eq.json"
       },
       {
+        "fingerprint": "sha256:1a05acd4751a46974c5505a9f9ec79307041d60e566c80ce478175d90f7639fd",
+        "path": "device-profiles/smc-mixer-main/multilevel-volume.json"
+      },
+      {
         "fingerprint": "sha256:871c8237a52249fcc818420d254c64c1722200df89e64a2e0af0815fccfb8a89",
         "path": "device-profiles/smc-pad-main/drum-set.json"
       },
@@ -2744,7 +2748,7 @@
         "path": "rig-profiles/full-live-rack.json"
       },
       {
-        "fingerprint": "sha256:d4fa456056e1c3f204cf81ce8fa2f01f2b2c5264738c8ddf865d82576e182529",
+        "fingerprint": "sha256:25cec49f2161eb2ddb4be3e475baf9c4f1aa0413ecbb5b2ad046877005ee22c0",
         "path": "rig.json"
       },
       {

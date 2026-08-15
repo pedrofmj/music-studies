@@ -1,0 +1,62 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "device-profile",
+  "id": "multilevel-volume",
+  "display_name": "Multilevel Volume",
+  "description": "Alternative SMC-Mixer control surface for the loaded instrument layers and master level.",
+  "slot": "smc-mixer-main",
+  "compatible_models": [
+    "M-VAVE SMC-Mixer"
+  ],
+  "hardware_preset": "smc-mixer-current-cc",
+  "required_endpoints": [
+    "midi.control-input"
+  ],
+  "required_capabilities": [
+    "parameter.layer-volume",
+    "parameter.master-volume"
+  ],
+  "readiness": "control-only",
+  "takeover_policy": {
+    "default": "ignore-until-moved",
+    "volume": "pickup"
+  },
+  "state_policy": "follow-engine",
+  "mappings": [
+    { "id": "layer-1-volume", "source_control": "fader-1", "target": "arturia.layer-1.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-2-volume", "source_control": "fader-2", "target": "arturia.layer-2.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-3-volume", "source_control": "fader-3", "target": "arturia.layer-3.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-4-volume", "source_control": "fader-4", "target": "arturia.layer-4.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-5-volume", "source_control": "fader-5", "target": "arturia.layer-5.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-6-volume", "source_control": "fader-6", "target": "arturia.layer-6.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-7-volume", "source_control": "fader-7", "target": "arturia.layer-7.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "master-volume", "source_control": "fader-8", "target": "master.volume", "transform": { "type": "direct" }, "takeover": "pickup" }
+  ],
+  "ownership": [
+    { "kind": "parameter", "target": "arturia.layer-1.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "arturia.layer-2.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "arturia.layer-3.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "arturia.layer-4.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "arturia.layer-5.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "arturia.layer-6.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "arturia.layer-7.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "master.volume", "mode": "exclusive" }
+  ],
+  "dependencies": {
+    "engines": [],
+    "effects": [
+      "effect.master.instrument-mixer",
+      "effect.mixer.cc-scale"
+    ],
+    "routes": [
+      "route.master.output"
+    ],
+    "helpers": [],
+    "assets": []
+  },
+  "switch_safety": {
+    "on_failure": "retain-active",
+    "rollback": "required",
+    "transition": "preserve"
+  }
+}

@@ -1,0 +1,6 @@
+# Local AI-agent metadata
+.vtcode/
+vtcode.toml
+
+# Local build outputs
+build/
