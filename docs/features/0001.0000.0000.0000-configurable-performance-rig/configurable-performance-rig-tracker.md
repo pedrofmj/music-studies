@@ -2,7 +2,7 @@
 
 Feature: `0001.0000.0000.0000`
 
-Updated: 2026-08-14
+Updated: 2026-08-15
 
 Documents:
 
@@ -92,7 +92,7 @@ benchmarks.
 | 1. Schemas and current profile extraction | ✅ | `full-live-rack` describes every current role and dependency; all known conflict classes are rejected |
 | 2. Deterministic compiler and parity | ✅ | Authored definitions deterministically materialize an equivalent temporary deployment on Linux and Windows; the protected live setup remains unchanged |
 | 3. Runtime, CLI, and shadow mode | ✅ | Portable control/CLI/IPC, immutable mappings and behaviors, native storage, Linux host lifecycle, five-slot input-only live shadow, and Linux/Windows parity/resource proof pass; the protected rig is restored |
-| 4. Control-only switching | ⬜ | Not started |
+| 4. Control-only switching | 🟡 | First live cutover/rollback exercised 2026-08-15; relay route activation and rollback verified; eight-fader exercise completed; rollback verified; live validation passes |
 | 5. MIDI management triggers | ⬜ | Not started |
 | 6. Prepared engines and graph deltas | ⬜ | Not started |
 | 7. Windows certification | ⬜ | Not started |
@@ -402,9 +402,14 @@ benchmarks.
   physical-output discovery was corrected so the Airstar legacy inventory
   verifies 8/8 with zero relay links, and live setup validation now passes 0
   failures (117/117 links) after restoring the missing SMK-25 AUX Stop/Play
-  link and recapturing the protected baseline on 2026-08-14. The explicitly
-  approved live eight-fader cutover/rollback evidence remains in this same
-  item.
+  link and recapturing the protected baseline on 2026-08-14. The first live
+  eight-fader cutover/rollback was exercised on 2026-08-15: the relay daemon
+  started and registered its two-port inventory; `--cutover` activated the
+  relay route (JACK topology verified: physical→relay input, relay output→8
+  targets); operator exercised all eight faders; `--rollback` restored the
+  legacy route (8/8 legacy links, 0 relay links); live validation passes 0
+  failures (117/117). The explicitly approved live eight-fader cutover/rollback
+  evidence is recorded in this item.
 - ⬜ Implement `eight-band-eq` and `multilevel-volume`.
 - ⬜ Support independent SMC-PAD and SMC-PAD Pocket profiles.
 - ⬜ Implement device and global CLI switching with overrides and reset.
