@@ -1,0 +1,90 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "device-profile",
+  "id": "pad-layer-controller",
+  "display_name": "Pad Layer Controller",
+  "description": "Alternative SMC-PAD role controlling the loaded ambient layer bank without changing its engines.",
+  "slot": "smc-pad-main",
+  "compatible_models": [
+    "M-VAVE SMC-PAD"
+  ],
+  "hardware_preset": "smc-pad-current-notes",
+  "required_endpoints": [
+    "midi.performance-input"
+  ],
+  "required_capabilities": [
+    "notes.ambient-pad-layers",
+    "parameter.pad-layer-volume",
+    "control.pad-layer-latch"
+  ],
+  "readiness": "control-only",
+  "takeover_policy": {
+    "default": "ignore-until-moved",
+    "volume": "pickup"
+  },
+  "state_policy": "persist",
+  "mappings": [
+    { "id": "layer-1-volume", "source_control": "knob-1", "target": "smc-pad.layer-1.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-2-volume", "source_control": "knob-2", "target": "smc-pad.layer-2.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "layer-1-latch", "source_control": "performance-pad-1", "target": "smc-pad.layer-1.enabled", "transform": { "type": "direct" } },
+    { "id": "layer-2-latch", "source_control": "performance-pad-2", "target": "smc-pad.layer-2.enabled", "transform": { "type": "direct" } },
+    { "id": "layer-3-latch", "source_control": "performance-pad-3", "target": "smc-pad.layer-3.enabled", "transform": { "type": "direct" } },
+    { "id": "layer-4-latch", "source_control": "performance-pad-4", "target": "smc-pad.layer-4.enabled", "transform": { "type": "direct" } },
+    { "id": "layer-5-latch", "source_control": "performance-pad-5", "target": "smc-pad.layer-5.enabled", "transform": { "type": "direct" } },
+    { "id": "layer-6-latch", "source_control": "performance-pad-6", "target": "smc-pad.layer-6.enabled", "transform": { "type": "direct" } },
+    { "id": "layer-7-latch", "source_control": "performance-pad-7", "target": "smc-pad.layer-7.enabled", "transform": { "type": "direct" } },
+    { "id": "layer-8-latch", "source_control": "performance-pad-8", "target": "smc-pad.layer-8.enabled", "transform": { "type": "direct" } }
+  ],
+  "ownership": [
+    { "kind": "parameter", "target": "smc-pad.layer-1.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "smc-pad.layer-2.volume", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smc-pad.layer-1.enabled", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smc-pad.layer-2.enabled", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smc-pad.layer-3.enabled", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smc-pad.layer-4.enabled", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smc-pad.layer-5.enabled", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smc-pad.layer-6.enabled", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smc-pad.layer-7.enabled", "mode": "exclusive" },
+    { "kind": "semantic-control", "target": "smc-pad.layer-8.enabled", "mode": "exclusive" },
+    { "kind": "helper", "target": "helper.smc-pad-layer-controller", "mode": "exclusive" }
+  ],
+  "dependencies": {
+    "engines": [
+      "engine.smk.oceans-worship-pad",
+      "engine.smk.warm-worship-pad",
+      "engine.smk.hillsong-pad",
+      "engine.smk.worship-shimmer",
+      "engine.smk.cloud-shimmer",
+      "engine.smk.magic-ambient",
+      "engine.smk.majesty-pad",
+      "engine.smk.sanctorium-pad"
+    ],
+    "effects": [
+      "effect.smk.layer-mixer",
+      "effect.master.instrument-mixer"
+    ],
+    "routes": [
+      "route.smk.performance-fanout",
+      "route.smk.layer-control",
+      "route.smk.master-sum"
+    ],
+    "helpers": [
+      "helper.smk25-pad-layers"
+    ],
+    "assets": [
+      "asset.smk.oceans-worship-pad",
+      "asset.smk.warm-worship-pad",
+      "asset.smk.hillsong-pad",
+      "asset.smk.worship-shimmer",
+      "asset.smk.cloud-shimmer",
+      "asset.smk.magic-ambient",
+      "asset.smk.majesty-pad",
+      "asset.smk.sanctorium-pad"
+    ]
+  },
+  "switch_safety": {
+    "on_failure": "retain-active",
+    "rollback": "required",
+    "transition": "preserve"
+  }
+}

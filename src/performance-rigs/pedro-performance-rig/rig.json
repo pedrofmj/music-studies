@@ -174,7 +174,8 @@
         }
       ],
       "available_device_profiles": [
-        "drum-set"
+        "drum-set",
+        "pad-layer-controller"
       ],
       "required": true
     },
@@ -221,7 +222,8 @@
     }
   ],
   "rig_profiles": [
-    "full-live-rack"
+    "full-live-rack",
+    "multilevel-volume-mixed-pads"
   ],
   "hardware_presets": [
     "arturia-current-rack",

@@ -1,0 +1,81 @@
+{
+  "schema": "music-studies/performance-rig/v1",
+  "kind": "rig-profile",
+  "id": "multilevel-volume-mixed-pads",
+  "display_name": "Multilevel Volume With Mixed Pads",
+  "description": "Alternative control-only composition using SMC-Mixer multilevel volume and SMC-PAD ambient layer ownership.",
+  "device_profiles": {
+    "arturia-main": "multi-instrument-rack",
+    "smk25-main": "ambient-pad-layers",
+    "smc-mixer-main": "multilevel-volume",
+    "smc-pad-main": "pad-layer-controller",
+    "smc-pad-pocket": "drum-set"
+  },
+  "readiness": "control-only",
+  "takeover_policy": {
+    "default": "ignore-until-moved",
+    "volume": "pickup"
+  },
+  "state_policy": "persist",
+  "required_capabilities": [
+    "control.master-mute",
+    "control.pad-layer-latch",
+    "control.pad-layer-transport",
+    "effect.equalizer.eight-band",
+    "midi.control-input",
+    "midi.performance-input",
+    "midi.transport-input",
+    "notes.ambient-pad-layers",
+    "notes.drum-set",
+    "notes.layered-instruments",
+    "parameter.drum-set-output-gain",
+    "parameter.drum-set-volume",
+    "parameter.layer-volume",
+    "parameter.layer-reverb",
+    "parameter.master-volume",
+    "parameter.pad-layer-volume"
+  ],
+  "ownership": [],
+  "preparation": {
+    "pinned_capabilities": [
+      "engine.drum-set",
+      "engine.smk.cloud-shimmer",
+      "engine.smk.hillsong-pad",
+      "engine.smk.magic-ambient",
+      "engine.smk.majesty-pad",
+      "engine.smk.oceans-worship-pad",
+      "engine.smk.sanctorium-pad",
+      "engine.smk.warm-worship-pad",
+      "engine.smk.worship-shimmer"
+    ]
+  },
+  "shared_resources": {
+    "engines": [
+      "engine.drum-set",
+      "engine.smk.cloud-shimmer",
+      "engine.smk.hillsong-pad",
+      "engine.smk.magic-ambient",
+      "engine.smk.majesty-pad",
+      "engine.smk.oceans-worship-pad",
+      "engine.smk.sanctorium-pad",
+      "engine.smk.warm-worship-pad",
+      "engine.smk.worship-shimmer"
+    ],
+    "effects": [
+      "effect.master.instrument-mixer",
+      "effect.pad.sustain-scale",
+      "effect.smk.layer-mixer"
+    ],
+    "routes": [
+      "route.master.output",
+      "route.smk.layer-control",
+      "route.smk.master-sum",
+      "route.smk.performance-fanout"
+    ]
+  },
+  "switch_safety": {
+    "on_failure": "retain-active",
+    "rollback": "required",
+    "transition": "preserve"
+  }
+}

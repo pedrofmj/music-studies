@@ -23,24 +23,24 @@
   },
   "state_policy": "follow-engine",
   "mappings": [
-    { "id": "layer-1-volume", "source_control": "fader-1", "target": "arturia.layer-1.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
-    { "id": "layer-2-volume", "source_control": "fader-2", "target": "arturia.layer-2.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
-    { "id": "layer-3-volume", "source_control": "fader-3", "target": "arturia.layer-3.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
-    { "id": "layer-4-volume", "source_control": "fader-4", "target": "arturia.layer-4.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
-    { "id": "layer-5-volume", "source_control": "fader-5", "target": "arturia.layer-5.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
-    { "id": "layer-6-volume", "source_control": "fader-6", "target": "arturia.layer-6.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
-    { "id": "layer-7-volume", "source_control": "fader-7", "target": "arturia.layer-7.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
-    { "id": "master-volume", "source_control": "fader-8", "target": "master.volume", "transform": { "type": "direct" }, "takeover": "pickup" }
+    { "id": "group-1-volume", "source_control": "fader-1", "target": "mixer.instrument-group-1.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "group-2-volume", "source_control": "fader-2", "target": "mixer.instrument-group-2.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "group-3-volume", "source_control": "fader-3", "target": "mixer.instrument-group-3.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "group-4-volume", "source_control": "fader-4", "target": "mixer.instrument-group-4.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "group-5-volume", "source_control": "fader-5", "target": "mixer.instrument-group-5.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "group-6-volume", "source_control": "fader-6", "target": "mixer.instrument-group-6.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "group-7-volume", "source_control": "fader-7", "target": "mixer.instrument-group-7.volume", "transform": { "type": "direct" }, "takeover": "pickup" },
+    { "id": "master-volume", "source_control": "fader-8", "target": "mixer.master.volume", "transform": { "type": "direct" }, "takeover": "pickup" }
   ],
   "ownership": [
-    { "kind": "parameter", "target": "arturia.layer-1.volume", "mode": "exclusive" },
-    { "kind": "parameter", "target": "arturia.layer-2.volume", "mode": "exclusive" },
-    { "kind": "parameter", "target": "arturia.layer-3.volume", "mode": "exclusive" },
-    { "kind": "parameter", "target": "arturia.layer-4.volume", "mode": "exclusive" },
-    { "kind": "parameter", "target": "arturia.layer-5.volume", "mode": "exclusive" },
-    { "kind": "parameter", "target": "arturia.layer-6.volume", "mode": "exclusive" },
-    { "kind": "parameter", "target": "arturia.layer-7.volume", "mode": "exclusive" },
-    { "kind": "parameter", "target": "master.volume", "mode": "exclusive" }
+    { "kind": "parameter", "target": "mixer.instrument-group-1.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "mixer.instrument-group-2.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "mixer.instrument-group-3.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "mixer.instrument-group-4.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "mixer.instrument-group-5.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "mixer.instrument-group-6.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "mixer.instrument-group-7.volume", "mode": "exclusive" },
+    { "kind": "parameter", "target": "mixer.master.volume", "mode": "exclusive" }
   ],
   "dependencies": {
     "engines": [],

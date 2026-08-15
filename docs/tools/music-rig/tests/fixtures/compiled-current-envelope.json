@@ -4,7 +4,7 @@
     "id": "music-rig-authoring-compiler",
     "version": "0.2.0"
   },
-  "definition_fingerprint": "sha256:89db2e6635579c7b9c5dd1bbcb927a6951ac8e686167c706c8d1a31f8978ba18",
+  "definition_fingerprint": "sha256:4bf65aa790d579e72d07c8200832fa9885f4d691d1c4787fc8e946e950445241",
   "device_profiles": [
     {
       "hardware_preset": "arturia-current-rack",
@@ -40,7 +40,7 @@
   "fingerprints": {
     "algorithm": "sha256",
     "platform_binding": "sha256:7ecbfc77df4d75cac23add768800d488f2b4ead78aaf6b965c423958727f326b",
-    "portable_source": "sha256:160e36473a19e442c2a2ffeb38e667f82a40a19433d29b875b31fd2eb4cbebf3",
+    "portable_source": "sha256:e007fc4efa8a478787ba638403356365dda0f09dc2e868e59b208d4c3fc38546",
     "schema_set": "sha256:2c1de2ba9a3a7b519eb758b688d874cdd1060b94d83a2ba469cf7fda65f63e06"
   },
   "generation": 1,
@@ -2708,12 +2708,16 @@
         "path": "device-profiles/smc-mixer-main/eight-band-eq.json"
       },
       {
-        "fingerprint": "sha256:1a05acd4751a46974c5505a9f9ec79307041d60e566c80ce478175d90f7639fd",
+        "fingerprint": "sha256:1d737a205d21a522764a5e800f04b9eaed45bfe0f8478fdc65f450ff5995b16a",
         "path": "device-profiles/smc-mixer-main/multilevel-volume.json"
       },
       {
         "fingerprint": "sha256:871c8237a52249fcc818420d254c64c1722200df89e64a2e0af0815fccfb8a89",
         "path": "device-profiles/smc-pad-main/drum-set.json"
+      },
+      {
+        "fingerprint": "sha256:b08248ff28bed4d0f1d5377d1b07174a6bd906a8cd06e07c730892fc1dece37e",
+        "path": "device-profiles/smc-pad-main/pad-layer-controller.json"
       },
       {
         "fingerprint": "sha256:38822e0754fc8ad5673e3454d362f869a92d04e056e73bda04b3d2d0baaf7d7f",
@@ -2748,7 +2752,11 @@
         "path": "rig-profiles/full-live-rack.json"
       },
       {
-        "fingerprint": "sha256:25cec49f2161eb2ddb4be3e475baf9c4f1aa0413ecbb5b2ad046877005ee22c0",
+        "fingerprint": "sha256:38d93bdf71cf741a0694961acf08abffdf3a4984e8810d76588201c1824c6cb5",
+        "path": "rig-profiles/multilevel-volume-mixed-pads.json"
+      },
+      {
+        "fingerprint": "sha256:06c56d83cae6035c0ced797544b13f9e5e4f8047e47ef85b4c957c1deccb5d89",
         "path": "rig.json"
       },
       {
