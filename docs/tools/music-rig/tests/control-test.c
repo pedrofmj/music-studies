@@ -50,6 +50,7 @@ static int dispatch_expect(
     return 0;
 }
 
+
 int main(void)
 {
     static music_rig_compiled_tables tables;
