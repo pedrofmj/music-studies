@@ -197,6 +197,45 @@ static music_rig_result parse_switch(
     return MUSIC_RIG_RESULT_OK;
 }
 
+static music_rig_result parse_reset(
+    int argc,
+    char *const argv[],
+    music_rig_cli_command *command
+)
+{
+    bool seen_device = false;
+    bool seen_dry_run = false;
+    bool seen_json = false;
+    bool seen_generation = false;
+    int index;
+
+    for (index = 2; index < argc; ++index) {
+        if (parse_common_option(
+                argc, argv, &index, command, &seen_json, &seen_generation
+            )) {
+            continue;
+        }
+        if (strcmp(argv[index], "--dry-run") == 0 && !seen_dry_run) {
+            seen_dry_run = true;
+            command->request.flags = MUSIC_RIG_REQUEST_DRY_RUN;
+        } else if (strcmp(argv[index], "--device") == 0 &&
+            !seen_device && index + 1 < argc &&
+            identifier_is_valid(argv[index + 1])) {
+            copy_identifier(command->request.device_slot, argv[index + 1]);
+            seen_device = true;
+            index += 1;
+        } else {
+            return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+        }
+    }
+    if (!seen_device || !seen_dry_run) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+    command->request.operation =
+        (uint32_t)MUSIC_RIG_OPERATION_RESET_DEVICE_OVERRIDE;
+    return MUSIC_RIG_RESULT_OK;
+}
+
 music_rig_result music_rig_cli_parse(
     int argc,
     char *const argv[],
@@ -229,6 +268,8 @@ music_rig_result music_rig_cli_parse(
         result = parse_read_command(argc, argv, 2, false, command);
     } else if (strcmp(argv[1], "switch") == 0) {
         result = parse_switch(argc, argv, command);
+    } else if (strcmp(argv[1], "reset") == 0) {
+        result = parse_reset(argc, argv, command);
     } else {
         result = MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }

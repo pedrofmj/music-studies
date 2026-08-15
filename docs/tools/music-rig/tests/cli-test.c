@@ -121,6 +121,10 @@ int main(void)
         "music-rig", "switch", "--device", "smc-mixer-main",
         "--profile", "eight-band-eq", "--dry-run"
     };
+    char *reset[] = {
+        "music-rig", "reset", "--device", "smc-mixer-main", "--dry-run",
+        "--json"
+    };
     char *missing[] = {
         "music-rig", "switch", "--global", "modeled-piano", "--dry-run"
     };
@@ -151,6 +155,8 @@ int main(void)
             "\"graph_delta\":\"empty\"") ||
         run_command(7, device, &mock, MUSIC_RIG_RESULT_OK,
             "dry-run yes") ||
+        run_command(6, reset, &mock, MUSIC_RIG_RESULT_OK,
+            "reset-device-override") ||
         run_command(5, missing, &mock, MUSIC_RIG_RESULT_NOT_FOUND,
             "result not-found")) {
         return 1;

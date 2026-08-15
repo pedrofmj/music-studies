@@ -19,6 +19,8 @@ static void print_usage(FILE *stream, const char *program)
         "[--json]\n",
         program
     );
+    fprintf(stream, "       %s reset --device SLOT --dry-run [--json]\n",
+        program);
 }
 
 static music_rig_result unavailable_exchange(
