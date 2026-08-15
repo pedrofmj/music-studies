@@ -197,6 +197,23 @@ static music_rig_result parse_switch(
     return MUSIC_RIG_RESULT_OK;
 }
 
+static music_rig_result parse_prepare(
+    int argc,
+    char *const argv[],
+    music_rig_cli_command *command
+)
+{
+    music_rig_result result = parse_switch(argc, argv, command);
+
+    if (result != MUSIC_RIG_RESULT_OK) {
+        return result;
+    }
+    command->request.operation = command->request.device_slot[0] == '\0'
+        ? (uint32_t)MUSIC_RIG_OPERATION_PREPARE_GLOBAL
+        : (uint32_t)MUSIC_RIG_OPERATION_PREPARE_DEVICE;
+    return MUSIC_RIG_RESULT_OK;
+}
+
 static music_rig_result parse_reset(
     int argc,
     char *const argv[],
@@ -268,6 +285,8 @@ music_rig_result music_rig_cli_parse(
         result = parse_read_command(argc, argv, 2, false, command);
     } else if (strcmp(argv[1], "switch") == 0) {
         result = parse_switch(argc, argv, command);
+    } else if (strcmp(argv[1], "prepare") == 0) {
+        result = parse_prepare(argc, argv, command);
     } else if (strcmp(argv[1], "reset") == 0) {
         result = parse_reset(argc, argv, command);
     } else {

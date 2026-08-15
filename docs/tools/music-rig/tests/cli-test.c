@@ -121,6 +121,10 @@ int main(void)
         "music-rig", "switch", "--global",
         "multilevel-volume-mixed-pads", "--dry-run", "--json"
     };
+    char *prepare_device[] = {
+        "music-rig", "prepare", "--device", "smc-mixer-main",
+        "--profile", "eight-band-eq", "--dry-run"
+    };
     char *device[] = {
         "music-rig", "switch", "--device", "smc-mixer-main",
         "--profile", "eight-band-eq", "--dry-run"
@@ -158,6 +162,10 @@ int main(void)
         command.request.flags != MUSIC_RIG_REQUEST_DRY_RUN ||
         run_command(5, profiles, &mock, MUSIC_RIG_RESULT_OK,
             "profile smc-mixer-main eight-band-eq control-only active") ||
+        music_rig_cli_parse(7, prepare_device, UINT64_C(74), &command) !=
+            MUSIC_RIG_RESULT_OK ||
+        command.request.operation != MUSIC_RIG_OPERATION_PREPARE_DEVICE ||
+        command.request.flags != MUSIC_RIG_REQUEST_DRY_RUN ||
         run_command(3, validate, &mock, MUSIC_RIG_RESULT_OK,
             "\"valid\":true") ||
         run_command(6, global, &mock, MUSIC_RIG_RESULT_OK,

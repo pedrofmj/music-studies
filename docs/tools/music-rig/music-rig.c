@@ -12,6 +12,13 @@ static void print_usage(FILE *stream, const char *program)
     fprintf(stream, "       %s profiles list [--device SLOT] [--json]\n",
         program);
     fprintf(stream, "       %s validate [--json]\n", program);
+    fprintf(stream, "       %s prepare --global PROFILE --dry-run [--json]\n",
+        program);
+    fprintf(stream,
+        "       %s prepare --device SLOT --profile PROFILE --dry-run "
+        "[--json]\n",
+        program
+    );
     fprintf(stream, "       %s switch --global PROFILE --dry-run [--json]\n",
         program);
     fprintf(stream,
