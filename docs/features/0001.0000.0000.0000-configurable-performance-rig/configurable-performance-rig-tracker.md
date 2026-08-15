@@ -397,9 +397,14 @@ benchmarks.
   [run 31698846886](https://github.com/pedrofmj/music-studies/actions/runs/31698846886)
   passes Linux 59/59, Windows 43/43, and Windows JSON 48/48 under strict
   `/W4 /WX`, including the portable relay, all eight per-fader evidence
-  counters, and absence of an output-capable command on Windows. The required
-  production restore rehearsal and explicitly approved live eight-fader
-  cutover/rollback evidence remain in this same item.
+  counters, and absence of an output-capable command on Windows. The
+  production restore rehearsal passed on 2026-08-14, the `smc-mixer-links`
+  physical-output discovery was corrected so the Airstar legacy inventory
+  verifies 8/8 with zero relay links, and live setup validation now passes 0
+  failures (117/117 links) after restoring the missing SMK-25 AUX Stop/Play
+  link and recapturing the protected baseline on 2026-08-14. The explicitly
+  approved live eight-fader cutover/rollback evidence remains in this same
+  item.
 - ⬜ Implement `eight-band-eq` and `multilevel-volume`.
 - ⬜ Support independent SMC-PAD and SMC-PAD Pocket profiles.
 - ⬜ Implement device and global CLI switching with overrides and reset.
