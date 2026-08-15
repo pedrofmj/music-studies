@@ -62,6 +62,7 @@ def run_compiler(
     binding_id: str,
     cwd: Path,
     output: Optional[Path] = None,
+    rig_profile: Optional[str] = None,
 ) -> subprocess.CompletedProcess:
     command = [
         sys.executable,
@@ -71,6 +72,8 @@ def run_compiler(
         "--platform-binding",
         binding_id,
     ]
+    if rig_profile is not None:
+        command.extend(["--rig-profile", rig_profile])
     if output is None:
         command.append("--check-only")
     else:
@@ -210,6 +213,29 @@ def main() -> int:
             completed_cases.append("repeatable-output")
 
             document = load_json(first_output)
+            alternate_output = temporary_root / "alternate.json"
+            alternate = run_compiler(
+                RIG_ROOT,
+                "airstar-current",
+                REPOSITORY_ROOT,
+                alternate_output,
+                "multilevel-volume-mixed-pads",
+            )
+            require_success(alternate, "mixed profile compilation")
+            alternate_document = load_json(alternate_output)
+            if alternate_document["active_rig_profile"] != "multilevel-volume-mixed-pads":
+                raise AssertionError("mixed profile was not selected")
+            alternate_profiles = {
+                (row["slot"], row["profile"])
+                for row in alternate_document["device_profiles"]
+            }
+            if (
+                ("smc-mixer-main", "multilevel-volume") not in alternate_profiles
+                or ("smc-pad-main", "pad-layer-controller") not in alternate_profiles
+                or ("smc-pad-pocket", "drum-set") not in alternate_profiles
+            ):
+                raise AssertionError("mixed profile device selection was not compiled")
+            completed_cases.append("mixed-profile-selection")
             canonical_render = (
                 json.dumps(
                     document,
@@ -539,11 +565,11 @@ def main() -> int:
                 raise AssertionError("relative encoding mismatch compiled")
             completed_cases.append("relative-encoding-rejection")
 
-        if len(completed_cases) != 13:
+        if len(completed_cases) != 14:
             raise AssertionError(
-                f"compiler test accounting expected 13, got {completed_cases}"
+                f"compiler test accounting expected 14, got {completed_cases}"
             )
-        print("Performance Rig compiler tests: PASS (cases=13)")
+        print("Performance Rig compiler tests: PASS (cases=14)")
         return 0
     except (AssertionError, OSError, ValueError, KeyError) as error:
         print(f"FAIL: {error}", file=sys.stderr)
