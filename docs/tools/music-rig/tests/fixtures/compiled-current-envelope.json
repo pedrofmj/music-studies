@@ -4,7 +4,7 @@
     "id": "music-rig-authoring-compiler",
     "version": "0.2.0"
   },
-  "definition_fingerprint": "sha256:9be68993c164802f694f4d6359c208d9937fbfcf668781ce5a1c3bff5f30cb9e",
+  "definition_fingerprint": "sha256:d09299d526f36052b6af8b6647e0ffa3f3dfa28da0000c3fad990bd738a25c83",
   "device_profiles": [
     {
       "hardware_preset": "arturia-current-rack",
@@ -39,7 +39,7 @@
   ],
   "fingerprints": {
     "algorithm": "sha256",
-    "platform_binding": "sha256:eb331c7f04f29ebde8e4e767e012a26b48a09acada3a5d540a41bc551fe8c504",
+    "platform_binding": "sha256:7ecbfc77df4d75cac23add768800d488f2b4ead78aaf6b965c423958727f326b",
     "portable_source": "sha256:dceb0d635c1816c2228cd3cd191691161052a1c9ec21ae266b7742f1158a2f95",
     "schema_set": "sha256:2c1de2ba9a3a7b519eb758b688d874cdd1060b94d83a2ba469cf7fda65f63e06"
   },
@@ -2695,7 +2695,7 @@
   "schema": "music-studies/compiled-performance-rig/v1",
   "source_manifest": {
     "platform_binding": {
-      "fingerprint": "sha256:eb331c7f04f29ebde8e4e767e012a26b48a09acada3a5d540a41bc551fe8c504",
+      "fingerprint": "sha256:7ecbfc77df4d75cac23add768800d488f2b4ead78aaf6b965c423958727f326b",
       "path": "platform-bindings/linux/airstar-current.json"
     },
     "portable": [

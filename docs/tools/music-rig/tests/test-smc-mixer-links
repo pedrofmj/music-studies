@@ -35,6 +35,10 @@ if [[ "$1" == '-l' ]]; then
     done <"$state"
     exit 0
 fi
+if [[ "$1" == '-o' ]]; then
+    awk -F'|' 'NF > 1 {print $1}' "$state" | sort -u
+    exit 0
+fi
 IFS= read -r count <"$calls" || count=0
 printf '%s\n' "$((count + 1))" >"$calls"
 if [[ -n "${MUSIC_RIG_FAKE_FAIL_AT:-}" &&

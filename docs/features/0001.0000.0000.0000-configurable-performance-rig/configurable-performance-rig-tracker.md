@@ -2,7 +2,7 @@
 
 Feature: `0001.0000.0000.0000`
 
-Updated: 2026-08-12
+Updated: 2026-08-14
 
 Documents:
 
@@ -27,7 +27,12 @@ Documents:
 - ✅ Automated tests do not mutate the live audio or MIDI graph.
 - ✅ Restore remains preview-only without the explicit `--apply` option.
 - ✅ Airstar observations create no remote files and control no services.
-- ⬜ Production restore rehearsal is required before the first live cutover.
+- ✅ Production restore rehearsal passed on 2026-08-14. The apply restored the
+  protected project, Patchbay snapshot, and services from verified sources with
+  Carla closed, kept the pre-restore deployment and service evidence under
+  `~/.local/state/pedro-live-rack/protected-restore-backups/20260814T233101`,
+  and left all four legacy services enabled and active with zero validation
+  failures.
 
 ## Latest Verification
 

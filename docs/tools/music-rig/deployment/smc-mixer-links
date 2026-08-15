@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly PHYSICAL_OUTPUT='Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-4- full speed:(capture_1) SINCO SMC-Mixer-Master'
 readonly RELAY_INPUT='music-rigd-smc-mixer:device.smc-mixer-main.midi-input'
 readonly RELAY_OUTPUT='music-rigd-smc-mixer:device.smc-mixer-main.midi-output'
 readonly TARGETS=(
@@ -20,6 +19,20 @@ usage() {
     printf '%s\n' \
         'Usage: smc-mixer-links --preview|--verify-legacy|--verify-relay' \
         '                       --cutover|--rollback'
+}
+
+discover_physical_output() {
+    local matches
+    local count
+
+    matches="$($PW_LINK_BIN -o 2>/dev/null | grep -- 'SMC-Mixer-Master' || true)"
+    count="$(printf '%s\n' "$matches" | grep -c . || true)"
+    if [[ $count != 1 ]]; then
+        printf '%s\n' \
+            "Expected exactly one physical SMC-Mixer output port, found $count." >&2
+        return 1
+    fi
+    printf '%s\n' "$matches"
 }
 
 link_exists() {
@@ -195,6 +208,7 @@ main() {
         printf 'Missing pw-link command: %s\n' "$PW_LINK_BIN" >&2
         return 2
     }
+    PHYSICAL_OUTPUT="$(discover_physical_output)" || return 2
     case "$1" in
     --preview)
         report

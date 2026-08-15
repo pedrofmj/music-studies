@@ -1,6 +1,6 @@
 {
   "schema": "music-studies/pedro-live-setup/v1",
-  "captured_at": "2026-08-09T15:03:55-03:00",
+  "captured_at": "2026-08-14T23:45:00-03:00",
   "reference_host": {
     "hostname": "airstar",
     "architecture": "x86_64",
@@ -399,13 +399,13 @@
   ],
   "patchbay": {
     "raw_snapshot": "src/midi-setup/airstar-patchbay.json",
-    "raw_sha256": "7f055a94ca98b945d7dc7372bd4e88246c26ade74a45beff217460eb75dbece1",
+    "raw_sha256": "919acc7e51a6af59b34ab80526920b52aa3d9157706e9e671ed3d81167109fb9",
     "raw_links": 117,
     "midi_snapshot": "src/midi-setup/airstar-midi-patchbay.json",
-    "midi_sha256": "8bf1bfdc156fa26583fe8a96142a1a550111b945ca2a91e7fd2b94462e2b305c",
+    "midi_sha256": "a5091eb73bbcb1d8620bbb5d21cd00632963af28e87b00f4a0c977c3c0aea6c4",
     "midi_links": 67,
     "deployment_snapshot": "src/midi-setup/pedro-live-rack-patchbay.json",
-    "deployment_sha256": "f6170a4c49579711033ed0379d4a7426f4ee15d1f441adbbbfedb358d016b429",
+    "deployment_sha256": "73b35846ccd94d7e8858f13290799387669cbe5a2afd25732a92d6ab4cdbaae3",
     "deployment_links": 115,
     "excluded_from_deployment": [
       "ALSA Playback [java] audio links are unrelated to the performance rack."

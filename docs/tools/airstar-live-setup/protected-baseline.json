@@ -3,7 +3,7 @@
   "id": "airstar-single-rig-2026-08-09",
   "status": "protected-production-default",
   "description": "Known-good single-rig setup used for rehearsals, studio work, and live performance.",
-  "captured_at": "2026-08-09T15:03:55-03:00",
+  "captured_at": "2026-08-14T23:45:00-03:00",
   "source_commit": "c2e1911406f942a9da0a9f91c65eae8a32148e28",
   "reference_host": {
     "hostname": "airstar",
@@ -27,7 +27,7 @@
   "protected_files": [
     {
       "path": "docs/tools/airstar-live-setup/setup.json",
-      "sha256": "3af1bb063239dc47a425ea3df109a260fea4dff98a0e645380f1d6e33b7275d6"
+      "sha256": "def19bd17d02d38bf28dddf23dc72c56dec5f90eeaa9f9a5ceb20d05a9208c1f"
     },
     {
       "path": "docs/tools/airstar-live-setup/install-airstar-live-setup",
@@ -55,19 +55,19 @@
     },
     {
       "path": "src/audio-software/carla/projects/pedro-live-rack/project.json",
-      "sha256": "2677eacef274486d0e9626a5f61fb8f589d6eea87d44ca788062f8610ee4032e"
+      "sha256": "1e3da93f4972cc91f99328228b0e90050c7955ec5d3b4eee5ba5f73663c8a1bf"
     },
     {
       "path": "src/midi-setup/airstar-patchbay.json",
-      "sha256": "7f055a94ca98b945d7dc7372bd4e88246c26ade74a45beff217460eb75dbece1"
+      "sha256": "919acc7e51a6af59b34ab80526920b52aa3d9157706e9e671ed3d81167109fb9"
     },
     {
       "path": "src/midi-setup/airstar-midi-patchbay.json",
-      "sha256": "8bf1bfdc156fa26583fe8a96142a1a550111b945ca2a91e7fd2b94462e2b305c"
+      "sha256": "a5091eb73bbcb1d8620bbb5d21cd00632963af28e87b00f4a0c977c3c0aea6c4"
     },
     {
       "path": "src/midi-setup/pedro-live-rack-patchbay.json",
-      "sha256": "f6170a4c49579711033ed0379d4a7426f4ee15d1f441adbbbfedb358d016b429"
+      "sha256": "73b35846ccd94d7e8858f13290799387669cbe5a2afd25732a92d6ab4cdbaae3"
     },
     {
       "path": "bin/carla-pedro-project",
