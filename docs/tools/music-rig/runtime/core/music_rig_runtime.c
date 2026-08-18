@@ -156,6 +156,7 @@ music_rig_result music_rig_runtime_init(
 )
 {
     music_rig_result result;
+    music_rig_control_snapshot snapshot;
 
     if (runtime == NULL || config == NULL ||
         config->initial_generation == NULL ||
@@ -164,7 +165,11 @@ music_rig_result music_rig_runtime_init(
         config->definition_fingerprint_size !=
             MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE ||
         !bounded_profile(config->active_rig_profile) ||
-        !interfaces_are_valid(interfaces)) {
+        !interfaces_are_valid(interfaces) ||
+        config->prepared_definition_count >
+            MUSIC_RIG_PREPARED_DEFINITION_CAPACITY ||
+        (config->prepared_definition_count != 0U &&
+            config->prepared_definitions == NULL)) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
     if (config->output_mode != MUSIC_RIG_OUTPUT_SUPPRESSED) {
@@ -198,6 +203,20 @@ music_rig_result music_rig_runtime_init(
     if (result != MUSIC_RIG_RESULT_OK) {
         return result;
     }
+    snapshot.generation_id = runtime->state.generation_id;
+    snapshot.active_rig_profile = runtime->active_rig_profile;
+    snapshot.tables = runtime->initial_generation.mapping;
+    snapshot.output_mode = runtime->state.output_mode;
+    result = music_rig_control_prepared_definitions_validate(
+        &snapshot,
+        config->prepared_definitions,
+        config->prepared_definition_count
+    );
+    if (result != MUSIC_RIG_RESULT_OK) {
+        return result;
+    }
+    runtime->prepared_definitions = config->prepared_definitions;
+    runtime->prepared_definition_count = config->prepared_definition_count;
     result = music_rig_generation_slot_init(
         &runtime->generations,
         &runtime->initial_generation
@@ -387,7 +406,13 @@ music_rig_result music_rig_runtime_dispatch(
     snapshot.active_rig_profile = runtime->active_rig_profile;
     snapshot.tables = runtime->control_generation->mapping;
     snapshot.output_mode = runtime->state.output_mode;
-    result = music_rig_control_dispatch(&snapshot, request, response);
+    result = music_rig_control_dispatch_prepared(
+        &snapshot,
+        runtime->prepared_definitions,
+        runtime->prepared_definition_count,
+        request,
+        response
+    );
     finished_ns = runtime->interfaces.clock.now_ns(
         runtime->interfaces.clock.context
     );

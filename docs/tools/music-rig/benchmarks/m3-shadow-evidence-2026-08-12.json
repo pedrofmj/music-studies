@@ -3,7 +3,7 @@
   "recorded_on": "2026-08-12",
   "source_commit": "20c069e43837478e73b840e0515b39163257f9d9",
   "definition": {
-    "path": "../tests/fixtures/compiled-current-envelope.json",
+    "path": "compiled-current-envelope-2026-08-12.json",
     "sha256": "0aba0defa098437599a78e24c133d479733b15fe0e38270a99c9619daffc8fbd",
     "fingerprint": "sha256:02ee1bba5fbd5982c2f3f8e2df0ef81f265afe93a7c13b7a7bd59129e952d628",
     "generation": 1

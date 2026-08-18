@@ -155,12 +155,14 @@ tests claims installed-asset or live-graph availability. See
 ## Portable Runtime Control Loop
 
 [`runtime/core/music_rig_runtime.c`](runtime/core/music_rig_runtime.c) provides
-the Milestone 3 daemon core: fixed-storage lifecycle state, a checksummed
+the portable daemon core: fixed-storage lifecycle state, a checksummed
 persistent-state frame, saturating metrics, expected-generation publication,
 bounded control-thread reclamation, stable device-slot port compatibility, and
-ABI-versioned clock/control/storage callbacks. Its event-driven loop handles
-decoded protocol v2 inspection and dry-run requests, idle waits, responses, and
-shutdown through mock adapters. Output-enabled mode is rejected.
+ABI-versioned clock/control/storage callbacks. Runtime initialization can retain
+at most 16 caller-owned prepared compiled definitions after full validation,
+duplicate Rig Profile rejection, and stable-port comparison. Its event-driven
+loop handles decoded protocol v2 inspection and dry-run requests, idle waits,
+responses, and shutdown through mock adapters. Output-enabled mode is rejected.
 
 [`runtime/core/music_rig_device_ports.c`](runtime/core/music_rig_device_ports.c)
 derives fixed `device.<slot>.midi-input` and `.midi-output` identities from
@@ -227,10 +229,11 @@ ports until a signal. It also adds the fully explicit, acknowledged
 ports and never creates links. See [RUNTIME.md](RUNTIME.md) for ownership,
 lifecycle, storage, adapter, metric, failure, and next-slice contracts.
 
-[`music-rig`](music-rig.c) recognizes `status`, `profiles list`, `validate`, and
-global/device switches only with `--dry-run`. The portable client library
-strictly parses commands and renders human or versioned JSON responses. Since
-no production endpoint exists, the executable returns adapter failure without
+[`music-rig`](music-rig.c) recognizes `status`, `profiles list`, `validate`,
+global/device prepare and switch dry-runs, and device-override reset dry-runs.
+The portable client library strictly parses commands and renders human or
+versioned JSON responses, including inactive prepared candidates. Since no
+production endpoint exists, the executable returns adapter failure without
 sending a request; CTest locks this fail-closed behavior.
 
 Example for the opt-in build:

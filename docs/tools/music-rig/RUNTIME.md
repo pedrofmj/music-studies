@@ -241,12 +241,15 @@ five-device aggregate insufficient by itself: each slot must have its own
 positive evidence before parity is accepted.
 
 Protocol v2 dispatch implements status, filtered profile listing, active
-validation, and dry-run prepare/switch/reset/reload planning over the immutable
-table image. Every response remains output-suppressed. Dry-runs report
-readiness, selected profiles, warnings, and an empty graph delta while keeping
-the previous and resulting generations equal. Commit-capable requests without
-the dry-run flag return unsupported. A stale expected generation produces
-result code 5 before operation evaluation.
+validation, and dry-run prepare/switch/reset/reload planning over immutable
+table images. Runtime initialization accepts at most 16 caller-owned prepared
+definitions, fully validates each definition and table, rejects duplicate Rig
+Profile IDs, and requires its stable device-slot port catalogue to match the
+active generation. Profile listing and global/device dry-runs can inspect those
+candidates without marking them active. Every response remains
+output-suppressed, and previous and resulting generations stay equal.
+Commit-capable requests without the dry-run flag return unsupported. A stale
+expected generation produces result code 5 before operation evaluation.
 
 ## Executable Boundary
 
@@ -268,10 +271,12 @@ configured IPC transport, installation target, or default-start path, and
 ordinary builds contain no output-capable command.
 
 `music-rig` now has a portable parser, transport interface, and human/JSON
-renderer for `status`, `profiles list`, `validate`, and explicit global/device
-dry-run switches. The executable has no configured production transport. It
-fails closed with adapter result 4 and sends nothing; a switch without
-`--dry-run` is rejected as an invalid command.
+renderer for `status`, `profiles list`, `validate`, explicit global/device
+prepare and switch dry-runs, and device-override reset dry-runs. Prepared
+profiles render as available rather than active. The executable has no
+configured production transport. It fails closed with adapter result 4 and
+sends nothing; a commit-capable command without `--dry-run` is rejected as an
+invalid command.
 
 CTest exercises successful idle/request/stop sequencing, read-only and dry-run
 responses, filtered inventories, cold warnings, stale generations, unsafe

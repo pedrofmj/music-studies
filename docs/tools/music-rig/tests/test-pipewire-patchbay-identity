@@ -1,0 +1,172 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly TOOL="${SCRIPT_DIR}/../../../../bin/pipewire-patchbay-json"
+readonly WORK="${TMPDIR:-/tmp}/music-rig-patchbay-identity-test-$$"
+readonly FAKE_BIN="${WORK}/bin"
+readonly CURRENT_GRAPH="${WORK}/current-graph.json"
+readonly SAVED_GRAPH="${WORK}/saved-graph.json"
+
+cleanup() {
+    rm -rf -- "$WORK"
+}
+trap cleanup EXIT
+mkdir -p -- "$FAKE_BIN"
+
+cat >"${FAKE_BIN}/pw-dump" <<'FAKE'
+#!/usr/bin/env bash
+set -euo pipefail
+cat -- "${MUSIC_RIG_FAKE_PW_DUMP:?}"
+FAKE
+cat >"${FAKE_BIN}/pw-link" <<'FAKE'
+#!/usr/bin/env bash
+printf '%s\n' 'pw-link must not run during a dry-run.' >&2
+exit 99
+FAKE
+chmod +x -- "${FAKE_BIN}/pw-dump" "${FAKE_BIN}/pw-link"
+
+cat >"$CURRENT_GRAPH" <<'JSON'
+[
+  {
+    "id": 1,
+    "type": "PipeWire:Interface:Node",
+    "info": {"props": {"node.name": "Midi-Bridge:SINCO 3"}}
+  },
+  {
+    "id": 2,
+    "type": "PipeWire:Interface:Node",
+    "info": {"props": {"node.name": "SMK25 Pad Layers"}}
+  },
+  {
+    "id": 3,
+    "type": "PipeWire:Interface:Node",
+    "info": {"props": {"node.name": "Midi-Bridge:SINCO 4"}}
+  },
+  {
+    "id": 79,
+    "type": "PipeWire:Interface:Port",
+    "info": {"props": {
+      "node.id": 1,
+      "port.direction": "out",
+      "port.name": "(capture_2) SINCO ",
+      "port.alias": "SINCO:SINCO ",
+      "object.path": "alsa:seq:default:client_30:capture_2",
+      "format.dsp": "8 bit raw midi"
+    }}
+  },
+  {
+    "id": 136,
+    "type": "PipeWire:Interface:Port",
+    "info": {"props": {
+      "node.id": 3,
+      "port.direction": "out",
+      "port.name": "(capture_1) SINCO SMK25-Master",
+      "port.alias": "SINCO:SINCO SMK25-Master",
+      "object.path": "alsa:seq:default:client_40:capture_1",
+      "format.dsp": "8 bit raw midi"
+    }}
+  },
+  {
+    "id": 630,
+    "type": "PipeWire:Interface:Port",
+    "info": {"props": {
+      "node.id": 3,
+      "port.direction": "out",
+      "port.name": "(capture_2) SINCO ",
+      "port.alias": "SINCO:SINCO ",
+      "object.path": "alsa:seq:default:client_40:capture_2",
+      "format.dsp": "8 bit raw midi"
+    }}
+  },
+  {
+    "id": 50,
+    "type": "PipeWire:Interface:Port",
+    "info": {"props": {
+      "node.id": 2,
+      "port.direction": "in",
+      "port.name": "midi-in",
+      "port.alias": "SMK25 Pad Layers:midi-in",
+      "object.path": "smk25-pad-layers:midi-in",
+      "format.dsp": "8 bit raw midi"
+    }}
+  }
+]
+JSON
+
+cat >"$SAVED_GRAPH" <<'JSON'
+{
+  "schema": "https://music-studies.local/schemas/pipewire-patchbay/v1",
+  "schema_version": 1,
+  "nodes": [],
+  "ports": [
+    {
+      "id": 94,
+      "node_id": 1,
+      "direction": "out",
+      "name_selector": "Midi-Bridge:SINCO 3:(capture_1) SINCO SMK25-Master",
+      "alias": "SINCO:SINCO SMK25-Master",
+      "object_path": "alsa:seq:default:client_28:capture_1",
+      "midi": true
+    },
+    {
+      "id": 78,
+      "node_id": 1,
+      "direction": "out",
+      "name_selector": "Midi-Bridge:SINCO 3:(capture_2) SINCO ",
+      "alias": "SINCO:SINCO ",
+      "object_path": "alsa:seq:default:client_28:capture_2",
+      "midi": true
+    },
+    {
+      "id": 50,
+      "node_id": 2,
+      "direction": "in",
+      "name_selector": "SMK25 Pad Layers:midi-in",
+      "alias": "SMK25 Pad Layers:midi-in",
+      "object_path": "smk25-pad-layers:midi-in",
+      "midi": true
+    }
+  ],
+  "links": [
+    {
+      "id": 200,
+      "output": {
+        "id": 78,
+        "node_id": 1,
+        "direction": "out",
+        "name_selector": "Midi-Bridge:SINCO 3:(capture_2) SINCO ",
+        "alias": "SINCO:SINCO ",
+        "object_path": "alsa:seq:default:client_28:capture_2",
+        "midi": true
+      },
+      "input": {
+        "id": 50,
+        "node_id": 2,
+        "direction": "in",
+        "name_selector": "SMK25 Pad Layers:midi-in",
+        "alias": "SMK25 Pad Layers:midi-in",
+        "object_path": "smk25-pad-layers:midi-in",
+        "midi": true
+      },
+      "kind": "midi"
+    }
+  ]
+}
+JSON
+
+output=$(
+    PATH="${FAKE_BIN}:$PATH" \
+    MUSIC_RIG_FAKE_PW_DUMP="$CURRENT_GRAPH" \
+        "$TOOL" import --names --dry-run "$SAVED_GRAPH" 2>&1
+)
+printf '%s\n' "$output"
+grep -Fq -- 'Missing: 630 -> 50 (would connect)' <<<"$output"
+grep -Fq -- 'Dry run: 1 total, 0 present, 1 would restore, 0 unresolved' \
+    <<<"$output"
+if grep -Fq -- 'Missing: 79 -> 50' <<<"$output"; then
+    printf '%s\n' 'Resolver selected the stale exact SINCO selector.' >&2
+    exit 1
+fi
+
+printf '%s\n' 'PipeWire patchbay identity test: OK'

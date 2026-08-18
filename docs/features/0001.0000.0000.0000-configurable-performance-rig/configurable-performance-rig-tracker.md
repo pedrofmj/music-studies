@@ -2,7 +2,7 @@
 
 Feature: `0001.0000.0000.0000`
 
-Updated: 2026-08-15
+Updated: 2026-08-18
 
 Documents:
 
@@ -38,10 +38,10 @@ Documents:
 
 | Check | Result |
 | --- | --- |
-| GCC isolated suite | ✅ 53/53 passed |
-| Clang isolated suite | ✅ 53/53 passed |
-| GCC with Linux JSON/JACK adapters | ✅ 59/59 passed |
-| Clang with Linux JSON/JACK adapters | ✅ 59/59 passed |
+| GCC isolated suite | ✅ 60/60 passed |
+| Clang isolated suite | ✅ 60/60 passed |
+| GCC with Linux JSON/JACK adapters | ✅ 67/67 passed |
+| Clang with Linux JSON/JACK adapters | ✅ 67/67 passed |
 | Arturia offline parity | ✅ MIDI, state, replay, and stereo ramp passed |
 | SMK-25 offline parity | ✅ Self-test, config, and JACK guard passed |
 | Startup contract | ✅ Protected authority and read-only boundaries pass |
@@ -409,10 +409,38 @@ benchmarks.
   targets); operator exercised all eight faders; `--rollback` restored the
   legacy route (8/8 legacy links, 0 relay links); live validation passes 0
   failures (117/117). The explicitly approved live eight-fader cutover/rollback
-  evidence is recorded in this item.
-- ⬜ Implement `eight-band-eq` and `multilevel-volume`.
-- ⬜ Support independent SMC-PAD and SMC-PAD Pocket profiles.
-- ⬜ Implement device and global CLI switching with overrides and reset.
+  evidence is recorded in this item. A 2026-08-17 regression audit corrected
+  the authored SMK-25 `midi.transport-input`, which had incorrectly reused the
+  primary `SMK25-Master` alias instead of the distinct AUX `capture_2` alias.
+  Current-catalogue validation now derives that endpoint from the protected
+  Patchbay evidence, and compiler coverage locks the two endpoint locators.
+  The live repair replaced the stale `SINCO 3 capture_2` route with the current
+  SMK-25 `SINCO 4 capture_2` route and recaptured the deployed snapshot under a
+  rollback guard; the graph backup is
+  `patchbay-before-smk-transport-20260817T072442.json`. The Patchbay name
+  resolver now correlates ambiguous AUX aliases with a uniquely named ALSA
+  sequencer sibling on the same client, with a regression that reproduces the
+  exact re-enumeration. Resolver deployment kept backup
+  `pipewire-patchbay-json-before-identity-20260817T104035Z`; the old 117-link
+  snapshot resolves 117/117 against the new graph, proving the repair survives
+  re-enumeration. GCC and Clang pass 60/60, both JSON/JACK configurations pass
+  67/67, the protected baseline passes 30/30, and full live Airstar validation
+  passes 0 failures with all four services active and 117/117 links present.
+- 🟡 Implement `eight-band-eq` and `multilevel-volume`. Both authored
+  profiles compile deterministically. The active EQ relay has live parity
+  evidence, and a bounded portable catalogue now validates prepared candidate
+  definitions, rejects duplicate Rig Profile IDs and stable-port drift,
+  lists its mixer profile as available, and accepts output-suppressed global
+  and device dry-runs without changing the active generation. Output-enabled
+  profile commit remains incomplete.
+- 🟡 Support independent SMC-PAD and SMC-PAD Pocket profiles. The authored
+  `pad-layer-controller` plus Pocket `drum-set` composition compiles in
+  `multilevel-volume-mixed-pads`; runtime pad routing and activation remain.
+- 🟡 Implement device and global CLI switching with overrides and reset. The
+  parser and renderer cover global/device prepare and switch dry-runs plus
+  device reset, including expected-generation guards and inactive prepared
+  profile rendering. A production IPC endpoint, generation commit, override
+  persistence, and reset commit remain incomplete.
 - ⬜ Prove atomicity, takeover safety, reconnect behavior, and rollback.
 - ⬜ Meet switch latency, resource, and xrun thresholds.
 

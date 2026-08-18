@@ -361,6 +361,18 @@ def main() -> int:
                 "smc-pad-pocket",
             }:
                 raise AssertionError("compiled input bindings omit a stable slot")
+            smk_endpoints = document["input_bindings"]["smk25-main"][
+                "endpoints"
+            ]
+            if (
+                smk_endpoints["midi.performance-input"]["locator"]
+                != "SINCO:SINCO SMK25-Master"
+                or smk_endpoints["midi.transport-input"]["locator"]
+                != "SINCO:SINCO "
+            ):
+                raise AssertionError(
+                    "SMK-25 performance and AUX transport endpoints were not preserved"
+                )
             if document["target_bindings"]["parameter.master-volume"] != {
                 "adapter": "linux.current-rack-controls",
                 "status": "available",

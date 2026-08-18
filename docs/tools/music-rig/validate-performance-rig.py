@@ -1588,6 +1588,27 @@ def validate_current_linux_binding(
     hardware_by_model = {
         device["model"]: device for device in setup["hardware"]
     }
+    patchbay_path = (
+        setup_path.resolve().parents[3]
+        / setup["patchbay"]["deployment_snapshot"]
+    )
+    patchbay = load_json(patchbay_path)
+    smk_primary_alias = hardware_by_model["M-VAVE SMK-25"]["pipewire_alias"]
+    smk_transport_aliases = {
+        link["output"].get("alias")
+        for link in patchbay["links"]
+        if link["input"].get("alias") == "SMK25 Pad Layers:midi-in"
+        and link["output"].get("alias") != smk_primary_alias
+    }
+    smk_transport_alias = None
+    if len(smk_transport_aliases) == 1:
+        smk_transport_alias = next(iter(smk_transport_aliases))
+    else:
+        errors.append(
+            f"{patchbay_path}: expected one distinct SMK-25 AUX transport "
+            f"alias, found {sorted(smk_transport_aliases)}"
+        )
+
     for slot in rig["device_slots"]:
         slot_id = slot["id"]
         matched_hardware = next(
@@ -1630,10 +1651,14 @@ def validate_current_linux_binding(
                 f"{binding_path}: protected slot {slot_id!r} is unavailable"
             )
         for endpoint, endpoint_binding in slot_binding["endpoints"].items():
-            if endpoint_binding["locator"] != expected_alias:
+            expected_endpoint_alias = expected_alias
+            if slot_id == "smk25-main" and endpoint == "midi.transport-input":
+                expected_endpoint_alias = smk_transport_alias
+            if endpoint_binding["locator"] != expected_endpoint_alias:
                 errors.append(
                     f"{binding_path}: slot {slot_id!r} endpoint {endpoint!r} "
-                    "differs from the protected PipeWire alias"
+                    "differs from the protected PipeWire alias "
+                    f"{expected_endpoint_alias!r}"
                 )
 
     expected_paths = {

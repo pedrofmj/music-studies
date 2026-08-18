@@ -79,7 +79,7 @@
     },
     {
       "path": "bin/pipewire-patchbay-json",
-      "sha256": "0cd42fcefcf21766682ef7973eb3166f054fa03a6f21e1b8c00ab87eae3b68b4"
+      "sha256": "1d8b896628cc747f1b947edb9cbb239c7b89dc2c0861cfe19620e045033efd5d"
     },
     {
       "path": "bin/pipewire-patchbay-refresh",

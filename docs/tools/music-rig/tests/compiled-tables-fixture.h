@@ -2,6 +2,7 @@
 #define MUSIC_RIG_TEST_COMPILED_TABLES_FIXTURE_H
 
 #include "music_rig/compiled_tables.h"
+#include "music_rig/definition.h"
 
 #include <string.h>
 
@@ -107,6 +108,65 @@ static music_rig_result init_compiled_tables_fixture(
         UINT32_C(2),
         UINT32_C(2)
     );
+}
+
+static inline music_rig_result init_alternate_prepared_definition_fixture(
+    music_rig_compiled_tables *tables,
+    music_rig_compiled_definition *definition,
+    music_rig_prepared_definition *prepared
+)
+{
+    music_rig_result result;
+
+    if (tables == NULL || definition == NULL || prepared == NULL) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+    result = init_compiled_tables_fixture(tables);
+    if (result != MUSIC_RIG_RESULT_OK) {
+        return result;
+    }
+    fixture_copy(
+        tables->device_profiles[1].profile,
+        "multilevel-volume"
+    );
+    fixture_copy(tables->mappings[1].mapping, "group-1-volume");
+    fixture_copy(tables->mappings[1].target, "master.volume");
+    fixture_copy(
+        tables->ownership[1].owners[0].profile,
+        "multilevel-volume"
+    );
+    result = music_rig_compiled_tables_prepare(
+        tables,
+        tables->device_profile_count,
+        tables->mapping_count,
+        tables->target_binding_count,
+        tables->ownership_count
+    );
+    if (result != MUSIC_RIG_RESULT_OK) {
+        return result;
+    }
+
+    memset(definition, 0, sizeof(*definition));
+    definition->schema_version = MUSIC_RIG_COMPILED_DEFINITION_VERSION;
+    definition->generation_id = UINT64_C(42);
+    definition->fingerprint[0] = UINT8_C(0x42);
+    fixture_copy(definition->rig_id, "pedro-performance-rig");
+    fixture_copy(
+        definition->active_rig_profile,
+        "multilevel-volume-mixed-pads"
+    );
+    fixture_copy(definition->platform_binding_id, "airstar-current");
+    fixture_copy(definition->platform, "linux");
+    definition->device_profile_count = tables->device_profile_count;
+    definition->mapping_count = tables->mapping_count;
+    definition->target_binding_count = tables->target_binding_count;
+    definition->ownership_count = tables->ownership_count;
+    definition->control_only = true;
+    definition->graph_delta_empty = true;
+    definition->authoring_only = true;
+    prepared->definition = definition;
+    prepared->tables = tables;
+    return MUSIC_RIG_RESULT_OK;
 }
 
 #endif

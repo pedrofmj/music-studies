@@ -192,6 +192,7 @@ static music_rig_runtime_config config_for(
 {
     music_rig_runtime_config config;
 
+    memset(&config, 0, sizeof(config));
     config.initial_generation = generation;
     config.definition_fingerprint = fingerprint;
     config.definition_fingerprint_size =
@@ -382,6 +383,73 @@ static int test_lifecycle_and_metrics(void)
             UINT64_C(8)
         ) != MUSIC_RIG_RESULT_INVALID_STATE) {
         fputs("stopped runtime accepted work\n", stderr);
+        return 1;
+    }
+    return 0;
+}
+
+static int test_prepared_definition_catalogue(void)
+{
+    static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
+        0x33
+    };
+    static music_rig_compiled_tables alternate_tables;
+    const music_rig_generation initial = {UINT64_C(1), &default_tables};
+    music_rig_compiled_definition alternate_definition;
+    music_rig_prepared_definition prepared;
+    music_rig_protocol_request value;
+    music_rig_protocol_response response;
+    music_rig_runtime runtime;
+    mock_adapter adapter;
+    music_rig_platform_interfaces interfaces;
+    music_rig_runtime_config config;
+
+    if (init_alternate_prepared_definition_fixture(
+            &alternate_tables,
+            &alternate_definition,
+            &prepared
+        ) != MUSIC_RIG_RESULT_OK) {
+        fputs("prepared runtime fixture failed\n", stderr);
+        return 1;
+    }
+    init_mock(&adapter);
+    interfaces = interfaces_for(&adapter);
+    config = config_for(&initial, fingerprint);
+    config.prepared_definitions = &prepared;
+    config.prepared_definition_count = 1U;
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+        MUSIC_RIG_RESULT_OK) {
+        fputs("prepared runtime initialization failed\n", stderr);
+        return 1;
+    }
+
+    value = request(
+        UINT64_C(31),
+        UINT64_C(1),
+        (uint32_t)MUSIC_RIG_OPERATION_SWITCH_GLOBAL
+    );
+    value.flags = MUSIC_RIG_REQUEST_DRY_RUN;
+    fixture_copy(value.profile, "multilevel-volume-mixed-pads");
+    if (music_rig_runtime_dispatch(&runtime, &value, &response) !=
+            MUSIC_RIG_RESULT_OK ||
+        response.result_code != (uint32_t)MUSIC_RIG_RESULT_OK ||
+        response.previous_generation != UINT64_C(1) ||
+        response.resulting_generation != UINT64_C(1) ||
+        response.profile_count != UINT32_C(2) ||
+        strcmp(
+            response.selected_profile,
+            "multilevel-volume-mixed-pads"
+        ) != 0 ||
+        runtime.state.generation_id != UINT64_C(1)) {
+        fputs("prepared runtime dry-run failed\n", stderr);
+        return 1;
+    }
+
+    config.prepared_definition_count =
+        MUSIC_RIG_PREPARED_DEFINITION_CAPACITY + 1U;
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+        MUSIC_RIG_RESULT_INVALID_ARGUMENT) {
+        fputs("oversized prepared runtime catalogue was accepted\n", stderr);
         return 1;
     }
     return 0;
@@ -761,6 +829,7 @@ int main(void)
     if (init_compiled_tables_fixture(&default_tables) !=
             MUSIC_RIG_RESULT_OK ||
         test_lifecycle_and_metrics() != 0 ||
+        test_prepared_definition_catalogue() != 0 ||
         test_generation_reclamation_and_ports() != 0 ||
         test_persisted_state() != 0 ||
         test_adapter_failures() != 0 ||

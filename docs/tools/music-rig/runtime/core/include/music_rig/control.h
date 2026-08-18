@@ -2,9 +2,11 @@
 #define MUSIC_RIG_CONTROL_H
 
 #include "music_rig/compiled_tables.h"
+#include "music_rig/definition.h"
 #include "music_rig/protocol.h"
 #include "music_rig/state.h"
 
+#include <stddef.h>
 #include <stdint.h>
 
 typedef struct music_rig_control_snapshot {
@@ -21,6 +23,20 @@ typedef struct music_rig_control_snapshot {
  */
 music_rig_result music_rig_control_dispatch(
     const music_rig_control_snapshot *snapshot,
+    const music_rig_protocol_request *request,
+    music_rig_protocol_response *response
+);
+
+music_rig_result music_rig_control_prepared_definitions_validate(
+    const music_rig_control_snapshot *snapshot,
+    const music_rig_prepared_definition *prepared_definitions,
+    size_t prepared_definition_count
+);
+
+music_rig_result music_rig_control_dispatch_prepared(
+    const music_rig_control_snapshot *snapshot,
+    const music_rig_prepared_definition *prepared_definitions,
+    size_t prepared_definition_count,
     const music_rig_protocol_request *request,
     music_rig_protocol_response *response
 );

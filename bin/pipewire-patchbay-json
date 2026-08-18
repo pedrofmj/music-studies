@@ -210,9 +210,11 @@ validate_document() {
 
 resolve_name() {
     local current_document=$1
-    local alias=$2
-    local selector=$3
-    local direction=$4
+    local saved_document=$2
+    local alias=$3
+    local selector=$4
+    local object_path=$5
+    local direction=$6
     local label
     local -a matches=()
 
@@ -223,11 +225,51 @@ resolve_name() {
     fi
 
     mapfile -t matches < <(
-        jq -r --arg alias "$alias" --arg selector "$selector" --arg direction "$direction" '
+        jq -r \
+            --arg alias "$alias" \
+            --arg selector "$selector" \
+            --arg object_path "$object_path" \
+            --arg direction "$direction" \
+            --slurpfile saved "$saved_document" '
             def matching_ids($field; $value):
                 [.ports[] | select(.[$field] == $value and .direction == $direction) | .id];
-            (if $alias != "" then matching_ids("alias"; $alias) else [] end) as $aliases
+            def sequencer_path:
+                ([capture("^(?<client>.*):(?<port>capture_[0-9]+)$")?][0] // null);
+            . as $current
+            | $saved[0] as $saved_document
+            | (if $alias != "" then matching_ids("alias"; $alias) else [] end) as $aliases
+            | ($object_path | sequencer_path) as $saved_path
+            | (if $saved_path == null then [] else
+                [$saved_document.ports[]
+                 | select(.direction == $direction)
+                 | ((.object_path // "") | sequencer_path) as $saved_sibling_path
+                 | select(
+                     $saved_sibling_path != null
+                     and $saved_sibling_path.client == $saved_path.client
+                     and $saved_sibling_path.port != $saved_path.port
+                   )
+                 | (.alias // "") as $sibling_alias
+                 | select($sibling_alias != "")
+                 | [$current.ports[]
+                    | select(.direction == $direction and (.alias // "") == $sibling_alias)]
+                     as $current_siblings
+                 | select(($current_siblings | length) == 1)
+                 | (($current_siblings[0].object_path // "") | sequencer_path)
+                     as $current_sibling_path
+                 | select($current_sibling_path != null)
+                 | $current.ports[]
+                 | select(.direction == $direction)
+                 | ((.object_path // "") | sequencer_path) as $current_port_path
+                 | select(
+                     $current_port_path != null
+                     and $current_port_path.client == $current_sibling_path.client
+                     and $current_port_path.port == $saved_path.port
+                   )
+                 | .id]
+                | unique
+              end) as $paired
             | if ($aliases | length) == 1 then $aliases
+              elif ($paired | length) == 1 then $paired
               elif $selector != "" then matching_ids("name_selector"; $selector)
               else $aliases
               end
@@ -259,7 +301,7 @@ import_patchbay() {
     local document=
     local dump_file current_document
     local total=0 restored=0 existing=0 unresolved=0 failed=0 would_restore=0
-    local output_id input_id output_alias output_selector output_direction input_alias input_selector input_direction
+    local output_id input_id output_alias output_selector output_object_path output_direction input_alias input_selector input_object_path input_direction
     local -A active_links=()
 
     while (($#)); do
@@ -305,12 +347,12 @@ import_patchbay() {
         active_links["$output_id:$input_id"]=1
     done < <(jq -r '.links[] | "\(.output.id)\t\(.input.id)"' "$current_document")
 
-    while IFS=$'\t' read -r output_id output_alias output_selector output_direction input_id input_alias input_selector input_direction; do
+    while IFS=$'\t' read -r output_id output_alias output_selector output_object_path output_direction input_id input_alias input_selector input_object_path input_direction; do
         ((total += 1))
 
         if [[ $use_names == true ]]; then
-            if ! output_id=$(resolve_name "$current_document" "$output_alias" "$output_selector" "$output_direction") \
-                || ! input_id=$(resolve_name "$current_document" "$input_alias" "$input_selector" "$input_direction"); then
+            if ! output_id=$(resolve_name "$current_document" "$document" "$output_alias" "$output_selector" "$output_object_path" "$output_direction") \
+                || ! input_id=$(resolve_name "$current_document" "$document" "$input_alias" "$input_selector" "$input_object_path" "$input_direction"); then
                 ((unresolved += 1))
                 continue
             fi
@@ -369,10 +411,12 @@ import_patchbay() {
                 .output.id,
                 (.output.alias // ""),
                 (.output.name_selector // ""),
+                (.output.object_path // ""),
                 (.output.direction // ""),
                 .input.id,
                 (.input.alias // ""),
                 (.input.name_selector // ""),
+                (.input.object_path // ""),
                 (.input.direction // "")
               ]
             | @tsv

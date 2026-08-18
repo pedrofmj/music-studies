@@ -12,6 +12,7 @@
 
 #define MUSIC_RIG_COMPILED_DEFINITION_VERSION UINT32_C(1)
 #define MUSIC_RIG_DEFINITION_ID_CAPACITY MUSIC_RIG_IDENTIFIER_CAPACITY
+#define MUSIC_RIG_PREPARED_DEFINITION_CAPACITY ((size_t)16)
 
 typedef struct music_rig_compiled_definition {
     uint32_t schema_version;
@@ -29,6 +30,11 @@ typedef struct music_rig_compiled_definition {
     bool graph_delta_empty;
     bool authoring_only;
 } music_rig_compiled_definition;
+
+typedef struct music_rig_prepared_definition {
+    const music_rig_compiled_definition *definition;
+    const music_rig_compiled_tables *tables;
+} music_rig_prepared_definition;
 
 typedef struct music_rig_definition_decoder {
     void *context;

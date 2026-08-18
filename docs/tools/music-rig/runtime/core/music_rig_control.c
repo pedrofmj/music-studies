@@ -1,4 +1,5 @@
 #include "music_rig/control.h"
+#include "music_rig/device_ports.h"
 
 #include <stdbool.h>
 #include <string.h>
@@ -94,7 +95,8 @@ static void set_readiness(
 
 static music_rig_result append_profile(
     music_rig_protocol_response *response,
-    const music_rig_compiled_device_profile *source
+    const music_rig_compiled_device_profile *source,
+    uint32_t flags
 )
 {
     music_rig_protocol_profile *target;
@@ -106,7 +108,7 @@ static music_rig_result append_profile(
     copy_text(target->device_slot, source->slot);
     copy_text(target->profile, source->profile);
     target->readiness = (uint32_t)source->readiness;
-    target->flags = MUSIC_RIG_PROFILE_ACTIVE;
+    target->flags = flags;
     response->profile_count += UINT32_C(1);
     return MUSIC_RIG_RESULT_OK;
 }
@@ -114,6 +116,7 @@ static music_rig_result append_profile(
 static music_rig_result append_profiles(
     const music_rig_compiled_tables *tables,
     const char *slot,
+    uint32_t flags,
     music_rig_protocol_response *response
 )
 {
@@ -124,7 +127,7 @@ static music_rig_result append_profiles(
             &tables->device_profiles[index];
 
         if (slot[0] == '\0' || strcmp(slot, profile->slot) == 0) {
-            music_rig_result result = append_profile(response, profile);
+            music_rig_result result = append_profile(response, profile, flags);
 
             if (result != MUSIC_RIG_RESULT_OK) {
                 return result;
@@ -134,6 +137,29 @@ static music_rig_result append_profiles(
     return response->profile_count == UINT32_C(0)
         ? MUSIC_RIG_RESULT_NOT_FOUND
         : MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result append_profile_unique(
+    music_rig_protocol_response *response,
+    const music_rig_compiled_device_profile *source,
+    uint32_t flags
+)
+{
+    size_t index;
+
+    for (index = 0U; index < response->profile_count; ++index) {
+        music_rig_protocol_profile *existing = &response->profiles[index];
+
+        if (strcmp(existing->device_slot, source->slot) == 0 &&
+            strcmp(existing->profile, source->profile) == 0) {
+            if (existing->readiness != (uint32_t)source->readiness) {
+                return MUSIC_RIG_RESULT_INVALID_DATA;
+            }
+            existing->flags |= flags;
+            return MUSIC_RIG_RESULT_OK;
+        }
+    }
+    return append_profile(response, source, flags);
 }
 
 static const music_rig_compiled_device_profile *find_device_profile(
@@ -169,45 +195,245 @@ static music_rig_result validate_tables(
     );
 }
 
-static music_rig_result dispatch_global_dry_run(
+music_rig_result music_rig_control_prepared_definitions_validate(
     const music_rig_control_snapshot *snapshot,
-    const music_rig_protocol_request *request,
+    const music_rig_prepared_definition *prepared_definitions,
+    size_t prepared_definition_count
+)
+{
+    music_rig_device_port_catalogue active_ports;
+    music_rig_result result;
+    size_t index;
+
+    if (snapshot == NULL || snapshot->generation_id == UINT64_C(0) ||
+        !bounded_text(snapshot->active_rig_profile, true) ||
+        !table_header_is_valid(snapshot->tables) ||
+        prepared_definition_count > MUSIC_RIG_PREPARED_DEFINITION_CAPACITY ||
+        (prepared_definition_count != 0U &&
+            prepared_definitions == NULL)) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+    result = music_rig_device_port_catalogue_build(
+        snapshot->tables,
+        &active_ports
+    );
+    if (result != MUSIC_RIG_RESULT_OK) {
+        return result;
+    }
+
+    for (index = 0U; index < prepared_definition_count; ++index) {
+        const music_rig_prepared_definition *prepared =
+            &prepared_definitions[index];
+        music_rig_device_port_catalogue candidate_ports;
+        music_rig_generation generation;
+        size_t previous;
+
+        if (prepared->definition == NULL || prepared->tables == NULL) {
+            return MUSIC_RIG_RESULT_INVALID_DATA;
+        }
+        result = music_rig_definition_generation_init(
+            prepared->definition,
+            prepared->tables,
+            &generation
+        );
+        if (result != MUSIC_RIG_RESULT_OK ||
+            generation.mapping != prepared->tables ||
+            strcmp(
+                prepared->definition->active_rig_profile,
+                snapshot->active_rig_profile
+            ) == 0) {
+            return MUSIC_RIG_RESULT_INVALID_DATA;
+        }
+        for (previous = 0U; previous < index; ++previous) {
+            if (strcmp(
+                    prepared_definitions[previous].definition->
+                        active_rig_profile,
+                    prepared->definition->active_rig_profile
+                ) == 0) {
+                return MUSIC_RIG_RESULT_INVALID_DATA;
+            }
+        }
+        result = music_rig_device_port_catalogue_build(
+            prepared->tables,
+            &candidate_ports
+        );
+        if (result != MUSIC_RIG_RESULT_OK ||
+            !music_rig_device_port_catalogues_match(
+                &active_ports,
+                &candidate_ports
+            )) {
+            return MUSIC_RIG_RESULT_INVALID_DATA;
+        }
+    }
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static const music_rig_compiled_tables *find_rig_tables(
+    const music_rig_control_snapshot *snapshot,
+    const music_rig_prepared_definition *prepared_definitions,
+    size_t prepared_definition_count,
+    const char *profile,
+    uint32_t *profile_flags
+)
+{
+    size_t index;
+
+    if (strcmp(profile, snapshot->active_rig_profile) == 0) {
+        *profile_flags = MUSIC_RIG_PROFILE_ACTIVE;
+        return snapshot->tables;
+    }
+    for (index = 0U; index < prepared_definition_count; ++index) {
+        if (strcmp(
+                profile,
+                prepared_definitions[index].definition->active_rig_profile
+            ) == 0) {
+            *profile_flags = UINT32_C(0);
+            return prepared_definitions[index].tables;
+        }
+    }
+    return NULL;
+}
+
+static const music_rig_compiled_device_profile *
+find_available_device_profile(
+    const music_rig_control_snapshot *snapshot,
+    const music_rig_prepared_definition *prepared_definitions,
+    size_t prepared_definition_count,
+    const char *slot,
+    const char *profile,
+    uint32_t *profile_flags
+)
+{
+    const music_rig_compiled_device_profile *found;
+    size_t index;
+
+    found = find_device_profile(snapshot->tables, slot, profile);
+    if (found != NULL) {
+        *profile_flags = MUSIC_RIG_PROFILE_ACTIVE;
+        return found;
+    }
+    for (index = 0U; index < prepared_definition_count; ++index) {
+        found = find_device_profile(
+            prepared_definitions[index].tables,
+            slot,
+            profile
+        );
+        if (found != NULL) {
+            *profile_flags = UINT32_C(0);
+            return found;
+        }
+    }
+    return NULL;
+}
+
+static music_rig_result append_available_profiles(
+    const music_rig_control_snapshot *snapshot,
+    const music_rig_prepared_definition *prepared_definitions,
+    size_t prepared_definition_count,
+    const char *slot,
     music_rig_protocol_response *response
 )
 {
     music_rig_result result;
+    size_t definition_index;
+
+    result = append_profiles(
+        snapshot->tables,
+        slot,
+        MUSIC_RIG_PROFILE_ACTIVE,
+        response
+    );
+    if (result != MUSIC_RIG_RESULT_OK &&
+        result != MUSIC_RIG_RESULT_NOT_FOUND) {
+        return result;
+    }
+    for (definition_index = 0U;
+         definition_index < prepared_definition_count;
+         ++definition_index) {
+        const music_rig_compiled_tables *tables =
+            prepared_definitions[definition_index].tables;
+        size_t profile_index;
+
+        for (profile_index = 0U;
+             profile_index < tables->device_profile_count;
+             ++profile_index) {
+            const music_rig_compiled_device_profile *profile =
+                &tables->device_profiles[profile_index];
+
+            if (slot[0] == '\0' || strcmp(slot, profile->slot) == 0) {
+                result = append_profile_unique(
+                    response,
+                    profile,
+                    UINT32_C(0)
+                );
+                if (result != MUSIC_RIG_RESULT_OK) {
+                    return result;
+                }
+            }
+        }
+    }
+    return response->profile_count == UINT32_C(0)
+        ? MUSIC_RIG_RESULT_NOT_FOUND
+        : MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result dispatch_global_dry_run(
+    const music_rig_control_snapshot *snapshot,
+    const music_rig_prepared_definition *prepared_definitions,
+    size_t prepared_definition_count,
+    const music_rig_protocol_request *request,
+    music_rig_protocol_response *response
+)
+{
+    const music_rig_compiled_tables *tables;
+    music_rig_result result;
+    uint32_t profile_flags;
 
     copy_text(response->selected_profile, request->profile);
-    if (strcmp(request->profile, snapshot->active_rig_profile) != 0) {
+    tables = find_rig_tables(
+        snapshot,
+        prepared_definitions,
+        prepared_definition_count,
+        request->profile,
+        &profile_flags
+    );
+    if (tables == NULL) {
         return MUSIC_RIG_RESULT_NOT_FOUND;
     }
 
-    result = append_profiles(snapshot->tables, "", response);
+    result = append_profiles(tables, "", profile_flags, response);
     if (result == MUSIC_RIG_RESULT_OK) {
-        set_readiness(response, aggregate_readiness(snapshot->tables));
+        set_readiness(response, aggregate_readiness(tables));
     }
     return result;
 }
 
 static music_rig_result dispatch_device_dry_run(
     const music_rig_control_snapshot *snapshot,
+    const music_rig_prepared_definition *prepared_definitions,
+    size_t prepared_definition_count,
     const music_rig_protocol_request *request,
     music_rig_protocol_response *response
 )
 {
-    const music_rig_compiled_device_profile *profile = find_device_profile(
-        snapshot->tables,
-        request->device_slot,
-        request->profile
-    );
+    const music_rig_compiled_device_profile *profile;
+    uint32_t profile_flags;
 
+    profile = find_available_device_profile(
+        snapshot,
+        prepared_definitions,
+        prepared_definition_count,
+        request->device_slot,
+        request->profile,
+        &profile_flags
+    );
     copy_text(response->selected_device_slot, request->device_slot);
     copy_text(response->selected_profile, request->profile);
     if (profile == NULL) {
         return MUSIC_RIG_RESULT_NOT_FOUND;
     }
     set_readiness(response, profile->readiness);
-    return append_profile(response, profile);
+    return append_profile(response, profile, profile_flags);
 }
 
 static music_rig_result dispatch_reset_dry_run(
@@ -226,20 +452,23 @@ static music_rig_result dispatch_reset_dry_run(
         if (strcmp(profile->slot, request->device_slot) == 0) {
             copy_text(response->selected_profile, profile->profile);
             set_readiness(response, profile->readiness);
-            return append_profile(response, profile);
+            return append_profile(response, profile, MUSIC_RIG_PROFILE_ACTIVE);
         }
     }
     return MUSIC_RIG_RESULT_NOT_FOUND;
 }
 
-music_rig_result music_rig_control_dispatch(
+music_rig_result music_rig_control_dispatch_prepared(
     const music_rig_control_snapshot *snapshot,
+    const music_rig_prepared_definition *prepared_definitions,
+    size_t prepared_definition_count,
     const music_rig_protocol_request *request,
     music_rig_protocol_response *response
 )
 {
     uint8_t validated_request[MUSIC_RIG_PROTOCOL_REQUEST_SIZE];
     music_rig_result operation_result = MUSIC_RIG_RESULT_OK;
+    music_rig_result validation_result;
     bool is_dry_run;
 
     if (snapshot == NULL || request == NULL || response == NULL ||
@@ -252,6 +481,15 @@ music_rig_result music_rig_control_dispatch(
             sizeof(validated_request)
         ) != MUSIC_RIG_RESULT_OK) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+
+    validation_result = music_rig_control_prepared_definitions_validate(
+        snapshot,
+        prepared_definitions,
+        prepared_definition_count
+    );
+    if (validation_result != MUSIC_RIG_RESULT_OK) {
+        return validation_result;
     }
 
     memset(response, 0, sizeof(*response));
@@ -273,14 +511,21 @@ music_rig_result music_rig_control_dispatch(
         is_dry_run = request->flags == MUSIC_RIG_REQUEST_DRY_RUN;
         switch ((music_rig_operation)request->operation) {
         case MUSIC_RIG_OPERATION_STATUS:
-            operation_result = append_profiles(snapshot->tables, "", response);
+            operation_result = append_profiles(
+                snapshot->tables,
+                "",
+                MUSIC_RIG_PROFILE_ACTIVE,
+                response
+            );
             if (operation_result == MUSIC_RIG_RESULT_OK) {
                 set_readiness(response, aggregate_readiness(snapshot->tables));
             }
             break;
         case MUSIC_RIG_OPERATION_LIST_PROFILES:
-            operation_result = append_profiles(
-                snapshot->tables,
+            operation_result = append_available_profiles(
+                snapshot,
+                prepared_definitions,
+                prepared_definition_count,
                 request->device_slot,
                 response
             );
@@ -296,6 +541,7 @@ music_rig_result music_rig_control_dispatch(
                 operation_result = append_profiles(
                     snapshot->tables,
                     "",
+                    MUSIC_RIG_PROFILE_ACTIVE,
                     response
                 );
             }
@@ -303,13 +549,25 @@ music_rig_result music_rig_control_dispatch(
         case MUSIC_RIG_OPERATION_PREPARE_GLOBAL:
         case MUSIC_RIG_OPERATION_SWITCH_GLOBAL:
             operation_result = is_dry_run
-                ? dispatch_global_dry_run(snapshot, request, response)
+                ? dispatch_global_dry_run(
+                    snapshot,
+                    prepared_definitions,
+                    prepared_definition_count,
+                    request,
+                    response
+                )
                 : MUSIC_RIG_RESULT_UNSUPPORTED;
             break;
         case MUSIC_RIG_OPERATION_PREPARE_DEVICE:
         case MUSIC_RIG_OPERATION_SWITCH_DEVICE:
             operation_result = is_dry_run
-                ? dispatch_device_dry_run(snapshot, request, response)
+                ? dispatch_device_dry_run(
+                    snapshot,
+                    prepared_definitions,
+                    prepared_definition_count,
+                    request,
+                    response
+                )
                 : MUSIC_RIG_RESULT_UNSUPPORTED;
             break;
         case MUSIC_RIG_OPERATION_RESET_DEVICE_OVERRIDE:
@@ -339,4 +597,19 @@ music_rig_result music_rig_control_dispatch(
 
     response->result_code = (uint32_t)operation_result;
     return MUSIC_RIG_RESULT_OK;
+}
+
+music_rig_result music_rig_control_dispatch(
+    const music_rig_control_snapshot *snapshot,
+    const music_rig_protocol_request *request,
+    music_rig_protocol_response *response
+)
+{
+    return music_rig_control_dispatch_prepared(
+        snapshot,
+        NULL,
+        0U,
+        request,
+        response
+    );
 }

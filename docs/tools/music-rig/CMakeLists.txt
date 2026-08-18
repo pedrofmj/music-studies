@@ -773,6 +773,13 @@ if(BUILD_TESTING)
         set_tests_properties(
             music_rig_smc_mixer_links_transaction PROPERTIES TIMEOUT 60
         )
+        add_test(
+            NAME music_rig_pipewire_patchbay_identity
+            COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-pipewire-patchbay-identity"
+        )
+        set_tests_properties(
+            music_rig_pipewire_patchbay_identity PROPERTIES TIMEOUT 30
+        )
     endif()
 
     find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter)
@@ -943,7 +950,7 @@ if(BUILD_TESTING)
             "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-current-envelope.json"
         )
         set(MUSIC_RIG_JSON_DEFINITION_FINGERPRINT
-            "sha256:02ee1bba5fbd5982c2f3f8e2df0ef81f265afe93a7c13b7a7bd59129e952d628"
+            "sha256:e43fa6ad1c16b3672a997e9f620448fdbbc1fb0c141361049ca67d49faab5114"
         )
         add_executable(music_rig_json_definition_test
             tests/json-definition-test.c

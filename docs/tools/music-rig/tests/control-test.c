@@ -50,15 +50,48 @@ static int dispatch_expect(
     return 0;
 }
 
+static int dispatch_prepared_expect(
+    const music_rig_control_snapshot *snapshot,
+    const music_rig_prepared_definition *prepared_definitions,
+    size_t prepared_definition_count,
+    const music_rig_protocol_request *value,
+    music_rig_result expected,
+    music_rig_protocol_response *response
+)
+{
+    if (music_rig_control_dispatch_prepared(
+            snapshot,
+            prepared_definitions,
+            prepared_definition_count,
+            value,
+            response
+        ) != MUSIC_RIG_RESULT_OK ||
+        response->result_code != (uint32_t)expected ||
+        response->previous_generation != snapshot->generation_id ||
+        response->resulting_generation != snapshot->generation_id) {
+        fputs("prepared control response contract failed\n", stderr);
+        return 1;
+    }
+    return 0;
+}
 
 int main(void)
 {
     static music_rig_compiled_tables tables;
+    static music_rig_compiled_tables alternate_tables;
+    static music_rig_compiled_tables incompatible_tables;
+    music_rig_compiled_definition alternate_definition;
+    music_rig_prepared_definition prepared[2];
     music_rig_control_snapshot snapshot;
     music_rig_protocol_request value;
     music_rig_protocol_response response;
 
-    if (init_compiled_tables_fixture(&tables) != MUSIC_RIG_RESULT_OK) {
+    if (init_compiled_tables_fixture(&tables) != MUSIC_RIG_RESULT_OK ||
+        init_alternate_prepared_definition_fixture(
+            &alternate_tables,
+            &alternate_definition,
+            &prepared[0]
+        ) != MUSIC_RIG_RESULT_OK) {
         fputs("could not prepare control fixture\n", stderr);
         return 1;
     }
@@ -88,6 +121,102 @@ int main(void)
         fputs("filtered profile inspection failed\n", stderr);
         return 1;
     }
+
+    if (dispatch_prepared_expect(
+            &snapshot,
+            prepared,
+            1U,
+            &value,
+            MUSIC_RIG_RESULT_OK,
+            &response
+        ) ||
+        response.profile_count != UINT32_C(2) ||
+        strcmp(response.profiles[0].profile, "eight-band-eq") != 0 ||
+        response.profiles[0].flags != MUSIC_RIG_PROFILE_ACTIVE ||
+        strcmp(response.profiles[1].profile, "multilevel-volume") != 0 ||
+        response.profiles[1].flags != UINT32_C(0)) {
+        fputs("prepared profile inventory failed\n", stderr);
+        return 1;
+    }
+
+    value = request(
+        MUSIC_RIG_OPERATION_SWITCH_GLOBAL,
+        MUSIC_RIG_REQUEST_DRY_RUN,
+        NULL,
+        "multilevel-volume-mixed-pads"
+    );
+    if (dispatch_prepared_expect(
+            &snapshot,
+            prepared,
+            1U,
+            &value,
+            MUSIC_RIG_RESULT_OK,
+            &response
+        ) ||
+        response.profile_count != UINT32_C(2) ||
+        strcmp(
+            response.selected_profile,
+            "multilevel-volume-mixed-pads"
+        ) != 0 ||
+        response.profiles[0].flags != UINT32_C(0) ||
+        response.profiles[1].flags != UINT32_C(0)) {
+        fputs("prepared global dry-run failed\n", stderr);
+        return 1;
+    }
+
+    value = request(
+        MUSIC_RIG_OPERATION_SWITCH_DEVICE,
+        MUSIC_RIG_REQUEST_DRY_RUN,
+        "smc-mixer-main",
+        "multilevel-volume"
+    );
+    if (dispatch_prepared_expect(
+            &snapshot,
+            prepared,
+            1U,
+            &value,
+            MUSIC_RIG_RESULT_OK,
+            &response
+        ) ||
+        response.profile_count != UINT32_C(1) ||
+        strcmp(response.profiles[0].profile, "multilevel-volume") != 0 ||
+        response.profiles[0].flags != UINT32_C(0)) {
+        fputs("prepared device dry-run failed\n", stderr);
+        return 1;
+    }
+
+    prepared[1] = prepared[0];
+    if (music_rig_control_prepared_definitions_validate(
+            &snapshot,
+            prepared,
+            2U
+        ) != MUSIC_RIG_RESULT_INVALID_DATA) {
+        fputs("duplicate prepared Rig Profile was accepted\n", stderr);
+        return 1;
+    }
+    incompatible_tables = alternate_tables;
+    fixture_copy(
+        incompatible_tables.device_profiles[1].slot,
+        "smc-mixer-other"
+    );
+    fixture_copy(
+        incompatible_tables.input_bindings[1].slot,
+        "smc-mixer-other"
+    );
+    fixture_copy(
+        incompatible_tables.ownership[1].owners[0].slot,
+        "smc-mixer-other"
+    );
+    prepared[0].tables = &incompatible_tables;
+    if (music_rig_control_prepared_definitions_validate(
+            &snapshot,
+            prepared,
+            1U
+        ) != MUSIC_RIG_RESULT_INVALID_DATA) {
+        fputs("prepared stable-port drift was accepted\n", stderr);
+        return 1;
+    }
+    prepared[0].tables = &alternate_tables;
 
     value = request(
         MUSIC_RIG_OPERATION_VALIDATE_ACTIVE,

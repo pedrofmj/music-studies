@@ -2,6 +2,7 @@
 #define MUSIC_RIG_RUNTIME_H
 
 #include "music_rig/core.h"
+#include "music_rig/definition.h"
 #include "music_rig/device_ports.h"
 #include "music_rig/protocol.h"
 #include "music_rig/state.h"
@@ -93,6 +94,8 @@ typedef struct music_rig_runtime_config {
     const uint8_t *definition_fingerprint;
     size_t definition_fingerprint_size;
     const char *active_rig_profile;
+    const music_rig_prepared_definition *prepared_definitions;
+    size_t prepared_definition_count;
     music_rig_output_mode output_mode;
 } music_rig_runtime_config;
 
@@ -106,6 +109,8 @@ typedef struct music_rig_runtime {
     music_rig_device_port_catalogue device_ports;
     music_rig_platform_interfaces interfaces;
     char active_rig_profile[MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY];
+    const music_rig_prepared_definition *prepared_definitions;
+    size_t prepared_definition_count;
     bool control_started;
 } music_rig_runtime;
 

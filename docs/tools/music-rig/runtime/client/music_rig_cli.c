@@ -394,10 +394,13 @@ static void render_human(
 
         append_format(
             builder,
-            "profile %s %s %s active\n",
+            "profile %s %s %s %s\n",
             profile->device_slot,
             profile->profile,
-            readiness_name(profile->readiness)
+            readiness_name(profile->readiness),
+            (profile->flags & MUSIC_RIG_PROFILE_ACTIVE) != UINT32_C(0)
+                ? "active"
+                : "available"
         );
     }
 }
@@ -445,12 +448,15 @@ static void render_json(
         append_format(
             builder,
             "%s{\"device\":\"%s\",\"profile\":\"%s\","
-            "\"readiness\":\"%s\",\"active\":true,"
+            "\"readiness\":\"%s\",\"active\":%s,"
             "\"override\":%s}",
             index == 0 ? "" : ",",
             profile->device_slot,
             profile->profile,
             readiness_name(profile->readiness),
+            (profile->flags & MUSIC_RIG_PROFILE_ACTIVE) != UINT32_C(0)
+                ? "true"
+                : "false",
             (profile->flags & MUSIC_RIG_PROFILE_OVERRIDE) != UINT32_C(0)
                 ? "true" : "false"
         );

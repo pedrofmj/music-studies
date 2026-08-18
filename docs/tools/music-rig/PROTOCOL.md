@@ -1,9 +1,11 @@
 # Music Rig IPC Protocol
 
 Status: protocol v2 freezes the complete operation inventory and implements the
-Milestone 3 read-only and dry-run subset. Linux `SOCK_SEQPACKET` and Windows
-message-mode named pipes carry the same frames through ephemeral mock tests.
-No production endpoint, daemon listener, service, or installed state exists.
+read-only and dry-run subset. Milestone 4 adds bounded discovery of explicitly
+prepared compiled definitions without enabling commits. Linux `SOCK_SEQPACKET`
+and Windows message-mode named pipes carry the same frames through ephemeral
+mock tests. No production endpoint, daemon listener, service, or installed state
+exists.
 
 ## Versioning
 
@@ -49,9 +51,12 @@ The complete operation inventory is:
 | 9 | `validate-active` | none | Read-only |
 
 Any prepare, switch, reset, or reload request without the dry-run flag returns
-`unsupported`. A dry-run can inspect only profiles present in the loaded
-immutable definition. It never publishes a generation, persists state, loads a
-resource, contacts a device, or changes a graph.
+`unsupported`. A dry-run can inspect the active immutable definition plus a
+caller-owned catalogue of at most 16 explicitly prepared definitions. Every
+candidate must pass the full compiled-definition validation and expose the same
+stable device-slot port catalogue as the active definition. Candidate profile
+rows are available but not active. A dry-run never publishes a generation,
+persists state, loads a resource, contacts a device, or changes a graph.
 
 ## Response Frame
 
@@ -117,8 +122,11 @@ The portable client parser and renderer support:
 music-rig status [--json] [--expected-generation ID]
 music-rig profiles list [--device SLOT] [--json]
 music-rig validate [--json]
+music-rig prepare --global PROFILE --dry-run [--json]
+music-rig prepare --device SLOT --profile PROFILE --dry-run [--json]
 music-rig switch --global PROFILE --dry-run [--json]
 music-rig switch --device SLOT --profile PROFILE --dry-run [--json]
+music-rig reset --device SLOT --dry-run [--json]
 ```
 
 Human and versioned JSON rendering use the same decoded response. The parser

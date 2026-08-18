@@ -44,7 +44,7 @@
         },
         "midi.transport-input": {
           "direction": "input",
-          "locator": "SINCO:SINCO SMK25-Master"
+          "locator": "SINCO:SINCO "
         }
       },
       "status": "available"

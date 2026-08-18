@@ -4,7 +4,7 @@
     "id": "music-rig-authoring-compiler",
     "version": "0.2.0"
   },
-  "definition_fingerprint": "sha256:e43fa6ad1c16b3672a997e9f620448fdbbc1fb0c141361049ca67d49faab5114",
+  "definition_fingerprint": "sha256:02ee1bba5fbd5982c2f3f8e2df0ef81f265afe93a7c13b7a7bd59129e952d628",
   "device_profiles": [
     {
       "hardware_preset": "arturia-current-rack",
@@ -39,7 +39,7 @@
   ],
   "fingerprints": {
     "algorithm": "sha256",
-    "platform_binding": "sha256:2aa15be0409ceff9f6f7ed03cebcd6b0f00cfcdbbc37a67be9bf2497b5432e86",
+    "platform_binding": "sha256:ddacd42ce74810dfe6a3154f4ed4a18fe7106e6fbbeabf8fa3f185e100148203",
     "portable_source": "sha256:e007fc4efa8a478787ba638403356365dda0f09dc2e868e59b208d4c3fc38546",
     "schema_set": "sha256:2c1de2ba9a3a7b519eb758b688d874cdd1060b94d83a2ba469cf7fda65f63e06"
   },
@@ -176,7 +176,7 @@
         },
         "midi.transport-input": {
           "direction": "input",
-          "locator": "SINCO:SINCO "
+          "locator": "SINCO:SINCO SMK25-Master"
         }
       },
       "identity": {
@@ -2695,7 +2695,7 @@
   "schema": "music-studies/compiled-performance-rig/v1",
   "source_manifest": {
     "platform_binding": {
-      "fingerprint": "sha256:2aa15be0409ceff9f6f7ed03cebcd6b0f00cfcdbbc37a67be9bf2497b5432e86",
+      "fingerprint": "sha256:ddacd42ce74810dfe6a3154f4ed4a18fe7106e6fbbeabf8fa3f185e100148203",
       "path": "platform-bindings/linux/airstar-current.json"
     },
     "portable": [

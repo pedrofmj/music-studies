@@ -2,9 +2,10 @@
 
 Language: **English**
 
-Status: Milestones 0 through 3 complete. Milestone 4 is active at the first
-SMC-Mixer parity cutover gate. The protected single-rig deployment remains the
-production default.
+Status: Milestones 0 through 3 complete. Milestone 4 is active at the
+prepared control-only profile selection gate after the first SMC-Mixer parity
+cutover and rollback. The protected single-rig deployment remains the production
+default.
 
 Related documents:
 
@@ -250,9 +251,10 @@ machine-validated result is
 [Milestone 3 shadow evidence](../../tools/music-rig/benchmarks/M3-SHADOW-EVIDENCE.md).
 
 Milestone 3 is complete. No runtime was installed or enabled, no output path
-exists, and the protected setup remains the default. The next sequential task
-is the Milestone 4 SMC-Mixer independent parity gate; ownership cutover still
-requires a rehearsed rollback and explicit live approval.
+exists, and the protected setup remains the default. At this checkpoint the
+next sequential task was the Milestone 4 SMC-Mixer independent parity gate.
+That cutover and rollback are now recorded as complete in the implementation
+tracker; the current slice remains uninstalled and commit-disabled.
 Hosted
 [closure run 31637953686](https://github.com/pedrofmj/music-studies/actions/runs/31637953686)
 passes the checksummed evidence gate on Linux 53/53, Windows 40/40, and Windows
