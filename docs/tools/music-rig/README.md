@@ -161,8 +161,10 @@ bounded control-thread reclamation, stable device-slot port compatibility, and
 ABI-versioned clock/control/storage callbacks. Runtime initialization can retain
 at most 16 caller-owned prepared compiled definitions after full validation,
 duplicate Rig Profile rejection, and stable-port comparison. Its event-driven
-loop handles decoded protocol v2 inspection and dry-run requests, idle waits,
-responses, and shutdown through mock adapters. Output-enabled mode is rejected.
+loop handles decoded protocol v2 inspection, dry-runs, and a durable
+output-suppressed global switch transaction with bounded rollback. State v2
+persists the active Rig Profile and still reads v1 frames. Device commits,
+production IPC, and output-enabled mode remain unavailable.
 
 [`runtime/core/music_rig_device_ports.c`](runtime/core/music_rig_device_ports.c)
 derives fixed `device.<slot>.midi-input` and `.midi-output` identities from

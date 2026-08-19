@@ -237,11 +237,7 @@ music_rig_result music_rig_control_prepared_definitions_validate(
             &generation
         );
         if (result != MUSIC_RIG_RESULT_OK ||
-            generation.mapping != prepared->tables ||
-            strcmp(
-                prepared->definition->active_rig_profile,
-                snapshot->active_rig_profile
-            ) == 0) {
+            generation.mapping != prepared->tables) {
             return MUSIC_RIG_RESULT_INVALID_DATA;
         }
         for (previous = 0U; previous < index; ++previous) {

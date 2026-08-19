@@ -145,10 +145,12 @@ dispatch index performs mapping lookup without allocation, locks, JSON
 traversal, or string comparison. The version 1 table image has explicit
 capacities and occupies 451,032 bytes in the current 64-bit local builds.
 
-The exact 64-byte persistent-state frame covers integrity rejection, qualified
-restore, definition-fingerprint fallback, and atomic-replace failure through
-mock storage. The runtime does not yet persist profile overrides or recompute
-the canonical JSON fingerprint emitted by the compiler.
+Persistent state v2 is a fixed 128-byte frame containing the active Rig
+Profile as well as generation, fingerprint, mode, and integrity tag. The
+decoder retains compatibility with the 64-byte v1 frame. Tests cover qualified
+prepared-profile restore, missing-profile fallback, every v2 byte corruption,
+and atomic-replace failure. Per-device overrides and canonical JSON
+fingerprint recomputation remain incomplete.
 
 Explicit-path file adapters now perform bounded definition/state reads and
 native same-directory atomic state replacement on Linux and Windows. They use
@@ -172,10 +174,14 @@ Protocol v2 now freezes all nine planned operation IDs in fixed little-endian
 frames with bounded identifiers and a complete 16-profile response inventory.
 An allocation-free dispatcher implements status, filtered profile listing,
 active validation, and dry-run prepare/switch/reset/reload operations over the
-currently published immutable table image. Every committing request returns
-unsupported. The portable CLI parses and renders human/JSON inspection and
-global/device dry-run commands, but its executable has no configured endpoint
-and fails closed without sending. Ephemeral Linux `SOCK_SEQPACKET` and Windows
+currently published immutable table image. The portable runtime now wraps that
+planner with an output-suppressed global commit transaction: it reserves
+rollback capacity, publishes a monotonic immutable generation, persists the
+active Rig Profile, and republishes the prior mapping if persistence fails.
+The portable CLI accepts the global commit command shape, but its executable
+has no configured endpoint and fails closed without sending. Device/reset
+commits and output-enabled adoption remain unavailable. Ephemeral Linux
+`SOCK_SEQPACKET` and Windows
 current-user named-pipe tests carry 1,000 mixed requests through the real
 dispatcher. Local GCC/Clang pass 38/38, both optional JSON builds pass 41/41,
 eight ASan/UBSan boundary tests pass, and the protected baseline remains 30/30.

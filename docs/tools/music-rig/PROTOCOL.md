@@ -38,25 +38,34 @@ Request flag `0x1` means dry-run. No other request flag is accepted.
 
 The complete operation inventory is:
 
-| ID | Operation | Arguments | Milestone 3 behavior |
+| ID | Operation | Arguments | Current portable behavior |
 | ---: | --- | --- | --- |
 | 1 | `status` | none | Read-only |
 | 2 | `list-profiles` | optional device slot | Read-only |
 | 3 | `prepare-global` | profile | Dry-run only |
 | 4 | `prepare-device` | device slot and profile | Dry-run only |
-| 5 | `switch-global` | profile | Dry-run only |
+| 5 | `switch-global` | profile | Dry-run or runtime commit |
 | 6 | `switch-device` | device slot and profile | Dry-run only |
 | 7 | `reset-device-override` | device slot | Dry-run only |
 | 8 | `reload-compiled-definition` | none | Dry-run validation only |
 | 9 | `validate-active` | none | Read-only |
 
-Any prepare, switch, reset, or reload request without the dry-run flag returns
-`unsupported`. A dry-run can inspect the active immutable definition plus a
-caller-owned catalogue of at most 16 explicitly prepared definitions. Every
-candidate must pass the full compiled-definition validation and expose the same
-stable device-slot port catalogue as the active definition. Candidate profile
-rows are available but not active. A dry-run never publishes a generation,
-persists state, loads a resource, contacts a device, or changes a graph.
+A dry-run can inspect the active immutable definition plus a caller-owned
+catalogue of at most 16 explicitly prepared definitions. Every candidate must
+pass full compiled-definition validation and expose the same stable device-slot
+port catalogue as the active definition. Candidate profile rows are available
+but not active. A dry-run never publishes a generation, persists state, loads a
+resource, contacts a device, or changes a graph.
+
+The non-mutating table dispatcher still rejects every commit-capable request.
+The portable runtime transaction now accepts a non-dry-run `switch-global`
+request while output remains suppressed. It checks the expected generation,
+reuses only validated control-only table images, reserves bounded rollback
+storage, publishes a monotonically increasing immutable generation, and
+atomically persists the active Rig Profile. A persistence failure republishes
+the previous table image with a newer generation and reports rollback success
+or failure explicitly. Device switching, reset commit, output-enabled adoption,
+and production transports remain unsupported.
 
 ## Response Frame
 
@@ -111,8 +120,14 @@ Result codes remain stable:
 | 7 | Invalid or corrupt structured data |
 | 8 | Caller-owned buffer is too small |
 
-All current responses keep previous and resulting generations equal. A stale
-nonzero expected generation returns code 5 before operation evaluation.
+Read-only and dry-run responses keep previous and resulting generations
+equal. A successful global commit reports the generation observed before the
+transaction and the newly published generation. A failed persistence step
+reports the rollback generation when rollback publication succeeds. A stale
+nonzero expected generation returns code 5 before publication.
+For a global commit, control-plane duration stops at immutable generation
+publication; the following persistence and any rollback work are not folded into
+the commit-latency measurement.
 
 ## CLI Contract
 
@@ -124,16 +139,18 @@ music-rig profiles list [--device SLOT] [--json]
 music-rig validate [--json]
 music-rig prepare --global PROFILE --dry-run [--json]
 music-rig prepare --device SLOT --profile PROFILE --dry-run [--json]
-music-rig switch --global PROFILE --dry-run [--json]
+music-rig switch --global PROFILE [--dry-run] [--json]
 music-rig switch --device SLOT --profile PROFILE --dry-run [--json]
 music-rig reset --device SLOT --dry-run [--json]
 ```
 
 Human and versioned JSON rendering use the same decoded response. The parser
-rejects a switch without `--dry-run`, conflicting scopes, duplicate options,
-invalid identifiers, and numeric overflow. The executable currently has no
-configured transport; recognized commands return adapter failure 4, write no
-response output, and state that no request was sent.
+accepts a commit-capable global switch, but still requires `--dry-run` for
+prepare, device switch, and device reset commands. It rejects conflicting
+scopes, duplicate options, invalid identifiers, and numeric overflow. The
+executable currently has no configured transport; recognized commands,
+including global commits, return adapter failure 4, write no response output,
+and state that no request was sent.
 
 ## Mock Transports
 

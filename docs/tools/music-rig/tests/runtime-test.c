@@ -25,6 +25,7 @@ typedef struct mock_adapter {
     unsigned int stop_calls;
     unsigned int state_read_calls;
     unsigned int state_replace_calls;
+    unsigned int state_replace_failures;
     bool state_exists;
     music_rig_result start_result;
     music_rig_result wait_result;
@@ -141,6 +142,10 @@ static music_rig_result mock_storage_replace(
     mock_adapter *adapter = opaque;
 
     adapter->state_replace_calls += 1U;
+    if (adapter->state_replace_failures != 0U) {
+        adapter->state_replace_failures -= 1U;
+        return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    }
     if (adapter->state_replace_result != MUSIC_RIG_RESULT_OK) {
         return adapter->state_replace_result;
     }
@@ -344,7 +349,7 @@ static int test_lifecycle_and_metrics(void)
         adapter.responses[1].result_code !=
             (uint32_t)MUSIC_RIG_RESULT_GENERATION_CONFLICT ||
         adapter.responses[2].result_code !=
-            (uint32_t)MUSIC_RIG_RESULT_UNSUPPORTED ||
+            (uint32_t)MUSIC_RIG_RESULT_OK ||
         adapter.responses[0].profile_count != UINT32_C(2) ||
         strcmp(adapter.responses[0].profiles[0].profile, "organ") != 0 ||
         adapter.responses[0].control_duration_ns != UINT64_C(10)) {
@@ -359,11 +364,15 @@ static int test_lifecycle_and_metrics(void)
         metrics->list_requests != UINT64_C(0) ||
         metrics->validate_requests != UINT64_C(0) ||
         metrics->dry_run_requests != UINT64_C(0) ||
-        metrics->unsupported_requests != UINT64_C(1) ||
+        metrics->unsupported_requests != UINT64_C(0) ||
         metrics->invalid_requests != UINT64_C(0) ||
         metrics->control_responses != UINT64_C(3) ||
         metrics->generation_publications != UINT64_C(1) ||
         metrics->generation_conflicts != UINT64_C(3) ||
+        metrics->commit_requests != UINT64_C(1) ||
+        metrics->commit_successes != UINT64_C(0) ||
+        metrics->commit_rollbacks != UINT64_C(0) ||
+        metrics->commit_rollback_failures != UINT64_C(0) ||
         metrics->generation_reclamations != UINT64_C(0) ||
         metrics->generation_backpressure != UINT64_C(0) ||
         metrics->port_identity_conflicts != UINT64_C(0) ||
@@ -397,6 +406,7 @@ static int test_prepared_definition_catalogue(void)
     const music_rig_generation initial = {UINT64_C(1), &default_tables};
     music_rig_compiled_definition alternate_definition;
     music_rig_prepared_definition prepared;
+    music_rig_persisted_state persisted;
     music_rig_protocol_request value;
     music_rig_protocol_response response;
     music_rig_runtime runtime;
@@ -442,6 +452,196 @@ static int test_prepared_definition_catalogue(void)
         ) != 0 ||
         runtime.state.generation_id != UINT64_C(1)) {
         fputs("prepared runtime dry-run failed\n", stderr);
+        return 1;
+    }
+
+    value.flags = UINT32_C(0);
+    if (music_rig_runtime_dispatch(&runtime, &value, &response) !=
+            MUSIC_RIG_RESULT_OK ||
+        response.result_code != (uint32_t)MUSIC_RIG_RESULT_OK ||
+        response.previous_generation != UINT64_C(1) ||
+        response.resulting_generation != UINT64_C(2) ||
+        response.control_duration_ns != UINT64_C(10) ||
+        response.rollback_status !=
+            (uint32_t)MUSIC_RIG_ROLLBACK_NOT_REQUIRED ||
+        strcmp(
+            response.active_rig_profile,
+            "multilevel-volume-mixed-pads"
+        ) != 0 ||
+        strcmp(
+            runtime.active_rig_profile,
+            "multilevel-volume-mixed-pads"
+        ) != 0 ||
+        runtime.control_generation->mapping != &alternate_tables ||
+        runtime.metrics.commit_requests != UINT64_C(1) ||
+        runtime.metrics.commit_successes != UINT64_C(1) ||
+        runtime.metrics.state_writes != UINT64_C(1)) {
+        fputs("prepared global commit failed\n", stderr);
+        return 1;
+    }
+
+    value = request(
+        UINT64_C(32),
+        UINT64_C(2),
+        (uint32_t)MUSIC_RIG_OPERATION_SWITCH_GLOBAL
+    );
+    fixture_copy(value.profile, "full-live-rack");
+    if (music_rig_runtime_dispatch(&runtime, &value, &response) !=
+            MUSIC_RIG_RESULT_OK ||
+        response.result_code != (uint32_t)MUSIC_RIG_RESULT_OK ||
+        response.previous_generation != UINT64_C(2) ||
+        response.resulting_generation != UINT64_C(3) ||
+        strcmp(response.active_rig_profile, "full-live-rack") != 0 ||
+        runtime.control_generation->mapping != &default_tables ||
+        runtime.metrics.commit_requests != UINT64_C(2) ||
+        runtime.metrics.commit_successes != UINT64_C(2) ||
+        runtime.metrics.state_writes != UINT64_C(2)) {
+        fputs("base Rig Profile commit failed\n", stderr);
+        return 1;
+    }
+
+    memset(&persisted, 0, sizeof(persisted));
+    persisted.generation_id = UINT64_C(10);
+    memcpy(
+        persisted.definition_fingerprint,
+        fingerprint,
+        MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE
+    );
+    persisted.output_mode = MUSIC_RIG_OUTPUT_SUPPRESSED;
+    fixture_copy(
+        persisted.active_rig_profile,
+        "multilevel-volume-mixed-pads"
+    );
+    if (music_rig_state_encode(
+            &persisted,
+            adapter.state_frame,
+            sizeof(adapter.state_frame)
+        ) != MUSIC_RIG_RESULT_OK) {
+        fputs("prepared persisted state fixture failed\n", stderr);
+        return 1;
+    }
+    adapter.state_size = sizeof(adapter.state_frame);
+    adapter.state_exists = true;
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_OK ||
+        runtime.state.generation_id != UINT64_C(10) ||
+        strcmp(
+            runtime.active_rig_profile,
+            "multilevel-volume-mixed-pads"
+        ) != 0 ||
+        runtime.control_generation->mapping != &alternate_tables ||
+        runtime.metrics.state_restores != UINT64_C(1)) {
+        fputs("prepared Rig Profile state was not restored\n", stderr);
+        return 1;
+    }
+
+    value = request(
+        UINT64_C(33),
+        UINT64_C(10),
+        (uint32_t)MUSIC_RIG_OPERATION_SWITCH_GLOBAL
+    );
+    value.flags = MUSIC_RIG_REQUEST_DRY_RUN;
+    fixture_copy(value.profile, "full-live-rack");
+    if (music_rig_runtime_dispatch(&runtime, &value, &response) !=
+            MUSIC_RIG_RESULT_OK ||
+        response.result_code != (uint32_t)MUSIC_RIG_RESULT_OK ||
+        response.previous_generation != UINT64_C(10) ||
+        response.resulting_generation != UINT64_C(10) ||
+        strcmp(
+            response.active_rig_profile,
+            "multilevel-volume-mixed-pads"
+        ) != 0 ||
+        (response.profiles[0].flags & MUSIC_RIG_PROFILE_ACTIVE) !=
+            UINT32_C(0)) {
+        fputs("base Rig Profile dry-run after restore failed\n", stderr);
+        return 1;
+    }
+
+    init_mock(&adapter);
+    adapter.state_replace_failures = 1U;
+    interfaces = interfaces_for(&adapter);
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+        MUSIC_RIG_RESULT_OK) {
+        return 1;
+    }
+    value = request(
+        UINT64_C(34),
+        UINT64_C(1),
+        (uint32_t)MUSIC_RIG_OPERATION_SWITCH_GLOBAL
+    );
+    fixture_copy(value.profile, "multilevel-volume-mixed-pads");
+    if (music_rig_runtime_dispatch(&runtime, &value, &response) !=
+            MUSIC_RIG_RESULT_OK ||
+        response.result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_ADAPTER_FAILURE ||
+        response.previous_generation != UINT64_C(1) ||
+        response.resulting_generation != UINT64_C(3) ||
+        response.rollback_status !=
+            (uint32_t)MUSIC_RIG_ROLLBACK_SUCCEEDED ||
+        strcmp(response.active_rig_profile, "full-live-rack") != 0 ||
+        runtime.control_generation->mapping != &default_tables ||
+        runtime.metrics.generation_publications != UINT64_C(2) ||
+        runtime.metrics.commit_rollbacks != UINT64_C(1) ||
+        runtime.metrics.commit_rollback_failures != UINT64_C(0) ||
+        runtime.metrics.state_writes != UINT64_C(1) ||
+        runtime.metrics.adapter_failures != UINT64_C(1) ||
+        adapter.state_replace_calls != 2U) {
+        fputs("global commit persistence rollback failed\n", stderr);
+        return 1;
+    }
+    if (music_rig_state_decode(
+            adapter.state_frame,
+            adapter.state_size,
+            &persisted
+        ) != MUSIC_RIG_RESULT_OK ||
+        persisted.generation_id != UINT64_C(3) ||
+        strcmp(persisted.active_rig_profile, "full-live-rack") != 0) {
+        fputs("rolled-back global state was not durable\n", stderr);
+        return 1;
+    }
+
+    init_mock(&adapter);
+    adapter.state_replace_result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    interfaces = interfaces_for(&adapter);
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+        MUSIC_RIG_RESULT_OK) {
+        return 1;
+    }
+    value.request_id = UINT64_C(35);
+    if (music_rig_runtime_dispatch(&runtime, &value, &response) !=
+            MUSIC_RIG_RESULT_OK ||
+        response.result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_ADAPTER_FAILURE ||
+        response.rollback_status !=
+            (uint32_t)MUSIC_RIG_ROLLBACK_FAILED ||
+        response.resulting_generation != UINT64_C(3) ||
+        strcmp(runtime.active_rig_profile, "full-live-rack") != 0 ||
+        runtime.control_generation->mapping != &default_tables ||
+        runtime.metrics.commit_rollback_failures != UINT64_C(1) ||
+        runtime.metrics.adapter_failures != UINT64_C(2)) {
+        fputs("global commit rollback failure was hidden\n", stderr);
+        return 1;
+    }
+
+    init_mock(&adapter);
+    interfaces = interfaces_for(&adapter);
+    persisted.generation_id = UINT64_C(9);
+    fixture_copy(persisted.active_rig_profile, "missing-profile");
+    if (music_rig_state_encode(
+            &persisted,
+            adapter.state_frame,
+            sizeof(adapter.state_frame)
+        ) != MUSIC_RIG_RESULT_OK) {
+        return 1;
+    }
+    adapter.state_size = sizeof(adapter.state_frame);
+    adapter.state_exists = true;
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_OK ||
+        runtime.state.generation_id != UINT64_C(1) ||
+        strcmp(runtime.active_rig_profile, "full-live-rack") != 0 ||
+        runtime.metrics.state_fallbacks != UINT64_C(1)) {
+        fputs("missing persisted Rig Profile did not fall back\n", stderr);
         return 1;
     }
 
@@ -652,6 +852,7 @@ static int test_persisted_state(void)
         MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE
     );
     older.output_mode = MUSIC_RIG_OUTPUT_SUPPRESSED;
+    fixture_copy(older.active_rig_profile, "full-live-rack");
     if (music_rig_state_encode(
             &older,
             adapter.state_frame,

@@ -6,9 +6,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define MUSIC_RIG_RUNTIME_STATE_VERSION UINT32_C(1)
-#define MUSIC_RIG_RUNTIME_STATE_FRAME_SIZE ((size_t)64)
+#define MUSIC_RIG_RUNTIME_STATE_VERSION UINT32_C(2)
+#define MUSIC_RIG_RUNTIME_STATE_FRAME_SIZE ((size_t)128)
 #define MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE ((size_t)32)
+#define MUSIC_RIG_PERSISTED_PROFILE_CAPACITY ((size_t)65)
 
 typedef enum music_rig_output_mode {
     MUSIC_RIG_OUTPUT_SUPPRESSED = 0,
@@ -19,6 +20,7 @@ typedef struct music_rig_persisted_state {
     uint64_t generation_id;
     uint8_t definition_fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE];
     music_rig_output_mode output_mode;
+    char active_rig_profile[MUSIC_RIG_PERSISTED_PROFILE_CAPACITY];
 } music_rig_persisted_state;
 
 music_rig_result music_rig_state_encode(

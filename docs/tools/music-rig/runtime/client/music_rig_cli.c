@@ -187,8 +187,9 @@ static music_rig_result parse_switch(
         }
     }
 
-    if (!seen_dry_run || seen_global == seen_device ||
-        (seen_global && seen_profile) || (seen_device && !seen_profile)) {
+    if (seen_global == seen_device ||
+        (seen_global && seen_profile) ||
+        (seen_device && (!seen_profile || !seen_dry_run))) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
     command->request.operation = seen_global
@@ -205,6 +206,10 @@ static music_rig_result parse_prepare(
 {
     music_rig_result result = parse_switch(argc, argv, command);
 
+    if (result == MUSIC_RIG_RESULT_OK &&
+        command->request.flags != MUSIC_RIG_REQUEST_DRY_RUN) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
     if (result != MUSIC_RIG_RESULT_OK) {
         return result;
     }

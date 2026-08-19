@@ -12,7 +12,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define MUSIC_RIG_RUNTIME_ABI_VERSION UINT32_C(4)
+#define MUSIC_RIG_RUNTIME_ABI_VERSION UINT32_C(5)
+#define MUSIC_RIG_RUNTIME_COMMIT_GENERATION_CAPACITY \
+    (MUSIC_RIG_RETIRED_GENERATION_CAPACITY + (size_t)1)
 
 typedef enum music_rig_runtime_lifecycle {
     MUSIC_RIG_RUNTIME_UNINITIALIZED = 0,
@@ -53,6 +55,10 @@ typedef struct music_rig_runtime_metrics {
     uint64_t control_responses;
     uint64_t generation_publications;
     uint64_t generation_conflicts;
+    uint64_t commit_requests;
+    uint64_t commit_successes;
+    uint64_t commit_rollbacks;
+    uint64_t commit_rollback_failures;
     uint64_t generation_reclamations;
     uint64_t generation_backpressure;
     uint64_t port_identity_conflicts;
@@ -104,11 +110,19 @@ typedef struct music_rig_runtime {
     music_rig_runtime_state state;
     music_rig_runtime_metrics metrics;
     music_rig_generation initial_generation;
+    music_rig_generation committed_generations[
+        MUSIC_RIG_RUNTIME_COMMIT_GENERATION_CAPACITY
+    ];
+    bool committed_generation_in_use[
+        MUSIC_RIG_RUNTIME_COMMIT_GENERATION_CAPACITY
+    ];
     const music_rig_generation *control_generation;
     music_rig_generation_slot generations;
     music_rig_device_port_catalogue device_ports;
     music_rig_platform_interfaces interfaces;
     char active_rig_profile[MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY];
+    char initial_rig_profile[MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY];
+    const music_rig_compiled_tables *initial_tables;
     const music_rig_prepared_definition *prepared_definitions;
     size_t prepared_definition_count;
     bool control_started;

@@ -29,15 +29,15 @@ execute_process(
     ERROR_VARIABLE SWITCH_ERROR
     TIMEOUT 2
 )
-if(NOT SWITCH_RESULT EQUAL 2)
+if(NOT SWITCH_RESULT EQUAL 4)
     message(FATAL_ERROR
-        "music-rig accepted a non-dry-run switch: ${SWITCH_RESULT}"
+        "music-rig global switch did not fail at the transport boundary: ${SWITCH_RESULT}"
     )
 endif()
 if(NOT SWITCH_OUTPUT STREQUAL "")
-    message(FATAL_ERROR "unsafe switch unexpectedly wrote output")
+    message(FATAL_ERROR "global switch unexpectedly wrote output")
 endif()
-string(FIND "${SWITCH_ERROR}" "Usage:" USAGE_INDEX)
-if(USAGE_INDEX EQUAL -1)
-    message(FATAL_ERROR "unsafe switch did not return the command contract")
+string(FIND "${SWITCH_ERROR}" "no request was sent" NO_SWITCH_REQUEST_INDEX)
+if(NO_SWITCH_REQUEST_INDEX EQUAL -1)
+    message(FATAL_ERROR "global switch did not report its fail-closed boundary")
 endif()

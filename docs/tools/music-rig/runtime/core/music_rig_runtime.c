@@ -5,11 +5,59 @@
 #include <stdint.h>
 #include <string.h>
 
+_Static_assert(
+    MUSIC_RIG_PERSISTED_PROFILE_CAPACITY ==
+        MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY,
+    "persistent and protocol profile identifiers must have equal capacity"
+);
+
 static void increment(uint64_t *counter)
 {
     if (*counter != UINT64_MAX) {
         *counter += UINT64_C(1);
     }
+}
+
+static bool bounded_profile(const char *value)
+{
+    size_t index;
+
+    if (value == NULL) {
+        return false;
+    }
+    for (index = 0; index < MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY; ++index) {
+        if (value[index] == '\0') {
+            return index != 0;
+        }
+    }
+    return false;
+}
+
+static void copy_profile(char *target, const char *source)
+{
+    memcpy(target, source, strlen(source) + 1U);
+}
+
+static const music_rig_compiled_tables *profile_tables(
+    const music_rig_runtime *runtime,
+    const char *profile
+)
+{
+    size_t index;
+
+    if (strcmp(profile, runtime->initial_rig_profile) == 0) {
+        return runtime->initial_tables;
+    }
+    for (index = 0U; index < runtime->prepared_definition_count; ++index) {
+        if (strcmp(
+                profile,
+                runtime->prepared_definitions[index].definition->
+                    active_rig_profile
+            ) == 0) {
+            return runtime->prepared_definitions[index].tables;
+        }
+    }
+    return NULL;
 }
 
 static bool interfaces_are_valid(
@@ -34,6 +82,8 @@ static music_rig_result restore_state(music_rig_runtime *runtime)
     uint8_t frame[MUSIC_RIG_RUNTIME_STATE_FRAME_SIZE];
     size_t frame_size = 0;
     music_rig_persisted_state persisted;
+    const music_rig_compiled_tables *tables;
+    const char *profile;
     music_rig_result result;
 
     result = runtime->interfaces.storage.read(
@@ -68,8 +118,19 @@ static music_rig_result restore_state(music_rig_runtime *runtime)
         return MUSIC_RIG_RESULT_OK;
     }
 
+    profile = persisted.active_rig_profile[0] == 0
+        ? runtime->initial_rig_profile
+        : persisted.active_rig_profile;
+    tables = profile_tables(runtime, profile);
+    if (tables == NULL) {
+        increment(&runtime->metrics.state_fallbacks);
+        return MUSIC_RIG_RESULT_OK;
+    }
+
     runtime->initial_generation.id = persisted.generation_id;
+    runtime->initial_generation.mapping = tables;
     runtime->state.generation_id = persisted.generation_id;
+    copy_profile(runtime->active_rig_profile, profile);
     increment(&runtime->metrics.state_restores);
     return MUSIC_RIG_RESULT_OK;
 }
@@ -102,21 +163,6 @@ static music_rig_result adapter_failure(music_rig_runtime *runtime)
 {
     increment(&runtime->metrics.adapter_failures);
     return finish(runtime, MUSIC_RIG_RESULT_ADAPTER_FAILURE);
-}
-
-static bool bounded_profile(const char *value)
-{
-    size_t index;
-
-    if (value == NULL) {
-        return false;
-    }
-    for (index = 0; index < MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY; ++index) {
-        if (value[index] == '\0') {
-            return index != 0;
-        }
-    }
-    return false;
 }
 
 static void classify_request(
@@ -179,6 +225,9 @@ music_rig_result music_rig_runtime_init(
     memset(runtime, 0, sizeof(*runtime));
     runtime->interfaces = *interfaces;
     runtime->initial_generation = *config->initial_generation;
+    runtime->initial_tables = config->initial_generation->mapping;
+    runtime->prepared_definitions = config->prepared_definitions;
+    runtime->prepared_definition_count = config->prepared_definition_count;
     runtime->state.schema_version = MUSIC_RIG_RUNTIME_STATE_VERSION;
     runtime->state.generation_id = config->initial_generation->id;
     memcpy(
@@ -186,37 +235,33 @@ music_rig_result music_rig_runtime_init(
         config->definition_fingerprint,
         MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE
     );
-    memcpy(
-        runtime->active_rig_profile,
-        config->active_rig_profile,
-        strlen(config->active_rig_profile) + 1U
-    );
+    copy_profile(runtime->active_rig_profile, config->active_rig_profile);
+    copy_profile(runtime->initial_rig_profile, config->active_rig_profile);
     runtime->state.output_mode = config->output_mode;
-    result = restore_state(runtime);
-    if (result != MUSIC_RIG_RESULT_OK) {
-        return result;
-    }
+
     result = music_rig_device_port_catalogue_build(
-        runtime->initial_generation.mapping,
+        runtime->initial_tables,
         &runtime->device_ports
     );
     if (result != MUSIC_RIG_RESULT_OK) {
         return result;
     }
     snapshot.generation_id = runtime->state.generation_id;
-    snapshot.active_rig_profile = runtime->active_rig_profile;
-    snapshot.tables = runtime->initial_generation.mapping;
+    snapshot.active_rig_profile = runtime->initial_rig_profile;
+    snapshot.tables = runtime->initial_tables;
     snapshot.output_mode = runtime->state.output_mode;
     result = music_rig_control_prepared_definitions_validate(
         &snapshot,
-        config->prepared_definitions,
-        config->prepared_definition_count
+        runtime->prepared_definitions,
+        runtime->prepared_definition_count
     );
     if (result != MUSIC_RIG_RESULT_OK) {
         return result;
     }
-    runtime->prepared_definitions = config->prepared_definitions;
-    runtime->prepared_definition_count = config->prepared_definition_count;
+    result = restore_state(runtime);
+    if (result != MUSIC_RIG_RESULT_OK) {
+        return result;
+    }
     result = music_rig_generation_slot_init(
         &runtime->generations,
         &runtime->initial_generation
@@ -285,6 +330,60 @@ music_rig_result music_rig_runtime_publish_generation(
     return MUSIC_RIG_RESULT_OK;
 }
 
+static music_rig_generation *allocate_commit_generation(
+    music_rig_runtime *runtime,
+    uint64_t generation_id,
+    const music_rig_compiled_tables *tables
+)
+{
+    size_t index;
+
+    for (index = 0U;
+         index < MUSIC_RIG_RUNTIME_COMMIT_GENERATION_CAPACITY;
+         ++index) {
+        if (!runtime->committed_generation_in_use[index]) {
+            runtime->committed_generation_in_use[index] = true;
+            runtime->committed_generations[index].id = generation_id;
+            runtime->committed_generations[index].mapping = tables;
+            return &runtime->committed_generations[index];
+        }
+    }
+    return NULL;
+}
+
+static bool release_commit_generation(
+    music_rig_runtime *runtime,
+    const music_rig_generation *generation
+)
+{
+    size_t index;
+
+    for (index = 0U;
+         index < MUSIC_RIG_RUNTIME_COMMIT_GENERATION_CAPACITY;
+         ++index) {
+        if (generation == &runtime->committed_generations[index]) {
+            runtime->committed_generation_in_use[index] = false;
+            return true;
+        }
+    }
+    return false;
+}
+
+static size_t available_commit_generations(const music_rig_runtime *runtime)
+{
+    size_t available = 0U;
+    size_t index;
+
+    for (index = 0U;
+         index < MUSIC_RIG_RUNTIME_COMMIT_GENERATION_CAPACITY;
+         ++index) {
+        if (!runtime->committed_generation_in_use[index]) {
+            available += 1U;
+        }
+    }
+    return available;
+}
+
 const music_rig_generation *music_rig_runtime_reclaim_generation(
     music_rig_runtime *runtime
 )
@@ -305,7 +404,8 @@ const music_rig_generation *music_rig_runtime_reclaim_generation(
             return NULL;
         }
         increment(&runtime->metrics.generation_reclamations);
-        if (generation != &runtime->initial_generation) {
+        if (generation != &runtime->initial_generation &&
+            !release_commit_generation(runtime, generation)) {
             return generation;
         }
     }
@@ -380,6 +480,218 @@ music_rig_result music_rig_runtime_run(music_rig_runtime *runtime)
     }
 }
 
+static music_rig_result plan_global_switch(
+    music_rig_runtime *runtime,
+    const music_rig_control_snapshot *snapshot,
+    const music_rig_protocol_request *request,
+    music_rig_protocol_response *response,
+    const music_rig_compiled_tables **target_tables
+)
+{
+    music_rig_protocol_request plan_request = *request;
+    music_rig_control_snapshot plan_snapshot = *snapshot;
+    music_rig_result result;
+    bool target_was_active;
+    size_t index;
+
+    plan_request.flags = MUSIC_RIG_REQUEST_DRY_RUN;
+    *target_tables = profile_tables(runtime, request->profile);
+    if (*target_tables == NULL) {
+        return music_rig_control_dispatch_prepared(
+            snapshot,
+            runtime->prepared_definitions,
+            runtime->prepared_definition_count,
+            &plan_request,
+            response
+        );
+    }
+
+    target_was_active =
+        strcmp(request->profile, runtime->active_rig_profile) == 0;
+    if (!target_was_active &&
+        strcmp(request->profile, runtime->initial_rig_profile) == 0) {
+        plan_snapshot.active_rig_profile = runtime->initial_rig_profile;
+        plan_snapshot.tables = runtime->initial_tables;
+    }
+    result = music_rig_control_dispatch_prepared(
+        &plan_snapshot,
+        runtime->prepared_definitions,
+        runtime->prepared_definition_count,
+        &plan_request,
+        response
+    );
+    if (result != MUSIC_RIG_RESULT_OK) {
+        return result;
+    }
+
+    copy_profile(response->active_rig_profile, runtime->active_rig_profile);
+    if (!target_was_active) {
+        for (index = 0U; index < response->profile_count; ++index) {
+            response->profiles[index].flags &= ~MUSIC_RIG_PROFILE_ACTIVE;
+        }
+    }
+    if (request->flags != MUSIC_RIG_REQUEST_DRY_RUN) {
+        response->flags &= ~MUSIC_RIG_RESPONSE_DRY_RUN;
+    }
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static void mark_response_profiles_active(
+    music_rig_protocol_response *response
+)
+{
+    size_t index;
+
+    for (index = 0U; index < response->profile_count; ++index) {
+        response->profiles[index].flags |= MUSIC_RIG_PROFILE_ACTIVE;
+    }
+}
+
+static void set_commit_failure(
+    music_rig_protocol_response *response,
+    music_rig_result result
+)
+{
+    response->result_code = (uint32_t)result;
+    response->flags &= ~(MUSIC_RIG_RESPONSE_DRY_RUN |
+        MUSIC_RIG_RESPONSE_VALID | MUSIC_RIG_RESPONSE_GRAPH_DELTA_EMPTY);
+}
+
+static music_rig_result commit_global_switch(
+    music_rig_runtime *runtime,
+    const music_rig_protocol_request *request,
+    const music_rig_compiled_tables *target_tables,
+    music_rig_protocol_response *response,
+    uint64_t started_ns,
+    uint64_t *commit_duration_ns
+)
+{
+    const music_rig_generation *previous_generation =
+        runtime->control_generation;
+    music_rig_generation *commit_generation;
+    music_rig_generation *rollback_generation;
+    char previous_profile[MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY];
+    music_rig_result result;
+    uint64_t published_ns;
+    size_t retired_count;
+
+    increment(&runtime->metrics.commit_requests);
+    if (response->result_code != (uint32_t)MUSIC_RIG_RESULT_OK) {
+        return MUSIC_RIG_RESULT_OK;
+    }
+    if (response->readiness == (uint32_t)MUSIC_RIG_READINESS_COLD) {
+        set_commit_failure(response, MUSIC_RIG_RESULT_INVALID_STATE);
+        return MUSIC_RIG_RESULT_OK;
+    }
+    if (strcmp(request->profile, runtime->active_rig_profile) == 0) {
+        response->flags |= MUSIC_RIG_RESPONSE_VALID |
+            MUSIC_RIG_RESPONSE_GRAPH_DELTA_EMPTY;
+        mark_response_profiles_active(response);
+        return MUSIC_RIG_RESULT_OK;
+    }
+
+    retired_count = music_rig_generation_slot_retired_count(
+        &runtime->generations
+    );
+    if (runtime->state.generation_id > UINT64_MAX - UINT64_C(2)) {
+        increment(&runtime->metrics.generation_conflicts);
+        set_commit_failure(response, MUSIC_RIG_RESULT_GENERATION_CONFLICT);
+        return MUSIC_RIG_RESULT_OK;
+    }
+    if (retired_count >
+            MUSIC_RIG_RETIRED_GENERATION_CAPACITY - (size_t)2 ||
+        available_commit_generations(runtime) < 2U) {
+        increment(&runtime->metrics.generation_backpressure);
+        set_commit_failure(response, MUSIC_RIG_RESULT_INVALID_STATE);
+        return MUSIC_RIG_RESULT_OK;
+    }
+
+    copy_profile(previous_profile, runtime->active_rig_profile);
+    commit_generation = allocate_commit_generation(
+        runtime,
+        runtime->state.generation_id + UINT64_C(1),
+        target_tables
+    );
+    if (commit_generation == NULL) {
+        increment(&runtime->metrics.generation_backpressure);
+        set_commit_failure(response, MUSIC_RIG_RESULT_INVALID_STATE);
+        return MUSIC_RIG_RESULT_OK;
+    }
+
+    result = music_rig_runtime_publish_generation(
+        runtime,
+        commit_generation,
+        request->expected_generation
+    );
+    if (result != MUSIC_RIG_RESULT_OK) {
+        release_commit_generation(runtime, commit_generation);
+        set_commit_failure(response, result);
+        return MUSIC_RIG_RESULT_OK;
+    }
+    published_ns = runtime->interfaces.clock.now_ns(
+        runtime->interfaces.clock.context
+    );
+    *commit_duration_ns = published_ns >= started_ns
+        ? published_ns - started_ns
+        : UINT64_C(0);
+
+    copy_profile(runtime->active_rig_profile, request->profile);
+    result = music_rig_runtime_persist_state(runtime);
+    if (result == MUSIC_RIG_RESULT_OK) {
+        response->resulting_generation = runtime->state.generation_id;
+        copy_profile(
+            response->active_rig_profile,
+            runtime->active_rig_profile
+        );
+        response->flags |= MUSIC_RIG_RESPONSE_VALID |
+            MUSIC_RIG_RESPONSE_GRAPH_DELTA_EMPTY;
+        mark_response_profiles_active(response);
+        increment(&runtime->metrics.commit_successes);
+        return MUSIC_RIG_RESULT_OK;
+    }
+
+    rollback_generation = allocate_commit_generation(
+        runtime,
+        runtime->state.generation_id + UINT64_C(1),
+        (const music_rig_compiled_tables *)previous_generation->mapping
+    );
+    if (rollback_generation != NULL &&
+        music_rig_runtime_publish_generation(
+            runtime,
+            rollback_generation,
+            runtime->state.generation_id
+        ) == MUSIC_RIG_RESULT_OK) {
+        copy_profile(runtime->active_rig_profile, previous_profile);
+        response->resulting_generation = runtime->state.generation_id;
+        copy_profile(
+            response->active_rig_profile,
+            runtime->active_rig_profile
+        );
+        if (music_rig_runtime_persist_state(runtime) == MUSIC_RIG_RESULT_OK) {
+            response->rollback_status =
+                (uint32_t)MUSIC_RIG_ROLLBACK_SUCCEEDED;
+            increment(&runtime->metrics.commit_rollbacks);
+        } else {
+            response->rollback_status =
+                (uint32_t)MUSIC_RIG_ROLLBACK_FAILED;
+            increment(&runtime->metrics.commit_rollback_failures);
+        }
+    } else {
+        if (rollback_generation != NULL) {
+            release_commit_generation(runtime, rollback_generation);
+        }
+        response->resulting_generation = runtime->state.generation_id;
+        copy_profile(
+            response->active_rig_profile,
+            runtime->active_rig_profile
+        );
+        response->rollback_status = (uint32_t)MUSIC_RIG_ROLLBACK_FAILED;
+        increment(&runtime->metrics.commit_rollback_failures);
+    }
+    set_commit_failure(response, MUSIC_RIG_RESULT_ADAPTER_FAILURE);
+    return MUSIC_RIG_RESULT_OK;
+}
+
 music_rig_result music_rig_runtime_dispatch(
     music_rig_runtime *runtime,
     const music_rig_protocol_request *request,
@@ -387,9 +699,11 @@ music_rig_result music_rig_runtime_dispatch(
 )
 {
     music_rig_control_snapshot snapshot;
+    const music_rig_compiled_tables *target_tables = NULL;
     music_rig_result result;
     uint64_t started_ns;
     uint64_t finished_ns;
+    uint64_t commit_duration_ns = UINT64_MAX;
 
     if (runtime == NULL || request == NULL || response == NULL) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
@@ -406,13 +720,35 @@ music_rig_result music_rig_runtime_dispatch(
     snapshot.active_rig_profile = runtime->active_rig_profile;
     snapshot.tables = runtime->control_generation->mapping;
     snapshot.output_mode = runtime->state.output_mode;
-    result = music_rig_control_dispatch_prepared(
-        &snapshot,
-        runtime->prepared_definitions,
-        runtime->prepared_definition_count,
-        request,
-        response
-    );
+    if (request->operation ==
+        (uint32_t)MUSIC_RIG_OPERATION_SWITCH_GLOBAL) {
+        result = plan_global_switch(
+            runtime,
+            &snapshot,
+            request,
+            response,
+            &target_tables
+        );
+        if (result == MUSIC_RIG_RESULT_OK &&
+            request->flags != MUSIC_RIG_REQUEST_DRY_RUN) {
+            result = commit_global_switch(
+                runtime,
+                request,
+                target_tables,
+                response,
+                started_ns,
+                &commit_duration_ns
+            );
+        }
+    } else {
+        result = music_rig_control_dispatch_prepared(
+            &snapshot,
+            runtime->prepared_definitions,
+            runtime->prepared_definition_count,
+            request,
+            response
+        );
+    }
     finished_ns = runtime->interfaces.clock.now_ns(
         runtime->interfaces.clock.context
     );
@@ -422,9 +758,11 @@ music_rig_result music_rig_runtime_dispatch(
         increment(&runtime->metrics.invalid_requests);
         return result;
     }
-    response->control_duration_ns = finished_ns >= started_ns
-        ? finished_ns - started_ns
-        : UINT64_C(0);
+    response->control_duration_ns = commit_duration_ns != UINT64_MAX
+        ? commit_duration_ns
+        : (finished_ns >= started_ns
+            ? finished_ns - started_ns
+            : UINT64_C(0));
     classify_request(runtime, request, response);
     return MUSIC_RIG_RESULT_OK;
 }
@@ -443,6 +781,7 @@ music_rig_result music_rig_runtime_persist_state(music_rig_runtime *runtime)
         return MUSIC_RIG_RESULT_INVALID_STATE;
     }
 
+    memset(&persisted, 0, sizeof(persisted));
     persisted.generation_id = runtime->state.generation_id;
     memcpy(
         persisted.definition_fingerprint,
@@ -450,6 +789,10 @@ music_rig_result music_rig_runtime_persist_state(music_rig_runtime *runtime)
         MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE
     );
     persisted.output_mode = runtime->state.output_mode;
+    copy_profile(
+        persisted.active_rig_profile,
+        runtime->active_rig_profile
+    );
     result = music_rig_state_encode(&persisted, frame, sizeof(frame));
     if (result != MUSIC_RIG_RESULT_OK) {
         return result;

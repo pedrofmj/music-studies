@@ -1,12 +1,13 @@
 # Portable Runtime Control Loop
 
-The Milestone 3 runtime is a platform-neutral, output-suppressed control
-dispatcher. It establishes the definition, qualified persistent state, metrics,
-generation, and adapter contracts that Linux and Windows daemon hosts use. It
-does not create an IPC endpoint, bind a device, inspect or change a graph,
-contact a plugin host, install a service, or start by default. The Linux host
-now resolves per-user locations and provides an explicit output-suppressed
-lifecycle without using those paths for I/O.
+The portable runtime is a platform-neutral, output-suppressed control
+dispatcher with the first Milestone 4 global commit transaction. It establishes
+the definition, qualified persistent state, metrics, generation, and adapter
+contracts that Linux and Windows daemon hosts use. It does not create an IPC
+endpoint, bind a device, inspect or change a graph, contact a plugin host,
+install a service, or start by default. The Linux host resolves per-user
+locations and provides an explicit output-suppressed lifecycle without using
+those paths for I/O.
 
 ## Ownership And Storage
 
@@ -23,13 +24,15 @@ pointer through the existing lock-free generation slot. State and metric
 accessors return live read-only views and are not cross-thread snapshots.
 
 The generation slot has a fixed eight-entry retirement ring. Publication
-retires the previous pointer; it never frees or reuses caller storage. The
-control thread may reclaim entries only after the real-time adopter has
-published a newer adopted pointer. A full ring returns invalid state without
-publishing, providing bounded backpressure instead of unbounded retention.
-`music_rig_runtime_reclaim_generation` consumes safe retired entries and hides
-the runtime-owned initial generation; every external pointer it returns may be
-reused by its caller.
+retires the previous pointer; it never frees or prematurely reuses generation
+storage. The runtime embeds nine commit-generation records in its caller-owned
+top-level storage and reserves two free records plus two retirement entries
+before a durable commit so persistence rollback remains possible. The control
+thread may reclaim entries only after the real-time adopter has published a
+newer adopted pointer. Internal initial and commit records are reclaimed
+silently; external generation pointers are returned to their caller. A full
+ring returns invalid state without publishing, providing bounded backpressure
+instead of unbounded retention.
 
 The runtime rejects `MUSIC_RIG_OUTPUT_ENABLED`. Only
 `MUSIC_RIG_OUTPUT_SUPPRESSED` can initialize until a later milestone adds and
@@ -47,7 +50,7 @@ uninitialized -> initialized -> running -> stopped
 
 Initialization requires a nonzero generation, an exact 32-byte definition
 fingerprint, an active Rig Profile ID, output-suppressed mode, runtime adapter
-ABI version 4, storage adapter ABI version 1, and a prepared immutable table
+ABI version 5, storage adapter ABI version 1, and a prepared immutable table
 image with a valid stable device-port catalogue. It reads qualified state
 before publishing the initial generation. `run` may be called exactly once. A
 normal stop closes the control adapter and records the monotonic stop time.
@@ -207,17 +210,20 @@ links, or emit events. WinMM and other host bindings remain later work.
 ## State And Metrics
 
 Live versioned state records lifecycle, published generation ID, raw definition
-fingerprint, output mode, and monotonic start/stop times. The portable persistent
-frame is exactly 64 bytes: magic, version, generation, fingerprint,
-output-suppressed mode, reserved bytes, and a 64-bit FNV-1a integrity tag. The
-tag detects accidental corruption; it is not authentication.
+fingerprint, output mode, and monotonic start/stop times. Persistent state v2 is
+exactly 128 bytes: magic, version, generation, fingerprint, output-suppressed
+mode, a 65-byte active Rig Profile ID, reserved bytes, and a 64-bit FNV-1a
+integrity tag. The tag detects accidental corruption; it is not authentication.
+The decoder remains backward-compatible with the 64-byte v1 frame, which has no
+profile ID and therefore restores the configured base profile.
 
 A missing state object starts from the compiled definition. State with the same
-fingerprint and a current generation restores. A changed definition fingerprint
-or older persisted generation falls back to the compiled generation and
+fingerprint, a current generation, and an available base or prepared Rig Profile
+restores that immutable table image. A changed fingerprint, older generation,
+or unavailable persisted profile falls back to the compiled base generation and
 increments a fallback metric. Invalid length, magic, version, reserved fields,
-mode, generation, or integrity tag fails closed. Persistence is explicit and
-uses the adapter's atomic-replace callback.
+mode, generation, profile ID, or integrity tag fails closed. Persistence uses
+the adapter's atomic-replace callback.
 
 Publishing a new caller-owned generation supports an optional
 expected-generation precondition. Stale preconditions, non-increasing
@@ -231,6 +237,7 @@ All metrics are unsigned 64-bit saturating counters:
 - control, status, list, validation, dry-run, unsupported, invalid, and response
   counts;
 - generation publications, conflicts, reclamations, and backpressure;
+- global commit requests, successes, rollbacks, and rollback failures;
 - stable port-identity conflicts;
 - state restores, qualified fallbacks, and writes; and
 - adapter failures.
@@ -245,11 +252,17 @@ validation, and dry-run prepare/switch/reset/reload planning over immutable
 table images. Runtime initialization accepts at most 16 caller-owned prepared
 definitions, fully validates each definition and table, rejects duplicate Rig
 Profile IDs, and requires its stable device-slot port catalogue to match the
-active generation. Profile listing and global/device dry-runs can inspect those
-candidates without marking them active. Every response remains
-output-suppressed, and previous and resulting generations stay equal.
-Commit-capable requests without the dry-run flag return unsupported. A stale
-expected generation produces result code 5 before operation evaluation.
+base generation. Profile listing and global/device dry-runs can inspect those
+candidates without publishing.
+
+The runtime accepts a non-dry-run global switch in output-suppressed mode. It
+plans the target through the same dispatcher, preserves the configured base
+profile as a switch-back target, publishes a bounded internal generation, and
+persists active profile plus generation. Persistence failure republishes the
+previous mapping and rewrites the rolled-back state; both successful and failed
+rollback writes are explicit in the response and metrics. Device override and
+reset commits remain unsupported. A stale expected generation produces result
+code 5 before publication.
 
 ## Executable Boundary
 
@@ -272,24 +285,23 @@ ordinary builds contain no output-capable command.
 
 `music-rig` now has a portable parser, transport interface, and human/JSON
 renderer for `status`, `profiles list`, `validate`, explicit global/device
-prepare and switch dry-runs, and device-override reset dry-runs. Prepared
-profiles render as available rather than active. The executable has no
-configured production transport. It fails closed with adapter result 4 and
-sends nothing; a commit-capable command without `--dry-run` is rejected as an
-invalid command.
+prepare and switch dry-runs, a commit-capable global switch, and device-override
+reset dry-runs. Prepared profiles render as available rather than active. The
+executable has no configured production transport. It fails closed with adapter
+result 4 and sends nothing, including for a valid global commit command.
 
 CTest exercises successful idle/request/stop sequencing, read-only and dry-run
 responses, filtered inventories, cold warnings, stale generations, unsafe
 switch rejection, publication conflicts, qualified state
-restore/fallback, all 64 single-byte state corruptions, state I/O failures,
-definition source/decoder failures, the full compiled-envelope JSON decoder,
-native temporary-file definition reads and atomic state replacements, explicit
-daemon validation and fingerprint mismatch, invalid lifecycle/configuration,
-ABI rejection, bounded generation reuse, stable port identity, CLI fail-closed
-behavior, daemon inertness, XDG resolution without writes, bounded journal
-records, rate limiting, clean Linux signal shutdown, and the guarded uninstalled
-user-unit contract. Linux and Windows
-mock transports carry 1,000 mixed v2 requests through the real table dispatcher.
+restore/fallback, all 128 single-byte state corruptions, v1 compatibility,
+state I/O failures, definition source/decoder failures, the full
+compiled-envelope JSON decoder, native temporary-file definition reads and
+atomic state replacements, explicit daemon validation and fingerprint mismatch,
+invalid lifecycle/configuration, ABI rejection, bounded generation reuse, stable
+port identity, CLI fail-closed behavior, daemon inertness, XDG resolution without
+writes, bounded journal records, rate limiting, clean Linux signal shutdown, and
+the guarded uninstalled user-unit contract. Linux and Windows mock transports
+carry 1,000 mixed v2 requests through the real table dispatcher.
 A source audit rejects allocation and C thread-lock calls from the compiled
 tables, control dispatcher, definition, device-port catalogue, diagnostics,
 runtime, and state core.

@@ -19,7 +19,7 @@ static void print_usage(FILE *stream, const char *program)
         "[--json]\n",
         program
     );
-    fprintf(stream, "       %s switch --global PROFILE --dry-run [--json]\n",
+    fprintf(stream, "       %s switch --global PROFILE [--dry-run] [--json]\n",
         program);
     fprintf(stream,
         "       %s switch --device SLOT --profile PROFILE --dry-run "

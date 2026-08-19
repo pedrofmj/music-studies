@@ -3,7 +3,11 @@
 #include <string.h>
 
 #define STATE_MAGIC UINT32_C(0x4d525354)
-#define STATE_CHECKSUM_OFFSET ((size_t)56)
+#define LEGACY_STATE_VERSION UINT32_C(1)
+#define LEGACY_STATE_FRAME_SIZE ((size_t)64)
+#define LEGACY_CHECKSUM_OFFSET ((size_t)56)
+#define STATE_PROFILE_OFFSET ((size_t)52)
+#define STATE_CHECKSUM_OFFSET ((size_t)120)
 #define FNV1A_OFFSET_BASIS UINT64_C(14695981039346656037)
 #define FNV1A_PRIME UINT64_C(1099511628211)
 
@@ -55,6 +59,43 @@ static uint64_t checksum(const uint8_t *input, size_t input_size)
     return value;
 }
 
+static bool bytes_are_zero(const uint8_t *input, size_t input_size)
+{
+    size_t index;
+
+    for (index = 0U; index < input_size; ++index) {
+        if (input[index] != UINT8_C(0)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool profile_is_valid(const char *profile)
+{
+    size_t index;
+
+    for (index = 0U; index < MUSIC_RIG_PERSISTED_PROFILE_CAPACITY; ++index) {
+        unsigned char character = (unsigned char)profile[index];
+
+        if (character == (unsigned char)'\0') {
+            return index != 0U;
+        }
+        if (!((character >= (unsigned char)'a' &&
+                character <= (unsigned char)'z') ||
+            (character >= (unsigned char)'A' &&
+                character <= (unsigned char)'Z') ||
+            (character >= (unsigned char)'0' &&
+                character <= (unsigned char)'9') ||
+            character == (unsigned char)'-' ||
+            character == (unsigned char)'_' ||
+            character == (unsigned char)'.')) {
+            return false;
+        }
+    }
+    return false;
+}
+
 music_rig_result music_rig_state_encode(
     const music_rig_persisted_state *state,
     uint8_t *output,
@@ -64,7 +105,8 @@ music_rig_result music_rig_state_encode(
     if (state == NULL || output == NULL ||
         output_size != MUSIC_RIG_RUNTIME_STATE_FRAME_SIZE ||
         state->generation_id == UINT64_C(0) ||
-        state->output_mode != MUSIC_RIG_OUTPUT_SUPPRESSED) {
+        state->output_mode != MUSIC_RIG_OUTPUT_SUPPRESSED ||
+        !profile_is_valid(state->active_rig_profile)) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
 
@@ -78,6 +120,11 @@ music_rig_result music_rig_state_encode(
         MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE
     );
     write_u32(output + 48, (uint32_t)state->output_mode);
+    memcpy(
+        output + STATE_PROFILE_OFFSET,
+        state->active_rig_profile,
+        strlen(state->active_rig_profile)
+    );
     write_u64(
         output + STATE_CHECKSUM_OFFSET,
         checksum(output, STATE_CHECKSUM_OFFSET)
@@ -93,16 +140,25 @@ music_rig_result music_rig_state_decode(
 {
     uint64_t generation_id;
     uint32_t output_mode;
+    bool legacy;
 
     if (input == NULL || state == NULL) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
-    if (input_size != MUSIC_RIG_RUNTIME_STATE_FRAME_SIZE ||
+
+    legacy = input_size == LEGACY_STATE_FRAME_SIZE;
+    if ((!legacy && input_size != MUSIC_RIG_RUNTIME_STATE_FRAME_SIZE) ||
         read_u32(input) != STATE_MAGIC ||
-        read_u32(input + 4) != MUSIC_RIG_RUNTIME_STATE_VERSION ||
-        read_u32(input + 52) != UINT32_C(0) ||
-        read_u64(input + STATE_CHECKSUM_OFFSET) !=
-            checksum(input, STATE_CHECKSUM_OFFSET)) {
+        read_u32(input + 4) != (legacy
+            ? LEGACY_STATE_VERSION
+            : MUSIC_RIG_RUNTIME_STATE_VERSION) ||
+        (legacy
+            ? (read_u32(input + 52) != UINT32_C(0) ||
+                read_u64(input + LEGACY_CHECKSUM_OFFSET) !=
+                    checksum(input, LEGACY_CHECKSUM_OFFSET))
+            : (!bytes_are_zero(input + 117, 3U) ||
+                read_u64(input + STATE_CHECKSUM_OFFSET) !=
+                    checksum(input, STATE_CHECKSUM_OFFSET)))) {
         return MUSIC_RIG_RESULT_INVALID_DATA;
     }
 
@@ -113,6 +169,7 @@ music_rig_result music_rig_state_decode(
         return MUSIC_RIG_RESULT_INVALID_DATA;
     }
 
+    memset(state, 0, sizeof(*state));
     state->generation_id = generation_id;
     memcpy(
         state->definition_fingerprint,
@@ -120,5 +177,15 @@ music_rig_result music_rig_state_decode(
         MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE
     );
     state->output_mode = (music_rig_output_mode)output_mode;
+    if (!legacy) {
+        memcpy(
+            state->active_rig_profile,
+            input + STATE_PROFILE_OFFSET,
+            MUSIC_RIG_PERSISTED_PROFILE_CAPACITY
+        );
+        if (!profile_is_valid(state->active_rig_profile)) {
+            return MUSIC_RIG_RESULT_INVALID_DATA;
+        }
+    }
     return MUSIC_RIG_RESULT_OK;
 }

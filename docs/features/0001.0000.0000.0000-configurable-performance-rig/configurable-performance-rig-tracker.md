@@ -281,12 +281,13 @@ benchmarks.
   compiler mapping-index entry and builds a fixed 256-entry numeric event
   dispatch index with no lookup allocation, lock, JSON traversal, or string
   comparison. The complete version 1 table image is 451,032 bytes on the local
-  64-bit builds. The exact 64-byte persistent-state frame detects corruption and
-  covers qualified restore, definition-fingerprint fallback, and atomic-replace
-  failure through mock storage. Explicit-path host adapters read definitions and
-  state on Linux and Windows and atomically replace only state through native
-  same-directory temporary files. The opt-in daemon can load and report one
-  trusted definition through an explicit offline command. Local GCC/Clang pass
+  64-bit builds. The original v1 64-byte persistent-state frame detects
+  corruption and covers qualified restore, definition-fingerprint fallback, and
+  atomic-replace failure through mock storage; Milestone 4 retains v1 decoding
+  while writing the active-profile-aware 128-byte v2 frame. Explicit-path host
+  adapters read definitions and state on Linux and Windows and atomically replace
+  only state through native same-directory temporary files. The opt-in daemon
+  can load and report one trusted definition through an explicit offline command. Local GCC/Clang pass
   35/35, both optional JSON builds pass 38/38, seven ASan/UBSan boundary tests
   pass, and the protected baseline remains 30/30. Hosted
   [run 31536417870](https://github.com/pedrofmj/music-studies/actions/runs/31536417870)
@@ -447,9 +448,15 @@ benchmarks.
 - 🟡 Implement device and global CLI switching with overrides and reset. The
   parser and renderer cover global/device prepare and switch dry-runs plus
   device reset, including expected-generation guards and inactive prepared
-  profile rendering. A production IPC endpoint, generation commit, override
-  persistence, and reset commit remain incomplete.
-- ⬜ Prove atomicity, takeover safety, reconnect behavior, and rollback.
+  profile rendering. The portable output-suppressed runtime now commits global
+  prepared profiles with monotonic generation publication, v2 active-profile
+  persistence, v1 state compatibility, base-profile switch-back, and explicit
+  persistence rollback. A production IPC endpoint, output-enabled adoption,
+  per-device override persistence, and reset commit remain incomplete.
+- 🟡 Prove atomicity, takeover safety, reconnect behavior, and rollback.
+  Global generation/persistence atomicity now has injected rollback-success and
+  rollback-failure coverage; live adoption, takeover, reconnect, and
+  output-enabled rollback evidence remain incomplete.
 - ⬜ Meet switch latency, resource, and xrun thresholds.
 
 ## Milestone 5: MIDI Management Triggers

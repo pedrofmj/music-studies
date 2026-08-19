@@ -231,7 +231,9 @@ int main(void)
     }
 
     if (music_rig_cli_parse(4, unsafe, UINT64_C(1), &command) !=
-            MUSIC_RIG_RESULT_INVALID_ARGUMENT ||
+            MUSIC_RIG_RESULT_OK ||
+        command.request.flags != UINT32_C(0) ||
+        command.request.operation != MUSIC_RIG_OPERATION_SWITCH_GLOBAL ||
         music_rig_cli_parse(7, ambiguous, UINT64_C(1), &command) !=
             MUSIC_RIG_RESULT_INVALID_ARGUMENT ||
         music_rig_cli_parse(7, duplicate_global, UINT64_C(1), &command) !=
@@ -240,7 +242,7 @@ int main(void)
             MUSIC_RIG_RESULT_INVALID_ARGUMENT ||
         music_rig_cli_parse(4, unsafe_reset, UINT64_C(1), &command) !=
             MUSIC_RIG_RESULT_INVALID_ARGUMENT) {
-        fputs("unsafe CLI switch was accepted\n", stderr);
+        fputs("invalid CLI switch shape was accepted\n", stderr);
         return 1;
     }
 
