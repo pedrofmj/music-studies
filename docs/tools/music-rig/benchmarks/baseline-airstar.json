@@ -1,7 +1,7 @@
 {
   "baseline_id": "airstar-single-rig-2026-08-09",
   "capture_source": "fixture",
-  "captured_at": "2026-08-18T19:07:41-03:00",
+  "captured_at": "2026-08-19T04:50:19-03:00",
   "comparison": {
     "midi_graph_links": true,
     "project_checksum": true,
@@ -18,7 +18,7 @@
     "carla_project_connections": 111,
     "deployment_graph_links": 116,
     "midi_graph_links": 68,
-    "pipewire_quantum_frames": 2048,
+    "pipewire_quantum_frames": 1024,
     "raw_graph_links": 118,
     "services": 4
   },
@@ -31,7 +31,7 @@
     "audio": {
       "metadata": {
         "clock.allowed-rates": "[ 48000 ]",
-        "clock.force-quantum": "2048",
+        "clock.force-quantum": "1024",
         "clock.force-rate": "0",
         "clock.max-quantum": "2048",
         "clock.min-quantum": "32",
@@ -43,7 +43,7 @@
         "error_total": 0,
         "raw": "S   ID  QUANT   RATE    WAIT    BUSY   W/Q   B/Q  ERR FORMAT           NAME \nC   29      0      0    ---     ---   ---   ---     0                  Dummy-Driver\nC   30      0      0    ---     ---   ---   ---     0                  Freewheel-Driver\nC   32      0      0    ---     ---   ---   ---     0                  SMK25 Pad Layers\nC   65      0      0    ---     ---   ---   ---     0                  Midi-Bridge\nC   96      0      0    ---     ---   ---   ---     0                  v4l2_input.pci-0000_00_14.0-usb-0_6_1.0\nC   54      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_5__sink\nC   62      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_4__sink\nC   60      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_3__sink\nC   61      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__sink\nC   59      0      0    ---     ---   ---   ---     0                  alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__source\nC  100      0      0    ---     ---   ---   ---     0                  alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_6__source\nC  129      0      0    ---     ---   ---   ---     0                  alsa_playback.java\nC  145      0      0    ---     ---   ---   ---     0                  Carla\nC  144      0      0    ---     ---   ---   ---     0                  AR-CH-1 - Basic Piano\nC  184      0      0    ---     ---   ---   ---     0                  AR-CH-2 - Nord White Grand Full 24C\nC  190      0      0    ---     ---   ---   ---     0                  AR-CH-3 - Alt Strings\nC  228      0      0    ---     ---   ---   ---     0                  AR-CH-4 - Good Flute\nC  234      0      0    ---     ---   ---   ---     0                  AR-CH-5 - SAX Lirakeys CL\nC  240      0      0    ---     ---   ---   ---     0                  AR-CH-6 - Hammond Organ Fast\nC  246      0      0    ---     ---   ---   ---     0                  AR-CH-7 - Optik Synth\nC  252      0      0    ---     ---   ---   ---     0                  AR-CH-8 - PAD EFEITOS\nC  258      0      0    ---     ---   ---   ---     0                  AR-CH-9 - AtmosferaPAD\nC  264      0      0    ---     ---   ---   ---     0                  PD-CH-1 - Drum Set\nC  270      0      0    ---     ---   ---   ---     0                  SMK-CH-1 - Oceans Worship Pad\nC  276      0      0    ---     ---   ---   ---     0                  SMK-CH-2 - Warm Worship Pad\nC  282      0      0    ---     ---   ---   ---     0                  SMK-CH-3 - Hillsong Pad\nC  288      0      0    ---     ---   ---   ---     0                  SMK-CH-4 - Worship Shimmer\nC  294      0      0    ---     ---   ---   ---     0                  SMK-CH-5 - Cloud Shimmer\nC  300      0      0    ---     ---   ---   ---     0                  SMK-CH-6 - Magic Ambient\nC  306      0      0    ---     ---   ---   ---     0                  SMK-CH-7 - Majesty Pad\nC  312      0      0    ---     ---   ---   ---     0                  SMK-CH-8 - Sanctorium Pad\nC  326      0      0    ---     ---   ---   ---     0                  SMK Layer Mixer x8 Stereo\nC  350      0      0    ---     ---   ---   ---     0                  LSP Mixer x8 Stereo\nC  374      0      0    ---     ---   ---   ---     0                  SMC-MIX - 8-Band EQ\nC  382      0      0    ---     ---   ---   ---     0                  AR-CH-2 Output Trim +6 dB\nC  406      0      0    ---     ---   ---   ---     0                  AR Controls - Sustain Scale\nC  410      0      0    ---     ---   ---   ---     0                  PD Controls - Sustain Scale\nC  414      0      0    ---     ---   ---   ---     0                  AR-CH-2 Volume Map\nC  418      0      0    ---     ---   ---   ---     0                  AR-CH-4 Volume Map\nC  422      0      0    ---     ---   ---   ---     0                  AR-CH-5 Volume Map\nC  426      0      0    ---     ---   ---   ---     0                  AR-CH-6 Volume Map\nC  430      0      0    ---     ---   ---   ---     0                  AR-CH-7 Volume Map\nC  434      0      0    ---     ---   ---   ---     0                  AR-CH-8 Volume Map\nC  438      0      0    ---     ---   ---   ---     0                  AR-CH-9 Volume Map\nC  442      0      0    ---     ---   ---   ---     0                  PD-CH-1 Volume Map\nC  446      0      0    ---     ---   ---   ---     0                  AR-CH-2 Reverb Map\nC  450      0      0    ---     ---   ---   ---     0                  AR-CH-4 Reverb Map\nC  454      0      0    ---     ---   ---   ---     0                  AR-CH-5 Reverb Map\nC  458      0      0    ---     ---   ---   ---     0                  AR-CH-6 Reverb Map\nC  462      0      0    ---     ---   ---   ---     0                  AR-CH-7 Reverb Map\nC  466      0      0    ---     ---   ---   ---     0                  AR-CH-8 Reverb Map\nC  470      0      0    ---     ---   ---   ---     0                  AR-CH-9 Reverb Map\nC  474      0      0    ---     ---   ---   ---     0                  SMC-EQ-1 CC Scale\nC  478      0      0    ---     ---   ---   ---     0                  SMC-EQ-2 CC Scale\nC  482      0      0    ---     ---   ---   ---     0                  SMC-EQ-3 CC Scale\nC  486      0      0    ---     ---   ---   ---     0                  SMC-EQ-4 CC Scale\nC  490      0      0    ---     ---   ---   ---     0                  SMC-EQ-5 CC Scale\nC  494      0      0    ---     ---   ---   ---     0                  SMC-EQ-6 CC Scale\nC  498      0      0    ---     ---   ---   ---     0                  SMC-EQ-7 CC Scale\nC  502      0      0    ---     ---   ---   ---     0                  SMC-EQ-8 CC Scale\nC  506      0      0    ---     ---   ---   ---     0                  PD-CH-1 Output Gain 0 to +12 dB\nC  530      0      0    ---     ---   ---   ---     0                  PD-CH-1 Gain Map\nC  102      0      0    ---     ---   ---   ---     0                  alsa_output.usb-Generic_USB_Audio_20210726905926-00.analog-stereo\nC  101      0      0    ---     ---   ---   ---     0                  alsa_input.usb-Generic_USB_Audio_20210726905926-00.mono-fallback\nC   41      0      0    ---     ---   ---   ---     0                  Arturia Main Volume Encoder"
       },
-      "quantum_frames": 2048,
+      "quantum_frames": 1024,
       "sample_rate_hz": 48000
     },
     "graph": {
@@ -645,7 +645,7 @@
       "nodes": 65,
       "ports": 358
     },
-    "observed_at": "2026-08-18T19:07:41-03:00",
+    "observed_at": "2026-08-19T04:50:19-03:00",
     "processes": [
       {
         "command": "pipewire",
@@ -765,7 +765,7 @@
     "relevant_process_rss_bytes": 199266304,
     "service_memory_current_bytes": 443371520
   },
-  "protected_source_commit": "c2e1911406f942a9da0a9f91c65eae8a32148e28",
+  "protected_source_commit": "480d98d0b75554230057c07d82a97ad30dbbd413",
   "safety": {
     "controls_services": false,
     "creates_remote_files": false,

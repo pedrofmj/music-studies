@@ -123,7 +123,7 @@ docs/tools/airstar-live-setup/validate-airstar-live-setup --live --fast
 ~~~
 
 The live check requires four M-VAVE USB devices, the Arturia, Carla, all four
-services, the 2048-frame quantum, and every saved link.
+services, the 1024-frame quantum, and every saved link.
 
 ## Graph Artifacts
 

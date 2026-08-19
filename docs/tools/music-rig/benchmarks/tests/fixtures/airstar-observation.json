@@ -6,7 +6,7 @@
     "mutates_graph": false,
     "controls_services": false
   },
-  "observed_at": "2026-08-18T19:07:41-03:00",
+  "observed_at": "2026-08-19T04:50:19-03:00",
   "system": {
     "hostname": "airstar",
     "architecture": "x86_64",
@@ -22,7 +22,7 @@
   },
   "audio": {
     "sample_rate_hz": 48000,
-    "quantum_frames": 2048,
+    "quantum_frames": 1024,
     "metadata": {
       "log.level": "2",
       "clock.rate": "48000",
@@ -30,7 +30,7 @@
       "clock.quantum": "1024",
       "clock.min-quantum": "32",
       "clock.max-quantum": "2048",
-      "clock.force-quantum": "2048",
+      "clock.force-quantum": "1024",
       "clock.force-rate": "0"
     },
     "pw_top": {

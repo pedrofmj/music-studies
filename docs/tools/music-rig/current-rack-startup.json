@@ -25,7 +25,7 @@
       "pipewire-carla-quantum.service",
       "pipewire-patchbay-watch.service"
     ],
-    "pipewire_quantum_frames": 2048,
+    "pipewire_quantum_frames": 1024,
     "hardware_models": [
       "KeyLab Essential 61 mk3",
       "M-VAVE SMK-25",

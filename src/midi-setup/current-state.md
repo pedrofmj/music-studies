@@ -10,7 +10,7 @@
 | Project | /c/music/carla/pedro.uproject |
 | Rack structure | 49 uniquely named plugins, 16 native SF2 slots, 111 Carla project connections |
 | Saved graph | 118 raw links; 116 performance-owned deployment links; 68 MIDI links |
-| Quantum | 2048 frames, persisted by pipewire-carla-quantum.service |
+| Quantum | 1024 frames, persisted by pipewire-carla-quantum.service |
 | Output | Tiger Lake Speaker + Headphones through the rack EQ and Arturia gate |
 
 The project stored in Git and the deployed project had SHA-256

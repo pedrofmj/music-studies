@@ -2,7 +2,7 @@
 
 Status: **complete**
 
-Capture: fixture at 2026-08-18T19:07:41-03:00
+Capture: fixture at 2026-08-19T04:50:19-03:00
 
 The observer is read-only: it creates no remote files, changes no graph
 connections, and controls no services.
@@ -17,7 +17,7 @@ connections, and controls no services.
 | Project connections | 111 | 111 | PASS |
 | Raw graph links | 118 | 118 | PASS |
 | MIDI graph links | 68 | 68 | PASS |
-| Quantum | 2048 | 2048 | PASS |
+| Quantum | 1024 | 1024 | PASS |
 | Sample rate | available | 48000 | PASS |
 | Stable services | active | 4 | PASS |
 

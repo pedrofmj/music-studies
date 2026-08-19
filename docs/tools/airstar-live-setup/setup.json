@@ -66,7 +66,7 @@
     "plugins": 49,
     "soundfont_slots": 16,
     "project_patchbay_connections": 111,
-    "pipewire_quantum": 2048,
+    "pipewire_quantum": 1024,
     "plugin_uris": [
       "http://gareus.org/oss/lv2/midifilter#mapcc",
       "http://gareus.org/oss/lv2/midifilter#scalecc",

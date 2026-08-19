@@ -5,7 +5,7 @@ PartOf=pipewire.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/pw-metadata -n settings 0 clock.force-quantum 2048
+ExecStart=/usr/bin/pw-metadata -n settings 0 clock.force-quantum 1024
 RemainAfterExit=yes
 
 [Install]

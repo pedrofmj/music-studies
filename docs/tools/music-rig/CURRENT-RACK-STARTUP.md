@@ -29,7 +29,7 @@ does not run any listed command.
 | Carla plugins | 49 |
 | Carla project connections | 111 |
 | Deployment graph links | 116 |
-| PipeWire quantum | 2048 frames |
+| PipeWire quantum | 1024 frames |
 | Services | 4 |
 | Controllers | 5 |
 
