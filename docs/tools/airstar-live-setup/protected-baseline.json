@@ -3,7 +3,7 @@
   "id": "airstar-single-rig-2026-08-09",
   "status": "protected-production-default",
   "description": "Known-good single-rig setup used for rehearsals, studio work, and live performance.",
-  "captured_at": "2026-08-14T23:45:00-03:00",
+  "captured_at": "2026-08-18T16:56:36-03:00",
   "source_commit": "c2e1911406f942a9da0a9f91c65eae8a32148e28",
   "reference_host": {
     "hostname": "airstar",
@@ -13,9 +13,9 @@
   "expected": {
     "carla_plugins": 49,
     "carla_project_connections": 111,
-    "raw_graph_links": 117,
-    "midi_graph_links": 67,
-    "deployment_graph_links": 115,
+    "raw_graph_links": 118,
+    "midi_graph_links": 68,
+    "deployment_graph_links": 116,
     "services": 4,
     "pipewire_quantum_frames": 2048
   },
@@ -27,7 +27,7 @@
   "protected_files": [
     {
       "path": "docs/tools/airstar-live-setup/setup.json",
-      "sha256": "def19bd17d02d38bf28dddf23dc72c56dec5f90eeaa9f9a5ceb20d05a9208c1f"
+      "sha256": "5fe7eb116d29b58869f842a1a96679836877a4998dc95b67dfcaad6aa7035f6d"
     },
     {
       "path": "docs/tools/airstar-live-setup/install-airstar-live-setup",
@@ -47,7 +47,7 @@
     },
     {
       "path": "docs/tools/airstar-live-setup/controller-profiles.md",
-      "sha256": "6a0f71a443fa20ef787e8f8f324ec3eff1b92d44f4cd905c64aa9fc664a700f1"
+      "sha256": "b3b8016aff4802521b7906d5e4df2860fc8979a67e1287e3fe83d3fe3a5e035f"
     },
     {
       "path": "src/audio-software/carla/projects/pedro-live-rack/pedro.uproject",
@@ -55,19 +55,19 @@
     },
     {
       "path": "src/audio-software/carla/projects/pedro-live-rack/project.json",
-      "sha256": "1e3da93f4972cc91f99328228b0e90050c7955ec5d3b4eee5ba5f73663c8a1bf"
+      "sha256": "a223114f5587055e3e4254cb1fde7b636d63780bcee482f2b7b82214df8beac5"
     },
     {
       "path": "src/midi-setup/airstar-patchbay.json",
-      "sha256": "919acc7e51a6af59b34ab80526920b52aa3d9157706e9e671ed3d81167109fb9"
+      "sha256": "fe0b31f95ae1e4cb381e7c7afec6f6b4adb3b402b64a453ed8348d771245f655"
     },
     {
       "path": "src/midi-setup/airstar-midi-patchbay.json",
-      "sha256": "a5091eb73bbcb1d8620bbb5d21cd00632963af28e87b00f4a0c977c3c0aea6c4"
+      "sha256": "74690c0aca6f7c21f09b479c400bb39650dca84540db4a531030e58f741558ce"
     },
     {
       "path": "src/midi-setup/pedro-live-rack-patchbay.json",
-      "sha256": "73b35846ccd94d7e8858f13290799387669cbe5a2afd25732a92d6ab4cdbaae3"
+      "sha256": "257d8750f700056e04bc1c9d51c2bcc84a936af8c7d29e540aeeb3a748c5bf0e"
     },
     {
       "path": "bin/carla-pedro-project",
@@ -91,7 +91,7 @@
     },
     {
       "path": "docs/tools/arturia-main-volume-encoder/arturia-main-volume-encoder.c",
-      "sha256": "d54b2145bec2b31f7e2f5ccffba43299de4b9af69f673f9c08e74bce49887964"
+      "sha256": "e23828c97bd779ea55cbe40dedb15b1c8b7ce8212274ed8525b70cc49d0c6df8"
     },
     {
       "path": "docs/tools/arturia-main-volume-encoder/arturia-main-volume-encoder.service",

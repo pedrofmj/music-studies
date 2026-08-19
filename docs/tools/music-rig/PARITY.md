@@ -14,7 +14,7 @@ The verifier reads four protected repository sources:
 - its `project.json` metadata as the 49-plugin and 111-connection count
   authority;
 - `pedro-live-rack-patchbay.json` as the deployment-link authority; and
-- `setup.json` as the 115-link count and protected source-checksum authority.
+- `setup.json` as the 116-link count and protected source-checksum authority.
 
 Before inventory comparison, it verifies that the materialized root remains a
 strict descendant of the system temporary directory, that the manifest retains
@@ -50,7 +50,7 @@ multiplicity while allowing serialization order to change.
 
 ### Patchbay Links
 
-The 115 deployment links form a multiset containing:
+The 116 deployment links form a multiset containing:
 
 - link kind;
 - each endpoint's direction and port name;
@@ -67,7 +67,7 @@ selectors must match exactly.
 
 Passing requires both the protected and materialized inventories to contain
 exactly 49 plugins, 18 plugin asset references, 111 Carla project connections,
-and 115 Patchbay links. The plugin map and all three multisets must then match
+and 116 Patchbay links. The plugin map and all three multisets must then match
 exactly. Count-only equality is not sufficient.
 
 Run the verifier after temporary materialization:

@@ -1,7 +1,7 @@
 {
   "baseline_id": "airstar-single-rig-2026-08-09",
-  "capture_source": "live-read-only-ssh",
-  "captured_at": "2026-08-10T16:11:35-03:00",
+  "capture_source": "fixture",
+  "captured_at": "2026-08-18T19:07:41-03:00",
   "comparison": {
     "midi_graph_links": true,
     "project_checksum": true,
@@ -16,10 +16,10 @@
   "expected": {
     "carla_plugins": 49,
     "carla_project_connections": 111,
-    "deployment_graph_links": 115,
-    "midi_graph_links": 67,
+    "deployment_graph_links": 116,
+    "midi_graph_links": 68,
     "pipewire_quantum_frames": 2048,
-    "raw_graph_links": 117,
+    "raw_graph_links": 118,
     "services": 4
   },
   "graph_difference": {
@@ -41,7 +41,7 @@
       },
       "pw_top": {
         "error_total": 0,
-        "raw": "S   ID  QUANT   RATE    WAIT    BUSY   W/Q   B/Q  ERR FORMAT           NAME \nC   29      0      0    ---     ---   ---   ---     0                  Dummy-Driver\nC   30      0      0    ---     ---   ---   ---     0                  Freewheel-Driver\nC   42      0      0    ---     ---   ---   ---     0                  Midi-Bridge\nC   93      0      0    ---     ---   ---   ---     0                  v4l2_input.pci-0000_00_14.0-usb-0_6_1.0\nC   85      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_5__sink\nC   95      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_4__sink\nC   96      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_3__sink\nC   97      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__sink\nC   98      0      0    ---     ---   ---   ---     0                  alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__source\nC   99      0      0    ---     ---   ---   ---     0                  alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_6__source\nC  295      0      0    ---     ---   ---   ---     0                  Arturia Main Volume Encoder\nC  575      0      0    ---     ---   ---   ---     0                  SMK25 Pad Layers\nC  329      0      0    ---     ---   ---   ---     0                  Carla\nC  460      0      0    ---     ---   ---   ---     0                  AR-CH-1 - Basic Piano\nC  557      0      0    ---     ---   ---   ---     0                  AR-CH-2 - Nord White Grand Full 24C\nC  525      0      0    ---     ---   ---   ---     0                  AR-CH-3 - Alt Strings\nC  485      0      0    ---     ---   ---   ---     0                  AR-CH-4 - Good Flute\nC  276      0      0    ---     ---   ---   ---     0                  AR-CH-5 - SAX Lirakeys CL\nC  431      0      0    ---     ---   ---   ---     0                  AR-CH-6 - Hammond Organ Fast\nC  533      0      0    ---     ---   ---   ---     0                  AR-CH-7 - Optik Synth\nC  464      0      0    ---     ---   ---   ---     0                  AR-CH-8 - PAD EFEITOS\nC  596      0      0    ---     ---   ---   ---     0                  AR-CH-9 - AtmosferaPAD\nC  277      0      0    ---     ---   ---   ---     0                  PD-CH-1 - Drum Set\nC  314      0      0    ---     ---   ---   ---     0                  SMK-CH-1 - Oceans Worship Pad\nC  400      0      0    ---     ---   ---   ---     0                  SMK-CH-2 - Warm Worship Pad\nC  428      0      0    ---     ---   ---   ---     0                  SMK-CH-3 - Hillsong Pad\nC  203      0      0    ---     ---   ---   ---     0                  SMK-CH-4 - Worship Shimmer\nC  334      0      0    ---     ---   ---   ---     0                  SMK-CH-5 - Cloud Shimmer\nC  322      0      0    ---     ---   ---   ---     0                  SMK-CH-6 - Magic Ambient\nC  387      0      0    ---     ---   ---   ---     0                  SMK-CH-7 - Majesty Pad\nC  328      0      0    ---     ---   ---   ---     0                  SMK-CH-8 - Sanctorium Pad\nC  178      0      0    ---     ---   ---   ---     0                  SMK Layer Mixer x8 Stereo\nC  359      0      0    ---     ---   ---   ---     0                  LSP Mixer x8 Stereo\nC  348      0      0    ---     ---   ---   ---     0                  SMC-MIX - 8-Band EQ\nC  422      0      0    ---     ---   ---   ---     0                  AR-CH-2 Output Trim +6 dB\nC  339      0      0    ---     ---   ---   ---     0                  AR Controls - Sustain Scale\nC  444      0      0    ---     ---   ---   ---     0                  PD Controls - Sustain Scale\nC  500      0      0    ---     ---   ---   ---     0                  AR-CH-2 Volume Map\nC  375      0      0    ---     ---   ---   ---     0                  AR-CH-4 Volume Map\nC  279      0      0    ---     ---   ---   ---     0                  AR-CH-5 Volume Map\nC  561      0      0    ---     ---   ---   ---     0                  AR-CH-6 Volume Map\nC  281      0      0    ---     ---   ---   ---     0                  AR-CH-7 Volume Map\nC  404      0      0    ---     ---   ---   ---     0                  AR-CH-8 Volume Map\nC  502      0      0    ---     ---   ---   ---     0                  AR-CH-9 Volume Map\nC  482      0      0    ---     ---   ---   ---     0                  PD-CH-1 Volume Map\nC  496      0      0    ---     ---   ---   ---     0                  AR-CH-2 Reverb Map\nC  223      0      0    ---     ---   ---   ---     0                  AR-CH-4 Reverb Map\nC  419      0      0    ---     ---   ---   ---     0                  AR-CH-5 Reverb Map\nC  182      0      0    ---     ---   ---   ---     0                  AR-CH-6 Reverb Map\nC  338      0      0    ---     ---   ---   ---     0                  AR-CH-7 Reverb Map\nC  208      0      0    ---     ---   ---   ---     0                  AR-CH-8 Reverb Map\nC  240      0      0    ---     ---   ---   ---     0                  AR-CH-9 Reverb Map\nC  247      0      0    ---     ---   ---   ---     0                  SMC-EQ-1 CC Scale\nC  228      0      0    ---     ---   ---   ---     0                  SMC-EQ-2 CC Scale\nC  250      0      0    ---     ---   ---   ---     0                  SMC-EQ-3 CC Scale\nC  244      0      0    ---     ---   ---   ---     0                  SMC-EQ-4 CC Scale\nC  421      0      0    ---     ---   ---   ---     0                  SMC-EQ-5 CC Scale\nC  587      0      0    ---     ---   ---   ---     0                  SMC-EQ-6 CC Scale\nC  259      0      0    ---     ---   ---   ---     0                  SMC-EQ-7 CC Scale\nC  201      0      0    ---     ---   ---   ---     0                  SMC-EQ-8 CC Scale\nC  396      0      0    ---     ---   ---   ---     0                  PD-CH-1 Output Gain 0 to +12 dB\nC  278      0      0    ---     ---   ---   ---     0                  PD-CH-1 Gain Map\nC  625      0      0    ---     ---   ---   ---     0                  smc-pad-gain-verify\nC  258      0      0    ---     ---   ---   ---     0                  alsa_playback.java"
+        "raw": "S   ID  QUANT   RATE    WAIT    BUSY   W/Q   B/Q  ERR FORMAT           NAME \nC   29      0      0    ---     ---   ---   ---     0                  Dummy-Driver\nC   30      0      0    ---     ---   ---   ---     0                  Freewheel-Driver\nC   32      0      0    ---     ---   ---   ---     0                  SMK25 Pad Layers\nC   65      0      0    ---     ---   ---   ---     0                  Midi-Bridge\nC   96      0      0    ---     ---   ---   ---     0                  v4l2_input.pci-0000_00_14.0-usb-0_6_1.0\nC   54      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_5__sink\nC   62      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_4__sink\nC   60      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_3__sink\nC   61      0      0    ---     ---   ---   ---     0                  alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__sink\nC   59      0      0    ---     ---   ---   ---     0                  alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__source\nC  100      0      0    ---     ---   ---   ---     0                  alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_6__source\nC  129      0      0    ---     ---   ---   ---     0                  alsa_playback.java\nC  145      0      0    ---     ---   ---   ---     0                  Carla\nC  144      0      0    ---     ---   ---   ---     0                  AR-CH-1 - Basic Piano\nC  184      0      0    ---     ---   ---   ---     0                  AR-CH-2 - Nord White Grand Full 24C\nC  190      0      0    ---     ---   ---   ---     0                  AR-CH-3 - Alt Strings\nC  228      0      0    ---     ---   ---   ---     0                  AR-CH-4 - Good Flute\nC  234      0      0    ---     ---   ---   ---     0                  AR-CH-5 - SAX Lirakeys CL\nC  240      0      0    ---     ---   ---   ---     0                  AR-CH-6 - Hammond Organ Fast\nC  246      0      0    ---     ---   ---   ---     0                  AR-CH-7 - Optik Synth\nC  252      0      0    ---     ---   ---   ---     0                  AR-CH-8 - PAD EFEITOS\nC  258      0      0    ---     ---   ---   ---     0                  AR-CH-9 - AtmosferaPAD\nC  264      0      0    ---     ---   ---   ---     0                  PD-CH-1 - Drum Set\nC  270      0      0    ---     ---   ---   ---     0                  SMK-CH-1 - Oceans Worship Pad\nC  276      0      0    ---     ---   ---   ---     0                  SMK-CH-2 - Warm Worship Pad\nC  282      0      0    ---     ---   ---   ---     0                  SMK-CH-3 - Hillsong Pad\nC  288      0      0    ---     ---   ---   ---     0                  SMK-CH-4 - Worship Shimmer\nC  294      0      0    ---     ---   ---   ---     0                  SMK-CH-5 - Cloud Shimmer\nC  300      0      0    ---     ---   ---   ---     0                  SMK-CH-6 - Magic Ambient\nC  306      0      0    ---     ---   ---   ---     0                  SMK-CH-7 - Majesty Pad\nC  312      0      0    ---     ---   ---   ---     0                  SMK-CH-8 - Sanctorium Pad\nC  326      0      0    ---     ---   ---   ---     0                  SMK Layer Mixer x8 Stereo\nC  350      0      0    ---     ---   ---   ---     0                  LSP Mixer x8 Stereo\nC  374      0      0    ---     ---   ---   ---     0                  SMC-MIX - 8-Band EQ\nC  382      0      0    ---     ---   ---   ---     0                  AR-CH-2 Output Trim +6 dB\nC  406      0      0    ---     ---   ---   ---     0                  AR Controls - Sustain Scale\nC  410      0      0    ---     ---   ---   ---     0                  PD Controls - Sustain Scale\nC  414      0      0    ---     ---   ---   ---     0                  AR-CH-2 Volume Map\nC  418      0      0    ---     ---   ---   ---     0                  AR-CH-4 Volume Map\nC  422      0      0    ---     ---   ---   ---     0                  AR-CH-5 Volume Map\nC  426      0      0    ---     ---   ---   ---     0                  AR-CH-6 Volume Map\nC  430      0      0    ---     ---   ---   ---     0                  AR-CH-7 Volume Map\nC  434      0      0    ---     ---   ---   ---     0                  AR-CH-8 Volume Map\nC  438      0      0    ---     ---   ---   ---     0                  AR-CH-9 Volume Map\nC  442      0      0    ---     ---   ---   ---     0                  PD-CH-1 Volume Map\nC  446      0      0    ---     ---   ---   ---     0                  AR-CH-2 Reverb Map\nC  450      0      0    ---     ---   ---   ---     0                  AR-CH-4 Reverb Map\nC  454      0      0    ---     ---   ---   ---     0                  AR-CH-5 Reverb Map\nC  458      0      0    ---     ---   ---   ---     0                  AR-CH-6 Reverb Map\nC  462      0      0    ---     ---   ---   ---     0                  AR-CH-7 Reverb Map\nC  466      0      0    ---     ---   ---   ---     0                  AR-CH-8 Reverb Map\nC  470      0      0    ---     ---   ---   ---     0                  AR-CH-9 Reverb Map\nC  474      0      0    ---     ---   ---   ---     0                  SMC-EQ-1 CC Scale\nC  478      0      0    ---     ---   ---   ---     0                  SMC-EQ-2 CC Scale\nC  482      0      0    ---     ---   ---   ---     0                  SMC-EQ-3 CC Scale\nC  486      0      0    ---     ---   ---   ---     0                  SMC-EQ-4 CC Scale\nC  490      0      0    ---     ---   ---   ---     0                  SMC-EQ-5 CC Scale\nC  494      0      0    ---     ---   ---   ---     0                  SMC-EQ-6 CC Scale\nC  498      0      0    ---     ---   ---   ---     0                  SMC-EQ-7 CC Scale\nC  502      0      0    ---     ---   ---   ---     0                  SMC-EQ-8 CC Scale\nC  506      0      0    ---     ---   ---   ---     0                  PD-CH-1 Output Gain 0 to +12 dB\nC  530      0      0    ---     ---   ---   ---     0                  PD-CH-1 Gain Map\nC  102      0      0    ---     ---   ---   ---     0                  alsa_output.usb-Generic_USB_Audio_20210726905926-00.analog-stereo\nC  101      0      0    ---     ---   ---   ---     0                  alsa_input.usb-Generic_USB_Audio_20210726905926-00.mono-fallback\nC   41      0      0    ---     ---   ---   ---     0                  Arturia Main Volume Encoder"
       },
       "quantum_frames": 2048,
       "sample_rate_hz": 48000
@@ -287,6 +287,11 @@
           "input": "Speaker + Headphones:playback_FR",
           "midi": false,
           "output": "Arturia Main Volume Encoder:audio-out-r"
+        },
+        {
+          "input": "PD-CH-1 - Drum Set:events-in",
+          "midi": true,
+          "output": "Arturia Main Volume Encoder:drum-volume-init"
         },
         {
           "input": "AR Controls - Sustain Scale:events-in",
@@ -634,48 +639,48 @@
           "output": "SMK25 Pad Layers:layer-8"
         }
       ],
-      "links": 117,
-      "midi_links": 67,
-      "midi_ports": 152,
-      "nodes": 64,
-      "ports": 363
+      "links": 118,
+      "midi_links": 68,
+      "midi_ports": 142,
+      "nodes": 65,
+      "ports": 358
     },
-    "observed_at": "2026-08-10T16:11:35-03:00",
+    "observed_at": "2026-08-18T19:07:41-03:00",
     "processes": [
       {
-        "command": "arturia-main-vo",
-        "cpu_percent": 0.3,
-        "elapsed_seconds": 153612,
-        "pid": 2067289,
-        "rss_kib": 9004
-      },
-      {
-        "command": "smk25-pad-layer",
-        "cpu_percent": 0.8,
-        "elapsed_seconds": 153611,
-        "pid": 2067297,
-        "rss_kib": 9160
-      },
-      {
         "command": "pipewire",
-        "cpu_percent": 0.9,
-        "elapsed_seconds": 199307,
-        "pid": 3851279,
-        "rss_kib": 154152
+        "cpu_percent": 0.4,
+        "elapsed_seconds": 16726,
+        "pid": 3394,
+        "rss_kib": 132732
       },
       {
         "command": "pipewire",
         "cpu_percent": 0.0,
-        "elapsed_seconds": 199307,
-        "pid": 3851282,
-        "rss_kib": 908
+        "elapsed_seconds": 16726,
+        "pid": 3399,
+        "rss_kib": 6192
+      },
+      {
+        "command": "smk25-pad-layer",
+        "cpu_percent": 0.3,
+        "elapsed_seconds": 16726,
+        "pid": 3405,
+        "rss_kib": 8844
       },
       {
         "command": "wireplumber",
         "cpu_percent": 0.0,
-        "elapsed_seconds": 199307,
-        "pid": 3851283,
-        "rss_kib": 12892
+        "elapsed_seconds": 16726,
+        "pid": 3407,
+        "rss_kib": 37436
+      },
+      {
+        "command": "arturia-main-vo",
+        "cpu_percent": 0.2,
+        "elapsed_seconds": 7898,
+        "pid": 807766,
+        "rss_kib": 9392
       }
     ],
     "project": {
@@ -697,10 +702,10 @@
     "services": [
       {
         "active_state": "active",
-        "cpu_usage_nsec": 595461203000,
+        "cpu_usage_nsec": 18578903000,
         "load_state": "loaded",
-        "main_pid": 2067289,
-        "memory_current_bytes": 3584000,
+        "main_pid": 807766,
+        "memory_current_bytes": 4042752,
         "name": "arturia-main-volume-encoder.service",
         "restarts": 0,
         "sub_state": "running",
@@ -708,10 +713,10 @@
       },
       {
         "active_state": "active",
-        "cpu_usage_nsec": 1250279750000,
+        "cpu_usage_nsec": 63060707000,
         "load_state": "loaded",
-        "main_pid": 2067297,
-        "memory_current_bytes": 3837952,
+        "main_pid": 3405,
+        "memory_current_bytes": 3452928,
         "name": "smk25-pad-layers.service",
         "restarts": 0,
         "sub_state": "running",
@@ -719,7 +724,7 @@
       },
       {
         "active_state": "active",
-        "cpu_usage_nsec": 21844000,
+        "cpu_usage_nsec": 6588000,
         "load_state": "loaded",
         "main_pid": 0,
         "memory_current_bytes": null,
@@ -730,10 +735,10 @@
       },
       {
         "active_state": "active",
-        "cpu_usage_nsec": 66603076549000,
+        "cpu_usage_nsec": 1313896474000,
         "load_state": "loaded",
-        "main_pid": 1733471,
-        "memory_current_bytes": 4413648896,
+        "main_pid": 1289652,
+        "memory_current_bytes": 435875840,
         "name": "pipewire-patchbay-watch.service",
         "restarts": 0,
         "sub_state": "running",
@@ -748,7 +753,7 @@
     "system": {
       "architecture": "x86_64",
       "hostname": "airstar",
-      "kernel": "7.0.0-28-generic",
+      "kernel": "7.0.0-29-generic",
       "os_id": "ubuntu",
       "os_pretty_name": "Ubuntu 24.04.4 LTS",
       "os_version": "24.04"
@@ -756,9 +761,9 @@
   },
   "performance": {
     "pipewire_error_total": 0,
-    "relevant_process_cpu_percent": 2,
-    "relevant_process_rss_bytes": 190582784,
-    "service_memory_current_bytes": 4421070848
+    "relevant_process_cpu_percent": 0.8999999999999999,
+    "relevant_process_rss_bytes": 199266304,
+    "service_memory_current_bytes": 443371520
   },
   "protected_source_commit": "c2e1911406f942a9da0a9f91c65eae8a32148e28",
   "safety": {

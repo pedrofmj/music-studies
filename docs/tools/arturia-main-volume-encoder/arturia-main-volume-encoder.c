@@ -55,12 +55,16 @@ enum {
     MUTE_OUTPUT_CC = 118,
     VOLUME_OUTPUT_CC = 119,
     MIDI_CHANNEL = 0,
+    DRUM_VOLUME_OUTPUT_CC = 7,
+    DRUM_MIDI_CHANNEL = 9,
+    DRUM_VOLUME_VALUE = 127,
 };
 
 static const char *const JACK_MIDI_TYPE = "8 bit raw midi";
 static const char *const JACK_AUDIO_TYPE = "32 bit float mono audio";
 static jack_port_t *input_port;
 static jack_port_t *output_port;
+static jack_port_t *drum_volume_output_port;
 static jack_port_t *audio_input_left_port;
 static jack_port_t *audio_input_right_port;
 static jack_port_t *audio_output_left_port;
@@ -69,6 +73,7 @@ static atomic_int volume_value;
 static atomic_int mute_value;
 static atomic_int button_down;
 static int output_connection_count;
+static int drum_volume_output_connection_count;
 static atomic_uint generation;
 static float audio_gain;
 static float audio_ramp_step;
@@ -87,13 +92,18 @@ static int process_midi(jack_nframes_t frame_count, void *unused)
 {
     void *input_buffer;
     void *output_buffer;
+    void *drum_volume_output_buffer;
     uint32_t event_count;
     uint32_t index;
 
     (void)unused;
     input_buffer = jack_port_get_buffer(input_port, frame_count);
     output_buffer = jack_port_get_buffer(output_port, frame_count);
+    drum_volume_output_buffer = jack_port_get_buffer(
+        drum_volume_output_port, frame_count
+    );
     jack_midi_clear_buffer(output_buffer);
+    jack_midi_clear_buffer(drum_volume_output_buffer);
     {
         const int connections = jack_port_connected(output_port);
 
@@ -107,6 +117,24 @@ static int process_midi(jack_nframes_t frame_count, void *unused)
             );
         }
         output_connection_count = connections;
+    }
+    {
+        const int connections = jack_port_connected(drum_volume_output_port);
+
+        if (connections > 0 && connections > drum_volume_output_connection_count) {
+            const jack_midi_data_t drum_volume_message[] = {
+                0xb0 | DRUM_MIDI_CHANNEL,
+                DRUM_VOLUME_OUTPUT_CC,
+                DRUM_VOLUME_VALUE,
+            };
+            (void)jack_midi_event_write(
+                drum_volume_output_buffer,
+                0,
+                drum_volume_message,
+                sizeof(drum_volume_message)
+            );
+        }
+        drum_volume_output_connection_count = connections;
     }
     event_count = jack_midi_get_event_count(input_buffer);
 
@@ -278,6 +306,7 @@ int main(int argc, char **argv)
     atomic_init(&button_down, 0);
     atomic_init(&generation, 0);
     output_connection_count = -1;
+    drum_volume_output_connection_count = -1;
 
     signal(SIGINT, stop_running);
     signal(SIGTERM, stop_running);
@@ -312,7 +341,11 @@ int main(int argc, char **argv)
     audio_output_right_port = jack_port_register(
         client, "audio-out-r", JACK_AUDIO_TYPE, JACK_PORT_IS_OUTPUT, 0
     );
+    drum_volume_output_port = jack_port_register(
+        client, "drum-volume-init", JACK_MIDI_TYPE, JACK_PORT_IS_OUTPUT, 0
+    );
     if (input_port == NULL || output_port == NULL
+        || drum_volume_output_port == NULL
         || audio_input_left_port == NULL || audio_input_right_port == NULL
         || audio_output_left_port == NULL || audio_output_right_port == NULL) {
         fprintf(stderr, "Could not register MIDI/audio ports\n");
@@ -333,9 +366,11 @@ int main(int argc, char **argv)
 
     printf(
         "Converting channel 1 CC%d to volume CC%d and button CC%d to mute CC%d; "
-        "initial volume=%d mute=%d; stereo output gate enabled\n",
+        "initial volume=%d mute=%d; stereo output gate enabled; "
+        "drum channel 10 CC%d reset enabled\n",
         VOLUME_INPUT_CC, VOLUME_OUTPUT_CC, BUTTON_INPUT_CC, MUTE_OUTPUT_CC,
-        atomic_load(&volume_value), atomic_load(&mute_value)
+        atomic_load(&volume_value), atomic_load(&mute_value),
+        DRUM_VOLUME_OUTPUT_CC
     );
     fflush(stdout);
 

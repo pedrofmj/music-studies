@@ -194,7 +194,7 @@ def main() -> int:
         require_success(baseline, "baseline parity")
         expected_summary = (
             "plugins=49, plugin-assets=18, carla-connections=111, "
-            "patchbay-links=115, "
+            "patchbay-links=116, "
             "activation=none"
         )
         if expected_summary not in baseline.stdout:
@@ -322,7 +322,7 @@ def main() -> int:
         require_failure(
             link_result,
             "Patchbay link count drift",
-            "materialized Patchbay link count: expected 115, found 114",
+            "materialized Patchbay link count: expected 116, found 115",
         )
         completed_cases.append("link-count-drift")
 

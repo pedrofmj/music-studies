@@ -18,7 +18,7 @@
   "expected": {
     "carla_plugins": 49,
     "carla_project_connections": 111,
-    "deployment_graph_links": 115,
+    "deployment_graph_links": 116,
     "services": [
       "arturia-main-volume-encoder.service",
       "smk25-pad-layers.service",

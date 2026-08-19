@@ -426,7 +426,7 @@ def verify_parity(arguments: argparse.Namespace) -> Mapping[str, Any]:
         )
     )
     errors.extend(
-        require_count("protected expected Patchbay links", expected_links, 115)
+        require_count("protected expected Patchbay links", expected_links, 116)
     )
     if metadata.get("sha256") != portable_text_sha256(arguments.reference_carla):
         errors.append("protected Carla metadata checksum mismatch")

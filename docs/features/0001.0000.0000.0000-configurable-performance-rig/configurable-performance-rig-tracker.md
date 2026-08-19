@@ -425,7 +425,15 @@ benchmarks.
   snapshot resolves 117/117 against the new graph, proving the repair survives
   re-enumeration. GCC and Clang pass 60/60, both JSON/JACK configurations pass
   67/67, the protected baseline passes 30/30, and full live Airstar validation
-  passes 0 failures with all four services active and 117/117 links present.
+  passes 0 failures with all four services active and 117/117 links present. A
+  2026-08-18 pad-audio regression was traced to retained channel-10 CC7=0 in the
+  shared drum SoundFont. The protected Arturia helper now exposes a stateless
+  `drum-volume-init` output that emits CC7=127 once on drum-target connection or
+  reconnection. Offline coverage proves the exact `B9 07 7F` bytes, suppression
+  during a steady connection, and replay after disconnect/reconnect. Guarded live
+  deployment observed channel 10 CC7 value 127, removed the observer, and left the
+  normalized performance snapshot at 116/116 with all four services active. The
+  protected inventories are now 118 raw, 68 MIDI, and 116 deployment links.
 - 🟡 Implement `eight-band-eq` and `multilevel-volume`. Both authored
   profiles compile deterministically. The active EQ relay has live parity
   evidence, and a bounded portable catalogue now validates prepared candidate

@@ -1,6 +1,6 @@
 {
   "schema": "music-studies/pedro-live-setup/v1",
-  "captured_at": "2026-08-14T23:45:00-03:00",
+  "captured_at": "2026-08-18T16:56:36-03:00",
   "reference_host": {
     "hostname": "airstar",
     "architecture": "x86_64",
@@ -240,7 +240,16 @@
     },
     "pad_devices": {
       "route": "Master capture_1 to PD-CH-1 Drum Set",
-      "notes": "The drum SoundFont consumes normal GM-style note events."
+      "notes": "The drum SoundFont consumes normal GM-style note events.",
+      "volume_reset": {
+        "source": "Arturia Main Volume Encoder:drum-volume-init",
+        "target": "PD-CH-1 - Drum Set:events-in",
+        "trigger": "initial connection and reconnection",
+        "channel": 10,
+        "cc": 7,
+        "value": 127,
+        "steady_connection_repeats": false
+      }
     }
   },
   "external_assets": [
@@ -399,14 +408,14 @@
   ],
   "patchbay": {
     "raw_snapshot": "src/midi-setup/airstar-patchbay.json",
-    "raw_sha256": "919acc7e51a6af59b34ab80526920b52aa3d9157706e9e671ed3d81167109fb9",
-    "raw_links": 117,
+    "raw_sha256": "fe0b31f95ae1e4cb381e7c7afec6f6b4adb3b402b64a453ed8348d771245f655",
+    "raw_links": 118,
     "midi_snapshot": "src/midi-setup/airstar-midi-patchbay.json",
-    "midi_sha256": "a5091eb73bbcb1d8620bbb5d21cd00632963af28e87b00f4a0c977c3c0aea6c4",
-    "midi_links": 67,
+    "midi_sha256": "74690c0aca6f7c21f09b479c400bb39650dca84540db4a531030e58f741558ce",
+    "midi_links": 68,
     "deployment_snapshot": "src/midi-setup/pedro-live-rack-patchbay.json",
-    "deployment_sha256": "73b35846ccd94d7e8858f13290799387669cbe5a2afd25732a92d6ab4cdbaae3",
-    "deployment_links": 115,
+    "deployment_sha256": "257d8750f700056e04bc1c9d51c2bcc84a936af8c7d29e540aeeb3a748c5bf0e",
+    "deployment_links": 116,
     "excluded_from_deployment": [
       "ALSA Playback [java] audio links are unrelated to the performance rack."
     ],

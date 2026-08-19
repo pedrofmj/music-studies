@@ -14,6 +14,11 @@ stereo audio gate after the final EQ. The gate ramps over 10 ms to avoid
 clicks. Carla maps CC119 to the LSP mixer's `Output gain`. Fader 9 continues to
 emit CC85, but nothing in the current project consumes it.
 
+The drum SoundFont can retain channel-10 CC7=0 across a Carla/runtime state
+transition even while pad notes and audio meters remain active. The adapter owns
+a second, stateless output that sends channel-10 CC7=127 once when its drum link
+connects or reconnects.
+
 ## Data flow
 
 ```text
@@ -25,6 +30,9 @@ Arturia MIDI output
          CC115 press -> persistent mute state
        Arturia Main Volume Encoder:absolute-out
          --> LSP Mixer x8 Stereo:events-in -> Output gain
+       Arturia Main Volume Encoder:drum-volume-init
+         connection/reconnection -> channel-10 CC7=127
+         --> PD-CH-1 - Drum Set:events-in
 
 LSP Mixer x8 Stereo:Output L/R
   --> SMC-MIX - 8-Band EQ:Input L/R
@@ -54,7 +62,9 @@ is MIDI value 3, matching the master-gain value saved in the Carla project
 when the adapter was introduced. New encoder movement and mute changes are
 persisted by the service. Whenever `absolute-out` gains a connection, the
 service immediately replays the stored CC119 value so Carla starts at the
-persisted main volume without requiring encoder movement.
+persisted main volume without requiring encoder movement. The drum initializer
+has no persisted value: its fixed CC7=127 message is emitted only when
+`drum-volume-init` gains a connection.
 
 ## Installed files
 
@@ -74,6 +84,7 @@ The persistent patchbay snapshot owns these links:
 ```text
 KL Essential 61 mk3 MIDI -> Arturia Main Volume Encoder:relative-in
 Arturia Main Volume Encoder:absolute-out -> LSP Mixer x8 Stereo:events-in
+Arturia Main Volume Encoder:drum-volume-init -> PD-CH-1 - Drum Set:events-in
 LSP Mixer x8 Stereo:Output L/R -> SMC-MIX - 8-Band EQ:Input L/R
 SMC-MIX - 8-Band EQ:Output L/R -> Arturia Main Volume Encoder:audio-in-l/r
 Arturia Main Volume Encoder:audio-out-l/r -> system playback L/R
@@ -98,8 +109,9 @@ JACK development headers.
 ## Portability boundary
 
 The controller transformation itself is platform-neutral: consume relative
-CC114, maintain a clamped accumulator, emit absolute CC119, and turn CC115
-presses into persistent stereo mute state. The current JACK MIDI/audio client,
+CC114, maintain a clamped accumulator, emit absolute CC119, turn CC115 presses
+into persistent stereo mute state, and emit channel-10 CC7=127 on drum-target
+connection. The current JACK MIDI/audio client,
 systemd service, and PipeWire connections are Linux adapters.
 
 A future Echora/Galaxy implementation should preserve that transformation and

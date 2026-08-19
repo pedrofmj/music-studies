@@ -144,7 +144,7 @@ an offline example.
 [`verify-materialized-rig-parity.py`](verify-materialized-rig-parity.py)
 validates the temporary bundle manifest and proves exact normalized inventories
 for all 49 plugins, 18 Carla plugin asset references, 111 Carla project
-connections, and 115 Patchbay links. Full plugin subtrees include parameter
+connections, and 116 Patchbay links. Full plugin subtrees include parameter
 mappings and state; home and SoundFont paths and the explicitly relocated
 default sink are normalized. A portable regression also locks all protected
 installer/validator checksums, read-only entry points, missing plugin, asset,

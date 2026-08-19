@@ -12,6 +12,7 @@
 enum {
     PORT_MIDI_INPUT,
     PORT_MIDI_OUTPUT,
+    PORT_DRUM_VOLUME_OUTPUT,
     PORT_AUDIO_INPUT_LEFT,
     PORT_AUDIO_INPUT_RIGHT,
     PORT_AUDIO_OUTPUT_LEFT,
@@ -39,6 +40,9 @@ typedef struct {
 
 static struct _jack_port fake_midi_input_port = { PORT_MIDI_INPUT };
 static struct _jack_port fake_midi_output_port = { PORT_MIDI_OUTPUT };
+static struct _jack_port fake_drum_volume_output_port = {
+    PORT_DRUM_VOLUME_OUTPUT
+};
 static struct _jack_port fake_audio_input_left_port = { PORT_AUDIO_INPUT_LEFT };
 static struct _jack_port fake_audio_input_right_port = { PORT_AUDIO_INPUT_RIGHT };
 static struct _jack_port fake_audio_output_left_port = { PORT_AUDIO_OUTPUT_LEFT };
@@ -47,11 +51,13 @@ static struct _jack_port fake_audio_output_right_port = {
 };
 static fake_midi_buffer_t fake_midi_input;
 static fake_midi_buffer_t fake_midi_output;
+static fake_midi_buffer_t fake_drum_volume_output;
 static float fake_audio_input_left[TEST_AUDIO_FRAMES];
 static float fake_audio_input_right[TEST_AUDIO_FRAMES];
 static float fake_audio_output_left[TEST_AUDIO_FRAMES];
 static float fake_audio_output_right[TEST_AUDIO_FRAMES];
 static int fake_output_connections;
+static int fake_drum_volume_output_connections;
 
 #define CHECK(condition, message) do { \
     if (!(condition)) { \
@@ -66,18 +72,22 @@ static void reset_runtime(void)
 
     input_port = &fake_midi_input_port;
     output_port = &fake_midi_output_port;
+    drum_volume_output_port = &fake_drum_volume_output_port;
     audio_input_left_port = &fake_audio_input_left_port;
     audio_input_right_port = &fake_audio_input_right_port;
     audio_output_left_port = &fake_audio_output_left_port;
     audio_output_right_port = &fake_audio_output_right_port;
     memset(&fake_midi_input, 0, sizeof(fake_midi_input));
     memset(&fake_midi_output, 0, sizeof(fake_midi_output));
+    memset(&fake_drum_volume_output, 0, sizeof(fake_drum_volume_output));
     atomic_store(&volume_value, 64);
     atomic_store(&mute_value, 0);
     atomic_store(&button_down, 0);
     atomic_store(&generation, 0);
     output_connection_count = 0;
+    drum_volume_output_connection_count = 0;
     fake_output_connections = 0;
+    fake_drum_volume_output_connections = 0;
     audio_gain = 1.0f;
     audio_ramp_step = 0.25f;
 
@@ -107,20 +117,22 @@ static void set_input(
 }
 
 static int output_matches(
+    const fake_midi_buffer_t *buffer,
     uint32_t index,
     jack_nframes_t time_value,
+    unsigned char status,
     unsigned char controller,
     unsigned char value
 )
 {
     const fake_midi_event_t *event;
 
-    if (index >= fake_midi_output.count)
+    if (index >= buffer->count)
         return 0;
-    event = &fake_midi_output.events[index];
+    event = &buffer->events[index];
     return event->time == time_value &&
         event->size == 3 &&
-        event->data[0] == 0xb0 &&
+        event->data[0] == status &&
         event->data[1] == controller &&
         event->data[2] == value;
 }
@@ -161,12 +173,69 @@ static int test_connection_replay(void)
     CHECK(process_midi(4, NULL) == 0, "connection replay process failed");
     CHECK(fake_midi_output.count == 1, "new connection did not replay volume");
     CHECK(
-        output_matches(0, 0, VOLUME_OUTPUT_CC, 64),
+        output_matches(
+            &fake_midi_output, 0, 0, 0xb0, VOLUME_OUTPUT_CC, 64
+        ),
         "connection replay emitted the wrong value"
     );
 
     CHECK(process_midi(4, NULL) == 0, "steady connection process failed");
     CHECK(fake_midi_output.count == 0, "steady connection replayed twice");
+    return 0;
+}
+
+static int test_drum_volume_connection_reset(void)
+{
+    reset_runtime();
+    fake_drum_volume_output_connections = 1;
+
+    CHECK(process_midi(4, NULL) == 0, "drum connection reset failed");
+    CHECK(
+        fake_drum_volume_output.count == 1,
+        "new drum connection did not emit one reset"
+    );
+    CHECK(
+        output_matches(
+            &fake_drum_volume_output,
+            0,
+            0,
+            0xb0 | DRUM_MIDI_CHANNEL,
+            DRUM_VOLUME_OUTPUT_CC,
+            DRUM_VOLUME_VALUE
+        ),
+        "drum connection emitted the wrong reset"
+    );
+
+    CHECK(process_midi(4, NULL) == 0, "steady drum connection failed");
+    CHECK(
+        fake_drum_volume_output.count == 0,
+        "steady drum connection repeated the reset"
+    );
+
+    fake_drum_volume_output_connections = 0;
+    CHECK(process_midi(4, NULL) == 0, "drum disconnect process failed");
+    CHECK(
+        fake_drum_volume_output.count == 0,
+        "drum disconnect emitted a reset"
+    );
+
+    fake_drum_volume_output_connections = 1;
+    CHECK(process_midi(4, NULL) == 0, "drum reconnect reset failed");
+    CHECK(
+        fake_drum_volume_output.count == 1,
+        "drum reconnect did not emit one reset"
+    );
+    CHECK(
+        output_matches(
+            &fake_drum_volume_output,
+            0,
+            0,
+            0xb0 | DRUM_MIDI_CHANNEL,
+            DRUM_VOLUME_OUTPUT_CC,
+            DRUM_VOLUME_VALUE
+        ),
+        "drum reconnect emitted the wrong reset"
+    );
     return 0;
 }
 
@@ -180,7 +249,9 @@ static int test_relative_volume(void)
     CHECK(atomic_load(&generation) == 1, "volume change was not published");
     CHECK(fake_midi_output.count == 1, "volume change emitted wrong count");
     CHECK(
-        output_matches(0, 3, VOLUME_OUTPUT_CC, 65),
+        output_matches(
+            &fake_midi_output, 0, 3, 0xb0, VOLUME_OUTPUT_CC, 65
+        ),
         "volume change emitted wrong message"
     );
 
@@ -204,7 +275,12 @@ static int test_mute_edge_and_audio_ramp(void)
 
     CHECK(process_midi(4, NULL) == 0, "mute press process failed");
     CHECK(atomic_load(&mute_value) == 127, "mute press did not toggle on");
-    CHECK(output_matches(0, 2, MUTE_OUTPUT_CC, 127), "wrong mute-on output");
+    CHECK(
+        output_matches(
+            &fake_midi_output, 0, 2, 0xb0, MUTE_OUTPUT_CC, 127
+        ),
+        "wrong mute-on output"
+    );
 
     CHECK(process_midi(4, NULL) == 0, "held mute process failed");
     CHECK(fake_midi_output.count == 0, "held button toggled more than once");
@@ -216,7 +292,10 @@ static int test_mute_edge_and_audio_ramp(void)
     set_input(2, 0xb0, BUTTON_INPUT_CC, 127);
     CHECK(process_midi(4, NULL) == 0, "second mute press process failed");
     CHECK(atomic_load(&mute_value) == 0, "second press did not toggle off");
-    CHECK(output_matches(0, 2, MUTE_OUTPUT_CC, 0), "wrong mute-off output");
+    CHECK(
+        output_matches(&fake_midi_output, 0, 2, 0xb0, MUTE_OUTPUT_CC, 0),
+        "wrong mute-off output"
+    );
     CHECK(atomic_load(&generation) == 2, "mute edges published wrong count");
 
     reset_runtime();
@@ -358,6 +437,7 @@ int main(void)
 {
     if (test_clamping_and_state() != 0 ||
         test_connection_replay() != 0 ||
+        test_drum_volume_connection_reset() != 0 ||
         test_relative_volume() != 0 ||
         test_mute_edge_and_audio_ramp() != 0 ||
         test_reusable_behavior_parity() != 0)
@@ -445,6 +525,8 @@ void *jack_port_get_buffer(jack_port_t *port, jack_nframes_t frame_count)
         return &fake_midi_input;
     case PORT_MIDI_OUTPUT:
         return &fake_midi_output;
+    case PORT_DRUM_VOLUME_OUTPUT:
+        return &fake_drum_volume_output;
     case PORT_AUDIO_INPUT_LEFT:
         return fake_audio_input_left;
     case PORT_AUDIO_INPUT_RIGHT:
@@ -485,13 +567,17 @@ void jack_midi_clear_buffer(void *port_buffer)
 {
     fake_midi_buffer_t *buffer = port_buffer;
 
-    if (buffer == &fake_midi_output)
+    if (buffer == &fake_midi_output || buffer == &fake_drum_volume_output)
         buffer->count = 0;
 }
 
 int jack_port_connected(const jack_port_t *port)
 {
-    return port == &fake_midi_output_port ? fake_output_connections : 0;
+    if (port == &fake_midi_output_port)
+        return fake_output_connections;
+    if (port == &fake_drum_volume_output_port)
+        return fake_drum_volume_output_connections;
+    return 0;
 }
 
 int jack_midi_event_write(
@@ -504,7 +590,7 @@ int jack_midi_event_write(
     fake_midi_buffer_t *buffer = port_buffer;
     fake_midi_event_t *event;
 
-    if (buffer != &fake_midi_output ||
+    if ((buffer != &fake_midi_output && buffer != &fake_drum_volume_output) ||
         buffer->count >= TEST_EVENT_CAPACITY ||
         size > sizeof(event->data))
         return -1;

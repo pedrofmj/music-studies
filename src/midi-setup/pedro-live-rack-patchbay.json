@@ -1,7 +1,7 @@
 {
   "schema": "https://music-studies.local/schemas/pipewire-patchbay/v1",
   "schema_version": 1,
-  "generated_at": "2026-08-14T23:45:00-03:00",
+  "generated_at": "2026-08-18T16:56:36-03:00",
   "hostname": "airstar",
   "scope": "pedro-live-rack",
   "nodes": [
@@ -5438,6 +5438,20 @@
       "object_path": "PD-CH-1 Gain Map:output_0",
       "format_dsp": "8 bit raw midi",
       "midi": true
+    },
+    {
+      "id": 633,
+      "node_id": 32,
+      "node_name": "Arturia Main Volume Encoder",
+      "node_description": "Arturia Main Volume Encoder",
+      "direction": "out",
+      "port_id": 3,
+      "name": "drum-volume-init",
+      "name_selector": "Arturia Main Volume Encoder:drum-volume-init",
+      "alias": "Arturia Main Volume Encoder:drum-volume-init",
+      "object_path": "Arturia Main Volume Encoder:output_3",
+      "format_dsp": "8 bit raw midi",
+      "midi": true
     }
   ],
   "links": [
@@ -9116,6 +9130,38 @@
         "name_selector": "SMK25 Pad Layers:midi-in",
         "alias": "SMK25 Pad Layers:midi-in",
         "object_path": "SMK25 Pad Layers:input_0",
+        "format_dsp": "8 bit raw midi",
+        "midi": true
+      },
+      "kind": "midi"
+    },
+    {
+      "id": 640,
+      "output": {
+        "id": 633,
+        "node_id": 32,
+        "node_name": "Arturia Main Volume Encoder",
+        "node_description": "Arturia Main Volume Encoder",
+        "direction": "out",
+        "port_id": 3,
+        "name": "drum-volume-init",
+        "name_selector": "Arturia Main Volume Encoder:drum-volume-init",
+        "alias": "Arturia Main Volume Encoder:drum-volume-init",
+        "object_path": "Arturia Main Volume Encoder:output_3",
+        "format_dsp": "8 bit raw midi",
+        "midi": true
+      },
+      "input": {
+        "id": 260,
+        "node_id": 257,
+        "node_name": "PD-CH-1 - Drum Set",
+        "node_description": "PD-CH-1 - Drum Set",
+        "direction": "in",
+        "port_id": 0,
+        "name": "events-in",
+        "name_selector": "PD-CH-1 - Drum Set:events-in",
+        "alias": "PD-CH-1 - Drum Set:events-in",
+        "object_path": "PD-CH-1 - Drum Set:input_0",
         "format_dsp": "8 bit raw midi",
         "midi": true
       },

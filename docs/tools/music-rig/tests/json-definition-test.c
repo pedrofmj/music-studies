@@ -189,8 +189,8 @@ static int test_full_definition_shadow(
 int main(int argc, char **argv)
 {
     static const char fingerprint_text[] =
-        "sha256:e43fa6ad1c16b3672a997e9f620448fd"
-        "bbc1fb0c141361049ca67d49faab5114";
+        "sha256:b5988448d8346ffdca61bbcebd3d0b8b"
+        "d4c62ae214923fe55bf1ffdbffbb22c3";
     static uint8_t workspace[DOCUMENT_CAPACITY];
     static document_source source;
     static music_rig_compiled_tables tables;

@@ -84,7 +84,7 @@ deployment milestones.
 
 Run the read-only [semantic parity gate](PARITY.md) against the completed
 bundle to compare all 49 plugins, 18 plugin asset references, 111 Carla project
-connections, and 115 Patchbay links with the protected sources. The
+connections, and 116 Patchbay links with the protected sources. The
 materializer self-test proves exact combined, home-derived, SoundFont-only, and
 identity relocation, repeatable bytes, CRLF portability, and deterministic
 missing-endpoint rejection without creating installed output.

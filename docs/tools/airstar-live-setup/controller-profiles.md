@@ -83,6 +83,12 @@ Master ports feed a dedicated `PD-CH-1 Gain Map` intermediary that converts CC37
 to private CC110, controlling post-instrument output gain from 0 to approximately
 +12 dB without passing through the sustain-only filter.
 
+The persistent Patchbay also connects the dedicated `drum-volume-init` output
+from `Arturia Main Volume Encoder` directly to the drum input. On initial
+connection and each reconnection, it sends channel-10 CC7=127 once to clear a
+retained zero SoundFont volume. It does not repeat while the link remains
+connected and does not alter pad notes or the post-instrument gain mapping.
+
 ## Physical Verification
 
 After configuring a replacement controller, use jack_midi_dump or another raw

@@ -9,7 +9,7 @@
 | Plugin host | Carla Flatpak 2.5.10, studio.kx.carla |
 | Project | /c/music/carla/pedro.uproject |
 | Rack structure | 49 uniquely named plugins, 16 native SF2 slots, 111 Carla project connections |
-| Saved graph | 117 raw links; 115 performance-owned deployment links; 67 MIDI links |
+| Saved graph | 118 raw links; 116 performance-owned deployment links; 68 MIDI links |
 | Quantum | 2048 frames, persisted by pipewire-carla-quantum.service |
 | Output | Tiger Lake Speaker + Headphones through the rack EQ and Arturia gate |
 
@@ -44,7 +44,10 @@ LSP Mixer -> SMC-MIX 8-Band EQ -> Arturia volume/mute gate
 
 AR-CH-2 has a dedicated +6 dB trim before the master mixer. SMK Knobs 1-8
 control hard mixer gains for their corresponding layers. The Arturia central
-encoder is converted from relative CC114 to persistent absolute CC119.
+encoder is converted from relative CC114 to persistent absolute CC119. The same
+helper sends channel-10 CC7=127 once whenever its dedicated output connects or
+reconnects to the drum SoundFont, preventing retained zero volume from silencing
+both pad devices.
 
 ## Active User Services
 

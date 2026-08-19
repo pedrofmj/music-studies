@@ -127,10 +127,10 @@ services, the 2048-frame quantum, and every saved link.
 
 ## Graph Artifacts
 
-- src/midi-setup/airstar-patchbay.json is the raw 117-link reference-host
+- src/midi-setup/airstar-patchbay.json is the raw 118-link reference-host
   snapshot.
-- src/midi-setup/airstar-midi-patchbay.json is its MIDI-only inventory.
-- src/midi-setup/pedro-live-rack-patchbay.json is the 115-link deployment
+- src/midi-setup/airstar-midi-patchbay.json is its 68-link MIDI-only inventory.
+- src/midi-setup/pedro-live-rack-patchbay.json is the 116-link deployment
   snapshot.
 
 The deployment snapshot excludes two ALSA Playback [java] links that happened

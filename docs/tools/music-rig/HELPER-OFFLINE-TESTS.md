@@ -35,6 +35,8 @@ The external Arturia harness verifies:
 - MIDI value clamping and missing-state defaults;
 - atomic volume/mute state persistence through a temporary file;
 - absolute CC119 volume replay on a new output connection;
+- one channel-10 CC7=127 drum reset on connection/reconnection, with no steady
+  connection repeats;
 - channel-1 relative CC114 conversion and neutral/wrong-channel rejection;
 - edge-triggered CC115 mute/unmute output on CC118;
 - one generation publication per accepted control edge; and
@@ -81,4 +83,6 @@ Offline parity does not prove hardware discovery, physical encoder/pad input,
 controller LED state, PipeWire reconnection, service restart recovery, or
 audible ramp quality. Those checks remain part of the repeatable current-rack
 startup transcript and later explicit live-hardware procedure. They must not be
-run automatically.
+run automatically. The 2026-08-18 guarded Airstar repair separately observed the
+deployed initializer emit channel-10 CC7 value 127 and then removed its temporary
+observer link.

@@ -212,7 +212,7 @@
     "patchbay-deployment-source": {
       "resolver": "repository-relative",
       "value": "src/midi-setup/pedro-live-rack-patchbay.json",
-      "sha256": "73b35846ccd94d7e8858f13290799387669cbe5a2afd25732a92d6ab4cdbaae3"
+      "sha256": "257d8750f700056e04bc1c9d51c2bcc84a936af8c7d29e540aeeb3a748c5bf0e"
     },
     "patchbay-state-target": {
       "resolver": "linux.home-relative",
