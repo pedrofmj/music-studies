@@ -269,9 +269,33 @@ static int test_fail_closed_cleanup(void)
     return 0;
 }
 
+static int test_output_host_contract(void)
+{
+    static music_rig_compiled_tables tables;
+    music_rig_generation generation;
+    music_rig_generation_slot generations;
+    music_rig_device_midi_shadow shadow;
+    music_rig_jack_midi_output host;
+
+    reset_fake_jack();
+    CHECK(init_shadow(&tables, &generation, &generations, &shadow),
+        "output shadow initialization failed");
+    CHECK(music_rig_jack_midi_output_init(&host, &shadow) ==
+            MUSIC_RIG_RESULT_OK, "output host initialization failed");
+    CHECK(music_rig_jack_midi_output_start(&host) == MUSIC_RIG_RESULT_OK,
+        "output host start failed");
+    CHECK(registered_count == 4U && registered_flags[0] == 1UL &&
+        registered_flags[1] == 2UL && registered_flags[2] == 1UL &&
+        registered_flags[3] == 2UL, "paired port contract failed");
+    CHECK(music_rig_jack_midi_output_stop(&host) == MUSIC_RIG_RESULT_OK &&
+        close_count == 1, "output host cleanup failed");
+    return 0;
+}
+
 int main(void)
 {
     if (test_input_only_lifecycle() != 0 ||
+        test_output_host_contract() != 0 ||
         test_fail_closed_cleanup() != 0) {
         return 1;
     }
@@ -286,7 +310,8 @@ jack_client_t *jack_client_open(
     ...
 )
 {
-    if (strcmp(name, "music-rigd-shadow") != 0 ||
+    if ((strcmp(name, "music-rigd-shadow") != 0 &&
+         strcmp(name, "music-rigd-output") != 0) ||
         options != UINT32_C(1)) {
         fake_contract_failed = 1;
         return NULL;
