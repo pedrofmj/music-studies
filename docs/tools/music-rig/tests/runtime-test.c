@@ -33,7 +33,31 @@ typedef struct mock_adapter {
     music_rig_result stop_result;
     music_rig_result state_read_result;
     music_rig_result state_replace_result;
+    unsigned int output_prepare_calls;
+    unsigned int output_confirm_calls;
+    music_rig_result output_prepare_result;
+    music_rig_result output_confirm_result;
 } mock_adapter;
+
+static music_rig_result mock_output_prepare(
+    void *opaque, const music_rig_generation *generation
+)
+{
+    mock_adapter *adapter = opaque;
+    (void)generation;
+    adapter->output_prepare_calls += 1U;
+    return adapter->output_prepare_result;
+}
+
+static music_rig_result mock_output_confirm(
+    void *opaque, const music_rig_generation *generation
+)
+{
+    mock_adapter *adapter = opaque;
+    (void)generation;
+    adapter->output_confirm_calls += 1U;
+    return adapter->output_confirm_result;
+}
 
 static uint64_t mock_now_ns(void *opaque)
 {
@@ -168,6 +192,8 @@ static void init_mock(mock_adapter *adapter)
     adapter->stop_result = MUSIC_RIG_RESULT_OK;
     adapter->state_read_result = MUSIC_RIG_RESULT_OK;
     adapter->state_replace_result = MUSIC_RIG_RESULT_OK;
+    adapter->output_prepare_result = MUSIC_RIG_RESULT_OK;
+    adapter->output_confirm_result = MUSIC_RIG_RESULT_OK;
 }
 
 static music_rig_platform_interfaces interfaces_for(mock_adapter *adapter)
@@ -986,8 +1012,8 @@ static int test_invalid_configuration(void)
     config = config_for(&initial, fingerprint);
     config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
     if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
-        MUSIC_RIG_RESULT_UNSUPPORTED) {
-        fputs("enabled output mode was accepted\n", stderr);
+        MUSIC_RIG_RESULT_INVALID_ARGUMENT) {
+        fputs("enabled output mode without adapter was accepted\n", stderr);
         return 1;
     }
 
@@ -1025,6 +1051,164 @@ static int test_invalid_configuration(void)
     return 0;
 }
 
+static int test_enabled_output_initialization(void)
+{
+    static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
+        0x40
+    };
+    const music_rig_generation initial = {UINT64_C(1), &default_tables};
+    music_rig_runtime runtime;
+    mock_adapter adapter;
+    music_rig_platform_interfaces interfaces;
+    music_rig_runtime_config config;
+    music_rig_output_adoption_adapter output;
+
+    init_mock(&adapter);
+    interfaces = interfaces_for(&adapter);
+    memset(&output, 0, sizeof(output));
+    output.abi_version = MUSIC_RIG_OUTPUT_ADOPTION_ADAPTER_ABI_VERSION;
+    output.context = &adapter;
+    output.prepare = mock_output_prepare;
+    output.confirm = mock_output_confirm;
+    config = config_for(&initial, fingerprint);
+    config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
+    config.output_adoption = &output;
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_OK ||
+        adapter.output_prepare_calls != 1U ||
+        adapter.output_confirm_calls != 1U ||
+        runtime.state.output_mode != MUSIC_RIG_OUTPUT_ENABLED) {
+        fputs("enabled output initialization failed\n", stderr);
+        return 1;
+    }
+
+    init_mock(&adapter);
+    adapter.output_prepare_result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    interfaces = interfaces_for(&adapter);
+    config = config_for(&initial, fingerprint);
+    config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
+    config.output_adoption = &output;
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+        MUSIC_RIG_RESULT_ADAPTER_FAILURE ||
+        adapter.output_prepare_calls != 1U ||
+        adapter.output_confirm_calls != 0U) {
+        fputs("failed output preparation was not rejected\n", stderr);
+        return 1;
+    }
+    return 0;
+}
+
+static int test_device_override_transactions(void)
+{
+    static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
+        0x31
+    };
+    static music_rig_compiled_tables alternate_tables;
+    static music_rig_compiled_definition alternate_definition;
+    static music_rig_prepared_definition prepared;
+    music_rig_compiled_tables initial_tables;
+    music_rig_generation initial;
+    music_rig_runtime runtime;
+    music_rig_runtime_config config;
+    music_rig_platform_interfaces interfaces;
+    music_rig_protocol_request switch_request;
+    music_rig_protocol_request reset_request;
+    music_rig_protocol_response response;
+    mock_adapter adapter;
+
+    if (init_compiled_tables_fixture(&initial_tables) != MUSIC_RIG_RESULT_OK ||
+        init_alternate_prepared_definition_fixture(
+            &alternate_tables, &alternate_definition, &prepared
+        ) != MUSIC_RIG_RESULT_OK) {
+        return 1;
+    }
+    initial.id = UINT64_C(1);
+    initial.mapping = &initial_tables;
+    init_mock(&adapter);
+    interfaces = interfaces_for(&adapter);
+    config = config_for(&initial, fingerprint);
+    config.prepared_definitions = &prepared;
+    config.prepared_definition_count = 1U;
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_OK) {
+        return 1;
+    }
+    switch_request = request(UINT64_C(21), UINT64_C(1),
+        MUSIC_RIG_OPERATION_SWITCH_DEVICE);
+    fixture_copy(switch_request.device_slot, "smc-mixer-main");
+    fixture_copy(switch_request.profile, "multilevel-volume");
+    if (music_rig_runtime_dispatch(&runtime, &switch_request, &response) !=
+            MUSIC_RIG_RESULT_OK || response.result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_OK || response.resulting_generation !=
+            UINT64_C(2) || runtime.device_override_count != 1U ||
+        strcmp(runtime.device_overrides[0].profile, "multilevel-volume") != 0) {
+        fputs("device override commit failed\n", stderr);
+        return 1;
+    }
+    switch_request.request_id = UINT64_C(22);
+    switch_request.expected_generation = UINT64_C(2);
+    if (music_rig_runtime_dispatch(&runtime, &switch_request, &response) !=
+            MUSIC_RIG_RESULT_OK || response.result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_OK || response.resulting_generation !=
+            UINT64_C(2) || runtime.device_override_count != 1U) {
+        fputs("idempotent device switch changed state\n", stderr);
+        return 1;
+    }
+    {
+        music_rig_runtime restored;
+        if (music_rig_runtime_init(&restored, &config, &interfaces) !=
+                MUSIC_RIG_RESULT_OK || restored.device_override_count != 1U ||
+            strcmp(restored.device_overrides[0].device_slot,
+                "smc-mixer-main") != 0 ||
+            strcmp(((const music_rig_compiled_tables *)
+                restored.initial_generation.mapping)->device_profiles[1].profile,
+                "multilevel-volume") != 0) {
+            fputs("device override state restore failed\n", stderr);
+            return 1;
+        }
+    }
+    switch_request.request_id = UINT64_C(23);
+    switch_request.expected_generation = UINT64_C(1);
+    if (music_rig_runtime_dispatch(&runtime, &switch_request, &response) !=
+            MUSIC_RIG_RESULT_OK || response.result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_GENERATION_CONFLICT ||
+        runtime.device_override_count != 1U) {
+        fputs("device override generation guard failed\n", stderr);
+        return 1;
+    }
+    reset_request = request(UINT64_C(24), UINT64_C(2),
+        MUSIC_RIG_OPERATION_RESET_DEVICE_OVERRIDE);
+    fixture_copy(reset_request.device_slot, "smc-mixer-main");
+    if (music_rig_runtime_dispatch(&runtime, &reset_request, &response) !=
+            MUSIC_RIG_RESULT_OK || response.result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_OK || response.resulting_generation !=
+            UINT64_C(3) || runtime.device_override_count != 0U ||
+        strcmp(((const music_rig_compiled_tables *)
+            runtime.control_generation->mapping)->device_profiles[1].profile,
+            "eight-band-eq") != 0) {
+        fputs("device override reset failed\n", stderr);
+        return 1;
+    }
+
+    init_mock(&adapter);
+    adapter.state_replace_failures = 1U;
+    interfaces = interfaces_for(&adapter);
+    config = config_for(&initial, fingerprint);
+    config.prepared_definitions = &prepared;
+    config.prepared_definition_count = 1U;
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_OK || music_rig_runtime_dispatch(
+                &runtime, &switch_request, &response
+            ) != MUSIC_RIG_RESULT_OK || response.result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_ADAPTER_FAILURE ||
+        response.rollback_status != (uint32_t)MUSIC_RIG_ROLLBACK_SUCCEEDED ||
+        runtime.device_override_count != 0U) {
+        fputs("device override persistence rollback failed\n", stderr);
+        return 1;
+    }
+    return 0;
+}
+
 int main(void)
 {
     if (init_compiled_tables_fixture(&default_tables) !=
@@ -1034,7 +1218,9 @@ int main(void)
         test_generation_reclamation_and_ports() != 0 ||
         test_persisted_state() != 0 ||
         test_adapter_failures() != 0 ||
-        test_invalid_configuration() != 0) {
+        test_invalid_configuration() != 0 ||
+        test_enabled_output_initialization() != 0 ||
+        test_device_override_transactions() != 0) {
         return 1;
     }
     return 0;

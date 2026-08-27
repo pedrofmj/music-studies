@@ -9,7 +9,7 @@
 #include <stdatomic.h>
 #include <stdint.h>
 
-#define MUSIC_RIG_SMC_MIXER_RELAY_ABI_VERSION UINT32_C(1)
+#define MUSIC_RIG_SMC_MIXER_RELAY_ABI_VERSION UINT32_C(2)
 
 typedef music_rig_result (*music_rig_smc_mixer_emit_fn)(
     void *context,
@@ -45,6 +45,7 @@ typedef struct music_rig_smc_mixer_relay {
     const music_rig_generation *current_generation;
     uint64_t current_generation_id;
     _Atomic(const music_rig_generation *) prepared_generation;
+    _Atomic(const music_rig_generation *) adopted_generation;
     const music_rig_compiled_tables *tables;
     music_rig_smc_mixer_emit_fn emit;
     void *emit_context;
@@ -83,6 +84,11 @@ music_rig_result music_rig_smc_mixer_relay_process(
 const char *music_rig_smc_mixer_relay_input_port_id(
     const music_rig_smc_mixer_relay *relay
 );
+bool music_rig_smc_mixer_relay_generation_is_adopted(
+    const music_rig_smc_mixer_relay *relay,
+    const music_rig_generation *generation
+);
+
 
 const char *music_rig_smc_mixer_relay_output_port_id(
     const music_rig_smc_mixer_relay *relay

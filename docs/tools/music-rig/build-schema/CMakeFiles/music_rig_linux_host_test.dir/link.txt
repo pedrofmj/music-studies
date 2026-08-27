@@ -1,0 +1,1 @@
+/usr/bin/cc -g "CMakeFiles/music_rig_linux_host_test.dir/tests/linux-host-test.c.o" -o music_rig_linux_host_test  libmusic_rig_linux_host.a libmusic_rig_core.a 

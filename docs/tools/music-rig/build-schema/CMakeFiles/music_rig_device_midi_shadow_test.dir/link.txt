@@ -1,0 +1,1 @@
+/usr/bin/cc -g "CMakeFiles/music_rig_device_midi_shadow_test.dir/tests/device-midi-shadow-test.c.o" -o music_rig_device_midi_shadow_test  libmusic_rig_device_midi_shadow.a libmusic_rig_current_behaviors.a libmusic_rig_core.a 

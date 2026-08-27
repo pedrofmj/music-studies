@@ -1,0 +1,1 @@
+/usr/bin/cc -g "CMakeFiles/music_rig_compiled_table_composition_test.dir/tests/compiled-table-composition-test.c.o" -o music_rig_compiled_table_composition_test  libmusic_rig_core.a 

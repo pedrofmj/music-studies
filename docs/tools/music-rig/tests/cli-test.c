@@ -241,7 +241,9 @@ int main(void)
         music_rig_cli_parse(6, duplicate_dry_run, UINT64_C(1), &command) !=
             MUSIC_RIG_RESULT_INVALID_ARGUMENT ||
         music_rig_cli_parse(4, unsafe_reset, UINT64_C(1), &command) !=
-            MUSIC_RIG_RESULT_INVALID_ARGUMENT) {
+            MUSIC_RIG_RESULT_OK || command.request.operation !=
+            MUSIC_RIG_OPERATION_RESET_DEVICE_OVERRIDE ||
+        command.request.flags != UINT32_C(0)) {
         fputs("invalid CLI switch shape was accepted\n", stderr);
         return 1;
     }

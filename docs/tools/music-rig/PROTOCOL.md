@@ -1,11 +1,9 @@
 # Music Rig IPC Protocol
 
-Status: protocol v2 freezes the complete operation inventory and implements the
-read-only and dry-run subset. Milestone 4 adds bounded discovery of explicitly
-prepared compiled definitions without enabling commits. Linux `SOCK_SEQPACKET`
-and Windows message-mode named pipes carry the same frames through ephemeral
-mock tests. No production endpoint, daemon listener, service, or installed state
-exists.
+Status: protocol v2 freezes the complete operation inventory. The portable
+runtime implements output-suppressed global and device transactions with
+generation guards and durable state. Linux `SOCK_SEQPACKET` now has an explicit
+authenticated daemon/client host; Windows transport remains a separate adapter.
 
 ## Versioning
 
@@ -45,8 +43,8 @@ The complete operation inventory is:
 | 3 | `prepare-global` | profile | Dry-run only |
 | 4 | `prepare-device` | device slot and profile | Dry-run only |
 | 5 | `switch-global` | profile | Dry-run or runtime commit |
-| 6 | `switch-device` | device slot and profile | Dry-run only |
-| 7 | `reset-device-override` | device slot | Dry-run only |
+| 6 | `switch-device` | device slot and profile | Dry-run or runtime commit |
+| 7 | `reset-device-override` | device slot | Dry-run or runtime commit |
 | 8 | `reload-compiled-definition` | none | Dry-run validation only |
 | 9 | `validate-active` | none | Read-only |
 
@@ -58,14 +56,13 @@ but not active. A dry-run never publishes a generation, persists state, loads a
 resource, contacts a device, or changes a graph.
 
 The non-mutating table dispatcher still rejects every commit-capable request.
-The portable runtime transaction now accepts a non-dry-run `switch-global`
-request while output remains suppressed. It checks the expected generation,
+The portable runtime transaction accepts non-dry-run global and device requests
+while output remains suppressed. It checks the expected generation,
 reuses only validated control-only table images, reserves bounded rollback
 storage, publishes a monotonically increasing immutable generation, and
-atomically persists the active Rig Profile. A persistence failure republishes
+atomically persists the active Rig Profile and device override set. A persistence failure republishes
 the previous table image with a newer generation and reports rollback success
-or failure explicitly. Device switching, reset commit, output-enabled adoption,
-and production transports remain unsupported.
+or failure explicitly. Output-enabled adoption remains unsupported.
 
 ## Response Frame
 
@@ -140,17 +137,16 @@ music-rig validate [--json]
 music-rig prepare --global PROFILE --dry-run [--json]
 music-rig prepare --device SLOT --profile PROFILE --dry-run [--json]
 music-rig switch --global PROFILE [--dry-run] [--json]
-music-rig switch --device SLOT --profile PROFILE --dry-run [--json]
-music-rig reset --device SLOT --dry-run [--json]
+music-rig switch --device SLOT --profile PROFILE [--dry-run] [--json]
+music-rig reset --device SLOT [--dry-run] [--json]
 ```
 
 Human and versioned JSON rendering use the same decoded response. The parser
-accepts a commit-capable global switch, but still requires `--dry-run` for
-prepare, device switch, and device reset commands. It rejects conflicting
+accepts commit-capable global/device switches and reset, while still requiring
+`--dry-run` for prepare commands. It rejects conflicting
 scopes, duplicate options, invalid identifiers, and numeric overflow. The
-executable currently has no configured transport; recognized commands,
-including global commits, return adapter failure 4, write no response output,
-and state that no request was sent.
+Linux builds connect to the resolved per-user control socket. If the daemon is
+absent, recognized commands return adapter failure 4 without sending a request.
 
 ## Mock Transports
 
@@ -161,9 +157,13 @@ mixed status, filtered-list, validation, and device dry-run requests through
 the real immutable-table dispatcher. They create no filesystem socket, default
 pipe, service, runtime state, device connection, or musical output.
 
-The Linux host now resolves the XDG runtime location but deliberately creates
-no socket. A future production IPC adapter still requires peer credential
-checks, permissions, bounded timeouts, and oversized-message rejection. The
-Windows production adapter requires the equivalent lifecycle and timeout
-handling described in
+The Linux production adapter uses a filesystem `SOCK_SEQPACKET` endpoint,
+restricts the socket to the current user, validates `SO_PEERCRED`, and rejects
+truncated or oversized frames. Malformed and unauthorized peers are closed so
+they cannot terminate or hold the daemon's serialized client slot. Client and
+response I/O has a bounded two-second timeout. A second daemon refuses an active
+socket rather than unlinking it. The explicit daemon run command
+loads a fingerprint-verified compiled definition and serves the runtime
+dispatcher. The Windows production adapter requires the equivalent lifecycle
+and timeout handling described in
 [ADR 0004](../../features/0001.0000.0000.0000-configurable-performance-rig/architecture-decisions/0004-windows-local-ipc-named-pipes.md).

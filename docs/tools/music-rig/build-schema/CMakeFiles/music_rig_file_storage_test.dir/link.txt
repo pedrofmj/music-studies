@@ -1,0 +1,1 @@
+/usr/bin/cc -g "CMakeFiles/music_rig_file_storage_test.dir/tests/file-storage-test.c.o" -o music_rig_file_storage_test  libmusic_rig_file_storage.a libmusic_rig_core.a 

@@ -161,10 +161,12 @@ bounded control-thread reclamation, stable device-slot port compatibility, and
 ABI-versioned clock/control/storage callbacks. Runtime initialization can retain
 at most 16 caller-owned prepared compiled definitions after full validation,
 duplicate Rig Profile rejection, and stable-port comparison. Its event-driven
-loop handles decoded protocol v2 inspection, dry-runs, and a durable
-output-suppressed global switch transaction with bounded rollback. State v2
-persists the active Rig Profile and still reads v1 frames. Device commits,
-production IPC, and output-enabled mode remain unavailable.
+loop handles decoded protocol v2 inspection, dry-runs, and durable
+output-suppressed global and per-device switch transactions with bounded
+rollback. State v3 persists the active Rig Profile and device overrides while
+still reading v1 and v2 frames. Production IPC is available through the
+authenticated Linux control socket; output-enabled adoption remains
+unavailable.
 
 [`runtime/core/music_rig_device_ports.c`](runtime/core/music_rig_device_ports.c)
 derives fixed `device.<slot>.midi-input` and `.midi-output` identities from
@@ -284,6 +286,13 @@ adoption, resources, and audio-stability counters. CTest validates the contract,
 a complete synthetic campaign, threshold-boundary failures, and thirteen
 negative semantic cases using only the Python standard library. The fixture is
 not performance evidence and no test connects to the live rack.
+
+The `music_rig_switch_performance` CTest exercises 1,000 alternating device
+switch/reset transactions through the real portable runtime for each required
+load label and enforces the 20 ms control-commit p95 gate. Its clock and storage
+are local test adapters; it also exercises atomic generation adoption and the
+one-processing-period-plus-margin bound. It does not measure daemon resources,
+xruns, dropouts, or live audio behavior.
 
 ## Versioned IPC Contract
 

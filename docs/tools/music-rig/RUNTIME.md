@@ -1,7 +1,7 @@
 # Portable Runtime Control Loop
 
 The portable runtime is a platform-neutral, output-suppressed control
-dispatcher with the first Milestone 4 global commit transaction. It establishes
+dispatcher with Milestone 4 global and device commit transactions. It establishes
 the definition, qualified persistent state, metrics, generation, and adapter
 contracts that Linux and Windows daemon hosts use. It does not create an IPC
 endpoint, bind a device, inspect or change a graph, contact a plugin host,
@@ -50,7 +50,7 @@ uninitialized -> initialized -> running -> stopped
 
 Initialization requires a nonzero generation, an exact 32-byte definition
 fingerprint, an active Rig Profile ID, output-suppressed mode, runtime adapter
-ABI version 5, storage adapter ABI version 1, and a prepared immutable table
+ABI version 6, storage adapter ABI version 1, and a prepared immutable table
 image with a valid stable device-port catalogue. It reads qualified state
 before publishing the initial generation. `run` may be called exactly once. A
 normal stop closes the control adapter and records the monotonic stop time.
@@ -115,8 +115,11 @@ Unset or relative configuration, cache, and state roots fall back below an
 absolute `HOME` as required by the XDG conventions. `XDG_RUNTIME_DIR` must be
 present and absolute because it has no safe persistent fallback. Resolution is
 bounded to 4,096-byte buffers and fails closed on invalid or oversized input.
-The reported control-socket path is only a future location; no socket is
-created.
+The explicit Linux daemon host creates the per-user runtime directory and
+binds an authenticated filesystem `SOCK_SEQPACKET` endpoint at this path. The
+client and response paths use bounded two-second I/O waits; malformed or
+unauthorized peers are closed without terminating the daemon. Startup rejects
+an active same-user socket and removes only a stale socket.
 
 The portable diagnostic dispatcher owns fixed control-thread storage, validates
 bounded printable codes and messages, applies a fixed-window burst limit, and
@@ -210,12 +213,12 @@ links, or emit events. WinMM and other host bindings remain later work.
 ## State And Metrics
 
 Live versioned state records lifecycle, published generation ID, raw definition
-fingerprint, output mode, and monotonic start/stop times. Persistent state v2 is
-exactly 128 bytes: magic, version, generation, fingerprint, output-suppressed
-mode, a 65-byte active Rig Profile ID, reserved bytes, and a 64-bit FNV-1a
-integrity tag. The tag detects accidental corruption; it is not authentication.
-The decoder remains backward-compatible with the 64-byte v1 frame, which has no
-profile ID and therefore restores the configured base profile.
+fingerprint, output mode, and monotonic start/stop times. Persistent state v3 is
+exactly 800 bytes: the v2 fields plus five fixed 130-byte device-override
+entries, reserved bytes, and a final 64-bit FNV-1a integrity tag. The tag
+detects accidental corruption; it is not authentication. The decoder remains
+backward-compatible with the 128-byte v2 and 64-byte v1 frames; older frames
+restore with no device overrides.
 
 A missing state object starts from the compiled definition. State with the same
 fingerprint, a current generation, and an available base or prepared Rig Profile
@@ -255,14 +258,18 @@ Profile IDs, and requires its stable device-slot port catalogue to match the
 base generation. Profile listing and global/device dry-runs can inspect those
 candidates without publishing.
 
-The runtime accepts a non-dry-run global switch in output-suppressed mode. It
+The runtime accepts non-dry-run global and per-device switches in
+output-suppressed mode. It
 plans the target through the same dispatcher, preserves the configured base
 profile as a switch-back target, publishes a bounded internal generation, and
 persists active profile plus generation. Persistence failure republishes the
 previous mapping and rewrites the rolled-back state; both successful and failed
-rollback writes are explicit in the response and metrics. Device override and
-reset commits remain unsupported. A stale expected generation produces result
-code 5 before publication.
+rollback writes are explicit in the response and metrics. Device switches
+compose one prepared profile into the active table while preserving stable
+ports, and reset restores the configured base profile. A stale expected
+generation produces result code 5 before publication.
+Selecting the device's already active profile is an idempotent success: it does
+not publish a generation or create a redundant override.
 
 ## Executable Boundary
 

@@ -84,6 +84,88 @@ static int test_legacy_state_compatibility(void)
     return 0;
 }
 
+static uint64_t test_checksum(const uint8_t *input, size_t input_size)
+{
+    uint64_t value = UINT64_C(14695981039346656037);
+    size_t index;
+
+    for (index = 0U; index < input_size; ++index) {
+        value ^= (uint64_t)input[index];
+        value *= UINT64_C(1099511628211);
+    }
+    return value;
+}
+
+static void test_write_u64(uint8_t *output, uint64_t value)
+{
+    size_t index;
+
+    for (index = 0U; index < 8U; ++index) {
+        output[index] = (uint8_t)(value >> (56U - index * 8U));
+    }
+}
+
+static int test_v2_state_compatibility(void)
+{
+    uint8_t frame[128] = {0};
+    music_rig_persisted_state decoded;
+
+    frame[0] = (uint8_t)'M';
+    frame[1] = (uint8_t)'R';
+    frame[2] = (uint8_t)'S';
+    frame[3] = (uint8_t)'T';
+    frame[7] = UINT8_C(2);
+    frame[15] = UINT8_C(42);
+    frame[52] = (uint8_t)'f';
+    frame[53] = (uint8_t)'u';
+    frame[54] = (uint8_t)'l';
+    frame[55] = (uint8_t)'l';
+    frame[56] = (uint8_t)'-';
+    frame[57] = (uint8_t)'l';
+    frame[58] = (uint8_t)'i';
+    frame[59] = (uint8_t)'v';
+    frame[60] = (uint8_t)'e';
+    frame[61] = (uint8_t)'-';
+    frame[62] = (uint8_t)'r';
+    frame[63] = (uint8_t)'a';
+    frame[64] = (uint8_t)'c';
+    frame[65] = (uint8_t)'k';
+    test_write_u64(frame + 120U, test_checksum(frame, 120U));
+    if (music_rig_state_decode(frame, sizeof(frame), &decoded) !=
+            MUSIC_RIG_RESULT_OK || decoded.generation_id != UINT64_C(42) ||
+        strcmp(decoded.active_rig_profile, "full-live-rack") != 0 ||
+        decoded.device_override_count != 0U) {
+        fputs("v2 state compatibility failed\n", stderr);
+        return 1;
+    }
+    return 0;
+}
+
+static int test_device_override_state(void)
+{
+    music_rig_persisted_state source;
+    music_rig_persisted_state decoded;
+    uint8_t frame[MUSIC_RIG_RUNTIME_STATE_FRAME_SIZE];
+
+    memset(&source, 0, sizeof(source));
+    source.generation_id = UINT64_C(43);
+    source.output_mode = MUSIC_RIG_OUTPUT_SUPPRESSED;
+    strcpy(source.active_rig_profile, "full-live-rack");
+    source.device_override_count = 1U;
+    strcpy(source.device_overrides[0].device_slot, "smc-mixer-main");
+    strcpy(source.device_overrides[0].profile, "multilevel-volume");
+    if (music_rig_state_encode(&source, frame, sizeof(frame)) !=
+            MUSIC_RIG_RESULT_OK || music_rig_state_decode(
+                frame, sizeof(frame), &decoded
+            ) != MUSIC_RIG_RESULT_OK || decoded.device_override_count != 1U ||
+        strcmp(decoded.device_overrides[0].device_slot, "smc-mixer-main") != 0 ||
+        strcmp(decoded.device_overrides[0].profile, "multilevel-volume") != 0) {
+        fputs("device override state round trip failed\n", stderr);
+        return 1;
+    }
+    return 0;
+}
+
 static int test_invalid_arguments(void)
 {
     music_rig_persisted_state state;
@@ -112,5 +194,7 @@ int main(void)
 {
     return test_round_trip_and_corruption() != 0 ||
         test_legacy_state_compatibility() != 0 ||
+        test_v2_state_compatibility() != 0 ||
+        test_device_override_state() != 0 ||
         test_invalid_arguments() != 0;
 }

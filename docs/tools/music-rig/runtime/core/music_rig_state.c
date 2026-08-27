@@ -5,9 +5,14 @@
 #define STATE_MAGIC UINT32_C(0x4d525354)
 #define LEGACY_STATE_VERSION UINT32_C(1)
 #define LEGACY_STATE_FRAME_SIZE ((size_t)64)
+#define STATE_V2_FRAME_SIZE ((size_t)128)
 #define LEGACY_CHECKSUM_OFFSET ((size_t)56)
 #define STATE_PROFILE_OFFSET ((size_t)52)
 #define STATE_CHECKSUM_OFFSET ((size_t)120)
+#define STATE_V3_OVERRIDE_COUNT_OFFSET ((size_t)128)
+#define STATE_V3_OVERRIDE_OFFSET ((size_t)136)
+#define STATE_V3_OVERRIDE_SIZE MUSIC_RIG_PERSISTED_DEVICE_OVERRIDE_FRAME_SIZE
+#define STATE_V3_CHECKSUM_OFFSET ((size_t)792)
 #define FNV1A_OFFSET_BASIS UINT64_C(14695981039346656037)
 #define FNV1A_PRIME UINT64_C(1099511628211)
 
@@ -96,6 +101,12 @@ static bool profile_is_valid(const char *profile)
     return false;
 }
 
+static bool output_mode_is_valid(music_rig_output_mode output_mode)
+{
+    return output_mode == MUSIC_RIG_OUTPUT_SUPPRESSED ||
+        output_mode == MUSIC_RIG_OUTPUT_ENABLED;
+}
+
 music_rig_result music_rig_state_encode(
     const music_rig_persisted_state *state,
     uint8_t *output,
@@ -105,7 +116,7 @@ music_rig_result music_rig_state_encode(
     if (state == NULL || output == NULL ||
         output_size != MUSIC_RIG_RUNTIME_STATE_FRAME_SIZE ||
         state->generation_id == UINT64_C(0) ||
-        state->output_mode != MUSIC_RIG_OUTPUT_SUPPRESSED ||
+        !output_mode_is_valid(state->output_mode) ||
         !profile_is_valid(state->active_rig_profile)) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
@@ -125,10 +136,24 @@ music_rig_result music_rig_state_encode(
         state->active_rig_profile,
         strlen(state->active_rig_profile)
     );
-    write_u64(
-        output + STATE_CHECKSUM_OFFSET,
-        checksum(output, STATE_CHECKSUM_OFFSET)
-    );
+    if (state->device_override_count >
+            MUSIC_RIG_PERSISTED_DEVICE_OVERRIDE_CAPACITY) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+    write_u32(output + STATE_V3_OVERRIDE_COUNT_OFFSET,
+        state->device_override_count);
+    for (size_t index = 0U; index < state->device_override_count; ++index) {
+        const music_rig_persisted_device_override *override =
+            &state->device_overrides[index];
+        if (!profile_is_valid(override->device_slot) ||
+            !profile_is_valid(override->profile)) {
+            return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+        }
+        memcpy(output + STATE_V3_OVERRIDE_OFFSET + index * STATE_V3_OVERRIDE_SIZE,
+            override, sizeof(*override));
+    }
+    write_u64(output + STATE_V3_CHECKSUM_OFFSET,
+        checksum(output, STATE_V3_CHECKSUM_OFFSET));
     return MUSIC_RIG_RESULT_OK;
 }
 
@@ -141,31 +166,42 @@ music_rig_result music_rig_state_decode(
     uint64_t generation_id;
     uint32_t output_mode;
     bool legacy;
+    bool v2;
+    bool v3;
+    bool valid_header;
+    bool valid_checksum;
 
     if (input == NULL || state == NULL) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
 
     legacy = input_size == LEGACY_STATE_FRAME_SIZE;
-    if ((!legacy && input_size != MUSIC_RIG_RUNTIME_STATE_FRAME_SIZE) ||
-        read_u32(input) != STATE_MAGIC ||
-        read_u32(input + 4) != (legacy
-            ? LEGACY_STATE_VERSION
-            : MUSIC_RIG_RUNTIME_STATE_VERSION) ||
-        (legacy
-            ? (read_u32(input + 52) != UINT32_C(0) ||
-                read_u64(input + LEGACY_CHECKSUM_OFFSET) !=
-                    checksum(input, LEGACY_CHECKSUM_OFFSET))
-            : (!bytes_are_zero(input + 117, 3U) ||
-                read_u64(input + STATE_CHECKSUM_OFFSET) !=
-                    checksum(input, STATE_CHECKSUM_OFFSET)))) {
+    v2 = input_size == STATE_V2_FRAME_SIZE;
+    v3 = input_size == MUSIC_RIG_RUNTIME_STATE_FRAME_SIZE;
+    valid_header = (legacy || v2 || v3) && read_u32(input) == STATE_MAGIC &&
+        read_u32(input + 4) == (legacy ? LEGACY_STATE_VERSION :
+            (v2 ? UINT32_C(2) : MUSIC_RIG_RUNTIME_STATE_VERSION));
+    valid_checksum = legacy
+        ? read_u32(input + 52) == UINT32_C(0) &&
+            read_u64(input + LEGACY_CHECKSUM_OFFSET) ==
+                checksum(input, LEGACY_CHECKSUM_OFFSET)
+        : v2
+            ? bytes_are_zero(input + 117, 3U) &&
+                read_u64(input + STATE_CHECKSUM_OFFSET) ==
+                    checksum(input, STATE_CHECKSUM_OFFSET)
+            : bytes_are_zero(input + 132, 4U) &&
+                bytes_are_zero(input + 786, 6U) &&
+                read_u64(input + STATE_V3_CHECKSUM_OFFSET) ==
+                    checksum(input, STATE_V3_CHECKSUM_OFFSET);
+    if (!valid_header || !valid_checksum) {
         return MUSIC_RIG_RESULT_INVALID_DATA;
     }
 
     generation_id = read_u64(input + 8);
     output_mode = read_u32(input + 48);
     if (generation_id == UINT64_C(0) ||
-        output_mode != (uint32_t)MUSIC_RIG_OUTPUT_SUPPRESSED) {
+        (output_mode != (uint32_t)MUSIC_RIG_OUTPUT_SUPPRESSED &&
+         output_mode != (uint32_t)MUSIC_RIG_OUTPUT_ENABLED)) {
         return MUSIC_RIG_RESULT_INVALID_DATA;
     }
 
@@ -185,6 +221,30 @@ music_rig_result music_rig_state_decode(
         );
         if (!profile_is_valid(state->active_rig_profile)) {
             return MUSIC_RIG_RESULT_INVALID_DATA;
+        }
+        if (v3) {
+            uint32_t count = read_u32(input + STATE_V3_OVERRIDE_COUNT_OFFSET);
+            if (count > MUSIC_RIG_PERSISTED_DEVICE_OVERRIDE_CAPACITY) {
+                return MUSIC_RIG_RESULT_INVALID_DATA;
+            }
+            state->device_override_count = count;
+            for (uint32_t index = 0U; index < count; ++index) {
+                memcpy(&state->device_overrides[index],
+                    input + STATE_V3_OVERRIDE_OFFSET + index * STATE_V3_OVERRIDE_SIZE,
+                    sizeof(state->device_overrides[index]));
+                if (!profile_is_valid(state->device_overrides[index].device_slot) ||
+                    !profile_is_valid(state->device_overrides[index].profile)) {
+                    return MUSIC_RIG_RESULT_INVALID_DATA;
+                }
+            }
+            for (uint32_t index = 0U; index < count; ++index) {
+                for (uint32_t previous = 0U; previous < index; ++previous) {
+                    if (strcmp(state->device_overrides[index].device_slot,
+                            state->device_overrides[previous].device_slot) == 0) {
+                        return MUSIC_RIG_RESULT_INVALID_DATA;
+                    }
+                }
+            }
         }
     }
     return MUSIC_RIG_RESULT_OK;

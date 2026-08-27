@@ -1,0 +1,2 @@
+/usr/bin/ar qc libmusic_rig_current_behaviors.a CMakeFiles/music_rig_current_behaviors.dir/runtime/behaviors/music_rig_current_arturia.c.o CMakeFiles/music_rig_current_behaviors.dir/runtime/behaviors/music_rig_current_smk25.c.o
+/usr/bin/ranlib libmusic_rig_current_behaviors.a

@@ -498,8 +498,9 @@ music_rig_result music_rig_control_dispatch_prepared(
     response->rollback_status = (uint32_t)MUSIC_RIG_ROLLBACK_NOT_REQUIRED;
     copy_text(response->active_rig_profile, snapshot->active_rig_profile);
 
-    if (snapshot->output_mode != MUSIC_RIG_OUTPUT_SUPPRESSED) {
-        operation_result = MUSIC_RIG_RESULT_UNSUPPORTED;
+    if (snapshot->output_mode != MUSIC_RIG_OUTPUT_SUPPRESSED &&
+        snapshot->output_mode != MUSIC_RIG_OUTPUT_ENABLED) {
+        operation_result = MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     } else if (request->expected_generation != UINT64_C(0) &&
         request->expected_generation != snapshot->generation_id) {
         operation_result = MUSIC_RIG_RESULT_GENERATION_CONFLICT;

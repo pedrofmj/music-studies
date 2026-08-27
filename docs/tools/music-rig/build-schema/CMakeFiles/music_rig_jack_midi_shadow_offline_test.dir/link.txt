@@ -1,0 +1,1 @@
+/usr/bin/cc -g "CMakeFiles/music_rig_jack_midi_shadow_offline_test.dir/tests/jack-midi-shadow-offline-test.c.o" CMakeFiles/music_rig_jack_midi_shadow_offline_test.dir/runtime/linux/music_rig_jack_midi_shadow.c.o -o music_rig_jack_midi_shadow_offline_test  libmusic_rig_device_midi_shadow.a libmusic_rig_current_behaviors.a libmusic_rig_core.a 

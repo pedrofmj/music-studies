@@ -103,6 +103,7 @@ endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_library(music_rig_linux_host STATIC
+        runtime/linux/music_rig_linux_control_socket.c
         runtime/linux/music_rig_host_paths.c
         runtime/linux/music_rig_journal_diagnostics.c
         runtime/linux/music_rig_linux_lifecycle.c
@@ -110,6 +111,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_include_directories(music_rig_linux_host
         PUBLIC
             "${CMAKE_CURRENT_SOURCE_DIR}/runtime/platform/include"
+            "${CMAKE_CURRENT_SOURCE_DIR}/runtime/linux/include"
     )
     target_link_libraries(music_rig_linux_host PUBLIC music_rig_core)
     target_compile_features(music_rig_linux_host PUBLIC c_std_17)
@@ -177,6 +179,21 @@ add_executable(music-rig
     music-rig.c
 )
 target_link_libraries(music-rig PRIVATE music_rig_cli)
+if(TARGET music_rig_linux_host)
+    target_compile_definitions(music-rig PRIVATE MUSIC_RIG_HAS_LINUX_HOST=1)
+    target_link_libraries(music-rig PRIVATE music_rig_linux_host)
+endif()
+
+add_executable(music_rig_compiled_table_composition_test
+    tests/compiled-table-composition-test.c
+)
+target_link_libraries(music_rig_compiled_table_composition_test
+    PRIVATE music_rig_core
+)
+add_test(
+    NAME music_rig_compiled_table_composition
+    COMMAND music_rig_compiled_table_composition_test
+)
 
 add_executable(music-rigd
     music-rigd.c
@@ -377,6 +394,14 @@ if(BUILD_TESTING)
         tests/runtime-test.c
     )
     target_link_libraries(music_rig_runtime_test PRIVATE music_rig_core)
+    add_executable(music_rig_switch_performance_test
+        tests/switch-performance-test.c
+    )
+    target_link_libraries(music_rig_switch_performance_test PRIVATE music_rig_core)
+    target_compile_features(music_rig_switch_performance_test PRIVATE c_std_17)
+    set_target_properties(music_rig_switch_performance_test PROPERTIES
+        C_EXTENSIONS OFF
+    )
     add_executable(music_rig_control_test
         tests/control-test.c
     )
@@ -481,6 +506,9 @@ if(BUILD_TESTING)
         target_compile_options(music_rig_runtime_test PRIVATE
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
+        target_compile_options(music_rig_switch_performance_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
         target_compile_options(music_rig_control_test PRIVATE
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
@@ -542,6 +570,12 @@ if(BUILD_TESTING)
             -Werror
         )
         target_compile_options(music_rig_runtime_test PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+        target_compile_options(music_rig_switch_performance_test PRIVATE
             -Wall
             -Wextra
             -Wpedantic
@@ -627,6 +661,10 @@ if(BUILD_TESTING)
         COMMAND music_rig_smc_mixer_relay_test
     )
     add_test(NAME music_rig_runtime_test COMMAND music_rig_runtime_test)
+    add_test(
+        NAME music_rig_switch_performance
+        COMMAND music_rig_switch_performance_test
+    )
     add_test(NAME music_rig_control_test COMMAND music_rig_control_test)
     add_test(NAME music_rig_cli_test COMMAND music_rig_cli_test)
     add_test(NAME music_rig_state_test COMMAND music_rig_state_test)
@@ -952,6 +990,37 @@ if(BUILD_TESTING)
         set(MUSIC_RIG_JSON_DEFINITION_FINGERPRINT
             "sha256:b5988448d8346ffdca61bbcebd3d0b8bd4c62ae214923fe55bf1ffdbffbb22c3"
         )
+        set(MUSIC_RIG_MIXED_PADS_DEFINITION
+            "${CMAKE_CURRENT_BINARY_DIR}/compiled-mixed-pads.json"
+        )
+        execute_process(
+            COMMAND "${Python3_EXECUTABLE}"
+                "${MUSIC_RIG_COMPILER}"
+                --rig-root
+                "${CMAKE_CURRENT_SOURCE_DIR}/../../../src/performance-rigs/pedro-performance-rig"
+                --platform-binding airstar-current
+                --rig-profile multilevel-volume-mixed-pads
+                --output "${MUSIC_RIG_MIXED_PADS_DEFINITION}"
+            RESULT_VARIABLE mixed_pads_result
+            OUTPUT_VARIABLE mixed_pads_output
+            ERROR_VARIABLE mixed_pads_error
+        )
+        if(NOT mixed_pads_result EQUAL 0)
+            message(FATAL_ERROR
+                "could not compile mixed-pad definition: ${mixed_pads_error}"
+            )
+        endif()
+        string(REGEX MATCH
+            "definition=sha256:[0-9a-f]+"
+            mixed_pads_fingerprint_match
+            "${mixed_pads_output}"
+        )
+        string(REPLACE "definition=" "" MUSIC_RIG_MIXED_PADS_FINGERPRINT
+            "${mixed_pads_fingerprint_match}"
+        )
+        if(MUSIC_RIG_MIXED_PADS_FINGERPRINT STREQUAL "")
+            message(FATAL_ERROR "mixed-pad definition fingerprint was not reported")
+        endif()
         add_executable(music_rig_json_definition_test
             tests/json-definition-test.c
         )
@@ -1136,6 +1205,26 @@ if(BUILD_TESTING)
             music_rig_shadow_idle_workload PROPERTIES TIMEOUT 5
         )
         if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+            add_executable(music_rig_daemon_ipc_process_test
+                tests/daemon-ipc-process-test.c
+            )
+            target_compile_features(music_rig_daemon_ipc_process_test PRIVATE c_std_17)
+            set_target_properties(music_rig_daemon_ipc_process_test PROPERTIES
+                C_EXTENSIONS OFF
+            )
+            target_compile_options(music_rig_daemon_ipc_process_test PRIVATE
+                -Wall -Wextra -Wpedantic -Werror
+            )
+            add_test(
+                NAME music_rig_daemon_ipc_process
+                COMMAND music_rig_daemon_ipc_process_test
+                    $<TARGET_FILE:music-rigd>
+                    $<TARGET_FILE:music-rig>
+                    "${MUSIC_RIG_JSON_DEFINITION_FIXTURE}"
+                    "${MUSIC_RIG_JSON_DEFINITION_FINGERPRINT}"
+                    "${MUSIC_RIG_MIXED_PADS_DEFINITION}"
+                    "${MUSIC_RIG_MIXED_PADS_FINGERPRINT}"
+            )
             add_test(
                 NAME music_rig_shadow_idle_resource_mechanics
                 COMMAND "${Python3_EXECUTABLE}"

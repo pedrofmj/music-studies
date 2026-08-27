@@ -38,6 +38,76 @@ static void copy_profile(char *target, const char *source)
     memcpy(target, source, strlen(source) + 1U);
 }
 
+static int device_override_index(
+    const music_rig_runtime *runtime,
+    const char *device_slot
+)
+{
+    uint32_t index;
+
+    for (index = 0U; index < runtime->device_override_count; ++index) {
+        if (strcmp(runtime->device_overrides[index].device_slot,
+                device_slot) == 0) {
+            return (int)index;
+        }
+    }
+    return -1;
+}
+
+static const music_rig_compiled_tables *device_profile_tables(
+    const music_rig_runtime *runtime,
+    const char *device_slot,
+    const char *profile
+)
+{
+    size_t index;
+    uint16_t profile_index;
+
+    for (index = 0U; index < runtime->prepared_definition_count; ++index) {
+        const music_rig_prepared_definition *prepared =
+            &runtime->prepared_definitions[index];
+
+        if (music_rig_compiled_profile_index(
+                prepared->tables, device_slot, &profile_index
+            ) == MUSIC_RIG_RESULT_OK && strcmp(
+                prepared->tables->device_profiles[profile_index].profile,
+                profile
+            ) == 0) {
+            return prepared->tables;
+        }
+    }
+    return NULL;
+}
+
+static int free_device_override_table(const music_rig_runtime *runtime)
+{
+    size_t index;
+
+    for (index = 0U; index < MUSIC_RIG_PERSISTED_DEVICE_OVERRIDE_CAPACITY;
+         ++index) {
+        if (!runtime->device_override_table_in_use[index]) {
+            return (int)index;
+        }
+    }
+    return -1;
+}
+
+static void release_device_override_table(
+    music_rig_runtime *runtime,
+    const music_rig_compiled_tables *tables
+)
+{
+    size_t index;
+
+    for (index = 0U; index < MUSIC_RIG_PERSISTED_DEVICE_OVERRIDE_CAPACITY;
+         ++index) {
+        if (&runtime->device_override_tables[index] == tables) {
+            runtime->device_override_table_in_use[index] = false;
+            return;
+        }
+    }
+}
+
 static const music_rig_compiled_tables *profile_tables(
     const music_rig_runtime *runtime,
     const char *profile
@@ -75,6 +145,58 @@ static bool interfaces_are_valid(
         interfaces->storage.abi_version == MUSIC_RIG_STORAGE_ABI_VERSION &&
         interfaces->storage.read != NULL &&
         interfaces->storage.atomic_replace != NULL;
+}
+
+static bool output_adoption_is_valid(
+    const music_rig_output_adoption_adapter *adapter
+)
+{
+    return adapter != NULL &&
+        adapter->abi_version ==
+            MUSIC_RIG_OUTPUT_ADOPTION_ADAPTER_ABI_VERSION &&
+        adapter->prepare != NULL && adapter->confirm != NULL;
+}
+
+static music_rig_result prepare_output_generation(
+    music_rig_runtime *runtime,
+    const music_rig_generation *generation
+)
+{
+    music_rig_result result;
+
+    increment(&runtime->metrics.output_preparations);
+    result = runtime->output_adoption.prepare(
+        runtime->output_adoption.context,
+        generation
+    );
+    if (result != MUSIC_RIG_RESULT_OK) {
+        increment(&runtime->metrics.output_adoption_failures);
+        if (result == MUSIC_RIG_RESULT_ADAPTER_FAILURE) {
+            increment(&runtime->metrics.adapter_failures);
+        }
+    }
+    return result;
+}
+
+static music_rig_result confirm_output_generation(
+    music_rig_runtime *runtime,
+    const music_rig_generation *generation
+)
+{
+    music_rig_result result = runtime->output_adoption.confirm(
+        runtime->output_adoption.context,
+        generation
+    );
+
+    if (result == MUSIC_RIG_RESULT_OK) {
+        increment(&runtime->metrics.output_adoptions);
+    } else {
+        increment(&runtime->metrics.output_adoption_failures);
+        if (result == MUSIC_RIG_RESULT_ADAPTER_FAILURE) {
+            increment(&runtime->metrics.adapter_failures);
+        }
+    }
+    return result;
 }
 
 static music_rig_result restore_state(music_rig_runtime *runtime)
@@ -125,6 +247,43 @@ static music_rig_result restore_state(music_rig_runtime *runtime)
     if (tables == NULL) {
         increment(&runtime->metrics.state_fallbacks);
         return MUSIC_RIG_RESULT_OK;
+    }
+
+    runtime->base_tables = tables;
+    runtime->device_override_count = 0U;
+    {
+        const music_rig_compiled_tables *current = tables;
+    for (uint32_t index = 0U; index < persisted.device_override_count; ++index) {
+        const music_rig_compiled_tables *source = device_profile_tables(
+            runtime,
+            persisted.device_overrides[index].device_slot,
+            persisted.device_overrides[index].profile
+        );
+        int table_index = free_device_override_table(runtime);
+
+        if (source == NULL || table_index < 0 ||
+            music_rig_compiled_tables_compose_device(
+                current,
+                source,
+                persisted.device_overrides[index].device_slot,
+                &runtime->device_override_tables[table_index]
+            ) != MUSIC_RIG_RESULT_OK) {
+            memset(runtime->device_override_table_in_use, 0,
+                sizeof(runtime->device_override_table_in_use));
+            runtime->device_override_count = 0U;
+            increment(&runtime->metrics.state_fallbacks);
+            return MUSIC_RIG_RESULT_OK;
+        }
+        runtime->device_override_table_in_use[table_index] = true;
+        runtime->device_overrides[index] = persisted.device_overrides[index];
+        runtime->device_override_count += 1U;
+        current = &runtime->device_override_tables[table_index];
+    }
+    }
+    if (runtime->device_override_count != 0U) {
+        tables = &runtime->device_override_tables[
+            runtime->device_override_count - 1U
+        ];
     }
 
     runtime->initial_generation.id = persisted.generation_id;
@@ -218,14 +377,19 @@ music_rig_result music_rig_runtime_init(
             config->prepared_definitions == NULL)) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
-    if (config->output_mode != MUSIC_RIG_OUTPUT_SUPPRESSED) {
-        return MUSIC_RIG_RESULT_UNSUPPORTED;
+    if (config->output_mode != MUSIC_RIG_OUTPUT_SUPPRESSED &&
+        (config->output_mode != MUSIC_RIG_OUTPUT_ENABLED ||
+         !output_adoption_is_valid(config->output_adoption))) {
+        return config->output_mode == MUSIC_RIG_OUTPUT_ENABLED
+            ? MUSIC_RIG_RESULT_INVALID_ARGUMENT
+            : MUSIC_RIG_RESULT_UNSUPPORTED;
     }
 
     memset(runtime, 0, sizeof(*runtime));
     runtime->interfaces = *interfaces;
     runtime->initial_generation = *config->initial_generation;
     runtime->initial_tables = config->initial_generation->mapping;
+    runtime->base_tables = runtime->initial_tables;
     runtime->prepared_definitions = config->prepared_definitions;
     runtime->prepared_definition_count = config->prepared_definition_count;
     runtime->state.schema_version = MUSIC_RIG_RUNTIME_STATE_VERSION;
@@ -238,6 +402,9 @@ music_rig_result music_rig_runtime_init(
     copy_profile(runtime->active_rig_profile, config->active_rig_profile);
     copy_profile(runtime->initial_rig_profile, config->active_rig_profile);
     runtime->state.output_mode = config->output_mode;
+    if (config->output_mode == MUSIC_RIG_OUTPUT_ENABLED) {
+        runtime->output_adoption = *config->output_adoption;
+    }
 
     result = music_rig_device_port_catalogue_build(
         runtime->initial_tables,
@@ -261,6 +428,19 @@ music_rig_result music_rig_runtime_init(
     result = restore_state(runtime);
     if (result != MUSIC_RIG_RESULT_OK) {
         return result;
+    }
+    if (runtime->state.output_mode == MUSIC_RIG_OUTPUT_ENABLED) {
+        result = prepare_output_generation(runtime, &runtime->initial_generation);
+        if (result == MUSIC_RIG_RESULT_OK) {
+            result = confirm_output_generation(
+                runtime, &runtime->initial_generation
+            );
+        }
+        if (result != MUSIC_RIG_RESULT_OK) {
+            memset(&runtime->output_adoption, 0,
+                sizeof(runtime->output_adoption));
+            return result;
+        }
     }
     result = music_rig_generation_slot_init(
         &runtime->generations,
@@ -308,6 +488,13 @@ music_rig_result music_rig_runtime_publish_generation(
         return MUSIC_RIG_RESULT_INVALID_DATA;
     }
 
+    if (runtime->state.output_mode == MUSIC_RIG_OUTPUT_ENABLED) {
+        result = prepare_output_generation(runtime, next_generation);
+        if (result != MUSIC_RIG_RESULT_OK) {
+            return result;
+        }
+    }
+
     result = music_rig_generation_slot_publish(
         &runtime->generations,
         next_generation
@@ -327,6 +514,46 @@ music_rig_result music_rig_runtime_publish_generation(
     runtime->state.generation_id = next_generation->id;
     runtime->control_generation = next_generation;
     increment(&runtime->metrics.generation_publications);
+    if (runtime->state.output_mode == MUSIC_RIG_OUTPUT_ENABLED) {
+        return confirm_output_generation(runtime, next_generation);
+    }
+    return MUSIC_RIG_RESULT_OK;
+}
+
+music_rig_result music_rig_runtime_enable_output(
+    music_rig_runtime *runtime,
+    const music_rig_output_adoption_adapter *adapter
+)
+{
+    music_rig_result result;
+
+    if (runtime == NULL || !output_adoption_is_valid(adapter)) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+    if (runtime->state.lifecycle != MUSIC_RIG_RUNTIME_INITIALIZED ||
+        runtime->state.output_mode != MUSIC_RIG_OUTPUT_SUPPRESSED) {
+        return MUSIC_RIG_RESULT_INVALID_STATE;
+    }
+
+    runtime->output_adoption = *adapter;
+    result = prepare_output_generation(runtime, runtime->control_generation);
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = confirm_output_generation(
+            runtime,
+            runtime->control_generation
+        );
+    }
+    if (result != MUSIC_RIG_RESULT_OK) {
+        memset(
+            &runtime->output_adoption,
+            0,
+            sizeof(runtime->output_adoption)
+        );
+        return result;
+    }
+
+    runtime->state.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
+    increment(&runtime->metrics.output_enablements);
     return MUSIC_RIG_RESULT_OK;
 }
 
@@ -404,6 +631,7 @@ const music_rig_generation *music_rig_runtime_reclaim_generation(
             return NULL;
         }
         increment(&runtime->metrics.generation_reclamations);
+        release_device_override_table(runtime, generation->mapping);
         if (generation != &runtime->initial_generation &&
             !release_commit_generation(runtime, generation)) {
             return generation;
@@ -571,6 +799,11 @@ static music_rig_result commit_global_switch(
     music_rig_generation *commit_generation;
     music_rig_generation *rollback_generation;
     char previous_profile[MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY];
+    const music_rig_compiled_tables *previous_base_tables;
+    music_rig_persisted_device_override previous_overrides[
+        MUSIC_RIG_PERSISTED_DEVICE_OVERRIDE_CAPACITY
+    ];
+    uint32_t previous_override_count;
     music_rig_result result;
     uint64_t published_ns;
     size_t retired_count;
@@ -607,6 +840,10 @@ static music_rig_result commit_global_switch(
     }
 
     copy_profile(previous_profile, runtime->active_rig_profile);
+    previous_base_tables = runtime->base_tables;
+    previous_override_count = runtime->device_override_count;
+    memcpy(previous_overrides, runtime->device_overrides,
+        sizeof(previous_overrides));
     commit_generation = allocate_commit_generation(
         runtime,
         runtime->state.generation_id + UINT64_C(1),
@@ -636,6 +873,8 @@ static music_rig_result commit_global_switch(
         : UINT64_C(0);
 
     copy_profile(runtime->active_rig_profile, request->profile);
+    runtime->base_tables = target_tables;
+    runtime->device_override_count = 0U;
     result = music_rig_runtime_persist_state(runtime);
     if (result == MUSIC_RIG_RESULT_OK) {
         response->resulting_generation = runtime->state.generation_id;
@@ -662,6 +901,10 @@ static music_rig_result commit_global_switch(
             runtime->state.generation_id
         ) == MUSIC_RIG_RESULT_OK) {
         copy_profile(runtime->active_rig_profile, previous_profile);
+        runtime->base_tables = previous_base_tables;
+        runtime->device_override_count = previous_override_count;
+        memcpy(runtime->device_overrides, previous_overrides,
+            sizeof(previous_overrides));
         response->resulting_generation = runtime->state.generation_id;
         copy_profile(
             response->active_rig_profile,
@@ -689,6 +932,232 @@ static music_rig_result commit_global_switch(
         increment(&runtime->metrics.commit_rollback_failures);
     }
     set_commit_failure(response, MUSIC_RIG_RESULT_ADAPTER_FAILURE);
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static void restore_device_transaction(
+    music_rig_runtime *runtime,
+    const music_rig_persisted_device_override *overrides,
+    uint32_t override_count,
+    const music_rig_generation *previous_generation,
+    music_rig_protocol_response *response
+)
+{
+    music_rig_generation *rollback_generation;
+
+    memcpy(runtime->device_overrides, overrides,
+        sizeof(runtime->device_overrides));
+    runtime->device_override_count = override_count;
+    rollback_generation = allocate_commit_generation(
+        runtime,
+        runtime->state.generation_id + UINT64_C(1),
+        (const music_rig_compiled_tables *)previous_generation->mapping
+    );
+    if (rollback_generation != NULL && music_rig_runtime_publish_generation(
+            runtime, rollback_generation, runtime->state.generation_id
+        ) == MUSIC_RIG_RESULT_OK && music_rig_runtime_persist_state(runtime) ==
+            MUSIC_RIG_RESULT_OK) {
+        response->rollback_status = (uint32_t)MUSIC_RIG_ROLLBACK_SUCCEEDED;
+        increment(&runtime->metrics.commit_rollbacks);
+    } else {
+        if (rollback_generation != NULL) {
+            release_commit_generation(runtime, rollback_generation);
+        }
+        response->rollback_status = (uint32_t)MUSIC_RIG_ROLLBACK_FAILED;
+        increment(&runtime->metrics.commit_rollback_failures);
+    }
+    set_commit_failure(response, MUSIC_RIG_RESULT_ADAPTER_FAILURE);
+}
+
+static music_rig_result commit_device_switch(
+    music_rig_runtime *runtime,
+    const music_rig_protocol_request *request,
+    music_rig_protocol_response *response
+)
+{
+    music_rig_persisted_device_override previous_overrides[
+        MUSIC_RIG_PERSISTED_DEVICE_OVERRIDE_CAPACITY
+    ];
+    const music_rig_generation *previous_generation =
+        runtime->control_generation;
+    const music_rig_compiled_tables *source;
+    music_rig_compiled_tables *composed;
+    music_rig_generation *generation;
+    int override_index;
+    int table_index;
+    uint32_t previous_count;
+    music_rig_result result;
+
+    increment(&runtime->metrics.commit_requests);
+    if (response->result_code != (uint32_t)MUSIC_RIG_RESULT_OK) {
+        return MUSIC_RIG_RESULT_OK;
+    }
+    {
+        uint16_t active_index;
+
+        if (music_rig_compiled_profile_index(
+                runtime->control_generation->mapping,
+                request->device_slot,
+                &active_index
+            ) == MUSIC_RIG_RESULT_OK && strcmp(
+                ((const music_rig_compiled_tables *)
+                    runtime->control_generation->mapping)->device_profiles[
+                    active_index
+                ].profile,
+                request->profile
+            ) == 0) {
+            response->flags &= ~MUSIC_RIG_RESPONSE_DRY_RUN;
+            response->flags |= MUSIC_RIG_RESPONSE_VALID |
+                MUSIC_RIG_RESPONSE_GRAPH_DELTA_EMPTY;
+            response->resulting_generation = runtime->state.generation_id;
+            return MUSIC_RIG_RESULT_OK;
+        }
+    }
+    source = device_profile_tables(
+        runtime, request->device_slot, request->profile
+    );
+    if (source == NULL) {
+        set_commit_failure(response, MUSIC_RIG_RESULT_NOT_FOUND);
+        return MUSIC_RIG_RESULT_OK;
+    }
+    override_index = device_override_index(runtime, request->device_slot);
+    if (override_index < 0) {
+        if (runtime->device_override_count >=
+                MUSIC_RIG_PERSISTED_DEVICE_OVERRIDE_CAPACITY) {
+            set_commit_failure(response, MUSIC_RIG_RESULT_INVALID_STATE);
+            return MUSIC_RIG_RESULT_OK;
+        }
+        override_index = (int)runtime->device_override_count;
+    }
+    table_index = free_device_override_table(runtime);
+    if (table_index < 0) {
+        set_commit_failure(response, MUSIC_RIG_RESULT_INVALID_STATE);
+        return MUSIC_RIG_RESULT_OK;
+    }
+    runtime->device_override_table_in_use[table_index] = true;
+    composed = &runtime->device_override_tables[table_index];
+    result = music_rig_compiled_tables_compose_device(
+        runtime->control_generation->mapping,
+        source,
+        request->device_slot,
+        composed
+    );
+    if (result != MUSIC_RIG_RESULT_OK) {
+        runtime->device_override_table_in_use[table_index] = false;
+        set_commit_failure(response, result);
+        return MUSIC_RIG_RESULT_OK;
+    }
+    memcpy(previous_overrides, runtime->device_overrides,
+        sizeof(previous_overrides));
+    previous_count = runtime->device_override_count;
+    generation = allocate_commit_generation(runtime,
+        runtime->state.generation_id + UINT64_C(1), composed);
+    if (generation == NULL || music_rig_runtime_publish_generation(
+            runtime, generation, request->expected_generation
+        ) != MUSIC_RIG_RESULT_OK) {
+        if (generation != NULL) release_commit_generation(runtime, generation);
+        runtime->device_override_table_in_use[table_index] = false;
+        set_commit_failure(response, MUSIC_RIG_RESULT_GENERATION_CONFLICT);
+        return MUSIC_RIG_RESULT_OK;
+    }
+    if ((uint32_t)override_index == runtime->device_override_count) {
+        runtime->device_override_count += 1U;
+    }
+    copy_profile(runtime->device_overrides[override_index].device_slot,
+        request->device_slot);
+    copy_profile(runtime->device_overrides[override_index].profile,
+        request->profile);
+    if (music_rig_runtime_persist_state(runtime) != MUSIC_RIG_RESULT_OK) {
+        restore_device_transaction(
+            runtime, previous_overrides, previous_count,
+            previous_generation, response
+        );
+        return MUSIC_RIG_RESULT_OK;
+    }
+    copy_profile(response->selected_device_slot, request->device_slot);
+    copy_profile(response->selected_profile, request->profile);
+    response->resulting_generation = runtime->state.generation_id;
+    response->flags &= ~MUSIC_RIG_RESPONSE_DRY_RUN;
+    response->flags |= MUSIC_RIG_RESPONSE_VALID |
+        MUSIC_RIG_RESPONSE_GRAPH_DELTA_EMPTY;
+    increment(&runtime->metrics.commit_successes);
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result reset_device_override(
+    music_rig_runtime *runtime,
+    const music_rig_protocol_request *request,
+    music_rig_protocol_response *response
+)
+{
+    music_rig_persisted_device_override previous_overrides[
+        MUSIC_RIG_PERSISTED_DEVICE_OVERRIDE_CAPACITY
+    ];
+    const music_rig_generation *previous_generation =
+        runtime->control_generation;
+    music_rig_compiled_tables *composed;
+    music_rig_generation *generation;
+    int override_index = device_override_index(runtime, request->device_slot);
+    int table_index;
+    uint32_t previous_count;
+
+    increment(&runtime->metrics.commit_requests);
+    if (response->result_code != (uint32_t)MUSIC_RIG_RESULT_OK) {
+        return MUSIC_RIG_RESULT_OK;
+    }
+    if (override_index < 0) {
+        response->flags &= ~MUSIC_RIG_RESPONSE_DRY_RUN;
+        response->flags |= MUSIC_RIG_RESPONSE_VALID |
+            MUSIC_RIG_RESPONSE_GRAPH_DELTA_EMPTY;
+        return MUSIC_RIG_RESULT_OK;
+    }
+    table_index = free_device_override_table(runtime);
+    if (table_index < 0) {
+        set_commit_failure(response, MUSIC_RIG_RESULT_INVALID_STATE);
+        return MUSIC_RIG_RESULT_OK;
+    }
+    runtime->device_override_table_in_use[table_index] = true;
+    composed = &runtime->device_override_tables[table_index];
+    if (music_rig_compiled_tables_compose_device(
+            runtime->control_generation->mapping,
+            runtime->base_tables,
+            request->device_slot,
+            composed
+        ) != MUSIC_RIG_RESULT_OK) {
+        runtime->device_override_table_in_use[table_index] = false;
+        set_commit_failure(response, MUSIC_RIG_RESULT_INVALID_DATA);
+        return MUSIC_RIG_RESULT_OK;
+    }
+    memcpy(previous_overrides, runtime->device_overrides,
+        sizeof(previous_overrides));
+    previous_count = runtime->device_override_count;
+    generation = allocate_commit_generation(runtime,
+        runtime->state.generation_id + UINT64_C(1), composed);
+    if (generation == NULL || music_rig_runtime_publish_generation(
+            runtime, generation, request->expected_generation
+        ) != MUSIC_RIG_RESULT_OK) {
+        if (generation != NULL) release_commit_generation(runtime, generation);
+        runtime->device_override_table_in_use[table_index] = false;
+        set_commit_failure(response, MUSIC_RIG_RESULT_GENERATION_CONFLICT);
+        return MUSIC_RIG_RESULT_OK;
+    }
+    for (uint32_t index = (uint32_t)override_index;
+         index + 1U < runtime->device_override_count; ++index) {
+        runtime->device_overrides[index] = runtime->device_overrides[index + 1U];
+    }
+    runtime->device_override_count -= 1U;
+    if (music_rig_runtime_persist_state(runtime) != MUSIC_RIG_RESULT_OK) {
+        restore_device_transaction(
+            runtime, previous_overrides, previous_count,
+            previous_generation, response
+        );
+        return MUSIC_RIG_RESULT_OK;
+    }
+    response->resulting_generation = runtime->state.generation_id;
+    response->flags &= ~MUSIC_RIG_RESPONSE_DRY_RUN;
+    response->flags |= MUSIC_RIG_RESPONSE_VALID |
+        MUSIC_RIG_RESPONSE_GRAPH_DELTA_EMPTY;
+    increment(&runtime->metrics.commit_successes);
     return MUSIC_RIG_RESULT_OK;
 }
 
@@ -741,13 +1210,39 @@ music_rig_result music_rig_runtime_dispatch(
             );
         }
     } else {
-        result = music_rig_control_dispatch_prepared(
-            &snapshot,
-            runtime->prepared_definitions,
-            runtime->prepared_definition_count,
-            request,
-            response
-        );
+        if (request->flags == MUSIC_RIG_REQUEST_DRY_RUN ||
+            (request->operation !=
+                (uint32_t)MUSIC_RIG_OPERATION_SWITCH_DEVICE &&
+             request->operation !=
+                (uint32_t)MUSIC_RIG_OPERATION_RESET_DEVICE_OVERRIDE)) {
+            result = music_rig_control_dispatch_prepared(
+                &snapshot,
+                runtime->prepared_definitions,
+                runtime->prepared_definition_count,
+                request,
+                response
+            );
+        } else {
+            music_rig_protocol_request plan_request = *request;
+            plan_request.flags = MUSIC_RIG_REQUEST_DRY_RUN;
+            result = music_rig_control_dispatch_prepared(
+                &snapshot,
+                runtime->prepared_definitions,
+                runtime->prepared_definition_count,
+                &plan_request,
+                response
+            );
+            if (result == MUSIC_RIG_RESULT_OK &&
+                request->operation ==
+                    (uint32_t)MUSIC_RIG_OPERATION_SWITCH_DEVICE) {
+                result = commit_device_switch(runtime, request, response);
+            }
+            if (result == MUSIC_RIG_RESULT_OK &&
+                request->operation ==
+                    (uint32_t)MUSIC_RIG_OPERATION_RESET_DEVICE_OVERRIDE) {
+                result = reset_device_override(runtime, request, response);
+            }
+        }
     }
     finished_ns = runtime->interfaces.clock.now_ns(
         runtime->interfaces.clock.context
@@ -793,6 +1288,9 @@ music_rig_result music_rig_runtime_persist_state(music_rig_runtime *runtime)
         persisted.active_rig_profile,
         runtime->active_rig_profile
     );
+    persisted.device_override_count = runtime->device_override_count;
+    memcpy(persisted.device_overrides, runtime->device_overrides,
+        sizeof(persisted.device_overrides));
     result = music_rig_state_encode(&persisted, frame, sizeof(frame));
     if (result != MUSIC_RIG_RESULT_OK) {
         return result;

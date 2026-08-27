@@ -152,6 +152,21 @@ static void observe_suppressed(
     shadow->observer.suppressed_midi(shadow->observer.context, &event);
 }
 
+static void observe_output(
+    music_rig_device_midi_shadow *shadow,
+    size_t slot_index,
+    uint32_t frame,
+    const uint8_t *message,
+    size_t message_size
+)
+{
+    if (shadow->observer.output_midi != NULL) {
+        shadow->observer.output_midi(
+            shadow->observer.context, slot_index, frame, message, message_size
+        );
+    }
+}
+
 static void smk25_emit(
     void *opaque,
     size_t route_index,
@@ -162,14 +177,13 @@ static void smk25_emit(
 {
     smk25_emit_context *context = opaque;
 
-    observe_suppressed(
-        context->shadow,
-        context->slot_index,
-        route_index,
-        frame,
-        message,
-        message_size
-    );
+    if (context->shadow->observer.output_midi != NULL) {
+        observe_output(context->shadow, context->slot_index, frame,
+            message, message_size);
+    } else {
+        observe_suppressed(context->shadow, context->slot_index, route_index,
+            frame, message, message_size);
+    }
 }
 
 void music_rig_device_midi_shadow_config_init(
@@ -405,14 +419,13 @@ music_rig_result music_rig_device_midi_shadow_process(
             &decision
         );
         if (result == MUSIC_RIG_RESULT_OK && decision.output_ready) {
-            observe_suppressed(
-                shadow,
-                slot_index,
-                0U,
-                frame,
-                decision.output,
-                sizeof(decision.output)
-            );
+            if (shadow->observer.output_midi != NULL) {
+                observe_output(shadow, slot_index, frame, decision.output,
+                    sizeof(decision.output));
+            } else {
+                observe_suppressed(shadow, slot_index, 0U, frame,
+                    decision.output, sizeof(decision.output));
+            }
         }
     } else if (slot->behavior ==
         MUSIC_RIG_DEVICE_MIDI_SHADOW_BEHAVIOR_CURRENT_SMK25) {

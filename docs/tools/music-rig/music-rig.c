@@ -1,5 +1,9 @@
 #include "music_rig/core.h"
 #include "music_rig/cli.h"
+#if defined(MUSIC_RIG_HAS_LINUX_HOST)
+#include "music_rig/host_paths.h"
+#include "music_rig/linux_control_socket.h"
+#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -22,14 +26,15 @@ static void print_usage(FILE *stream, const char *program)
     fprintf(stream, "       %s switch --global PROFILE [--dry-run] [--json]\n",
         program);
     fprintf(stream,
-        "       %s switch --device SLOT --profile PROFILE --dry-run "
+        "       %s switch --device SLOT --profile PROFILE [--dry-run] "
         "[--json]\n",
         program
     );
-    fprintf(stream, "       %s reset --device SLOT --dry-run [--json]\n",
+    fprintf(stream, "       %s reset --device SLOT [--dry-run] [--json]\n",
         program);
 }
 
+#if !defined(MUSIC_RIG_HAS_LINUX_HOST)
 static music_rig_result unavailable_exchange(
     void *context,
     const music_rig_protocol_request *request,
@@ -41,6 +46,29 @@ static music_rig_result unavailable_exchange(
     (void)response;
     return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
 }
+#endif
+
+#if defined(MUSIC_RIG_HAS_LINUX_HOST)
+static music_rig_result connect_linux_transport(
+    music_rig_linux_control_client *client,
+    music_rig_client_transport *transport
+)
+{
+    music_rig_host_paths paths;
+    music_rig_result result = music_rig_linux_host_paths_from_process(&paths);
+
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_linux_control_client_connect(
+            client, paths.control_socket
+        );
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        transport->context = client;
+        transport->exchange = music_rig_linux_control_client_exchange;
+    }
+    return result;
+}
+#endif
 
 int main(int argc, char **argv)
 {
@@ -50,6 +78,9 @@ int main(int argc, char **argv)
     char output[8192];
     size_t output_size;
     music_rig_result result;
+#if defined(MUSIC_RIG_HAS_LINUX_HOST)
+    music_rig_linux_control_client client = {-1};
+#endif
 
     if (argc == 2 &&
         (strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "version") == 0)) {
@@ -73,8 +104,22 @@ int main(int argc, char **argv)
         &command
     );
     if (result == MUSIC_RIG_RESULT_OK) {
+#if defined(MUSIC_RIG_HAS_LINUX_HOST)
+        result = connect_linux_transport(&client, &transport);
+        if (result != MUSIC_RIG_RESULT_OK) {
+            fputs(
+                "music-rig: control transport is not configured; "
+                "no request was sent\n",
+                stderr
+            );
+            return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+        }
+#else
         transport.context = NULL;
         transport.exchange = unavailable_exchange;
+#endif
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
         result = music_rig_cli_execute(
             &command,
             &transport,
@@ -91,6 +136,9 @@ int main(int argc, char **argv)
                 stderr
             );
         }
+#if defined(MUSIC_RIG_HAS_LINUX_HOST)
+        (void)music_rig_linux_control_client_close(&client);
+#endif
         return (int)result;
     }
 

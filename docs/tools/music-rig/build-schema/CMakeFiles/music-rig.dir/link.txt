@@ -1,0 +1,1 @@
+/usr/bin/cc -g "CMakeFiles/music-rig.dir/music-rig.c.o" -o music-rig  libmusic_rig_cli.a libmusic_rig_linux_host.a libmusic_rig_core.a 

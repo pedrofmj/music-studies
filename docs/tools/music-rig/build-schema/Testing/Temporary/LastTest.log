@@ -1,0 +1,970 @@
+Start testing: Aug 26 20:04 -03
+----------------------------------------------------------
+1/61 Testing: music_rig_compiled_table_composition
+1/61 Test: music_rig_compiled_table_composition
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_compiled_table_composition_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_compiled_table_composition" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_compiled_table_composition" end time: Aug 26 20:04 -03
+"music_rig_compiled_table_composition" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/61 Testing: music_rig_core_test
+2/61 Test: music_rig_core_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_core_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_core_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_core_test" end time: Aug 26 20:04 -03
+"music_rig_core_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/61 Testing: music_rig_protocol_test
+3/61 Test: music_rig_protocol_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_protocol_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_protocol_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_protocol_test" end time: Aug 26 20:04 -03
+"music_rig_protocol_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/61 Testing: music_rig_device_ports_test
+4/61 Test: music_rig_device_ports_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_device_ports_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_device_ports_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_device_ports_test" end time: Aug 26 20:04 -03
+"music_rig_device_ports_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/61 Testing: music_rig_diagnostics_test
+5/61 Test: music_rig_diagnostics_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_diagnostics_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_diagnostics_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_diagnostics_test" end time: Aug 26 20:04 -03
+"music_rig_diagnostics_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/61 Testing: music_rig_current_behaviors_test
+6/61 Test: music_rig_current_behaviors_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_current_behaviors_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_current_behaviors_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+Current behavior tests: OK (Arturia behavior=24 snapshot=8; SMK-25 behavior=2352 snapshot=1052 bytes)
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_current_behaviors_test" end time: Aug 26 20:04 -03
+"music_rig_current_behaviors_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/61 Testing: music_rig_device_midi_shadow_test
+7/61 Test: music_rig_device_midi_shadow_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_device_midi_shadow_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_device_midi_shadow_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+Device/MIDI shadow test: OK (storage=40840 bytes)
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_device_midi_shadow_test" end time: Aug 26 20:04 -03
+"music_rig_device_midi_shadow_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/61 Testing: music_rig_smc_mixer_relay_test
+8/61 Test: music_rig_smc_mixer_relay_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_smc_mixer_relay_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_smc_mixer_relay_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+SMC-Mixer compiled relay test: OK (storage=392 bytes)
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_smc_mixer_relay_test" end time: Aug 26 20:04 -03
+"music_rig_smc_mixer_relay_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/61 Testing: music_rig_runtime_test
+9/61 Test: music_rig_runtime_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_runtime_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_runtime_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_runtime_test" end time: Aug 26 20:04 -03
+"music_rig_runtime_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/61 Testing: music_rig_control_test
+10/61 Test: music_rig_control_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_control_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_control_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_control_test" end time: Aug 26 20:04 -03
+"music_rig_control_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/61 Testing: music_rig_cli_test
+11/61 Test: music_rig_cli_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_cli_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_cli_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_cli_test" end time: Aug 26 20:04 -03
+"music_rig_cli_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/61 Testing: music_rig_state_test
+12/61 Test: music_rig_state_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_state_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_state_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_state_test" end time: Aug 26 20:04 -03
+"music_rig_state_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/61 Testing: music_rig_definition_test
+13/61 Test: music_rig_definition_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_definition_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_definition_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_definition_test" end time: Aug 26 20:04 -03
+"music_rig_definition_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/61 Testing: music_rig_file_storage_test
+14/61 Test: music_rig_file_storage_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_file_storage_test" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/fixtures/compiled-current-envelope.json" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/file-storage-state.bin" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/missing-storage-parent/state.bin"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_file_storage_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_file_storage_test" end time: Aug 26 20:04 -03
+"music_rig_file_storage_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/61 Testing: music_rig_linux_host_test
+15/61 Test: music_rig_linux_host_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_linux_host_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_linux_host_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_linux_host_test" end time: Aug 26 20:04 -03
+"music_rig_linux_host_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/61 Testing: music_rig_linux_lifecycle_process_test
+16/61 Test: music_rig_linux_lifecycle_process_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_linux_lifecycle_process_test" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music-rigd"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_linux_lifecycle_process_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_linux_lifecycle_process_test" end time: Aug 26 20:04 -03
+"music_rig_linux_lifecycle_process_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/61 Testing: music_rig_jack_midi_shadow_offline_test
+17/61 Test: music_rig_jack_midi_shadow_offline_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_jack_midi_shadow_offline_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_jack_midi_shadow_offline_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+Offline input-only JACK MIDI shadow test: OK
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_jack_midi_shadow_offline_test" end time: Aug 26 20:04 -03
+"music_rig_jack_midi_shadow_offline_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+18/61 Testing: music_rig_jack_smc_mixer_relay_offline_test
+18/61 Test: music_rig_jack_smc_mixer_relay_offline_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_jack_smc_mixer_relay_offline_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_jack_smc_mixer_relay_offline_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+Offline JACK SMC-Mixer relay test: OK
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_jack_smc_mixer_relay_offline_test" end time: Aug 26 20:04 -03
+"music_rig_jack_smc_mixer_relay_offline_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/61 Testing: music_rigd_linux_host_paths
+19/61 Test: music_rigd_linux_host_paths
+Command: "/usr/bin/cmake" "-DDAEMON=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music-rigd" "-DWORK_DIR=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/host-path-check" "-P" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/check-music-rigd-host-paths.cmake"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rigd_linux_host_paths" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"music_rigd_linux_host_paths" end time: Aug 26 20:04 -03
+"music_rigd_linux_host_paths" time elapsed: 00:00:00
+----------------------------------------------------------
+
+20/61 Testing: music_rig_systemd_shadow_unit
+20/61 Test: music_rig_systemd_shadow_unit
+Command: "/usr/bin/cmake" "-DUNIT=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/packaging/linux/music-rigd.service" "-P" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/check-systemd-shadow-unit.cmake"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_systemd_shadow_unit" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_systemd_shadow_unit" end time: Aug 26 20:04 -03
+"music_rig_systemd_shadow_unit" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/61 Testing: music_rig_core_portability
+21/61 Test: music_rig_core_portability
+Command: "/usr/bin/cmake" "-DCORE_DIR=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/runtime/core" "-P" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/check-portable-core.cmake"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_core_portability" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_core_portability" end time: Aug 26 20:04 -03
+"music_rig_core_portability" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/61 Testing: music_rig_core_portability_guard_self_test
+22/61 Test: music_rig_core_portability_guard_self_test
+Command: "/usr/bin/cmake" "-DCHECK_SCRIPT=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/check-portable-core.cmake" "-DWORK_DIR=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/portable-core-guard-self-test" "-P" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/check-portable-core-guard.cmake"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_core_portability_guard_self_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_core_portability_guard_self_test" end time: Aug 26 20:04 -03
+"music_rig_core_portability_guard_self_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+23/61 Testing: music_rig_cli_version
+23/61 Test: music_rig_cli_version
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music-rig" "--version"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_cli_version" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+music-rig 0.1.0
+protocol 2
+profile-schema 1
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_cli_version" end time: Aug 26 20:04 -03
+"music_rig_cli_version" time elapsed: 00:00:00
+----------------------------------------------------------
+
+24/61 Testing: music_rig_cli_no_transport
+24/61 Test: music_rig_cli_no_transport
+Command: "/usr/bin/cmake" "-DCLI=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music-rig" "-P" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/check-music-rig-no-transport.cmake"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_cli_no_transport" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_cli_no_transport" end time: Aug 26 20:04 -03
+"music_rig_cli_no_transport" time elapsed: 00:00:00
+----------------------------------------------------------
+
+25/61 Testing: music_rigd_version
+25/61 Test: music_rigd_version
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music-rigd" "--version"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rigd_version" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+music-rigd 0.1.0
+protocol 2
+runtime-abi 6
+runtime-state 3
+storage-abi 1
+diagnostic-sink-abi 1
+compiled-tables 1
+file-storage-abi 1
+host-paths-abi 1
+linux-lifecycle-abi 1
+journal-diagnostics-abi 1
+jack-midi-shadow-abi 1
+output-mode suppressed-only
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rigd_version" end time: Aug 26 20:04 -03
+"music_rigd_version" time elapsed: 00:00:00
+----------------------------------------------------------
+
+26/61 Testing: music_rigd_no_default_activation
+26/61 Test: music_rigd_no_default_activation
+Command: "/usr/bin/cmake" "-DDAEMON=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music-rigd" "-P" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/check-music-rigd-no-default.cmake"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rigd_no_default_activation" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"music_rigd_no_default_activation" end time: Aug 26 20:04 -03
+"music_rigd_no_default_activation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+27/61 Testing: music_rigd_smc_mixer_activation_boundary
+27/61 Test: music_rigd_smc_mixer_activation_boundary
+Command: "/usr/bin/cmake" "-DDAEMON=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music-rigd" "-DEXPECT_RELAY=OFF" "-P" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/check-music-rigd-smc-mixer-boundary.cmake"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rigd_smc_mixer_activation_boundary" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"music_rigd_smc_mixer_activation_boundary" end time: Aug 26 20:04 -03
+"music_rigd_smc_mixer_activation_boundary" time elapsed: 00:00:00
+----------------------------------------------------------
+
+28/61 Testing: music_rig_runtime_boundary
+28/61 Test: music_rig_runtime_boundary
+Command: "/usr/bin/cmake" "-DRUNTIME_DIR=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/runtime/core" "-P" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/check-runtime-boundary.cmake"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_runtime_boundary" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_runtime_boundary" end time: Aug 26 20:04 -03
+"music_rig_runtime_boundary" time elapsed: 00:00:00
+----------------------------------------------------------
+
+29/61 Testing: music_rig_current_behaviors_boundary
+29/61 Test: music_rig_current_behaviors_boundary
+Command: "/usr/bin/cmake" "-DBEHAVIOR_DIR=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/runtime/behaviors" "-P" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/check-current-behaviors-boundary.cmake"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_current_behaviors_boundary" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_current_behaviors_boundary" end time: Aug 26 20:04 -03
+"music_rig_current_behaviors_boundary" time elapsed: 00:00:00
+----------------------------------------------------------
+
+30/61 Testing: music_rig_device_midi_shadow_boundary
+30/61 Test: music_rig_device_midi_shadow_boundary
+Command: "/usr/bin/cmake" "-DSHADOW_SOURCE=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/runtime/adapters/music_rig_device_midi_shadow.c" "-P" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/check-device-midi-shadow-boundary.cmake"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_device_midi_shadow_boundary" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_device_midi_shadow_boundary" end time: Aug 26 20:04 -03
+"music_rig_device_midi_shadow_boundary" time elapsed: 00:00:00
+----------------------------------------------------------
+
+31/61 Testing: music_rig_smc_mixer_relay_boundary
+31/61 Test: music_rig_smc_mixer_relay_boundary
+Command: "/usr/bin/cmake" "-DRELAY_SOURCE=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/runtime/adapters/music_rig_smc_mixer_relay.c" "-P" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/check-smc-mixer-relay-boundary.cmake"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_smc_mixer_relay_boundary" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_smc_mixer_relay_boundary" end time: Aug 26 20:04 -03
+"music_rig_smc_mixer_relay_boundary" time elapsed: 00:00:00
+----------------------------------------------------------
+
+32/61 Testing: music_rig_jack_midi_shadow_boundary
+32/61 Test: music_rig_jack_midi_shadow_boundary
+Command: "/usr/bin/cmake" "-DJACK_SHADOW_SOURCE=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/runtime/linux/music_rig_jack_midi_shadow.c" "-P" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/check-jack-midi-shadow-boundary.cmake"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_jack_midi_shadow_boundary" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_jack_midi_shadow_boundary" end time: Aug 26 20:04 -03
+"music_rig_jack_midi_shadow_boundary" time elapsed: 00:00:00
+----------------------------------------------------------
+
+33/61 Testing: music_rig_jack_smc_mixer_relay_boundary
+33/61 Test: music_rig_jack_smc_mixer_relay_boundary
+Command: "/usr/bin/cmake" "-DJACK_RELAY_SOURCE=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/runtime/linux/music_rig_jack_smc_mixer_relay.c" "-P" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/check-jack-smc-mixer-relay-boundary.cmake"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_jack_smc_mixer_relay_boundary" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_jack_smc_mixer_relay_boundary" end time: Aug 26 20:04 -03
+"music_rig_jack_smc_mixer_relay_boundary" time elapsed: 00:00:00
+----------------------------------------------------------
+
+34/61 Testing: music_rig_smc_mixer_links_transaction
+34/61 Test: music_rig_smc_mixer_links_transaction
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/test-smc-mixer-links"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_smc_mixer_links_transaction" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+SMC-Mixer link transaction test: OK
+<end of output>
+Test time =   2.80 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_smc_mixer_links_transaction" end time: Aug 26 20:04 -03
+"music_rig_smc_mixer_links_transaction" time elapsed: 00:00:02
+----------------------------------------------------------
+
+35/61 Testing: music_rig_pipewire_patchbay_identity
+35/61 Test: music_rig_pipewire_patchbay_identity
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/test-pipewire-patchbay-identity"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_pipewire_patchbay_identity" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+Missing: 630 -> 50 (would connect)
+Dry run: 1 total, 0 present, 1 would restore, 0 unresolved
+PipeWire patchbay identity test: OK
+<end of output>
+Test time =   0.09 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_pipewire_patchbay_identity" end time: Aug 26 20:04 -03
+"music_rig_pipewire_patchbay_identity" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+36/61 Testing: music_rig_profile_schema_self_test
+36/61 Test: music_rig_profile_schema_self_test
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/validate-performance-rig.py" "--self-test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_profile_schema_self_test" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_profile_schema_self_test" end time: Aug 26 20:04 -03
+"music_rig_profile_schema_self_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+37/61 Testing: music_rig_current_rig_schema
+37/61 Test: music_rig_current_rig_schema
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/validate-performance-rig.py" "--validate" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/../../../src/performance-rigs/pedro-performance-rig/rig.json"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_current_rig_schema" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_current_rig_schema" end time: Aug 26 20:04 -03
+"music_rig_current_rig_schema" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+38/61 Testing: music_rig_current_rig_profile_schema
+38/61 Test: music_rig_current_rig_profile_schema
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/validate-performance-rig.py" "--validate" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/../../../src/performance-rigs/pedro-performance-rig/rig-profiles/full-live-rack.json"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_current_rig_profile_schema" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_current_rig_profile_schema" end time: Aug 26 20:04 -03
+"music_rig_current_rig_profile_schema" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+39/61 Testing: music_rig_current_platform_binding_schema
+39/61 Test: music_rig_current_platform_binding_schema
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/validate-performance-rig.py" "--validate" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/../../../src/performance-rigs/pedro-performance-rig/platform-bindings/linux/airstar-current.json"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_current_platform_binding_schema" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_current_platform_binding_schema" end time: Aug 26 20:04 -03
+"music_rig_current_platform_binding_schema" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+40/61 Testing: music_rig_current_switch_triggers_schema
+40/61 Test: music_rig_current_switch_triggers_schema
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/validate-performance-rig.py" "--validate" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/../../../src/performance-rigs/pedro-performance-rig/switch-triggers.json"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_current_switch_triggers_schema" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_current_switch_triggers_schema" end time: Aug 26 20:04 -03
+"music_rig_current_switch_triggers_schema" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+41/61 Testing: music_rig_current_authored_catalogue
+41/61 Test: music_rig_current_authored_catalogue
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/validate-performance-rig.py" "--validate-root" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/../../../src/performance-rigs/pedro-performance-rig" "--authority-setup" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/../airstar-live-setup/setup.json" "--authority-pad-capture" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/benchmarks/hardware-preset-airstar-2026-08-11.json"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_current_authored_catalogue" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_current_authored_catalogue" end time: Aug 26 20:04 -03
+"music_rig_current_authored_catalogue" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+42/61 Testing: music_rig_compiler_self_test
+42/61 Test: music_rig_compiler_self_test
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/test-compile-performance-rig"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_compiler_self_test" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_compiler_self_test" end time: Aug 26 20:04 -03
+"music_rig_compiler_self_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+43/61 Testing: music_rig_current_compile_check
+43/61 Test: music_rig_current_compile_check
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/compile-performance-rig.py" "--rig-root" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/../../../src/performance-rigs/pedro-performance-rig" "--platform-binding" "airstar-current" "--check-only"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_current_compile_check" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_current_compile_check" end time: Aug 26 20:04 -03
+"music_rig_current_compile_check" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+44/61 Testing: music_rig_materializer_self_test
+44/61 Test: music_rig_materializer_self_test
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/test-materialize-compiled-rig"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_materializer_self_test" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_materializer_self_test" end time: Aug 26 20:04 -03
+"music_rig_materializer_self_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+45/61 Testing: music_rig_materialized_parity_self_test
+45/61 Test: music_rig_materialized_parity_self_test
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/test-materialized-rig-parity"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_materialized_parity_self_test" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_materialized_parity_self_test" end time: Aug 26 20:04 -03
+"music_rig_materialized_parity_self_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+46/61 Testing: music_rig_protected_single_rig_regression
+46/61 Test: music_rig_protected_single_rig_regression
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/test-protected-single-rig-regression"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_protected_single_rig_regression" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_protected_single_rig_regression" end time: Aug 26 20:04 -03
+"music_rig_protected_single_rig_regression" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+47/61 Testing: music_rig_switch_benchmark_contract
+47/61 Test: music_rig_switch_benchmark_contract
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/benchmarks/validate-switch-benchmark" "--check-contract"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_switch_benchmark_contract" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_switch_benchmark_contract" end time: Aug 26 20:04 -03
+"music_rig_switch_benchmark_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+48/61 Testing: music_rig_switch_benchmark_fixture
+48/61 Test: music_rig_switch_benchmark_fixture
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/benchmarks/validate-switch-benchmark" "--validate" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/benchmarks/tests/fixtures/switch-benchmark-result-valid.json"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_switch_benchmark_fixture" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_switch_benchmark_fixture" end time: Aug 26 20:04 -03
+"music_rig_switch_benchmark_fixture" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+49/61 Testing: music_rig_switch_benchmark_validator_self_test
+49/61 Test: music_rig_switch_benchmark_validator_self_test
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/benchmarks/validate-switch-benchmark" "--self-test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_switch_benchmark_validator_self_test" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_switch_benchmark_validator_self_test" end time: Aug 26 20:04 -03
+"music_rig_switch_benchmark_validator_self_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+50/61 Testing: music_rig_m3_shadow_evidence
+50/61 Test: music_rig_m3_shadow_evidence
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/benchmarks/validate-m3-shadow-evidence" "--validate" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/benchmarks/m3-shadow-evidence-2026-08-12.json"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_m3_shadow_evidence" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_m3_shadow_evidence" end time: Aug 26 20:04 -03
+"music_rig_m3_shadow_evidence" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+51/61 Testing: music_rig_m3_shadow_evidence_validator_self_test
+51/61 Test: music_rig_m3_shadow_evidence_validator_self_test
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/benchmarks/validate-m3-shadow-evidence" "--self-test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_m3_shadow_evidence_validator_self_test" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_m3_shadow_evidence_validator_self_test" end time: Aug 26 20:04 -03
+"music_rig_m3_shadow_evidence_validator_self_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+52/61 Testing: music_rig_generation_adoption
+52/61 Test: music_rig_generation_adoption
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_generation_adoption_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_generation_adoption" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+{"schema":"music-studies/generation-publication-spike/v2","iterations":9999,"atomic_pointer_lock_free":true,"storage_slots":4,"reclaimed":9999,"maximum_retired":3,"maximum_control_commit_ns":5809,"failures":0}
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_generation_adoption" end time: Aug 26 20:04 -03
+"music_rig_generation_adoption" time elapsed: 00:00:00
+----------------------------------------------------------
+
+53/61 Testing: music_rig_linux_ipc_roundtrip
+53/61 Test: music_rig_linux_ipc_roundtrip
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_linux_ipc_roundtrip_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_linux_ipc_roundtrip" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+{"schema":"music-studies/ipc-round-trip-spike/v1","transport":"linux-sock-seqpacket-mock-control","golden_frames":true,"round_trips":1000,"p50_ns":19437,"p95_ns":28773,"p99_ns":50974,"maximum_ns":124724,"failures":0}
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_linux_ipc_roundtrip" end time: Aug 26 20:04 -03
+"music_rig_linux_ipc_roundtrip" time elapsed: 00:00:00
+----------------------------------------------------------
+
+54/61 Testing: music_rig_arturia_helper_offline
+54/61 Test: music_rig_arturia_helper_offline
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_arturia_helper_offline_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_arturia_helper_offline" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+Offline Arturia helper test: OK
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_arturia_helper_offline" end time: Aug 26 20:04 -03
+"music_rig_arturia_helper_offline" time elapsed: 00:00:00
+----------------------------------------------------------
+
+55/61 Testing: music_rig_smk25_helper_self_test
+55/61 Test: music_rig_smk25_helper_self_test
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_smk25_helper" "--self-test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_smk25_helper_self_test" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+Self-test: OK
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_smk25_helper_self_test" end time: Aug 26 20:04 -03
+"music_rig_smk25_helper_self_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+56/61 Testing: music_rig_smk25_behavior_parity
+56/61 Test: music_rig_smk25_behavior_parity
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_smk25_behavior_parity_test"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_smk25_behavior_parity" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+SMK-25 current behavior parity: OK
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_smk25_behavior_parity" end time: Aug 26 20:04 -03
+"music_rig_smk25_behavior_parity" time elapsed: 00:00:00
+----------------------------------------------------------
+
+57/61 Testing: music_rig_smk25_helper_config
+57/61 Test: music_rig_smk25_helper_config
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_smk25_helper" "--check-config" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/../smk25-pad-layers/smk25-pad-layers.conf"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_smk25_helper_config" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+Configuration: OK
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_smk25_helper_config" end time: Aug 26 20:04 -03
+"music_rig_smk25_helper_config" time elapsed: 00:00:00
+----------------------------------------------------------
+
+58/61 Testing: music_rig_smk25_helper_jack_guard
+58/61 Test: music_rig_smk25_helper_jack_guard
+Command: "/usr/bin/cmake" "-DHELPER=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/music_rig_smk25_helper" "-DCONFIG=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/../smk25-pad-layers/smk25-pad-layers.conf" "-DSTATE=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema/smk25-jack-guard-state" "-P" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/tests/check-smk25-jack-guard.cmake"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_smk25_helper_jack_guard" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+-- SMK-25 JACK isolation guard: OK
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_smk25_helper_jack_guard" end time: Aug 26 20:04 -03
+"music_rig_smk25_helper_jack_guard" time elapsed: 00:00:00
+----------------------------------------------------------
+
+Unable to find executable: /tmp/opencode/music-rig-schema-venv/bin/python
+59/61 Testing: music_rig_current_rack_startup_contract
+59/61 Test: music_rig_current_rack_startup_contract
+Command: "" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/generate-current-rack-startup-transcript" "--check-document" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/CURRENT-RACK-STARTUP.md"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_current_rack_startup_contract" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_current_rack_startup_contract" end time: Aug 26 20:04 -03
+"music_rig_current_rack_startup_contract" time elapsed: 00:00:00
+----------------------------------------------------------
+
+60/61 Testing: music_rig_airstar_baseline_fixture
+60/61 Test: music_rig_airstar_baseline_fixture
+Command: "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/benchmarks/tests/test-capture-airstar-baseline"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_airstar_baseline_fixture" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+Protected baseline verified: 30 checks, 0 failures
+Baseline JSON: /tmp/tmp.qYrpZKLSuC/baseline.json
+Baseline Markdown: /tmp/tmp.qYrpZKLSuC/baseline.md
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_airstar_baseline_fixture" end time: Aug 26 20:04 -03
+"music_rig_airstar_baseline_fixture" time elapsed: 00:00:00
+----------------------------------------------------------
+
+61/61 Testing: music_rig_airstar_observer_safety
+61/61 Test: music_rig_airstar_observer_safety
+Command: "/usr/bin/cmake" "-DOBSERVER=/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/benchmarks/airstar-read-only-observer" "-P" "/c/development/egt/customers/ped/music-studies/docs/tools/music-rig/benchmarks/tests/check-observer-safety.cmake"
+Directory: /c/development/egt/customers/ped/music-studies/docs/tools/music-rig/build-schema
+"music_rig_airstar_observer_safety" start time: Aug 26 20:04 -03
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"music_rig_airstar_observer_safety" end time: Aug 26 20:04 -03
+"music_rig_airstar_observer_safety" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Aug 26 20:04 -03

@@ -1,0 +1,1 @@
+/usr/bin/cc -g "CMakeFiles/music_rig_linux_lifecycle_process_test.dir/tests/linux-lifecycle-process-test.c.o" -o music_rig_linux_lifecycle_process_test 

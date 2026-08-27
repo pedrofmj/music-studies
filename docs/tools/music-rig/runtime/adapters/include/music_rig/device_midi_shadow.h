@@ -53,11 +53,20 @@ typedef void (*music_rig_device_midi_suppressed_observer_fn)(
     const music_rig_device_midi_suppressed_event *event
 );
 
+typedef void (*music_rig_device_midi_output_fn)(
+    void *context,
+    size_t slot_index,
+    uint32_t frame,
+    const uint8_t *message,
+    size_t message_size
+);
+
 typedef struct music_rig_device_midi_shadow_observer {
     uint32_t abi_version;
     void *context;
     music_rig_device_midi_mapping_observer_fn mapping_decision;
     music_rig_device_midi_suppressed_observer_fn suppressed_midi;
+    music_rig_device_midi_output_fn output_midi;
 } music_rig_device_midi_shadow_observer;
 
 typedef struct music_rig_device_midi_shadow_config {

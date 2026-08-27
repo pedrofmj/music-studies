@@ -1,0 +1,1 @@
+/usr/bin/cc -g "CMakeFiles/music_rig_device_ports_test.dir/tests/device-ports-test.c.o" -o music_rig_device_ports_test  libmusic_rig_core.a 

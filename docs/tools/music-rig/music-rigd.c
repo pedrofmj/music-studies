@@ -10,6 +10,7 @@
 #if defined(MUSIC_RIG_HAS_LINUX_HOST)
 #include "music_rig/host_paths.h"
 #include "music_rig/journal_diagnostics.h"
+#include "music_rig/linux_control_socket.h"
 #include "music_rig/linux_lifecycle.h"
 #endif
 
@@ -28,6 +29,10 @@
 #endif
 
 #include <inttypes.h>
+#include <errno.h>
+#include <signal.h>
+#include <sys/stat.h>
+#include <time.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -39,6 +44,11 @@ static void print_usage(FILE *stream, const char *program)
 {
     fprintf(stream, "Usage: %s --version\n", program);
 #if defined(MUSIC_RIG_HAS_LINUX_HOST)
+    fprintf(stream,
+        "       %s run --definition PATH --expected-fingerprint SHA256 "
+        "[--prepared-definition PATH --prepared-fingerprint SHA256]\n",
+        program
+    );
     fprintf(stream, "       %s resolve-paths --check-only\n", program);
     fprintf(
         stream,
@@ -132,9 +142,12 @@ static int run_shadow(void)
 static uint8_t definition_document[DEFINITION_DOCUMENT_CAPACITY];
 static music_rig_compiled_tables definition_tables;
 
-static music_rig_result load_definition(
+static music_rig_result load_definition_into(
     const char *path,
     const char *fingerprint,
+    uint8_t *document,
+    size_t document_capacity,
+    music_rig_compiled_tables *tables,
     music_rig_compiled_definition *definition,
     music_rig_generation *generation
 )
@@ -165,23 +178,160 @@ static music_rig_result load_definition(
         result = music_rig_definition_load(
             &storage,
             &decoder,
-            definition_document,
-            sizeof(definition_document),
+            document,
+            document_capacity,
             expected,
             sizeof(expected),
             definition,
-            &definition_tables
+            tables
         );
     }
     if (result == MUSIC_RIG_RESULT_OK) {
         result = music_rig_definition_generation_init(
             definition,
-            &definition_tables,
+            tables,
             generation
         );
     }
     return result;
 }
+
+static music_rig_result load_definition(
+    const char *path,
+    const char *fingerprint,
+    music_rig_compiled_definition *definition,
+    music_rig_generation *generation
+)
+{
+    return load_definition_into(
+        path,
+        fingerprint,
+        definition_document,
+        sizeof(definition_document),
+        &definition_tables,
+        definition,
+        generation
+    );
+}
+
+#if defined(MUSIC_RIG_HAS_LINUX_HOST)
+static uint64_t daemon_clock(void *context)
+{
+    struct timespec now;
+    (void)context;
+    if (clock_gettime(CLOCK_MONOTONIC, &now) != 0) {
+        return UINT64_C(0);
+    }
+    return (uint64_t)now.tv_sec * UINT64_C(1000000000) +
+        (uint64_t)now.tv_nsec;
+}
+
+#if defined(MUSIC_RIG_ENABLE_JSON_DEFINITION)
+static int run_runtime(
+    const char *definition_path,
+    const char *fingerprint,
+    const char *prepared_path,
+    const char *prepared_fingerprint
+)
+{
+    static uint8_t prepared_document[DEFINITION_DOCUMENT_CAPACITY];
+    static music_rig_compiled_tables prepared_tables;
+    static music_rig_compiled_definition prepared_definition;
+    music_rig_compiled_definition definition = {0};
+    music_rig_generation generation = {0};
+    music_rig_generation prepared_generation = {0};
+    music_rig_prepared_definition prepared = {0};
+    music_rig_runtime runtime;
+    music_rig_runtime_config config;
+    music_rig_platform_interfaces interfaces;
+    music_rig_file_storage storage_file = {0};
+    music_rig_storage_adapter storage;
+    music_rig_linux_control_server server;
+    music_rig_host_paths paths;
+    music_rig_result result;
+
+    memset(&server, 0, sizeof(server));
+    server.listener = -1;
+    server.client = -1;
+    result = music_rig_linux_host_paths_from_process(&paths);
+    if (result == MUSIC_RIG_RESULT_OK &&
+        mkdir(paths.runtime_directory, 0700) != 0 && errno != EEXIST) {
+        result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    }
+    if (result == MUSIC_RIG_RESULT_OK &&
+        mkdir(paths.state_directory, 0700) != 0 && errno != EEXIST) {
+        result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = load_definition(definition_path, fingerprint,
+            &definition, &generation);
+    }
+    if (result == MUSIC_RIG_RESULT_OK && prepared_path != NULL) {
+        result = load_definition_into(
+            prepared_path,
+            prepared_fingerprint,
+            prepared_document,
+            sizeof(prepared_document),
+            &prepared_tables,
+            &prepared_definition,
+            &prepared_generation
+        );
+        prepared.definition = &prepared_definition;
+        prepared.tables = &prepared_tables;
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_file_storage_init(
+            &storage_file,
+            definition_path,
+            paths.active_state_file,
+            &storage
+        );
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_linux_control_server_open(
+            &server, paths.control_socket
+        );
+    }
+    memset(&interfaces, 0, sizeof(interfaces));
+    interfaces.abi_version = MUSIC_RIG_RUNTIME_ABI_VERSION;
+    interfaces.clock.now_ns = daemon_clock;
+    interfaces.control.context = &server;
+    interfaces.control.start = music_rig_linux_control_server_start;
+    interfaces.control.poll = music_rig_linux_control_server_poll;
+    interfaces.control.wait = music_rig_linux_control_server_wait;
+    interfaces.control.respond = music_rig_linux_control_server_respond;
+    interfaces.control.stop = music_rig_linux_control_server_stop;
+    interfaces.storage = storage;
+    memset(&config, 0, sizeof(config));
+    config.initial_generation = &generation;
+    config.definition_fingerprint = definition.fingerprint;
+    config.definition_fingerprint_size = sizeof(definition.fingerprint);
+    config.active_rig_profile = definition.active_rig_profile;
+    config.prepared_definitions = prepared_path == NULL ? NULL : &prepared;
+    config.prepared_definition_count = prepared_path == NULL ? 0U : 1U;
+    config.output_mode = MUSIC_RIG_OUTPUT_SUPPRESSED;
+    if (result == MUSIC_RIG_RESULT_OK) {
+        struct sigaction action;
+        memset(&action, 0, sizeof(action));
+        action.sa_handler = music_rig_linux_control_server_request_stop;
+        sigemptyset(&action.sa_mask);
+        (void)sigaction(SIGINT, &action, NULL);
+        (void)sigaction(SIGTERM, &action, NULL);
+        result = music_rig_runtime_init(&runtime, &config, &interfaces);
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_runtime_run(&runtime);
+    }
+    if (result != MUSIC_RIG_RESULT_OK) {
+        fprintf(stderr, "runtime failed: result %d\n", (int)result);
+    }
+    if (server.listener >= 0) {
+        (void)music_rig_linux_control_server_stop(&server);
+    }
+    return (int)result;
+}
+#endif
+#endif
 
 static int validate_definition(const char *path, const char *fingerprint)
 {
@@ -444,6 +594,26 @@ int main(int argc, char **argv)
     }
 
 #if defined(MUSIC_RIG_HAS_LINUX_HOST)
+    if (argc == 6 && strcmp(argv[1], "run") == 0 &&
+        strcmp(argv[2], "--definition") == 0 &&
+        strcmp(argv[4], "--expected-fingerprint") == 0) {
+#if defined(MUSIC_RIG_ENABLE_JSON_DEFINITION)
+        return run_runtime(argv[3], argv[5], NULL, NULL);
+#else
+        return MUSIC_RIG_RESULT_UNSUPPORTED;
+#endif
+    }
+    if (argc == 10 && strcmp(argv[1], "run") == 0 &&
+        strcmp(argv[2], "--definition") == 0 &&
+        strcmp(argv[4], "--expected-fingerprint") == 0 &&
+        strcmp(argv[6], "--prepared-definition") == 0 &&
+        strcmp(argv[8], "--prepared-fingerprint") == 0) {
+#if defined(MUSIC_RIG_ENABLE_JSON_DEFINITION)
+        return run_runtime(argv[3], argv[5], argv[7], argv[9]);
+#else
+        return MUSIC_RIG_RESULT_UNSUPPORTED;
+#endif
+    }
     if (argc == 3 && strcmp(argv[1], "resolve-paths") == 0 &&
         strcmp(argv[2], "--check-only") == 0) {
         return report_host_paths();

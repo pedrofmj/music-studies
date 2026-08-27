@@ -1,0 +1,1 @@
+/usr/bin/cc -g "CMakeFiles/music_rig_smc_mixer_relay_test.dir/tests/smc-mixer-relay-test.c.o" -o music_rig_smc_mixer_relay_test  libmusic_rig_smc_mixer_relay.a libmusic_rig_core.a 

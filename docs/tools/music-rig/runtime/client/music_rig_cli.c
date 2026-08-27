@@ -189,7 +189,7 @@ static music_rig_result parse_switch(
 
     if (seen_global == seen_device ||
         (seen_global && seen_profile) ||
-        (seen_device && (!seen_profile || !seen_dry_run))) {
+        (seen_device && !seen_profile)) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
     command->request.operation = seen_global
@@ -250,7 +250,7 @@ static music_rig_result parse_reset(
             return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
         }
     }
-    if (!seen_device || !seen_dry_run) {
+    if (!seen_device) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
     command->request.operation =

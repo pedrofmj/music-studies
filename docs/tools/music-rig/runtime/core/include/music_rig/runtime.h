@@ -12,7 +12,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define MUSIC_RIG_RUNTIME_ABI_VERSION UINT32_C(5)
+#define MUSIC_RIG_RUNTIME_ABI_VERSION UINT32_C(7)
+#define MUSIC_RIG_OUTPUT_ADOPTION_ADAPTER_ABI_VERSION UINT32_C(1)
 #define MUSIC_RIG_RUNTIME_COMMIT_GENERATION_CAPACITY \
     (MUSIC_RIG_RETIRED_GENERATION_CAPACITY + (size_t)1)
 
@@ -65,6 +66,10 @@ typedef struct music_rig_runtime_metrics {
     uint64_t state_restores;
     uint64_t state_fallbacks;
     uint64_t state_writes;
+    uint64_t output_enablements;
+    uint64_t output_preparations;
+    uint64_t output_adoptions;
+    uint64_t output_adoption_failures;
     uint64_t adapter_failures;
 } music_rig_runtime_metrics;
 
@@ -88,6 +93,19 @@ typedef struct music_rig_control_adapter {
     music_rig_result (*stop)(void *context);
 } music_rig_control_adapter;
 
+typedef struct music_rig_output_adoption_adapter {
+    uint32_t abi_version;
+    void *context;
+    music_rig_result (*prepare)(
+        void *context,
+        const music_rig_generation *generation
+    );
+    music_rig_result (*confirm)(
+        void *context,
+        const music_rig_generation *generation
+    );
+} music_rig_output_adoption_adapter;
+
 typedef struct music_rig_platform_interfaces {
     uint32_t abi_version;
     music_rig_clock_adapter clock;
@@ -103,6 +121,7 @@ typedef struct music_rig_runtime_config {
     const music_rig_prepared_definition *prepared_definitions;
     size_t prepared_definition_count;
     music_rig_output_mode output_mode;
+    const music_rig_output_adoption_adapter *output_adoption;
 } music_rig_runtime_config;
 
 /* Caller-owned storage keeps initialization deterministic and allocation-free. */
@@ -120,11 +139,23 @@ typedef struct music_rig_runtime {
     music_rig_generation_slot generations;
     music_rig_device_port_catalogue device_ports;
     music_rig_platform_interfaces interfaces;
+    music_rig_output_adoption_adapter output_adoption;
     char active_rig_profile[MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY];
     char initial_rig_profile[MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY];
     const music_rig_compiled_tables *initial_tables;
+    const music_rig_compiled_tables *base_tables;
     const music_rig_prepared_definition *prepared_definitions;
     size_t prepared_definition_count;
+    music_rig_compiled_tables device_override_tables[
+        MUSIC_RIG_PERSISTED_DEVICE_OVERRIDE_CAPACITY
+    ];
+    bool device_override_table_in_use[
+        MUSIC_RIG_PERSISTED_DEVICE_OVERRIDE_CAPACITY
+    ];
+    music_rig_persisted_device_override device_overrides[
+        MUSIC_RIG_PERSISTED_DEVICE_OVERRIDE_CAPACITY
+    ];
+    uint32_t device_override_count;
     bool control_started;
 } music_rig_runtime;
 
@@ -138,6 +169,12 @@ music_rig_result music_rig_runtime_publish_generation(
     music_rig_runtime *runtime,
     const music_rig_generation *next_generation,
     uint64_t expected_generation
+);
+
+/* Explicitly arms a prepared backend before the runtime control loop starts. */
+music_rig_result music_rig_runtime_enable_output(
+    music_rig_runtime *runtime,
+    const music_rig_output_adoption_adapter *adapter
 );
 
 const music_rig_generation *music_rig_runtime_reclaim_generation(

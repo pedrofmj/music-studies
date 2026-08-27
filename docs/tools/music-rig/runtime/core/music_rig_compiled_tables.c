@@ -132,6 +132,76 @@ static bool mapping_matches(
         mapping->number == number;
 }
 
+static bool ownership_has_profile(
+    const music_rig_compiled_ownership *ownership,
+    uint16_t profile_index
+)
+{
+    size_t index;
+
+    for (index = 0U; index < ownership->owner_count; ++index) {
+        if (ownership->owners[index].scope ==
+                MUSIC_RIG_OWNER_SCOPE_DEVICE_PROFILE &&
+            ownership->owners[index].profile_index == profile_index) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static const music_rig_compiled_ownership *find_ownership(
+    const music_rig_compiled_tables *tables,
+    music_rig_ownership_kind kind,
+    const char *target
+)
+{
+    size_t index;
+
+    for (index = 0U; index < tables->ownership_count; ++index) {
+        if (tables->ownership[index].kind == kind && strcmp(
+                tables->ownership[index].target, target
+            ) == 0) {
+            return &tables->ownership[index];
+        }
+    }
+    return NULL;
+}
+
+static music_rig_result remap_ownership(
+    const music_rig_compiled_ownership *source,
+    const music_rig_compiled_tables *current,
+    uint16_t source_index,
+    uint16_t base_index,
+    music_rig_compiled_ownership *output
+)
+{
+    size_t index;
+
+    *output = *source;
+    for (index = 0U; index < output->owner_count; ++index) {
+        music_rig_compiled_owner *owner = &output->owners[index];
+        uint16_t base_owner_index;
+
+        if (owner->scope != MUSIC_RIG_OWNER_SCOPE_DEVICE_PROFILE) {
+            continue;
+        }
+        if (owner->profile_index == source_index) {
+            base_owner_index = base_index;
+        } else if (music_rig_compiled_profile_index(
+                current, owner->slot, &base_owner_index
+            ) != MUSIC_RIG_RESULT_OK) {
+            return MUSIC_RIG_RESULT_INVALID_DATA;
+        }
+        owner->profile_index = base_owner_index;
+        memcpy(owner->slot, current->device_profiles[base_owner_index].slot,
+            sizeof(owner->slot));
+        memcpy(owner->profile,
+            current->device_profiles[base_owner_index].profile,
+            sizeof(owner->profile));
+    }
+    return MUSIC_RIG_RESULT_OK;
+}
+
 static music_rig_result validate_structure(
     const music_rig_compiled_tables *tables,
     uint32_t expected_device_profiles,
@@ -395,6 +465,182 @@ music_rig_result music_rig_compiled_tables_validate(
         }
     }
     return MUSIC_RIG_RESULT_OK;
+}
+
+music_rig_result music_rig_compiled_tables_compose_device(
+    const music_rig_compiled_tables *base,
+    const music_rig_compiled_tables *source,
+    const char *device_slot,
+    music_rig_compiled_tables *output
+)
+{
+    uint16_t base_index;
+    uint16_t source_index;
+    size_t index;
+
+    if (base == NULL || source == NULL || device_slot == NULL ||
+        output == NULL || music_rig_compiled_profile_index(
+            base, device_slot, &base_index
+        ) != MUSIC_RIG_RESULT_OK || music_rig_compiled_profile_index(
+            source, device_slot, &source_index
+        ) != MUSIC_RIG_RESULT_OK || base->device_profile_count !=
+            source->device_profile_count || base->input_binding_count !=
+            source->input_binding_count) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+    for (index = 0U; index < base->input_binding_count; ++index) {
+        if (memcmp(&base->input_bindings[index],
+                &source->input_bindings[index],
+                sizeof(base->input_bindings[index])) != 0) {
+            return MUSIC_RIG_RESULT_INVALID_DATA;
+        }
+    }
+    *output = *base;
+    output->device_profiles[base_index] = source->device_profiles[source_index];
+    output->mapping_count = 0U;
+    for (index = 0U; index < base->mapping_count; ++index) {
+        if (base->mappings[index].profile_index != base_index) {
+            if (output->mapping_count >= MUSIC_RIG_MAPPING_CAPACITY) {
+                return MUSIC_RIG_RESULT_BUFFER_TOO_SMALL;
+            }
+            output->mappings[output->mapping_count++] = base->mappings[index];
+        }
+    }
+    for (index = 0U; index < source->mapping_count; ++index) {
+        if (source->mappings[index].profile_index == source_index) {
+            music_rig_compiled_mapping mapping = source->mappings[index];
+            mapping.profile_index = base_index;
+            if (output->mapping_count >= MUSIC_RIG_MAPPING_CAPACITY) {
+                return MUSIC_RIG_RESULT_BUFFER_TOO_SMALL;
+            }
+            output->mappings[output->mapping_count++] = mapping;
+        }
+    }
+    {
+        music_rig_compiled_target_binding merged[
+            MUSIC_RIG_TARGET_BINDING_CAPACITY
+        ];
+        size_t base_target = 0U;
+        size_t source_target = 0U;
+        size_t merged_count = 0U;
+
+        while (base_target < base->target_binding_count ||
+               source_target < source->target_binding_count) {
+            if (merged_count >= MUSIC_RIG_TARGET_BINDING_CAPACITY) {
+                return MUSIC_RIG_RESULT_BUFFER_TOO_SMALL;
+            }
+            if (source_target == source->target_binding_count ||
+                (base_target < base->target_binding_count && strcmp(
+                    base->target_bindings[base_target].target,
+                    source->target_bindings[source_target].target
+                ) < 0)) {
+                merged[merged_count++] = base->target_bindings[base_target++];
+            } else if (base_target == base->target_binding_count ||
+                strcmp(
+                    source->target_bindings[source_target].target,
+                    base->target_bindings[base_target].target
+                ) < 0) {
+                merged[merged_count++] = source->target_bindings[source_target++];
+            } else {
+                if (memcmp(&base->target_bindings[base_target],
+                        &source->target_bindings[source_target],
+                        sizeof(base->target_bindings[base_target])) != 0) {
+                    return MUSIC_RIG_RESULT_INVALID_DATA;
+                }
+                merged[merged_count++] = base->target_bindings[base_target++];
+                ++source_target;
+            }
+        }
+        memset(output->target_bindings, 0, sizeof(output->target_bindings));
+        memcpy(output->target_bindings, merged,
+            merged_count * sizeof(merged[0]));
+        output->target_binding_count = (uint32_t)merged_count;
+    }
+    {
+        music_rig_compiled_ownership merged[
+            MUSIC_RIG_OWNERSHIP_CAPACITY
+        ];
+        size_t merged_count = 0U;
+
+        for (index = 0U; index < base->ownership_count; ++index) {
+            const music_rig_compiled_ownership *base_ownership =
+                &base->ownership[index];
+            const music_rig_compiled_ownership *candidate;
+
+            if (!ownership_has_profile(base_ownership, base_index)) {
+                candidate = base_ownership;
+            } else {
+                candidate = find_ownership(
+                    source, base_ownership->kind, base_ownership->target
+                );
+                if (candidate == NULL) {
+                    continue;
+                }
+            }
+            if (merged_count >= MUSIC_RIG_OWNERSHIP_CAPACITY) {
+                return MUSIC_RIG_RESULT_BUFFER_TOO_SMALL;
+            }
+            if (candidate == base_ownership) {
+                merged[merged_count++] = *candidate;
+            } else if (remap_ownership(
+                    candidate, output, source_index, base_index,
+                    &merged[merged_count]
+                ) != MUSIC_RIG_RESULT_OK) {
+                return MUSIC_RIG_RESULT_INVALID_DATA;
+            } else {
+                ++merged_count;
+            }
+        }
+        for (index = 0U; index < source->ownership_count; ++index) {
+            const music_rig_compiled_ownership *candidate =
+                &source->ownership[index];
+            const music_rig_compiled_ownership *base_candidate;
+
+            if (!ownership_has_profile(candidate, source_index)) {
+                continue;
+            }
+            base_candidate = find_ownership(
+                base, candidate->kind, candidate->target
+            );
+            if (base_candidate != NULL) {
+                if (!ownership_has_profile(base_candidate, base_index)) {
+                    music_rig_compiled_ownership *merged_candidate =
+                        (music_rig_compiled_ownership *)find_ownership(
+                            output, candidate->kind, candidate->target
+                        );
+
+                    if (merged_candidate == NULL || remap_ownership(
+                            candidate, output, source_index, base_index,
+                            merged_candidate
+                        ) != MUSIC_RIG_RESULT_OK) {
+                        return MUSIC_RIG_RESULT_INVALID_DATA;
+                    }
+                }
+                continue;
+            }
+            if (merged_count >= MUSIC_RIG_OWNERSHIP_CAPACITY ||
+                remap_ownership(candidate, output, source_index, base_index,
+                    &merged[merged_count]) != MUSIC_RIG_RESULT_OK) {
+                return merged_count >= MUSIC_RIG_OWNERSHIP_CAPACITY
+                    ? MUSIC_RIG_RESULT_BUFFER_TOO_SMALL
+                    : MUSIC_RIG_RESULT_INVALID_DATA;
+            }
+            ++merged_count;
+        }
+        memset(output->ownership, 0, sizeof(output->ownership));
+        memcpy(output->ownership, merged, merged_count * sizeof(merged[0]));
+        output->ownership_count = (uint32_t)merged_count;
+    }
+    {
+        music_rig_result result = music_rig_compiled_tables_prepare(
+        output,
+        output->device_profile_count,
+        output->mapping_count,
+        output->target_binding_count,
+        output->ownership_count
+        );
+        return result;
+    }
 }
 
 music_rig_result music_rig_compiled_profile_index(

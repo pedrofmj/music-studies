@@ -214,6 +214,14 @@ music_rig_result music_rig_compiled_tables_validate(
     uint32_t expected_ownership
 );
 
+/* Composes one device slot while preserving all other compiled table data. */
+music_rig_result music_rig_compiled_tables_compose_device(
+    const music_rig_compiled_tables *base,
+    const music_rig_compiled_tables *source,
+    const char *device_slot,
+    music_rig_compiled_tables *output
+);
+
 music_rig_result music_rig_compiled_profile_index(
     const music_rig_compiled_tables *tables,
     const char *slot,

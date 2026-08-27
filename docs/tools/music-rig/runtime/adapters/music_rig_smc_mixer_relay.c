@@ -194,7 +194,9 @@ music_rig_result music_rig_smc_mixer_relay_init(
     memcpy(relay->input_port_id, input->id, sizeof(relay->input_port_id));
     memcpy(relay->output_port_id, output->id, sizeof(relay->output_port_id));
     atomic_init(&relay->prepared_generation, generation);
-    if (!atomic_is_lock_free(&relay->prepared_generation)) {
+    atomic_init(&relay->adopted_generation, generation);
+    if (!atomic_is_lock_free(&relay->prepared_generation) ||
+        !atomic_is_lock_free(&relay->adopted_generation)) {
         memset(relay, 0, sizeof(*relay));
         return MUSIC_RIG_RESULT_UNSUPPORTED;
     }
@@ -283,6 +285,11 @@ music_rig_result music_rig_smc_mixer_relay_begin_cycle(
     relay->current_generation = generation;
     relay->current_generation_id = generation->id;
     relay->tables = generation->mapping;
+    atomic_store_explicit(
+        &relay->adopted_generation,
+        generation,
+        memory_order_release
+    );
     increment(&relay->metrics.generation_adoptions);
     return MUSIC_RIG_RESULT_OK;
 }
@@ -343,6 +350,20 @@ music_rig_result music_rig_smc_mixer_relay_process(
     }
     return result;
 }
+bool music_rig_smc_mixer_relay_generation_is_adopted(
+    const music_rig_smc_mixer_relay *relay,
+    const music_rig_generation *generation
+)
+{
+    if (!valid_relay(relay) || generation == NULL) {
+        return false;
+    }
+    return atomic_load_explicit(
+        &relay->adopted_generation,
+        memory_order_acquire
+    ) == generation;
+}
+
 
 const char *music_rig_smc_mixer_relay_input_port_id(
     const music_rig_smc_mixer_relay *relay

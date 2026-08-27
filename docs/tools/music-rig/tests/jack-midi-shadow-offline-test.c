@@ -57,6 +57,7 @@ static int activate_count;
 static int deactivate_count;
 static int close_count;
 static int fake_contract_failed;
+static uint8_t fake_output_data[16];
 
 #define CHECK(condition, message) do { \
     if (!(condition)) { \
@@ -307,6 +308,17 @@ int jack_activate(jack_client_t *client)
     CHECK(client == &fake_client, "wrong client activated");
     activate_count += 1;
     return fail_activation;
+}
+
+jack_midi_data_t *jack_midi_event_reserve(
+    void *port_buffer,
+    jack_nframes_t time,
+    size_t data_size
+)
+{
+    (void)port_buffer;
+    (void)time;
+    return data_size <= sizeof(fake_output_data) ? fake_output_data : NULL;
 }
 
 int jack_deactivate(jack_client_t *client)

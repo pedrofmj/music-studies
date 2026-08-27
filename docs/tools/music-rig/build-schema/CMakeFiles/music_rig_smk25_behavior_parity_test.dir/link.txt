@@ -1,0 +1,1 @@
+/usr/bin/cc -g "CMakeFiles/music_rig_smk25_behavior_parity_test.dir/tests/smk25-current-behavior-parity-test.c.o" -o music_rig_smk25_behavior_parity_test  libmusic_rig_current_behaviors.a libmusic_rig_forbidden_jack.a libmusic_rig_core.a 
