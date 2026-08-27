@@ -469,6 +469,15 @@ static int run_midi_shadow(const char *path, const char *fingerprint)
     puts("output-mode suppressed");
     return MUSIC_RIG_RESULT_OK;
 }
+
+static int run_midi_output(const char *path, const char *fingerprint)
+{
+    (void)path;
+    (void)fingerprint;
+    fputs("output-enabled device adoption requires an authorized host\n",
+        stderr);
+    return MUSIC_RIG_RESULT_UNSUPPORTED;
+}
 #endif
 
 #if defined(MUSIC_RIG_HAS_JACK_SMC_MIXER_RELAY)
@@ -636,6 +645,12 @@ int main(int argc, char **argv)
         strcmp(argv[4], "--expected-fingerprint") == 0 &&
         strcmp(argv[6], "--output-suppressed") == 0) {
         return run_midi_shadow(argv[3], argv[5]);
+    }
+    if (argc == 7 && strcmp(argv[1], "run-midi-output") == 0 &&
+        strcmp(argv[2], "--definition") == 0 &&
+        strcmp(argv[4], "--expected-fingerprint") == 0 &&
+        strcmp(argv[6], "--output-enabled") == 0) {
+        return run_midi_output(argv[3], argv[5]);
     }
 #endif
 #if defined(MUSIC_RIG_HAS_JACK_SMC_MIXER_RELAY)
