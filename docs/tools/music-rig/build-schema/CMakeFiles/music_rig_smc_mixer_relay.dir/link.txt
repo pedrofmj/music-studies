@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmusic_rig_smc_mixer_relay.a CMakeFiles/music_rig_smc_mixer_relay.dir/runtime/adapters/music_rig_smc_mixer_relay.c.o
-/usr/bin/ranlib libmusic_rig_smc_mixer_relay.a

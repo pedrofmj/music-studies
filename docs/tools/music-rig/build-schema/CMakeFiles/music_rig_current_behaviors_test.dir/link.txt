@@ -1,1 +1,0 @@
-/usr/bin/cc -g "CMakeFiles/music_rig_current_behaviors_test.dir/tests/current-behaviors-test.c.o" -o music_rig_current_behaviors_test  libmusic_rig_current_behaviors.a libmusic_rig_core.a 

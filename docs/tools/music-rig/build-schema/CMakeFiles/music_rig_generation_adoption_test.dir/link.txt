@@ -1,1 +1,0 @@
-/usr/bin/cc -g "CMakeFiles/music_rig_generation_adoption_test.dir/tests/generation-adoption-test.c.o" -o music_rig_generation_adoption_test  libmusic_rig_core.a 

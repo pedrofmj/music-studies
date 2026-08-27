@@ -1,1 +1,0 @@
-/usr/bin/cc -g "CMakeFiles/music_rig_protocol_test.dir/tests/protocol-test.c.o" -o music_rig_protocol_test  libmusic_rig_core.a 

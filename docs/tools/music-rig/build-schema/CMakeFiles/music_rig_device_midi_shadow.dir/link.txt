@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmusic_rig_device_midi_shadow.a CMakeFiles/music_rig_device_midi_shadow.dir/runtime/adapters/music_rig_device_midi_shadow.c.o
-/usr/bin/ranlib libmusic_rig_device_midi_shadow.a

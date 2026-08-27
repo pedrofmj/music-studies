@@ -1,1 +1,0 @@
-/usr/bin/cc -g "CMakeFiles/music_rig_smk25_helper.dir/c/development/egt/customers/ped/music-studies/docs/tools/smk25-pad-layers/smk25-pad-layers.c.o" -o music_rig_smk25_helper  libmusic_rig_forbidden_jack.a 

@@ -1,1 +1,0 @@
-/usr/bin/cc -g "CMakeFiles/music_rig_diagnostics_test.dir/tests/diagnostics-test.c.o" -o music_rig_diagnostics_test  libmusic_rig_core.a 

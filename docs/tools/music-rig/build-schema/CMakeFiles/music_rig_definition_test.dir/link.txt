@@ -1,1 +1,0 @@
-/usr/bin/cc -g "CMakeFiles/music_rig_definition_test.dir/tests/definition-test.c.o" -o music_rig_definition_test  libmusic_rig_core.a 

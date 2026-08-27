@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmusic_rig_file_storage.a CMakeFiles/music_rig_file_storage.dir/runtime/linux/music_rig_file_storage.c.o
-/usr/bin/ranlib libmusic_rig_file_storage.a

@@ -1,1 +1,0 @@
-/usr/bin/cc -g "CMakeFiles/music_rig_arturia_helper_offline_test.dir/tests/arturia-main-volume-encoder-offline-test.c.o" -o music_rig_arturia_helper_offline_test  libmusic_rig_current_behaviors.a libmusic_rig_core.a 
