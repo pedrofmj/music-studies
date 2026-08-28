@@ -1347,6 +1347,12 @@ static int test_output_enabled_device_switch(void)
         fputs("output-enabled device transaction accounting failed\n", stderr);
         return 1;
     }
+    if (runtime.device_override_count != 1U ||
+        strcmp(runtime.device_overrides[0].device_slot, "smc-mixer-main") != 0 ||
+        strcmp(runtime.device_overrides[0].profile, "multilevel-volume") != 0) {
+        fputs("output-enabled device state was not retained\n", stderr);
+        return 1;
+    }
     return 0;
 }
 
