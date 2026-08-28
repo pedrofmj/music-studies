@@ -890,6 +890,13 @@ static music_rig_result commit_global_switch(
         ? published_ns - started_ns
         : UINT64_C(0);
 
+    if (runtime->state.output_mode == MUSIC_RIG_OUTPUT_ENABLED &&
+        confirm_output_generation(runtime, commit_generation) !=
+            MUSIC_RIG_RESULT_OK) {
+        set_commit_failure(response, MUSIC_RIG_RESULT_ADAPTER_FAILURE);
+        return MUSIC_RIG_RESULT_OK;
+    }
+
     copy_profile(runtime->active_rig_profile, request->profile);
     runtime->base_tables = target_tables;
     runtime->device_override_count = 0U;

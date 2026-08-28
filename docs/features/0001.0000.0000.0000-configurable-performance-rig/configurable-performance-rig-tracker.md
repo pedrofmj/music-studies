@@ -456,7 +456,8 @@ benchmarks.
   generation guards, reset commit, explicit persistence rollback, and
   rollback-failure reporting. A
   authenticated Linux production IPC endpoint is now implemented; output-enabled
-  adoption and live device adoption remain incomplete. The endpoint has offline
+  output-enabled device-switch adoption is covered offline; live device adoption
+  remains incomplete. The endpoint has offline
   filesystem-socket status, reconnect, serialized client takeover, and
   permission coverage. Offline GCC and Clang suites pass 61/61; JSON/JACK
   passes 69/69.
