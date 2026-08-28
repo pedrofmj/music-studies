@@ -991,6 +991,8 @@ static void restore_device_transaction(
             runtime, rollback_generation, runtime->state.generation_id
         ) == MUSIC_RIG_RESULT_OK && music_rig_runtime_persist_state(runtime) ==
             MUSIC_RIG_RESULT_OK) {
+        runtime->control_generation = rollback_generation;
+        runtime->state.generation_id = rollback_generation->id;
         response->rollback_status = (uint32_t)MUSIC_RIG_ROLLBACK_SUCCEEDED;
         increment(&runtime->metrics.commit_rollbacks);
     } else {
