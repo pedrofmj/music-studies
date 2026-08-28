@@ -1319,6 +1319,65 @@ static int test_output_enabled_device_switch(void)
         fputs("output-enabled device switch failed\n", stderr);
         return 1;
     }
+    if (runtime.state.generation_id != UINT64_C(2) ||
+        response.resulting_generation != UINT64_C(2) ||
+        adapter.output_prepare_calls != 2U ||
+        adapter.output_confirm_calls != 2U) {
+        fputs("output-enabled device transaction accounting failed\n", stderr);
+        return 1;
+    }
+    return 0;
+}
+
+static int test_output_enabled_global_switch(void)
+{
+    static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
+        0x54
+    };
+    static music_rig_compiled_tables alternate_tables;
+    static music_rig_compiled_definition alternate_definition;
+    static music_rig_prepared_definition prepared;
+    music_rig_generation initial = {UINT64_C(1), &default_tables};
+    music_rig_runtime runtime;
+    music_rig_runtime_config config;
+    music_rig_platform_interfaces interfaces;
+    music_rig_output_adoption_adapter output;
+    music_rig_protocol_request value;
+    music_rig_protocol_response response;
+    mock_adapter adapter;
+
+    if (init_alternate_prepared_definition_fixture(
+            &alternate_tables, &alternate_definition, &prepared
+        ) != MUSIC_RIG_RESULT_OK) {
+        return 1;
+    }
+    init_mock(&adapter);
+    interfaces = interfaces_for(&adapter);
+    memset(&output, 0, sizeof(output));
+    output.abi_version = MUSIC_RIG_OUTPUT_ADOPTION_ADAPTER_ABI_VERSION;
+    output.context = &adapter;
+    output.prepare = mock_output_prepare;
+    output.confirm = mock_output_confirm;
+    config = config_for(&initial, fingerprint);
+    config.prepared_definitions = &prepared;
+    config.prepared_definition_count = 1U;
+    config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
+    config.output_adoption = &output;
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_OK) {
+        return 1;
+    }
+    value = request(UINT64_C(42), UINT64_C(1),
+        MUSIC_RIG_OPERATION_SWITCH_GLOBAL);
+    fixture_copy(value.profile, "multilevel-volume-mixed-pads");
+    if (music_rig_runtime_dispatch(&runtime, &value, &response) !=
+            MUSIC_RIG_RESULT_OK || response.result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_OK || adapter.output_prepare_calls != 2U ||
+        adapter.output_confirm_calls != 2U ||
+        strcmp(runtime.active_rig_profile, "multilevel-volume-mixed-pads") != 0) {
+        fputs("output-enabled global switch failed\n", stderr);
+        return 1;
+    }
     return 0;
 }
 
@@ -1335,7 +1394,8 @@ int main(void)
         test_enabled_output_initialization() != 0 ||
         test_output_confirmation_failure_is_fail_closed() != 0 ||
         test_device_override_transactions() != 0 ||
-        test_output_enabled_device_switch() != 0) {
+        test_output_enabled_device_switch() != 0 ||
+        test_output_enabled_global_switch() != 0) {
         return 1;
     }
     return 0;
