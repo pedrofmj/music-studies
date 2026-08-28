@@ -73,6 +73,9 @@ static music_rig_result mock_output_rollback(
     mock_adapter *adapter = opaque;
     (void)generation;
     adapter->output_rollback_calls += 1U;
+    if (adapter->output_rollback_result != MUSIC_RIG_RESULT_OK) {
+        return adapter->output_rollback_result;
+    }
     return adapter->output_rollback_result;
 }
 
