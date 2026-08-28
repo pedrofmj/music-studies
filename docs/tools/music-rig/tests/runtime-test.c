@@ -1400,6 +1400,18 @@ static int test_output_enabled_global_switch(void)
         fputs("output-enabled global switch failed\n", stderr);
         return 1;
     }
+    adapter.output_confirm_failures = 1U;
+    adapter.output_rollback_result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    value.request_id = UINT64_C(43);
+    value.expected_generation = runtime.state.generation_id;
+    fixture_copy(value.profile, "full-live-rack");
+    if (music_rig_runtime_dispatch(&runtime, &value, &response) !=
+            MUSIC_RIG_RESULT_OK || response.result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_ADAPTER_FAILURE ||
+        adapter.output_rollback_calls != 1U) {
+        fputs("global rollback callback was not invoked\n", stderr);
+        return 1;
+    }
     return 0;
 }
 
