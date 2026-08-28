@@ -37,6 +37,7 @@ typedef struct mock_adapter {
     unsigned int output_confirm_calls;
     music_rig_result output_prepare_result;
     music_rig_result output_confirm_result;
+    unsigned int output_confirm_failures;
 } mock_adapter;
 
 static music_rig_result mock_output_prepare(
@@ -56,6 +57,10 @@ static music_rig_result mock_output_confirm(
     mock_adapter *adapter = opaque;
     (void)generation;
     adapter->output_confirm_calls += 1U;
+    if (adapter->output_confirm_failures != 0U) {
+        adapter->output_confirm_failures -= 1U;
+        return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    }
     return adapter->output_confirm_result;
 }
 
@@ -1099,6 +1104,37 @@ static int test_enabled_output_initialization(void)
     return 0;
 }
 
+static int test_output_confirmation_failure_is_fail_closed(void)
+{
+    static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
+        0x52
+    };
+    const music_rig_generation initial = {UINT64_C(1), &default_tables};
+    music_rig_runtime runtime;
+    mock_adapter adapter;
+    music_rig_platform_interfaces interfaces;
+    music_rig_runtime_config config;
+    music_rig_output_adoption_adapter output;
+
+    init_mock(&adapter);
+    adapter.output_confirm_failures = 1U;
+    interfaces = interfaces_for(&adapter);
+    memset(&output, 0, sizeof(output));
+    output.abi_version = MUSIC_RIG_OUTPUT_ADOPTION_ADAPTER_ABI_VERSION;
+    output.context = &adapter;
+    output.prepare = mock_output_prepare;
+    output.confirm = mock_output_confirm;
+    config = config_for(&initial, fingerprint);
+    config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
+    config.output_adoption = &output;
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+        MUSIC_RIG_RESULT_ADAPTER_FAILURE || adapter.output_confirm_calls != 1U) {
+        fputs("output confirmation failure was accepted\n", stderr);
+        return 1;
+    }
+    return 0;
+}
+
 static int test_device_override_transactions(void)
 {
     static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
@@ -1221,6 +1257,7 @@ int main(void)
         test_adapter_failures() != 0 ||
         test_invalid_configuration() != 0 ||
         test_enabled_output_initialization() != 0 ||
+        test_output_confirmation_failure_is_fail_closed() != 0 ||
         test_device_override_transactions() != 0) {
         return 1;
     }
