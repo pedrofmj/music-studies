@@ -567,6 +567,7 @@ static int test_prepared_definition_catalogue(void)
         return 1;
     }
 
+
     value = request(
         UINT64_C(33),
         UINT64_C(10),
@@ -1241,6 +1242,13 @@ static int test_device_override_transactions(void)
         response.rollback_status != (uint32_t)MUSIC_RIG_ROLLBACK_SUCCEEDED ||
         runtime.device_override_count != 0U) {
         fputs("device override persistence rollback failed\n", stderr);
+        return 1;
+    }
+    if (runtime.state.generation_id != UINT64_C(3) ||
+        runtime.control_generation->mapping == NULL ||
+        adapter.state_size != sizeof(adapter.state_frame) ||
+        !adapter.state_exists) {
+        fputs("device rollback state was not retained\n", stderr);
         return 1;
     }
     return 0;
