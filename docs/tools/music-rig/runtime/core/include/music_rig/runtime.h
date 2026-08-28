@@ -104,6 +104,10 @@ typedef struct music_rig_output_adoption_adapter {
         void *context,
         const music_rig_generation *generation
     );
+    music_rig_result (*rollback)(
+        void *context,
+        const music_rig_generation *generation
+    );
 } music_rig_output_adoption_adapter;
 
 typedef struct music_rig_platform_interfaces {

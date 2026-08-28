@@ -38,6 +38,8 @@ typedef struct mock_adapter {
     music_rig_result output_prepare_result;
     music_rig_result output_confirm_result;
     unsigned int output_confirm_failures;
+    unsigned int output_rollback_calls;
+    music_rig_result output_rollback_result;
 } mock_adapter;
 
 static music_rig_result mock_output_prepare(
@@ -62,6 +64,16 @@ static music_rig_result mock_output_confirm(
         return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
     }
     return adapter->output_confirm_result;
+}
+
+static music_rig_result mock_output_rollback(
+    void *opaque, const music_rig_generation *generation
+)
+{
+    mock_adapter *adapter = opaque;
+    (void)generation;
+    adapter->output_rollback_calls += 1U;
+    return adapter->output_rollback_result;
 }
 
 
@@ -200,6 +212,7 @@ static void init_mock(mock_adapter *adapter)
     adapter->state_replace_result = MUSIC_RIG_RESULT_OK;
     adapter->output_prepare_result = MUSIC_RIG_RESULT_OK;
     adapter->output_confirm_result = MUSIC_RIG_RESULT_OK;
+    adapter->output_rollback_result = MUSIC_RIG_RESULT_OK;
 }
 
 static music_rig_platform_interfaces interfaces_for(mock_adapter *adapter)
@@ -1077,6 +1090,8 @@ static int test_enabled_output_initialization(void)
     output.context = &adapter;
     output.prepare = mock_output_prepare;
     output.confirm = mock_output_confirm;
+    output.rollback = mock_output_rollback;
+    output.rollback = mock_output_rollback;
     config = config_for(&initial, fingerprint);
     config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
     config.output_adoption = &output;
@@ -1125,11 +1140,13 @@ static int test_output_confirmation_failure_is_fail_closed(void)
     output.context = &adapter;
     output.prepare = mock_output_prepare;
     output.confirm = mock_output_confirm;
+    output.rollback = mock_output_rollback;
     config = config_for(&initial, fingerprint);
     config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
     config.output_adoption = &output;
     if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
-        MUSIC_RIG_RESULT_ADAPTER_FAILURE || adapter.output_confirm_calls != 1U) {
+        MUSIC_RIG_RESULT_ADAPTER_FAILURE || adapter.output_confirm_calls != 1U ||
+        adapter.output_rollback_calls != 0U) {
         fputs("output confirmation failure was accepted\n", stderr);
         return 1;
     }
@@ -1299,6 +1316,7 @@ static int test_output_enabled_device_switch(void)
     output.context = &adapter;
     output.prepare = mock_output_prepare;
     output.confirm = mock_output_confirm;
+    output.rollback = mock_output_rollback;
     config = config_for(&initial, fingerprint);
     config.prepared_definitions = &prepared;
     config.prepared_definition_count = 1U;
@@ -1358,6 +1376,7 @@ static int test_output_enabled_global_switch(void)
     output.context = &adapter;
     output.prepare = mock_output_prepare;
     output.confirm = mock_output_confirm;
+    output.rollback = mock_output_rollback;
     config = config_for(&initial, fingerprint);
     config.prepared_definitions = &prepared;
     config.prepared_definition_count = 1U;

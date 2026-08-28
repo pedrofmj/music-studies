@@ -154,7 +154,8 @@ static bool output_adoption_is_valid(
     return adapter != NULL &&
         adapter->abi_version ==
             MUSIC_RIG_OUTPUT_ADOPTION_ADAPTER_ABI_VERSION &&
-        adapter->prepare != NULL && adapter->confirm != NULL;
+        adapter->prepare != NULL && adapter->confirm != NULL &&
+        adapter->rollback != NULL;
 }
 
 static music_rig_result prepare_output_generation(
@@ -197,6 +198,16 @@ static music_rig_result confirm_output_generation(
         }
     }
     return result;
+}
+
+static music_rig_result rollback_output_generation(
+    music_rig_runtime *runtime,
+    const music_rig_generation *generation
+)
+{
+    return runtime->output_adoption.rollback(
+        runtime->output_adoption.context, generation
+    );
 }
 
 static music_rig_generation *allocate_commit_generation(
@@ -891,6 +902,7 @@ static music_rig_result commit_global_switch(
     if (runtime->state.output_mode == MUSIC_RIG_OUTPUT_ENABLED &&
         confirm_output_generation(runtime, commit_generation) !=
             MUSIC_RIG_RESULT_OK) {
+        (void)rollback_output_generation(runtime, commit_generation);
         set_commit_failure(response, MUSIC_RIG_RESULT_ADAPTER_FAILURE);
         return MUSIC_RIG_RESULT_OK;
     }
@@ -1095,6 +1107,7 @@ static music_rig_result commit_device_switch(
         request->profile);
     if (runtime->state.output_mode == MUSIC_RIG_OUTPUT_ENABLED &&
         confirm_output_generation(runtime, generation) != MUSIC_RIG_RESULT_OK) {
+        (void)rollback_output_generation(runtime, generation);
         restore_device_transaction(runtime, transaction.previous_overrides,
             transaction.previous_override_count, transaction.previous_generation,
             response);

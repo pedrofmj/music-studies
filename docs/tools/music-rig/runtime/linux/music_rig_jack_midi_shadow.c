@@ -97,6 +97,17 @@ static music_rig_result output_confirm(
         ? MUSIC_RIG_RESULT_OK : MUSIC_RIG_RESULT_ADAPTER_FAILURE;
 }
 
+static music_rig_result output_rollback(
+    void *context,
+    const music_rig_generation *generation
+)
+{
+    music_rig_jack_midi_output *host = context;
+    (void)generation;
+    return valid_output_host(host) && host->client != NULL
+        ? MUSIC_RIG_RESULT_OK : MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+}
+
 
 static int process_cycle(jack_nframes_t frame_count, void *opaque)
 {
@@ -474,6 +485,7 @@ music_rig_output_adoption_adapter music_rig_jack_midi_output_adapter(
     adapter.context = host;
     adapter.prepare = output_prepare;
     adapter.confirm = output_confirm;
+    adapter.rollback = output_rollback;
     return adapter;
 }
 
