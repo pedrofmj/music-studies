@@ -1251,6 +1251,22 @@ static int test_device_override_transactions(void)
         fputs("device rollback state was not retained\n", stderr);
         return 1;
     }
+    init_mock(&adapter);
+    adapter.state_replace_failures = 3U;
+    interfaces = interfaces_for(&adapter);
+    config = config_for(&initial, fingerprint);
+    config.prepared_definitions = &prepared;
+    config.prepared_definition_count = 1U;
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+            MUSIC_RIG_RESULT_OK || music_rig_runtime_dispatch(
+                &runtime, &switch_request, &response
+            ) != MUSIC_RIG_RESULT_OK || response.result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_ADAPTER_FAILURE ||
+        response.rollback_status != (uint32_t)MUSIC_RIG_ROLLBACK_FAILED ||
+        runtime.metrics.commit_rollback_failures == 0U) {
+        fputs("device rollback failure was not reported\n", stderr);
+        return 1;
+    }
     return 0;
 }
 

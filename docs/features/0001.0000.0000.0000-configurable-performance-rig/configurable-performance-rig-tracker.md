@@ -448,16 +448,30 @@ benchmarks.
 - 🟡 Implement device and global CLI switching with overrides and reset. The
   parser and renderer cover global/device prepare and switch dry-runs plus
   device reset, including expected-generation guards and inactive prepared
-  profile rendering. The portable output-suppressed runtime now commits global
-  prepared profiles with monotonic generation publication, v2 active-profile
-  persistence, v1 state compatibility, base-profile switch-back, and explicit
-  persistence rollback. A production IPC endpoint, output-enabled adoption,
-  per-device override persistence, and reset commit remain incomplete.
+  profile rendering. A validated device-table composition helper preserves
+  stable input bindings and rebuilds profile-indexed mappings and dispatch data.
+  The portable output-suppressed runtime now commits global and per-device
+  prepared profiles with monotonic generation publication, v3 device-override
+  persistence, v1/v2 state compatibility, base-profile switch-back,
+  generation guards, reset commit, explicit persistence rollback, and
+  rollback-failure reporting. A
+  authenticated Linux production IPC endpoint is now implemented; output-enabled
+  adoption and live device adoption remain incomplete. The endpoint has offline
+  filesystem-socket status, reconnect, serialized client takeover, and
+  permission coverage. Offline GCC and Clang suites pass 61/61; JSON/JACK
+  passes 69/69.
 - 🟡 Prove atomicity, takeover safety, reconnect behavior, and rollback.
-  Global generation/persistence atomicity now has injected rollback-success and
-  rollback-failure coverage; live adoption, takeover, reconnect, and
-  output-enabled rollback evidence remain incomplete.
-- ⬜ Meet switch latency, resource, and xrun thresholds.
+  Global generation/persistence atomicity has injected rollback-success and
+  rollback-failure coverage. The Linux daemon now has end-to-end commit,
+  restart restoration, reset, malformed-peer recovery, serialized takeover,
+  and active-socket refusal coverage. Live adoption, reconnect under an active
+  device backend, and output-enabled rollback evidence remain incomplete.
+- 🟡 Meet switch latency, resource, and xrun thresholds. The offline runtime
+  benchmark now exercises 1,000 alternating device switch/reset transactions
+  under idle, normal-performance, and synthetic high-load labels and enforces
+  the 20 ms control-commit p95 gate plus the one-processing-period-plus-margin
+  atomic adoption bound. Daemon resource, xrun, dropout, and live-audio
+  measurements remain pending.
 
 ## Milestone 5: MIDI Management Triggers
 
