@@ -199,6 +199,17 @@ static music_rig_result confirm_output_generation(
     return result;
 }
 
+static music_rig_generation *allocate_commit_generation(
+    music_rig_runtime *runtime,
+    uint64_t generation_id,
+    const music_rig_compiled_tables *tables
+);
+
+static bool release_commit_generation(
+    music_rig_runtime *runtime,
+    const music_rig_generation *generation
+);
+
 static music_rig_result restore_state(music_rig_runtime *runtime)
 {
     uint8_t frame[MUSIC_RIG_RUNTIME_STATE_FRAME_SIZE];
@@ -514,9 +525,6 @@ music_rig_result music_rig_runtime_publish_generation(
     runtime->state.generation_id = next_generation->id;
     runtime->control_generation = next_generation;
     increment(&runtime->metrics.generation_publications);
-    if (runtime->state.output_mode == MUSIC_RIG_OUTPUT_ENABLED) {
-        return confirm_output_generation(runtime, next_generation);
-    }
     return MUSIC_RIG_RESULT_OK;
 }
 
@@ -1067,6 +1075,14 @@ static music_rig_result commit_device_switch(
         request->device_slot);
     copy_profile(runtime->device_overrides[override_index].profile,
         request->profile);
+    if (runtime->state.output_mode == MUSIC_RIG_OUTPUT_ENABLED &&
+        confirm_output_generation(runtime, generation) != MUSIC_RIG_RESULT_OK) {
+        restore_device_transaction(
+            runtime, previous_overrides, previous_count,
+            previous_generation, response
+        );
+        return MUSIC_RIG_RESULT_OK;
+    }
     if (music_rig_runtime_persist_state(runtime) != MUSIC_RIG_RESULT_OK) {
         restore_device_transaction(
             runtime, previous_overrides, previous_count,

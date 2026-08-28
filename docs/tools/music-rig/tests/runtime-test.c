@@ -59,6 +59,7 @@ static music_rig_result mock_output_confirm(
     return adapter->output_confirm_result;
 }
 
+
 static uint64_t mock_now_ns(void *opaque)
 {
     mock_adapter *adapter = opaque;

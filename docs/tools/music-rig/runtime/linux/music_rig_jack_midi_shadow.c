@@ -97,6 +97,7 @@ static music_rig_result output_confirm(
         ? MUSIC_RIG_RESULT_OK : MUSIC_RIG_RESULT_ADAPTER_FAILURE;
 }
 
+
 static int process_cycle(jack_nframes_t frame_count, void *opaque)
 {
     music_rig_jack_midi_shadow *host = opaque;
