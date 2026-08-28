@@ -793,16 +793,6 @@ static void set_commit_failure(
         MUSIC_RIG_RESPONSE_VALID | MUSIC_RIG_RESPONSE_GRAPH_DELTA_EMPTY);
 }
 
-typedef struct music_rig_commit_transaction {
-    const music_rig_generation *previous_generation;
-    music_rig_generation *generation;
-    const music_rig_compiled_tables *previous_base_tables;
-    music_rig_persisted_device_override previous_overrides[
-        MUSIC_RIG_PERSISTED_DEVICE_OVERRIDE_CAPACITY
-    ];
-    uint32_t previous_override_count;
-} music_rig_commit_transaction;
-
 static music_rig_result commit_global_switch(
     music_rig_runtime *runtime,
     const music_rig_protocol_request *request,
@@ -940,8 +930,7 @@ static music_rig_result commit_global_switch(
                 (uint32_t)MUSIC_RIG_ROLLBACK_SUCCEEDED;
             increment(&runtime->metrics.commit_rollbacks);
         } else {
-            response->rollback_status =
-                (uint32_t)MUSIC_RIG_ROLLBACK_FAILED;
+            response->rollback_status = (uint32_t)MUSIC_RIG_ROLLBACK_FAILED;
             increment(&runtime->metrics.commit_rollback_failures);
         }
     } else {
@@ -1000,7 +989,6 @@ static music_rig_result commit_device_switch(
     music_rig_protocol_response *response
 )
 {
-    music_rig_commit_transaction transaction;
     music_rig_persisted_device_override previous_overrides[
         MUSIC_RIG_PERSISTED_DEVICE_OVERRIDE_CAPACITY
     ];
@@ -1075,11 +1063,6 @@ static music_rig_result commit_device_switch(
     memcpy(previous_overrides, runtime->device_overrides,
         sizeof(previous_overrides));
     previous_count = runtime->device_override_count;
-    transaction.previous_generation = previous_generation;
-    transaction.previous_base_tables = runtime->base_tables;
-    transaction.previous_override_count = previous_count;
-    memcpy(transaction.previous_overrides, previous_overrides,
-        sizeof(previous_overrides));
     generation = allocate_commit_generation(runtime,
         runtime->state.generation_id + UINT64_C(1), composed);
     if (generation == NULL || music_rig_runtime_publish_generation(
@@ -1099,9 +1082,8 @@ static music_rig_result commit_device_switch(
         request->profile);
     if (runtime->state.output_mode == MUSIC_RIG_OUTPUT_ENABLED &&
         confirm_output_generation(runtime, generation) != MUSIC_RIG_RESULT_OK) {
-        restore_device_transaction(runtime, transaction.previous_overrides,
-            transaction.previous_override_count, transaction.previous_generation,
-            response);
+        restore_device_transaction(runtime, previous_overrides, previous_count,
+            previous_generation, response);
         return MUSIC_RIG_RESULT_OK;
     }
     if (music_rig_runtime_persist_state(runtime) != MUSIC_RIG_RESULT_OK) {
