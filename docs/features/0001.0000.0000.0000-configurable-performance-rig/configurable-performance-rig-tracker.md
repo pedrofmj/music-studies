@@ -459,9 +459,13 @@ benchmarks.
   authenticated Linux production IPC endpoint is now implemented; output-enabled
   device-switch adoption is covered offline; live device adoption
   remains incomplete. The endpoint has offline
-  filesystem-socket status, reconnect, serialized client takeover, and
+ filesystem-socket status, reconnect, serialized client takeover, and
   permission coverage. Offline GCC and Clang suites pass 61/61; JSON/JACK
   passes 69/69.
+- ✅ Define the output-enabled transaction contract. The contract fixes phase
+  order, monotonic rollback generations, backend rollback ownership, durable
+  state ordering, response status, and fail-closed behavior in
+  [OUTPUT-TRANSACTION.md](../../tools/music-rig/OUTPUT-TRANSACTION.md).
 - 🟡 Prove atomicity, takeover safety, reconnect behavior, and rollback.
   Global generation/persistence atomicity has injected rollback-success and
   rollback-failure coverage. The Linux daemon now has end-to-end commit,

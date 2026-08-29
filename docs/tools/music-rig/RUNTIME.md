@@ -271,6 +271,12 @@ generation produces result code 5 before publication.
 Selecting the device's already active profile is an idempotent success: it does
 not publish a generation or create a redundant override.
 
+The output-enabled transaction contract is defined in
+[`OUTPUT-TRANSACTION.md`](OUTPUT-TRANSACTION.md). It separates preparation,
+publication, confirmation, state persistence, and rollback; rollback always
+uses a new monotonically increasing generation and fails closed when backend or
+durable state cannot be restored.
+
 ## Executable Boundary
 
 `music-rigd` is built on Linux and Windows and remains inert without an
