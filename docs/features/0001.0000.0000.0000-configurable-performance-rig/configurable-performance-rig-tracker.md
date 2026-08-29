@@ -442,7 +442,8 @@ benchmarks.
   definitions, rejects duplicate Rig Profile IDs and stable-port drift,
   lists its mixer profile as available, and accepts output-suppressed global
   and device dry-runs without changing the active generation. Output-enabled
-  profile commit remains incomplete.
+  commit and rollback are covered with the mock adoption adapter; live profile
+  adoption remains incomplete.
 - 🟡 Support independent SMC-PAD and SMC-PAD Pocket profiles. The authored
   `pad-layer-controller` plus Pocket `drum-set` composition compiles in
   `multilevel-volume-mixed-pads`; runtime pad routing and activation remain.
@@ -457,7 +458,7 @@ benchmarks.
   generation guards, reset commit, explicit persistence rollback, and
   rollback-failure reporting. A
   authenticated Linux production IPC endpoint is now implemented; output-enabled
-  device-switch adoption is covered offline; live device adoption
+  device-switch adoption and rollback are covered offline; live device adoption
   remains incomplete. The endpoint has offline
  filesystem-socket status, reconnect, serialized client takeover, and
   permission coverage. Offline GCC and Clang suites pass 61/61; JSON/JACK
@@ -471,7 +472,9 @@ benchmarks.
   rollback-failure coverage. The Linux daemon now has end-to-end commit,
   restart restoration, reset, malformed-peer recovery, serialized takeover,
   and active-socket refusal coverage. Live adoption, reconnect under an active
-  device backend, and output-enabled rollback evidence remain incomplete.
+  device backend remain incomplete. Offline output-enabled rollback evidence
+  covers confirmation failure, previous-generation restoration, monotonic
+  rollback publication, and failed-runtime refusal.
 - 🟡 Meet switch latency, resource, and xrun thresholds. The offline runtime
   benchmark now exercises 1,000 alternating device switch/reset transactions
   under idle, normal-performance, and synthetic high-load labels and enforces

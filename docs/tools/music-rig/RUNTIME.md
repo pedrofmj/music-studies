@@ -259,7 +259,8 @@ base generation. Profile listing and global/device dry-runs can inspect those
 candidates without publishing.
 
 The runtime accepts non-dry-run global and per-device switches in
-output-suppressed mode. It
+output-suppressed mode and exercises the same transaction phases in
+output-enabled mode through its caller-owned backend adapter. It
 plans the target through the same dispatcher, preserves the configured base
 profile as a switch-back target, publishes a bounded internal generation, and
 persists active profile plus generation. Persistence failure republishes the

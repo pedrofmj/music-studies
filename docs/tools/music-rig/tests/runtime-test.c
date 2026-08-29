@@ -39,6 +39,7 @@ typedef struct mock_adapter {
     music_rig_result output_confirm_result;
     unsigned int output_confirm_failures;
     unsigned int output_rollback_calls;
+    uint64_t output_rollback_generation_id;
     music_rig_result output_rollback_result;
 } mock_adapter;
 
@@ -71,8 +72,8 @@ static music_rig_result mock_output_rollback(
 )
 {
     mock_adapter *adapter = opaque;
-    (void)generation;
     adapter->output_rollback_calls += 1U;
+    adapter->output_rollback_generation_id = generation->id;
     if (adapter->output_rollback_result != MUSIC_RIG_RESULT_OK) {
         return adapter->output_rollback_result;
     }
@@ -1094,7 +1095,6 @@ static int test_enabled_output_initialization(void)
     output.prepare = mock_output_prepare;
     output.confirm = mock_output_confirm;
     output.rollback = mock_output_rollback;
-    output.rollback = mock_output_rollback;
     config = config_for(&initial, fingerprint);
     config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
     config.output_adoption = &output;
@@ -1353,6 +1353,28 @@ static int test_output_enabled_device_switch(void)
         fputs("output-enabled device state was not retained\n", stderr);
         return 1;
     }
+    adapter.output_confirm_failures = 1U;
+    value.operation = MUSIC_RIG_OPERATION_RESET_DEVICE_OVERRIDE;
+    value.request_id = UINT64_C(43);
+    value.expected_generation = runtime.state.generation_id;
+    value.profile[0] = '\0';
+    if (music_rig_runtime_dispatch(&runtime, &value, &response) !=
+            MUSIC_RIG_RESULT_OK || response.result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_ADAPTER_FAILURE ||
+        response.rollback_status != (uint32_t)MUSIC_RIG_ROLLBACK_SUCCEEDED ||
+        response.resulting_generation != UINT64_C(4) ||
+        runtime.device_override_count != 1U || adapter.output_rollback_calls != 1U ||
+        adapter.output_rollback_generation_id != UINT64_C(2)) {
+        fprintf(stderr, "output-enabled device rollback failed: result=%u "
+            "rollback=%u generation=%llu overrides=%u rollbacks=%u op=%u slot=%s confirms=%llu commits=%llu\n",
+            response.result_code, response.rollback_status,
+            (unsigned long long)response.resulting_generation,
+            runtime.device_override_count, adapter.output_rollback_calls,
+            value.operation, value.device_slot,
+            (unsigned long long)adapter.output_confirm_calls,
+            (unsigned long long)runtime.metrics.commit_requests);
+        return 1;
+    }
     return 0;
 }
 
@@ -1407,15 +1429,37 @@ static int test_output_enabled_global_switch(void)
         return 1;
     }
     adapter.output_confirm_failures = 1U;
-    adapter.output_rollback_result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    adapter.output_rollback_result = MUSIC_RIG_RESULT_OK;
     value.request_id = UINT64_C(43);
     value.expected_generation = runtime.state.generation_id;
     fixture_copy(value.profile, "full-live-rack");
     if (music_rig_runtime_dispatch(&runtime, &value, &response) !=
             MUSIC_RIG_RESULT_OK || response.result_code !=
             (uint32_t)MUSIC_RIG_RESULT_ADAPTER_FAILURE ||
-        adapter.output_rollback_calls != 1U) {
-        fputs("global rollback callback was not invoked\n", stderr);
+        response.rollback_status != (uint32_t)MUSIC_RIG_ROLLBACK_SUCCEEDED ||
+        response.resulting_generation != UINT64_C(4) ||
+        strcmp(runtime.active_rig_profile, "multilevel-volume-mixed-pads") != 0 ||
+        adapter.output_rollback_calls != 1U ||
+        adapter.output_rollback_generation_id != UINT64_C(2)) {
+        fputs("output-enabled global rollback failed\n", stderr);
+        return 1;
+    }
+    adapter.output_confirm_failures = 1U;
+    adapter.output_rollback_result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    value.request_id = UINT64_C(44);
+    value.expected_generation = runtime.state.generation_id;
+    if (music_rig_runtime_dispatch(&runtime, &value, &response) !=
+            MUSIC_RIG_RESULT_OK || response.result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_ADAPTER_FAILURE ||
+        response.rollback_status != (uint32_t)MUSIC_RIG_ROLLBACK_FAILED ||
+        runtime.state.lifecycle != MUSIC_RIG_RUNTIME_FAILED) {
+        fputs("output-enabled global rollback failure was hidden\n", stderr);
+        return 1;
+    }
+    value.request_id = UINT64_C(45);
+    if (music_rig_runtime_dispatch(&runtime, &value, &response) !=
+        MUSIC_RIG_RESULT_INVALID_STATE) {
+        fputs("failed output runtime accepted another request\n", stderr);
         return 1;
     }
     return 0;
