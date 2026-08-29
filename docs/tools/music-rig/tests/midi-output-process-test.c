@@ -8,6 +8,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
 
 #define OUTPUT_CAPACITY ((size_t)4096)
@@ -55,6 +56,7 @@ int main(int argc, char **argv)
     pid_t child;
     size_t used = 0U;
     int status;
+    struct timespec reconnect_delay = {0, 200000000L};
 
     if (argc != 5 || pipe(descriptors) != 0) {
         fputs("MIDI output process test setup failed\n", stderr);
@@ -95,7 +97,8 @@ int main(int argc, char **argv)
         fputs("MIDI output did not report readiness\n", stderr);
         return 1;
     }
-    if (kill(child, SIGTERM) != 0 || waitpid(child, &status, 0) != child) {
+    if (nanosleep(&reconnect_delay, NULL) != 0 ||
+        kill(child, SIGTERM) != 0 || waitpid(child, &status, 0) != child) {
         (void)kill(child, SIGKILL);
         (void)waitpid(child, &status, 0);
         (void)close(descriptors[0]);
@@ -126,7 +129,9 @@ int main(int argc, char **argv)
         strstr(output, "input-output-port-pairs 5") == NULL ||
         strstr(output, "output-events 0") == NULL ||
         strstr(output, "output-reserve-failures 0") == NULL ||
+        strstr(output, "backend-reconnects 1") == NULL ||
         strstr(output, "output-mode enabled") == NULL) {
+        fputs(output, stderr);
         fputs("MIDI output process contract failed\n", stderr);
         return 1;
     }

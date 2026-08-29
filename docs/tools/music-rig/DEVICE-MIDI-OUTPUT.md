@@ -60,6 +60,11 @@ owned port state, and reopens the same paired stable ports. Reconnect refuses
 to run without a shutdown signal and closes the replacement client if
 activation or registration fails.
 
+The explicit daemon uses the timed Linux lifecycle poll hook to detect that
+shutdown and perform one reconnect transaction outside the JACK process
+callback. A reconnect failure terminates the command after cleanup rather than
+continuing with an uncertain backend.
+
 The fake-JACK offline test proves paired registration, generated Arturia MIDI
 emission, output metrics, adoption prepare/confirm/rollback callbacks, backend
 shutdown, and registration-failure cleanup.

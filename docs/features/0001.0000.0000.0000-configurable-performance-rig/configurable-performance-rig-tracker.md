@@ -474,8 +474,8 @@ benchmarks.
   activation remains opt-in and live backend adoption remains pending. The
   fake-JACK daemon process gate also proves explicit acknowledgement, startup,
   SIGTERM shutdown, paired-port registration, zero unsolicited output, and
-  cleanup. The output-host gate also proves reconnect after backend shutdown
-  and cleanup after replacement activation failure.
+  cleanup. The daemon lifecycle poll gate also proves automatic reconnect after
+  backend shutdown and cleanup after replacement activation failure.
 - 🟡 Prove atomicity, takeover safety, reconnect behavior, and rollback.
   Global generation/persistence atomicity has injected rollback-success and
   rollback-failure coverage. The Linux daemon now has end-to-end commit,

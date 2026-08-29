@@ -1136,6 +1136,7 @@ if(BUILD_TESTING)
             )
         endif()
         if(TARGET music_rig_jack_midi_output)
+            find_package(Threads REQUIRED)
             add_library(music_rig_fake_jack_midi_output SHARED
                 tests/fake-jack-midi-output.c
             )
@@ -1154,6 +1155,9 @@ if(BUILD_TESTING)
             )
             target_link_options(music_rig_fake_jack_midi_output PRIVATE
                 -fno-sanitize=all
+            )
+            target_link_libraries(music_rig_fake_jack_midi_output PRIVATE
+                Threads::Threads
             )
             add_executable(music_rig_midi_output_process_test
                 tests/midi-output-process-test.c

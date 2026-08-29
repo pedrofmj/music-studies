@@ -434,7 +434,15 @@ music_rig_result music_rig_jack_midi_output_reconnect(
     memset(host->input_ports, 0, sizeof(host->input_ports));
     memset(host->output_ports, 0, sizeof(host->output_ports));
     memset(host->output_buffers, 0, sizeof(host->output_buffers));
-    return music_rig_jack_midi_output_start(host);
+    {
+        music_rig_result result = music_rig_jack_midi_output_start(host);
+
+        if (result == MUSIC_RIG_RESULT_OK &&
+            host->metrics.reconnects != UINT64_MAX) {
+            host->metrics.reconnects += UINT64_C(1);
+        }
+        return result;
+    }
 }
 
 music_rig_result music_rig_jack_midi_output_stop(

@@ -14,6 +14,7 @@
 typedef struct music_rig_jack_midi_output_metrics {
     uint64_t output_events;
     uint64_t output_reserve_failures;
+    uint64_t reconnects;
 } music_rig_jack_midi_output_metrics;
 
 /* Caller-owned Linux JACK host. Read status and metrics only after stop. */

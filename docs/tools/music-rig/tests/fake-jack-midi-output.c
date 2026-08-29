@@ -1,6 +1,10 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include <stddef.h>
+#include <pthread.h>
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
 
 typedef uint32_t jack_nframes_t;
 typedef uint32_t jack_options_t;
@@ -22,6 +26,9 @@ static struct _jack_client client;
 static struct _jack_port ports[10];
 static uint8_t buffers[10][256];
 static size_t registered_count;
+static int activation_count;
+static void (*shutdown_callback)(void *);
+static void *shutdown_context;
 static const char *const expected_ports[] = {
     "device.arturia-main.midi-input",
     "device.arturia-main.midi-output",
@@ -51,6 +58,18 @@ jack_client_t *jack_client_open(
     return &client;
 }
 
+static void *shutdown_worker(void *context)
+{
+    struct timespec delay = {0, 50000000L};
+
+    (void)context;
+    (void)nanosleep(&delay, NULL);
+    if (shutdown_callback != NULL) {
+        shutdown_callback(shutdown_context);
+    }
+    return NULL;
+}
+
 int jack_client_close(jack_client_t *value)
 {
     return value == &client ? 0 : -1;
@@ -58,7 +77,21 @@ int jack_client_close(jack_client_t *value)
 
 int jack_activate(jack_client_t *value)
 {
-    return value == &client && registered_count == 10U ? 0 : -1;
+    pthread_t worker;
+
+    if (value != &client || registered_count != 10U) {
+        return -1;
+    }
+    activation_count += 1;
+    if (activation_count == 1 && pthread_create(
+            &worker, NULL, shutdown_worker, NULL
+        ) != 0) {
+        return -1;
+    }
+    if (activation_count == 1) {
+        (void)pthread_detach(worker);
+    }
+    return 0;
 }
 
 int jack_deactivate(jack_client_t *value)
@@ -82,8 +115,8 @@ void jack_on_shutdown(
 )
 {
     (void)value;
-    (void)callback;
-    (void)argument;
+    shutdown_callback = callback;
+    shutdown_context = argument;
 }
 
 jack_port_t *jack_port_register(

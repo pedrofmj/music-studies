@@ -10,6 +10,7 @@
 
 #define DIAGNOSTIC_INTERVAL_NS UINT64_C(1000000000)
 #define DIAGNOSTIC_BURST UINT32_C(4)
+#define LIFECYCLE_POLL_INTERVAL_NS UINT64_C(100000000)
 
 static volatile sig_atomic_t stop_requested;
 
@@ -35,8 +36,10 @@ static music_rig_result monotonic_now(uint64_t *timestamp_ns)
     return MUSIC_RIG_RESULT_OK;
 }
 
-music_rig_result music_rig_linux_shadow_lifecycle_run(
-    const music_rig_diagnostic_sink *sink
+static music_rig_result lifecycle_run(
+    const music_rig_diagnostic_sink *sink,
+    music_rig_linux_lifecycle_poll_fn poll_fn,
+    void *context
 )
 {
     struct sigaction action;
@@ -106,9 +109,28 @@ music_rig_result music_rig_linux_shadow_lifecycle_run(
             "output-suppressed shadow host ready"
         );
     }
-    while (result == MUSIC_RIG_RESULT_OK && stop_requested == 0) {
-        if (sigsuspend(&wait_mask) != -1 || errno != EINTR) {
-            result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    if (poll_fn == NULL) {
+        while (result == MUSIC_RIG_RESULT_OK && stop_requested == 0) {
+            if (sigsuspend(&wait_mask) != -1 || errno != EINTR) {
+                result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+            }
+        }
+    } else {
+        while (result == MUSIC_RIG_RESULT_OK && stop_requested == 0) {
+            struct timespec timeout = {
+                0,
+                (long)LIFECYCLE_POLL_INTERVAL_NS
+            };
+            int signal_number = sigtimedwait(&blocked_signals, NULL, &timeout);
+
+            if (signal_number == SIGINT || signal_number == SIGTERM) {
+                stop_requested = 1;
+            } else if (signal_number < 0 && errno != EAGAIN &&
+                errno != EINTR) {
+                result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+            } else if (stop_requested == 0) {
+                result = poll_fn(context);
+            }
         }
     }
 
@@ -140,4 +162,22 @@ music_rig_result music_rig_linux_shadow_lifecycle_run(
         result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
     }
     return result;
+}
+
+music_rig_result music_rig_linux_shadow_lifecycle_run(
+    const music_rig_diagnostic_sink *sink
+)
+{
+    return lifecycle_run(sink, NULL, NULL);
+}
+
+music_rig_result music_rig_linux_shadow_lifecycle_run_with_poll(
+    const music_rig_diagnostic_sink *sink,
+    music_rig_linux_lifecycle_poll_fn poll_fn,
+    void *context
+)
+{
+    return sink == NULL || poll_fn == NULL
+        ? MUSIC_RIG_RESULT_INVALID_ARGUMENT
+        : lifecycle_run(sink, poll_fn, context);
 }

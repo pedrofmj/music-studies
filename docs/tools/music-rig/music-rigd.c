@@ -403,6 +403,36 @@ static void configure_current_behaviors(
     }
 }
 
+typedef struct music_rig_output_lifecycle_context {
+    music_rig_jack_midi_output *host;
+    music_rig_output_adoption_adapter *adoption;
+    music_rig_generation *generation;
+} music_rig_output_lifecycle_context;
+
+static music_rig_result poll_output_backend(void *opaque)
+{
+    music_rig_output_lifecycle_context *context = opaque;
+    music_rig_result result;
+
+    if (!atomic_load_explicit(
+            &context->host->backend_shutdown, memory_order_acquire
+        )) {
+        return MUSIC_RIG_RESULT_OK;
+    }
+    result = music_rig_jack_midi_output_reconnect(context->host);
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = context->adoption->prepare(
+            context->adoption->context, context->generation
+        );
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = context->adoption->confirm(
+            context->adoption->context, context->generation
+        );
+    }
+    return result;
+}
+
 static int run_midi_shadow(const char *path, const char *fingerprint)
 {
     music_rig_compiled_definition definition = {0};
@@ -499,6 +529,7 @@ static int run_midi_output(const char *path, const char *fingerprint)
     music_rig_result result;
     music_rig_result stop_result = MUSIC_RIG_RESULT_OK;
     bool host_started = false;
+    music_rig_output_lifecycle_context lifecycle_context;
 
     result = load_definition(path, fingerprint, &definition, &generation);
     if (result == MUSIC_RIG_RESULT_OK) {
@@ -534,13 +565,25 @@ static int run_midi_output(const char *path, const char *fingerprint)
     }
     if (result == MUSIC_RIG_RESULT_OK) {
         adoption = music_rig_jack_midi_output_adapter(&host);
+        lifecycle_context.host = &host;
+        lifecycle_context.adoption = &adoption;
+        lifecycle_context.generation = &generation;
+        if (atomic_load_explicit(
+                &host.backend_shutdown, memory_order_acquire
+            )) {
+            result = poll_output_backend(&lifecycle_context);
+        }
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
         result = adoption.prepare(adoption.context, &generation);
         if (result == MUSIC_RIG_RESULT_OK) {
             result = adoption.confirm(adoption.context, &generation);
         }
     }
     if (result == MUSIC_RIG_RESULT_OK) {
-        result = music_rig_linux_shadow_lifecycle_run(&sink);
+        result = music_rig_linux_shadow_lifecycle_run_with_poll(
+            &sink, poll_output_backend, &lifecycle_context
+        );
         stop_result = music_rig_jack_midi_output_stop(&host);
         host_started = false;
         if (result == MUSIC_RIG_RESULT_OK) {
@@ -567,6 +610,7 @@ static int run_midi_output(const char *path, const char *fingerprint)
     printf("output-events %" PRIu64 "\n", host.metrics.output_events);
     printf("output-reserve-failures %" PRIu64 "\n",
         host.metrics.output_reserve_failures);
+    printf("backend-reconnects %" PRIu64 "\n", host.metrics.reconnects);
     puts("output-mode enabled");
     return MUSIC_RIG_RESULT_OK;
 }
