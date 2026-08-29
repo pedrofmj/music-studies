@@ -102,6 +102,11 @@ int jack_deactivate(jack_client_t *value)
     return value == &client ? 0 : -1;
 }
 
+uint64_t jack_get_time(void)
+{
+    return UINT64_C(1234);
+}
+
 int jack_set_process_callback(
     jack_client_t *value,
     int (*callback)(jack_nframes_t, void *),

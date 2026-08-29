@@ -76,6 +76,11 @@ shutdown and perform one reconnect transaction outside the JACK process
 callback. A reconnect failure terminates the command after cleanup rather than
 continuing with an uncertain backend.
 
+Each JACK processing cycle records the generation adopted by the Device/MIDI
+engine and a JACK-derived nanosecond timestamp in lock-free atomic fields. The
+runtime adoption query reads those fields without waiting or entering the JACK
+callback, allowing IPC status to expose `adopted_at_ns` after the first cycle.
+
 The `run-output` control-server mode performs the same check from its periodic
 control poll. Reconnect completes before the next authenticated request is
 handled, so status, switch, and reset operations cannot use a dead backend.

@@ -155,7 +155,7 @@ static bool output_adoption_is_valid(
         adapter->abi_version ==
             MUSIC_RIG_OUTPUT_ADOPTION_ADAPTER_ABI_VERSION &&
         adapter->prepare != NULL && adapter->confirm != NULL &&
-        adapter->rollback != NULL;
+        adapter->rollback != NULL && adapter->adopted != NULL;
 }
 
 static music_rig_result prepare_output_generation(
@@ -216,6 +216,30 @@ static music_rig_result rollback_output_generation(
         }
     }
     return result;
+}
+
+static void report_output_adoption(
+    music_rig_runtime *runtime,
+    music_rig_protocol_response *response
+)
+{
+    uint64_t adopted_at_ns = UINT64_C(0);
+    music_rig_result result;
+
+    if (runtime->state.output_mode != MUSIC_RIG_OUTPUT_ENABLED) {
+        return;
+    }
+    result = runtime->output_adoption.adopted(
+        runtime->output_adoption.context,
+        runtime->control_generation,
+        &adopted_at_ns
+    );
+    if (result == MUSIC_RIG_RESULT_OK && adopted_at_ns != UINT64_C(0)) {
+        response->adopted_at_ns = adopted_at_ns;
+    } else if (result == MUSIC_RIG_RESULT_ADAPTER_FAILURE) {
+        increment(&runtime->metrics.output_adoption_failures);
+        increment(&runtime->metrics.adapter_failures);
+    }
 }
 
 static music_rig_generation *allocate_commit_generation(
@@ -1373,6 +1397,7 @@ music_rig_result music_rig_runtime_dispatch(
         increment(&runtime->metrics.invalid_requests);
         return result;
     }
+    report_output_adoption(runtime, response);
     response->control_duration_ns = commit_duration_ns != UINT64_MAX
         ? commit_duration_ns
         : (finished_ns >= started_ns

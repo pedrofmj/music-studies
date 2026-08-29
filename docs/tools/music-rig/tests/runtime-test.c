@@ -67,6 +67,17 @@ static music_rig_result mock_output_confirm(
     return adapter->output_confirm_result;
 }
 
+static music_rig_result mock_output_adopted(
+    void *opaque,
+    const music_rig_generation *generation,
+    uint64_t *adopted_at_ns
+)
+{
+    (void)opaque;
+    *adopted_at_ns = generation->id * UINT64_C(100);
+    return MUSIC_RIG_RESULT_OK;
+}
+
 static music_rig_result mock_output_rollback(
     void *opaque, const music_rig_generation *generation
 )
@@ -1095,6 +1106,7 @@ static int test_enabled_output_initialization(void)
     output.prepare = mock_output_prepare;
     output.confirm = mock_output_confirm;
     output.rollback = mock_output_rollback;
+    output.adopted = mock_output_adopted;
     config = config_for(&initial, fingerprint);
     config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
     config.output_adoption = &output;
@@ -1144,6 +1156,7 @@ static int test_output_confirmation_failure_is_fail_closed(void)
     output.prepare = mock_output_prepare;
     output.confirm = mock_output_confirm;
     output.rollback = mock_output_rollback;
+    output.adopted = mock_output_adopted;
     config = config_for(&initial, fingerprint);
     config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
     config.output_adoption = &output;
@@ -1320,6 +1333,7 @@ static int test_output_enabled_device_switch(void)
     output.prepare = mock_output_prepare;
     output.confirm = mock_output_confirm;
     output.rollback = mock_output_rollback;
+    output.adopted = mock_output_adopted;
     config = config_for(&initial, fingerprint);
     config.prepared_definitions = &prepared;
     config.prepared_definition_count = 1U;
@@ -1408,6 +1422,7 @@ static int test_output_enabled_global_switch(void)
     output.prepare = mock_output_prepare;
     output.confirm = mock_output_confirm;
     output.rollback = mock_output_rollback;
+    output.adopted = mock_output_adopted;
     config = config_for(&initial, fingerprint);
     config.prepared_definitions = &prepared;
     config.prepared_definition_count = 1U;

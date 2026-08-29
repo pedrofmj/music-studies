@@ -9,7 +9,7 @@
 #include <stdatomic.h>
 #include <stdint.h>
 
-#define MUSIC_RIG_JACK_MIDI_OUTPUT_ABI_VERSION UINT32_C(1)
+#define MUSIC_RIG_JACK_MIDI_OUTPUT_ABI_VERSION UINT32_C(2)
 
 typedef struct music_rig_jack_midi_output_metrics {
     uint64_t output_events;
@@ -33,6 +33,8 @@ typedef struct music_rig_jack_midi_output {
     _Atomic music_rig_result last_process_result;
     _Atomic bool active;
     _Atomic bool backend_shutdown;
+    _Atomic uint64_t adopted_generation_id;
+    _Atomic uint64_t adopted_at_ns;
     bool output_failed;
 } music_rig_jack_midi_output;
 

@@ -33,6 +33,7 @@ extern jack_client_t *jack_client_open(
 extern int jack_client_close(jack_client_t *client);
 extern int jack_activate(jack_client_t *client);
 extern int jack_deactivate(jack_client_t *client);
+extern uint64_t jack_get_time(void);
 extern int jack_set_process_callback(
     jack_client_t *client,
     int (*callback)(jack_nframes_t, void *),
@@ -145,6 +146,20 @@ static int process_cycle(jack_nframes_t frame_count, void *opaque)
     }
     host->output_failed = false;
     result = music_rig_device_midi_shadow_begin_cycle(host->shadow);
+    if (result == MUSIC_RIG_RESULT_OK) {
+        const music_rig_generation *adopted =
+            music_rig_generation_slot_adopted(host->generations);
+
+        if (adopted != NULL) {
+            atomic_store_explicit(
+                &host->adopted_generation_id, adopted->id, memory_order_release
+            );
+            atomic_store_explicit(
+                &host->adopted_at_ns, jack_get_time() * UINT64_C(1000),
+                memory_order_release
+            );
+        }
+    }
     for (slot_index = 0U;
          result == MUSIC_RIG_RESULT_OK && slot_index < host->port_count;
          ++slot_index) {
@@ -257,6 +272,31 @@ static music_rig_result output_rollback(
     return MUSIC_RIG_RESULT_OK;
 }
 
+static music_rig_result output_adopted(
+    void *context,
+    const music_rig_generation *generation,
+    uint64_t *adopted_at_ns
+)
+{
+    music_rig_jack_midi_output *host = context;
+
+    if (!valid_attached_host(host) || generation == NULL ||
+        adopted_at_ns == NULL) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+    if (atomic_load_explicit(
+            &host->adopted_generation_id, memory_order_acquire
+        ) != generation->id) {
+        *adopted_at_ns = UINT64_C(0);
+        return MUSIC_RIG_RESULT_NOT_FOUND;
+    }
+    *adopted_at_ns = atomic_load_explicit(
+        &host->adopted_at_ns, memory_order_acquire
+    );
+    return *adopted_at_ns == UINT64_C(0)
+        ? MUSIC_RIG_RESULT_NOT_FOUND : MUSIC_RIG_RESULT_OK;
+}
+
 music_rig_result music_rig_jack_midi_output_init(
     music_rig_jack_midi_output *host,
     music_rig_generation_slot *generations,
@@ -281,9 +321,13 @@ music_rig_result music_rig_jack_midi_output_init(
     atomic_init(&host->last_process_result, MUSIC_RIG_RESULT_OK);
     atomic_init(&host->active, false);
     atomic_init(&host->backend_shutdown, false);
+    atomic_init(&host->adopted_generation_id, UINT64_C(0));
+    atomic_init(&host->adopted_at_ns, UINT64_C(0));
     if (!atomic_is_lock_free(&host->last_process_result) ||
         !atomic_is_lock_free(&host->active) ||
-        !atomic_is_lock_free(&host->backend_shutdown)) {
+        !atomic_is_lock_free(&host->backend_shutdown) ||
+        !atomic_is_lock_free(&host->adopted_generation_id) ||
+        !atomic_is_lock_free(&host->adopted_at_ns)) {
         memset(host, 0, sizeof(*host));
         return MUSIC_RIG_RESULT_UNSUPPORTED;
     }
@@ -340,6 +384,7 @@ music_rig_output_adoption_adapter music_rig_jack_midi_output_adapter(
     adapter.prepare = output_prepare;
     adapter.confirm = output_confirm;
     adapter.rollback = output_rollback;
+    adapter.adopted = output_adopted;
     return adapter;
 }
 
@@ -434,6 +479,11 @@ music_rig_result music_rig_jack_midi_output_reconnect(
     memset(host->input_ports, 0, sizeof(host->input_ports));
     memset(host->output_ports, 0, sizeof(host->output_ports));
     memset(host->output_buffers, 0, sizeof(host->output_buffers));
+    atomic_store_explicit(
+        &host->adopted_generation_id, UINT64_C(0), memory_order_release
+    );
+    atomic_store_explicit(&host->adopted_at_ns, UINT64_C(0),
+        memory_order_release);
     {
         music_rig_result result = music_rig_jack_midi_output_start(host);
 

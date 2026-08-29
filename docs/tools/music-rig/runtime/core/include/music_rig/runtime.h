@@ -13,7 +13,7 @@
 #include <stdint.h>
 
 #define MUSIC_RIG_RUNTIME_ABI_VERSION UINT32_C(7)
-#define MUSIC_RIG_OUTPUT_ADOPTION_ADAPTER_ABI_VERSION UINT32_C(1)
+#define MUSIC_RIG_OUTPUT_ADOPTION_ADAPTER_ABI_VERSION UINT32_C(2)
 #define MUSIC_RIG_RUNTIME_COMMIT_GENERATION_CAPACITY \
     (MUSIC_RIG_RETIRED_GENERATION_CAPACITY + (size_t)1)
 
@@ -107,6 +107,11 @@ typedef struct music_rig_output_adoption_adapter {
     music_rig_result (*rollback)(
         void *context,
         const music_rig_generation *generation
+    );
+    music_rig_result (*adopted)(
+        void *context,
+        const music_rig_generation *generation,
+        uint64_t *adopted_at_ns
     );
 } music_rig_output_adoption_adapter;
 

@@ -41,6 +41,7 @@ Documents:
 | GCC isolated suite | ✅ 60/60 passed |
 | Complete local schema-enabled suite | ✅ 63/63 passed on 2026-08-29 |
 | Complete local JSON/JACK suite | ✅ 73/73 passed on 2026-08-29 |
+| Output adoption acknowledgement | ✅ Atomic generation/timestamp and IPC rendering pass |
 | Clang isolated suite | ✅ 60/60 passed |
 | GCC with Linux JSON/JACK adapters | ✅ 67/67 passed |
 | Clang with Linux JSON/JACK adapters | ✅ 67/67 passed |
@@ -479,7 +480,8 @@ benchmarks.
   output-runtime process gate proves runtime enablement plus authenticated
   status, global switch, switch-back, persistence, and clean shutdown through
   the control socket. Its control poll also proves automatic backend reconnect
-  before the next request.
+  before the next request. The output adapter reports the adopted generation
+  and non-blocking `adopted_at_ns` timestamp over the same IPC status path.
 - 🟡 Prove atomicity, takeover safety, reconnect behavior, and rollback.
   Global generation/persistence atomicity has injected rollback-success and
   rollback-failure coverage. The Linux daemon now has end-to-end commit,

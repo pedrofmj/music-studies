@@ -58,6 +58,12 @@ safe on the control thread and must not rely on JSON traversal, unbounded
 allocation, or graph discovery. The rollback callback receives the previous
 generation, not the failed target generation.
 
+The adapter's adoption query is non-blocking. The real-time backend records the
+adopted generation and timestamp atomically; control and IPC status reads that
+record later. A switch response may therefore report zero when the target has
+not reached a processing cycle yet, while a later status response reports its
+`adopted_at_ns` value.
+
 The output adapter is required only for output-enabled initialization. The
 default daemon and all shadow commands remain output-suppressed.
 

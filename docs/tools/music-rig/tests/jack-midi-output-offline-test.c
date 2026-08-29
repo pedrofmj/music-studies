@@ -102,6 +102,7 @@ int main(void)
     music_rig_device_midi_shadow_config shadow_config;
     music_rig_device_midi_shadow_observer observer;
     music_rig_output_adoption_adapter adapter;
+    uint64_t adopted_at_ns = UINT64_C(0);
     uint8_t message[3] = {UINT8_C(0xb0), UINT8_C(114), UINT8_C(65)};
     music_rig_result result;
 
@@ -145,6 +146,9 @@ int main(void)
     CHECK(music_rig_jack_midi_output_metrics_read(&host)->output_events ==
             UINT64_C(1), "output metrics were not recorded");
     adapter = music_rig_jack_midi_output_adapter(&host);
+    CHECK(adapter.adopted(adapter.context, &generation, &adopted_at_ns) ==
+            MUSIC_RIG_RESULT_OK && adopted_at_ns == UINT64_C(1234000),
+        "real-time adoption was not acknowledged");
     CHECK(adapter.prepare(adapter.context, &generation) == MUSIC_RIG_RESULT_OK &&
         adapter.confirm(adapter.context, &generation) == MUSIC_RIG_RESULT_OK,
         "initial output adoption failed");
@@ -273,6 +277,11 @@ void jack_midi_clear_buffer(void *port_buffer)
 {
     fake_buffer *buffer = port_buffer;
     buffer->count = 0U;
+}
+
+uint64_t jack_get_time(void)
+{
+    return UINT64_C(1234);
 }
 
 uint32_t jack_midi_get_event_count(void *port_buffer)
