@@ -146,7 +146,9 @@ int main(int argc, char **argv)
         (void)setenv("XDG_RUNTIME_DIR", runtime_home, 1);
         (void)setenv("XDG_STATE_HOME", state_home, 1);
         (void)setenv("XDG_CONFIG_HOME", root, 1);
-        (void)freopen(error_path, "wb", stderr);
+        if (freopen(error_path, "wb", stderr) == NULL) {
+            _exit(126);
+        }
         execv(argv[1], daemon_arguments);
         _exit(127);
     }
@@ -226,7 +228,9 @@ int main(int argc, char **argv)
         (void)setenv("XDG_RUNTIME_DIR", runtime_home, 1);
         (void)setenv("XDG_STATE_HOME", state_home, 1);
         (void)setenv("XDG_CONFIG_HOME", root, 1);
-        (void)freopen(error_path, "ab", stderr);
+        if (freopen(error_path, "ab", stderr) == NULL) {
+            _exit(126);
+        }
         execv(argv[1], daemon_arguments);
         _exit(127);
     }
