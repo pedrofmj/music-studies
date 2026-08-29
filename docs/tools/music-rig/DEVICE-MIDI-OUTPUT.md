@@ -50,6 +50,17 @@ music-rigd run-midi-output --definition PATH \
   --expected-fingerprint SHA256 --output-enabled --acknowledge-output
 ```
 
+The control-server variant uses the same explicit boundary while routing
+status, switch, and reset requests through the runtime transaction API:
+
+```text
+music-rigd run-output --definition PATH \
+  --expected-fingerprint SHA256 --acknowledge-output
+```
+
+It also accepts the optional `--prepared-definition PATH
+--prepared-fingerprint SHA256` pair before `--acknowledge-output`.
+
 The acknowledgement is required because this command can emit MIDI. It still
 does not create or remove graph links; external routing remains a separate,
 authorized operation.
@@ -67,4 +78,6 @@ continuing with an uncertain backend.
 
 The fake-JACK offline test proves paired registration, generated Arturia MIDI
 emission, output metrics, adoption prepare/confirm/rollback callbacks, backend
-shutdown, and registration-failure cleanup.
+shutdown, and registration-failure cleanup. The fake-JACK output-runtime
+process test additionally proves authenticated status, global switch,
+switch-back, persistence, and clean daemon shutdown through the control socket.

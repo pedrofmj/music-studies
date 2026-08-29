@@ -23,6 +23,10 @@
 #include "music_rig/jack_midi_output.h"
 #endif
 
+#if defined(MUSIC_RIG_HAS_JACK_MIDI_OUTPUT)
+#include "music_rig/jack_midi_output.h"
+#endif
+
 #if defined(MUSIC_RIG_HAS_JACK_SMC_MIXER_RELAY)
 #include "music_rig/jack_smc_mixer_relay.h"
 #endif
@@ -84,6 +88,12 @@ static void print_usage(FILE *stream, const char *program)
         "       %s run-midi-output --definition PATH "
         "--expected-fingerprint SHA256 --output-enabled "
         "--acknowledge-output\n",
+        program
+    );
+    fprintf(
+        stream,
+        "       %s run-output --definition PATH "
+        "--expected-fingerprint SHA256 --acknowledge-output\n",
         program
     );
 #endif
@@ -344,6 +354,165 @@ static int run_runtime(
     }
     return (int)result;
 }
+
+#if defined(MUSIC_RIG_HAS_JACK_MIDI_OUTPUT)
+static void configure_current_behaviors(
+    music_rig_device_midi_shadow_config *config
+);
+
+static int run_output_runtime(
+    const char *definition_path,
+    const char *fingerprint,
+    const char *prepared_path,
+    const char *prepared_fingerprint
+)
+{
+    static uint8_t prepared_document[DEFINITION_DOCUMENT_CAPACITY];
+    static music_rig_compiled_tables prepared_tables;
+    static music_rig_compiled_definition prepared_definition;
+    music_rig_compiled_definition definition = {0};
+    music_rig_generation generation = {0};
+    music_rig_generation prepared_generation = {0};
+    music_rig_prepared_definition prepared = {0};
+    music_rig_runtime runtime;
+    music_rig_runtime_config runtime_config;
+    music_rig_platform_interfaces interfaces;
+    music_rig_file_storage storage_file = {0};
+    music_rig_storage_adapter storage = {0};
+    music_rig_linux_control_server server;
+    music_rig_host_paths paths;
+    music_rig_jack_midi_output output_host;
+    music_rig_device_midi_shadow shadow;
+    music_rig_device_midi_shadow_config shadow_config;
+    music_rig_device_midi_shadow_observer observer = {0};
+    music_rig_output_adoption_adapter output_adapter;
+    music_rig_result result;
+    music_rig_result stop_result = MUSIC_RIG_RESULT_OK;
+    bool host_started = false;
+
+    memset(&server, 0, sizeof(server));
+    server.listener = -1;
+    server.client = -1;
+    result = music_rig_linux_host_paths_from_process(&paths);
+    if (result == MUSIC_RIG_RESULT_OK &&
+        mkdir(paths.runtime_directory, 0700) != 0 && errno != EEXIST) {
+        result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    }
+    if (result == MUSIC_RIG_RESULT_OK &&
+        mkdir(paths.state_directory, 0700) != 0 && errno != EEXIST) {
+        result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = load_definition(definition_path, fingerprint,
+            &definition, &generation);
+    }
+    if (result == MUSIC_RIG_RESULT_OK && prepared_path != NULL) {
+        result = load_definition_into(
+            prepared_path,
+            prepared_fingerprint,
+            prepared_document,
+            sizeof(prepared_document),
+            &prepared_tables,
+            &prepared_definition,
+            &prepared_generation
+        );
+        prepared.definition = &prepared_definition;
+        prepared.tables = &prepared_tables;
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_file_storage_init(
+            &storage_file, definition_path, paths.active_state_file, &storage
+        );
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_linux_control_server_open(
+            &server, paths.control_socket
+        );
+    }
+    memset(&interfaces, 0, sizeof(interfaces));
+    interfaces.abi_version = MUSIC_RIG_RUNTIME_ABI_VERSION;
+    interfaces.clock.now_ns = daemon_clock;
+    interfaces.control.context = &server;
+    interfaces.control.start = music_rig_linux_control_server_start;
+    interfaces.control.poll = music_rig_linux_control_server_poll;
+    interfaces.control.wait = music_rig_linux_control_server_wait;
+    interfaces.control.respond = music_rig_linux_control_server_respond;
+    interfaces.control.stop = music_rig_linux_control_server_stop;
+    interfaces.storage = storage;
+    memset(&runtime_config, 0, sizeof(runtime_config));
+    runtime_config.initial_generation = &generation;
+    runtime_config.definition_fingerprint = definition.fingerprint;
+    runtime_config.definition_fingerprint_size = sizeof(definition.fingerprint);
+    runtime_config.active_rig_profile = definition.active_rig_profile;
+    runtime_config.prepared_definitions = prepared_path == NULL ? NULL : &prepared;
+    runtime_config.prepared_definition_count = prepared_path == NULL ? 0U : 1U;
+    runtime_config.output_mode = MUSIC_RIG_OUTPUT_SUPPRESSED;
+    if (result == MUSIC_RIG_RESULT_OK) {
+        struct sigaction action;
+
+        memset(&action, 0, sizeof(action));
+        action.sa_handler = music_rig_linux_control_server_request_stop;
+        sigemptyset(&action.sa_mask);
+        (void)sigaction(SIGINT, &action, NULL);
+        (void)sigaction(SIGTERM, &action, NULL);
+        result = music_rig_runtime_init(&runtime, &runtime_config, &interfaces);
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_jack_midi_output_init(
+            &output_host, &runtime.generations,
+            runtime.control_generation->mapping
+        );
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_jack_midi_output_observer_init(
+            &output_host, &observer
+        );
+    }
+    music_rig_device_midi_shadow_config_init(&shadow_config);
+    shadow_config.generations = &runtime.generations;
+    shadow_config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
+    shadow_config.observer = observer;
+    if (result == MUSIC_RIG_RESULT_OK) {
+        configure_current_behaviors(&shadow_config);
+        result = music_rig_device_midi_shadow_init(&shadow, &shadow_config);
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_jack_midi_output_attach_shadow(
+            &output_host, &shadow
+        );
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_jack_midi_output_start(&output_host);
+        host_started = result == MUSIC_RIG_RESULT_OK;
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        output_adapter = music_rig_jack_midi_output_adapter(&output_host);
+        result = music_rig_runtime_enable_output(&runtime, &output_adapter);
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        puts("output-runtime ready");
+        fflush(stdout);
+        result = music_rig_runtime_run(&runtime);
+    }
+    if (host_started) {
+        stop_result = music_rig_jack_midi_output_stop(&output_host);
+        host_started = false;
+        if (result == MUSIC_RIG_RESULT_OK) {
+            result = stop_result;
+        }
+    }
+    if (server.listener >= 0) {
+        (void)music_rig_linux_control_server_stop(&server);
+    }
+    if (result != MUSIC_RIG_RESULT_OK) {
+        fprintf(stderr, "output runtime failed: result %d\n", (int)result);
+        return (int)result;
+    }
+    printf("output-mode enabled\n");
+    printf("output-events %" PRIu64 "\n", output_host.metrics.output_events);
+    return MUSIC_RIG_RESULT_OK;
+}
+#endif
 #endif
 #endif
 
@@ -788,6 +957,22 @@ int main(int argc, char **argv)
         strcmp(argv[6], "--output-enabled") == 0 &&
         strcmp(argv[7], "--acknowledge-output") == 0) {
         return run_midi_output(argv[3], argv[5]);
+    }
+#endif
+#if defined(MUSIC_RIG_HAS_JACK_MIDI_OUTPUT)
+    if (argc == 7 && strcmp(argv[1], "run-output") == 0 &&
+        strcmp(argv[2], "--definition") == 0 &&
+        strcmp(argv[4], "--expected-fingerprint") == 0 &&
+        strcmp(argv[6], "--acknowledge-output") == 0) {
+        return run_output_runtime(argv[3], argv[5], NULL, NULL);
+    }
+    if (argc == 11 && strcmp(argv[1], "run-output") == 0 &&
+        strcmp(argv[2], "--definition") == 0 &&
+        strcmp(argv[4], "--expected-fingerprint") == 0 &&
+        strcmp(argv[6], "--prepared-definition") == 0 &&
+        strcmp(argv[8], "--prepared-fingerprint") == 0 &&
+        strcmp(argv[10], "--acknowledge-output") == 0) {
+        return run_output_runtime(argv[3], argv[5], argv[7], argv[9]);
     }
 #endif
 #if defined(MUSIC_RIG_HAS_JACK_SMC_MIXER_RELAY)

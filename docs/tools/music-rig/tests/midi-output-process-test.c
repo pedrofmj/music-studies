@@ -68,7 +68,8 @@ int main(int argc, char **argv)
         if (dup2(descriptors[1], STDERR_FILENO) < 0 ||
             dup2(descriptors[1], STDOUT_FILENO) < 0 ||
             close(descriptors[1]) != 0 ||
-            setenv("LD_PRELOAD", argv[4], 1) != 0) {
+            setenv("LD_PRELOAD", argv[4], 1) != 0 ||
+            setenv("MUSIC_RIG_FAKE_OUTPUT_RECONNECT", "1", 1) != 0) {
             _exit(120);
         }
         execl(

@@ -1381,6 +1381,36 @@ if(BUILD_TESTING)
             set_tests_properties(
                 music_rig_midi_output_process PROPERTIES TIMEOUT 5
             )
+            add_executable(music_rig_output_runtime_process_test
+                tests/output-runtime-process-test.c
+            )
+            target_compile_features(
+                music_rig_output_runtime_process_test PRIVATE c_std_17
+            )
+            set_target_properties(
+                music_rig_output_runtime_process_test PROPERTIES
+                    C_EXTENSIONS OFF
+            )
+            target_compile_options(music_rig_output_runtime_process_test PRIVATE
+                -Wall
+                -Wextra
+                -Wpedantic
+                -Werror
+            )
+            add_test(
+                NAME music_rig_output_runtime_process
+                COMMAND music_rig_output_runtime_process_test
+                    $<TARGET_FILE:music-rigd>
+                    $<TARGET_FILE:music-rig>
+                    "${MUSIC_RIG_JSON_DEFINITION_FIXTURE}"
+                    "${MUSIC_RIG_JSON_DEFINITION_FINGERPRINT}"
+                    "${MUSIC_RIG_MIXED_PADS_DEFINITION}"
+                    "${MUSIC_RIG_MIXED_PADS_FINGERPRINT}"
+                    $<TARGET_FILE:music_rig_fake_jack_midi_output>
+            )
+            set_tests_properties(
+                music_rig_output_runtime_process PROPERTIES TIMEOUT 5
+            )
         endif()
         if(TARGET music_rig_smc_mixer_relay_process_test)
             add_test(

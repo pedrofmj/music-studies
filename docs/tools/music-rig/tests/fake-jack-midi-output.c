@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <pthread.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
@@ -83,12 +84,14 @@ int jack_activate(jack_client_t *value)
         return -1;
     }
     activation_count += 1;
-    if (activation_count == 1 && pthread_create(
+    if (activation_count == 1 && getenv("MUSIC_RIG_FAKE_OUTPUT_RECONNECT") != NULL &&
+        pthread_create(
             &worker, NULL, shutdown_worker, NULL
         ) != 0) {
         return -1;
     }
-    if (activation_count == 1) {
+    if (activation_count == 1 &&
+        getenv("MUSIC_RIG_FAKE_OUTPUT_RECONNECT") != NULL) {
         (void)pthread_detach(worker);
     }
     return 0;
