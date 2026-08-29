@@ -59,6 +59,11 @@ music_rig_result music_rig_jack_midi_output_start(
     music_rig_jack_midi_output *host
 );
 
+/* Reopens the client after the JACK server has signalled backend shutdown. */
+music_rig_result music_rig_jack_midi_output_reconnect(
+    music_rig_jack_midi_output *host
+);
+
 music_rig_result music_rig_jack_midi_output_stop(
     music_rig_jack_midi_output *host
 );

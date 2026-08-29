@@ -411,6 +411,32 @@ music_rig_result music_rig_jack_midi_output_start(
     return MUSIC_RIG_RESULT_OK;
 }
 
+music_rig_result music_rig_jack_midi_output_reconnect(
+    music_rig_jack_midi_output *host
+)
+{
+    jack_client_t *client;
+
+    if (!valid_attached_host(host) ||
+        !atomic_load_explicit(&host->backend_shutdown, memory_order_acquire)) {
+        return MUSIC_RIG_RESULT_INVALID_STATE;
+    }
+    client = host->client;
+    if (client != NULL) {
+        if (jack_client_close(client) != 0) {
+            host->client = NULL;
+            memset(host->input_ports, 0, sizeof(host->input_ports));
+            memset(host->output_ports, 0, sizeof(host->output_ports));
+            return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+        }
+        host->client = NULL;
+    }
+    memset(host->input_ports, 0, sizeof(host->input_ports));
+    memset(host->output_ports, 0, sizeof(host->output_ports));
+    memset(host->output_buffers, 0, sizeof(host->output_buffers));
+    return music_rig_jack_midi_output_start(host);
+}
+
 music_rig_result music_rig_jack_midi_output_stop(
     music_rig_jack_midi_output *host
 )

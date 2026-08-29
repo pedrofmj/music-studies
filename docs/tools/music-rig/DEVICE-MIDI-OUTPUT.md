@@ -54,6 +54,12 @@ The acknowledgement is required because this command can emit MIDI. It still
 does not create or remove graph links; external routing remains a separate,
 authorized operation.
 
+When JACK signals backend shutdown, the control thread may call
+`music_rig_jack_midi_output_reconnect`. The host closes the dead client, clears
+owned port state, and reopens the same paired stable ports. Reconnect refuses
+to run without a shutdown signal and closes the replacement client if
+activation or registration fails.
+
 The fake-JACK offline test proves paired registration, generated Arturia MIDI
 emission, output metrics, adoption prepare/confirm/rollback callbacks, backend
 shutdown, and registration-failure cleanup.

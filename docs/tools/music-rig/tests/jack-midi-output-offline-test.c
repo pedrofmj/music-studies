@@ -154,8 +154,16 @@ int main(void)
         adapter.rollback(adapter.context, &generation) == MUSIC_RIG_RESULT_OK,
         "output adoption rollback contract failed");
     registered_shutdown(registered_shutdown_context);
-    CHECK(music_rig_jack_midi_output_stop(&host) == MUSIC_RIG_RESULT_OK &&
-        close_count == 1, "output host cleanup failed");
+    result = music_rig_jack_midi_output_reconnect(&host);
+    CHECK(result == MUSIC_RIG_RESULT_OK && host.active &&
+        !host.backend_shutdown && registered_count == 4U && close_count == 1,
+        "output host reconnect failed");
+    registered_shutdown(registered_shutdown_context);
+    fail_activation = 1;
+    CHECK(music_rig_jack_midi_output_reconnect(&host) ==
+            MUSIC_RIG_RESULT_ADAPTER_FAILURE && host.client == NULL &&
+        !host.active && close_count == 3,
+        "output host reconnect failure did not clean up");
 
     reset_fake();
     CHECK(music_rig_jack_midi_output_init(&host, &generations, &tables) ==
@@ -185,6 +193,7 @@ jack_client_t *jack_client_open(
         return NULL;
     }
     *status = UINT32_C(0);
+    registered_count = 0U;
     return &fake_client;
 }
 

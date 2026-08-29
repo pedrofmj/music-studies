@@ -474,13 +474,16 @@ benchmarks.
   activation remains opt-in and live backend adoption remains pending. The
   fake-JACK daemon process gate also proves explicit acknowledgement, startup,
   SIGTERM shutdown, paired-port registration, zero unsolicited output, and
-  cleanup.
+  cleanup. The output-host gate also proves reconnect after backend shutdown
+  and cleanup after replacement activation failure.
 - 🟡 Prove atomicity, takeover safety, reconnect behavior, and rollback.
   Global generation/persistence atomicity has injected rollback-success and
   rollback-failure coverage. The Linux daemon now has end-to-end commit,
   restart restoration, reset, malformed-peer recovery, serialized takeover,
   and active-socket refusal coverage. Live adoption, reconnect under an active
-  device backend remain incomplete. Offline output-enabled rollback evidence
+  device backend remain incomplete. Offline reconnect under an active device
+  backend is covered; live adoption and live reconnect evidence remain
+  incomplete. Offline output-enabled rollback evidence
   covers confirmation failure, previous-generation restoration, monotonic
   rollback publication, and failed-runtime refusal.
 - 🟡 Meet switch latency, resource, and xrun thresholds. The offline runtime
