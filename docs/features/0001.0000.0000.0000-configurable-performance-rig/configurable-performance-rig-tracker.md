@@ -2,7 +2,7 @@
 
 Feature: `0001.0000.0000.0000`
 
-Updated: 2026-08-18
+Updated: 2026-08-29
 
 Documents:
 
@@ -39,6 +39,7 @@ Documents:
 | Check | Result |
 | --- | --- |
 | GCC isolated suite | ✅ 60/60 passed |
+| Complete local schema-enabled suite | ✅ 62/62 passed on 2026-08-29 |
 | Clang isolated suite | ✅ 60/60 passed |
 | GCC with Linux JSON/JACK adapters | ✅ 67/67 passed |
 | Clang with Linux JSON/JACK adapters | ✅ 67/67 passed |
