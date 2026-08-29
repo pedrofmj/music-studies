@@ -1,0 +1,89 @@
+{
+  "schema": "music-studies/protected-rack-musical-load-airstar/v1",
+  "captured_on": "2026-08-29",
+  "captured_at_utc": {
+    "start": "2026-08-29T23:21:12Z",
+    "end": "2026-08-29T23:22:17Z"
+  },
+  "host": "airstar",
+  "duration_seconds": 65,
+  "source_commit": "ab081d5",
+  "monitoring": {
+    "midi_tool": "aseqdump",
+    "pipewire_tool": "pw-top",
+    "graph_observation_tool": "pw-link -l",
+    "midi_sources": [
+      "16:0",
+      "16:1",
+      "16:2",
+      "16:3",
+      "20:0",
+      "20:1",
+      "24:0",
+      "24:1",
+      "24:2",
+      "28:0",
+      "28:1",
+      "28:2",
+      "32:0",
+      "32:1",
+      "32:2"
+    ],
+    "midi_event_lines": 1314,
+    "midi_event_types": {
+      "note_on": 254,
+      "note_off": 256,
+      "control_change": 804
+    },
+    "midi_events_by_source": {
+      "16:0": 382,
+      "20:0": 239,
+      "20:1": 239,
+      "32:0": 227,
+      "32:1": 227
+    },
+    "pipewire_samples": 65,
+    "speaker_sink_running_samples": 64,
+    "pipewire_quantum": 1024
+  },
+  "pipewire_health": {
+    "speaker_sink_id": 100,
+    "speaker_sink_name": "Tiger Lake-LP Smart Sound Technology Audio Controller Speaker + Headphones",
+    "speaker_sink_err_before": 20,
+    "speaker_sink_err_after": 24,
+    "speaker_sink_err_delta": 4,
+    "speaker_sink_wait_max_us": 14600.0,
+    "speaker_sink_busy_max_us": 46.7,
+    "speaker_sink_wq_max": 0.68,
+    "speaker_sink_bq_max": 0.0,
+    "carla_err_before": 8,
+    "carla_err_after": 8,
+    "midi_bridge_err_before": 0,
+    "midi_bridge_err_after": 0,
+    "journal_xrun_dropout_deadline_events_before": 0,
+    "journal_xrun_dropout_deadline_events_after": 0
+  },
+  "protected_graph": {
+    "patchbay_links_before": 116,
+    "patchbay_links_after": 116,
+    "link_hash_before": "sha256:9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "link_hash_after": "sha256:9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "graph_mutated": false,
+    "live_validator_failures": 0,
+    "temporary_artifacts_removed": true
+  },
+  "evaluation": {
+    "live_midi_activity_pass": true,
+    "protected_graph_pass": true,
+    "live_validator_pass": true,
+    "zero_xrun_pass": false,
+    "audible_output_independently_verified": false,
+    "accepted_as_milestone4_pass": false
+  },
+  "notes": [
+    "The operator-input window captured real Arturia, SMC mixer, and SMC pad activity without adding links or changing Carla.",
+    "The speaker sink ERR counter increased by four during the window. pw-top defines ERR as total xruns and errors, so the zero-xrun acceptance gate remains unmet.",
+    "The clean xrun/dropout/deadline journal result does not override the pw-top counter delta.",
+    "This is partial/rejected musical-load evidence; audible output and long-soak certification remain pending."
+  ]
+}

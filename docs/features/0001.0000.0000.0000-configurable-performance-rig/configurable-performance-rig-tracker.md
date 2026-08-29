@@ -45,6 +45,7 @@ Documents:
 | Output-enabled switch benchmark | ✅ Three 1,000-sample scenarios pass commit and adoption gates |
 | Airstar output-runtime rehearsal | ✅ Output-enabled IPC switches, adoption timestamps, zero graph mutation, and 0 live validation failures; [evidence](../../tools/music-rig/benchmarks/output-runtime-airstar-2026-08-29.json) |
 | Airstar output-runtime idle resources | ✅ 60 s, 0.4% max CPU, 12,616 KB peak RSS, 5 threads, 0 xrun/dropout/deadline events; [evidence](../../tools/music-rig/benchmarks/output-runtime-idle-airstar-2026-08-29.json) |
+| Airstar protected-rack musical-load observation | 🟡 65 s, 1,314 live MIDI events, graph unchanged, and 0 validator failures; speaker-sink `pw-top` ERR increased by 4, so the zero-xrun gate did not pass; [evidence](../../tools/music-rig/benchmarks/protected-rack-musical-load-airstar-2026-08-29.json) |
 | Clang isolated suite | ✅ 60/60 passed |
 | GCC with Linux JSON/JACK adapters | ✅ 67/67 passed |
 | Clang with Linux JSON/JACK adapters | ✅ 67/67 passed |
@@ -504,7 +505,10 @@ benchmarks.
   reports non-blocking adoption timestamps, and enforces the one-processing-
   period-plus-margin atomic adoption bound. Daemon resource, xrun, dropout,
   and live-audio measurements are partly covered by the Airstar 60-second idle
-  result; musical-load, live-audio, and long-soak measurements remain pending.
+  result. A 65-second operator-input observation captured 1,314 live MIDI events
+  without graph mutation, but the speaker sink accumulated four additional
+  `pw-top` ERR counts, so the zero-xrun musical-load gate remains unmet. Audible
+  output and long-soak measurements remain pending.
 
 ## Milestone 5: MIDI Management Triggers
 
