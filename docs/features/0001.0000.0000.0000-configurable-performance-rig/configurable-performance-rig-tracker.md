@@ -43,6 +43,7 @@ Documents:
 | Complete local JSON/JACK suite | ✅ 73/73 passed on 2026-08-29 |
 | Output adoption acknowledgement | ✅ Atomic generation/timestamp and IPC rendering pass |
 | Output-enabled switch benchmark | ✅ Three 1,000-sample scenarios pass commit and adoption gates |
+| Airstar output-runtime rehearsal | ✅ Output-enabled IPC switches, adoption timestamps, zero graph mutation, and 0 live validation failures; [evidence](../../tools/music-rig/benchmarks/output-runtime-airstar-2026-08-29.json) |
 | Clang isolated suite | ✅ 60/60 passed |
 | GCC with Linux JSON/JACK adapters | ✅ 67/67 passed |
 | Clang with Linux JSON/JACK adapters | ✅ 67/67 passed |
@@ -473,7 +474,9 @@ benchmarks.
 - 🟡 Implement the explicit Linux Device/MIDI output host. The fake-JACK gate
   proves paired stable-port registration, generated MIDI emission, adoption
   callbacks, shutdown, and registration-failure cleanup; default daemon
-  activation remains opt-in and live backend adoption remains pending. The
+  activation remains opt-in. The guarded 2026-08-29 Airstar rehearsal passed
+  output-enabled global/device/reset IPC transactions and real-time adoption;
+  live backend promotion remains pending. The
   fake-JACK daemon process gate also proves explicit acknowledgement, startup,
   SIGTERM shutdown, paired-port registration, zero unsolicited output, and
   cleanup. The daemon lifecycle poll gate also proves automatic reconnect after
@@ -489,8 +492,8 @@ benchmarks.
   restart restoration, reset, malformed-peer recovery, serialized takeover,
   and active-socket refusal coverage. Live adoption, reconnect under an active
   device backend remain incomplete. Offline reconnect under an active device
-  backend is covered; live adoption and live reconnect evidence remain
-  incomplete. Offline output-enabled rollback evidence
+  backend and the guarded Airstar output-runtime rehearsal are covered; live
+  fault/reconnect evidence remains incomplete. Offline output-enabled rollback evidence
   covers confirmation failure, previous-generation restoration, monotonic
   rollback publication, and failed-runtime refusal.
 - 🟡 Meet switch latency, resource, and xrun thresholds. The offline runtime
