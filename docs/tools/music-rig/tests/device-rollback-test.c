@@ -44,6 +44,8 @@ int main(void)
     music_rig_runtime_config config = {0};
     music_rig_platform_interfaces interfaces = {0};
     music_rig_output_adoption_adapter output = {0};
+    music_rig_protocol_request request = {0};
+    music_rig_protocol_response response;
     uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {0};
 
     if (init_compiled_tables_fixture(&tables) != MUSIC_RIG_RESULT_OK ||
@@ -80,6 +82,18 @@ int main(void)
     config.output_adoption = &output;
     if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
         MUSIC_RIG_RESULT_OK) {
+        return 1;
+    }
+    request.protocol_version = MUSIC_RIG_PROTOCOL_VERSION;
+    request.operation = MUSIC_RIG_OPERATION_SWITCH_DEVICE;
+    request.request_id = UINT64_C(7);
+    request.expected_generation = UINT64_C(1);
+    fixture_copy(request.device_slot, "smc-mixer-main");
+    fixture_copy(request.profile, "multilevel-volume");
+    if (music_rig_runtime_dispatch(&runtime, &request, &response) !=
+            MUSIC_RIG_RESULT_OK || response.result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_OK || runtime.state.generation_id !=
+            UINT64_C(2)) {
         return 1;
     }
     puts("Device rollback contract fixture: OK");
