@@ -394,6 +394,11 @@ if(BUILD_TESTING)
         tests/runtime-test.c
     )
     target_link_libraries(music_rig_runtime_test PRIVATE music_rig_core)
+    add_executable(music_rig_device_rollback_test
+        tests/device-rollback-test.c
+    )
+    target_link_libraries(music_rig_device_rollback_test PRIVATE music_rig_core)
+    add_test(NAME music_rig_device_rollback COMMAND music_rig_device_rollback_test)
     add_executable(music_rig_switch_performance_test
         tests/switch-performance-test.c
     )
