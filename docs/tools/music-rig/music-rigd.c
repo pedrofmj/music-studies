@@ -19,6 +19,10 @@
 #include "music_rig/jack_midi_shadow.h"
 #endif
 
+#if defined(MUSIC_RIG_HAS_JACK_MIDI_OUTPUT)
+#include "music_rig/jack_midi_output.h"
+#endif
+
 #if defined(MUSIC_RIG_HAS_JACK_SMC_MIXER_RELAY)
 #include "music_rig/jack_smc_mixer_relay.h"
 #endif
@@ -70,6 +74,16 @@ static void print_usage(FILE *stream, const char *program)
         stream,
         "       %s run-midi-shadow --definition PATH "
         "--expected-fingerprint SHA256 --output-suppressed\n",
+        program
+    );
+#endif
+#if defined(MUSIC_RIG_ENABLE_JSON_DEFINITION) && \
+    defined(MUSIC_RIG_HAS_JACK_MIDI_OUTPUT)
+    fprintf(
+        stream,
+        "       %s run-midi-output --definition PATH "
+        "--expected-fingerprint SHA256 --output-enabled "
+        "--acknowledge-output\n",
         program
     );
 #endif
@@ -472,9 +486,89 @@ static int run_midi_shadow(const char *path, const char *fingerprint)
 
 static int run_midi_output(const char *path, const char *fingerprint)
 {
-    (void)path;
-    (void)fingerprint;
-    return MUSIC_RIG_RESULT_UNSUPPORTED;
+    music_rig_compiled_definition definition = {0};
+    music_rig_generation generation = {0};
+    music_rig_generation_slot generations;
+    music_rig_device_midi_shadow_config config;
+    music_rig_device_midi_shadow shadow;
+    music_rig_jack_midi_output host;
+    music_rig_device_midi_shadow_observer observer = {0};
+    music_rig_output_adoption_adapter adoption;
+    music_rig_journal_diagnostics journal;
+    music_rig_diagnostic_sink sink;
+    music_rig_result result;
+    music_rig_result stop_result = MUSIC_RIG_RESULT_OK;
+    bool host_started = false;
+
+    result = load_definition(path, fingerprint, &definition, &generation);
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_generation_slot_init(&generations, &generation);
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_jack_midi_output_init(
+            &host, &generations, &definition_tables
+        );
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_jack_midi_output_observer_init(&host, &observer);
+    }
+    music_rig_device_midi_shadow_config_init(&config);
+    config.generations = &generations;
+    config.observer = observer;
+    config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
+    if (result == MUSIC_RIG_RESULT_OK) {
+        configure_current_behaviors(&config);
+        result = music_rig_device_midi_shadow_init(&shadow, &config);
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_jack_midi_output_attach_shadow(&host, &shadow);
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_journal_diagnostics_init(
+            &journal, STDERR_FILENO, &sink
+        );
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_jack_midi_output_start(&host);
+        host_started = result == MUSIC_RIG_RESULT_OK;
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        adoption = music_rig_jack_midi_output_adapter(&host);
+        result = adoption.prepare(adoption.context, &generation);
+        if (result == MUSIC_RIG_RESULT_OK) {
+            result = adoption.confirm(adoption.context, &generation);
+        }
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = music_rig_linux_shadow_lifecycle_run(&sink);
+        stop_result = music_rig_jack_midi_output_stop(&host);
+        host_started = false;
+        if (result == MUSIC_RIG_RESULT_OK) {
+            result = stop_result;
+        }
+        if (result == MUSIC_RIG_RESULT_OK &&
+            atomic_load_explicit(
+                &host.last_process_result, memory_order_acquire
+            ) != MUSIC_RIG_RESULT_OK) {
+            result = atomic_load_explicit(
+                &host.last_process_result, memory_order_relaxed
+            );
+        }
+    }
+    if (result != MUSIC_RIG_RESULT_OK && host_started) {
+        (void)music_rig_jack_midi_output_stop(&host);
+    }
+    if (result != MUSIC_RIG_RESULT_OK) {
+        fprintf(stderr, "MIDI output failed: result %d\n", (int)result);
+        return (int)result;
+    }
+    printf("definition-generation %" PRIu64 "\n", generation.id);
+    printf("input-output-port-pairs %zu\n", host.port_count);
+    printf("output-events %" PRIu64 "\n", host.metrics.output_events);
+    printf("output-reserve-failures %" PRIu64 "\n",
+        host.metrics.output_reserve_failures);
+    puts("output-mode enabled");
+    return MUSIC_RIG_RESULT_OK;
 }
 #endif
 
@@ -644,10 +738,11 @@ int main(int argc, char **argv)
         strcmp(argv[6], "--output-suppressed") == 0) {
         return run_midi_shadow(argv[3], argv[5]);
     }
-    if (argc == 7 && strcmp(argv[1], "run-midi-output") == 0 &&
+    if (argc == 8 && strcmp(argv[1], "run-midi-output") == 0 &&
         strcmp(argv[2], "--definition") == 0 &&
         strcmp(argv[4], "--expected-fingerprint") == 0 &&
-        strcmp(argv[6], "--output-enabled") == 0) {
+        strcmp(argv[6], "--output-enabled") == 0 &&
+        strcmp(argv[7], "--acknowledge-output") == 0) {
         return run_midi_output(argv[3], argv[5]);
     }
 #endif

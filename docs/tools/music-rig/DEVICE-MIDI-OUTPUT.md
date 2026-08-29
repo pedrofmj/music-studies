@@ -42,6 +42,18 @@ default daemon, input-only shadow command, and protected production deployment
 remain unchanged. Any future live use requires an explicit command, an
 independently supplied definition fingerprint, and an authorized rehearsal.
 
+The explicit daemon command is available only in a JSON-enabled Linux JACK
+build:
+
+```text
+music-rigd run-midi-output --definition PATH \
+  --expected-fingerprint SHA256 --output-enabled --acknowledge-output
+```
+
+The acknowledgement is required because this command can emit MIDI. It still
+does not create or remove graph links; external routing remains a separate,
+authorized operation.
+
 The fake-JACK offline test proves paired registration, generated Arturia MIDI
 emission, output metrics, adoption prepare/confirm/rollback callbacks, backend
 shutdown, and registration-failure cleanup.

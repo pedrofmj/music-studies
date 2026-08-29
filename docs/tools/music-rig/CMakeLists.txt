@@ -233,6 +233,12 @@ if(TARGET music_rig_jack_midi_shadow)
     )
     target_link_libraries(music-rigd PRIVATE music_rig_jack_midi_shadow)
 endif()
+if(TARGET music_rig_jack_midi_output)
+    target_compile_definitions(music-rigd PRIVATE
+        MUSIC_RIG_HAS_JACK_MIDI_OUTPUT=1
+    )
+    target_link_libraries(music-rigd PRIVATE music_rig_jack_midi_output)
+endif()
 set(MUSIC_RIG_SMC_MIXER_RELAY_COMMAND_ENABLED OFF)
 if(TARGET music_rig_jack_smc_mixer_relay AND
     MUSIC_RIG_ENABLE_JSON_C_SPIKE)
