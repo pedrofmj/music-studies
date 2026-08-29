@@ -47,8 +47,16 @@ static int run_cli(
         execv(program, arguments);
         _exit(127);
     }
-    return child > 0 && waitpid(child, &status, 0) == child &&
-        WIFEXITED(status) && WEXITSTATUS(status) == 0;
+    if (child <= 0) {
+        fputs("output-runtime CLI fork failed\n", stderr);
+        return 0;
+    }
+    if (waitpid(child, &status, 0) != child || !WIFEXITED(status) ||
+        WEXITSTATUS(status) != 0) {
+        fprintf(stderr, "output-runtime CLI failed with status %d\n", status);
+        return 0;
+    }
+    return 1;
 }
 
 static int read_ready(
@@ -124,7 +132,8 @@ int main(int argc, char **argv)
             setenv("XDG_RUNTIME_DIR", runtime_home, 1) != 0 ||
             setenv("XDG_STATE_HOME", state_home, 1) != 0 ||
             setenv("XDG_CONFIG_HOME", root, 1) != 0 ||
-            setenv("LD_PRELOAD", argv[7], 1) != 0) {
+            setenv("LD_PRELOAD", argv[7], 1) != 0 ||
+            setenv("MUSIC_RIG_FAKE_OUTPUT_RECONNECT", "1", 1) != 0) {
             _exit(120);
         }
         execl(argv[1], argv[1],
@@ -143,18 +152,25 @@ int main(int argc, char **argv)
     } else if (!read_ready(descriptors[0], output, &used,
             "output-runtime ready")) {
         failure = "lifecycle startup";
-    } else if (!run_cli(argv[2], status_arguments, root, runtime_home,
-            state_home)) {
-        failure = "initial status";
-    } else if (!run_cli(argv[2], switch_arguments, root, runtime_home,
-            state_home)) {
-        failure = "global switch";
-    } else if (!run_cli(argv[2], switch_back_arguments, root, runtime_home,
-            state_home)) {
-        failure = "global switch-back";
-    } else if (!run_cli(argv[2], status_after_arguments, root, runtime_home,
-            state_home)) {
-        failure = "final status";
+    } else {
+        struct timespec startup_delay = {0, 100000000L};
+
+        if (nanosleep(&startup_delay, NULL) != 0) {
+            failure = "control startup delay";
+        }
+        if (failure == NULL && !run_cli(argv[2], status_arguments, root,
+                runtime_home, state_home)) {
+            failure = "initial status";
+        } else if (failure == NULL && !run_cli(argv[2], switch_arguments,
+                root, runtime_home, state_home)) {
+            failure = "global switch";
+        } else if (failure == NULL && !run_cli(argv[2], switch_back_arguments,
+                root, runtime_home, state_home)) {
+            failure = "global switch-back";
+        } else if (failure == NULL && !run_cli(argv[2], status_after_arguments,
+                root, runtime_home, state_home)) {
+            failure = "final status";
+        }
     }
     if (failure != NULL) {
         fputs(output, stderr);
@@ -187,7 +203,8 @@ int main(int argc, char **argv)
     output[used] = '\0';
     if (!WIFEXITED(status) || WEXITSTATUS(status) != 0 ||
         strstr(output, "output-runtime ready") == NULL ||
-        strstr(output, "output-mode enabled") == NULL) {
+        strstr(output, "output-mode enabled") == NULL ||
+        strstr(output, "backend-reconnects 1") == NULL) {
         fputs(output, stderr);
         return 1;
     }

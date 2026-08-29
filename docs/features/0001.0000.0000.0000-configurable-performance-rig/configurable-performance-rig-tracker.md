@@ -478,7 +478,8 @@ benchmarks.
   backend shutdown and cleanup after replacement activation failure. The
   output-runtime process gate proves runtime enablement plus authenticated
   status, global switch, switch-back, persistence, and clean shutdown through
-  the control socket.
+  the control socket. Its control poll also proves automatic backend reconnect
+  before the next request.
 - 🟡 Prove atomicity, takeover safety, reconnect behavior, and rollback.
   Global generation/persistence atomicity has injected rollback-success and
   rollback-failure coverage. The Linux daemon now has end-to-end commit,

@@ -323,6 +323,7 @@ music_rig_result music_rig_linux_control_server_wait(void *context)
 {
     music_rig_linux_control_server *server = context;
     fd_set descriptors;
+    struct timeval timeout = {0, 100000};
     int maximum;
     int result;
 
@@ -338,7 +339,7 @@ music_rig_result music_rig_linux_control_server_wait(void *context)
             maximum = server->client;
         }
     }
-    result = select(maximum + 1, &descriptors, NULL, NULL, NULL);
+    result = select(maximum + 1, &descriptors, NULL, NULL, &timeout);
     return result < 0 && errno != EINTR
         ? MUSIC_RIG_RESULT_ADAPTER_FAILURE : MUSIC_RIG_RESULT_OK;
 }

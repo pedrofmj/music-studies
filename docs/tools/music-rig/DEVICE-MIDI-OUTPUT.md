@@ -76,6 +76,10 @@ shutdown and perform one reconnect transaction outside the JACK process
 callback. A reconnect failure terminates the command after cleanup rather than
 continuing with an uncertain backend.
 
+The `run-output` control-server mode performs the same check from its periodic
+control poll. Reconnect completes before the next authenticated request is
+handled, so status, switch, and reset operations cannot use a dead backend.
+
 The fake-JACK offline test proves paired registration, generated Arturia MIDI
 emission, output metrics, adoption prepare/confirm/rollback callbacks, backend
 shutdown, and registration-failure cleanup. The fake-JACK output-runtime

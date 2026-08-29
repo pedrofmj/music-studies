@@ -360,6 +360,82 @@ static void configure_current_behaviors(
     music_rig_device_midi_shadow_config *config
 );
 
+typedef struct music_rig_output_control_context {
+    music_rig_linux_control_server *server;
+    music_rig_jack_midi_output *host;
+    music_rig_output_adoption_adapter *adoption;
+    music_rig_runtime *runtime;
+} music_rig_output_control_context;
+
+static music_rig_result reconnect_output_backend(
+    music_rig_output_control_context *context
+)
+{
+    music_rig_result result;
+
+    if (!atomic_load_explicit(
+            &context->host->backend_shutdown, memory_order_acquire
+        )) {
+        return MUSIC_RIG_RESULT_OK;
+    }
+    result = music_rig_jack_midi_output_reconnect(context->host);
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = context->adoption->prepare(
+            context->adoption->context, context->runtime->control_generation
+        );
+    }
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = context->adoption->confirm(
+            context->adoption->context, context->runtime->control_generation
+        );
+    }
+    return result;
+}
+
+static music_rig_result output_control_start(void *opaque)
+{
+    music_rig_output_control_context *context = opaque;
+
+    return music_rig_linux_control_server_start(context->server);
+}
+
+static music_rig_control_poll output_control_poll(
+    void *opaque,
+    music_rig_protocol_request *request
+)
+{
+    music_rig_output_control_context *context = opaque;
+
+    if (reconnect_output_backend(context) != MUSIC_RIG_RESULT_OK) {
+        return MUSIC_RIG_CONTROL_ERROR;
+    }
+    return music_rig_linux_control_server_poll(context->server, request);
+}
+
+static music_rig_result output_control_wait(void *opaque)
+{
+    music_rig_output_control_context *context = opaque;
+
+    return music_rig_linux_control_server_wait(context->server);
+}
+
+static music_rig_result output_control_respond(
+    void *opaque,
+    const music_rig_protocol_response *response
+)
+{
+    music_rig_output_control_context *context = opaque;
+
+    return music_rig_linux_control_server_respond(context->server, response);
+}
+
+static music_rig_result output_control_stop(void *opaque)
+{
+    music_rig_output_control_context *context = opaque;
+
+    return music_rig_linux_control_server_stop(context->server);
+}
+
 static int run_output_runtime(
     const char *definition_path,
     const char *fingerprint,
@@ -386,6 +462,7 @@ static int run_output_runtime(
     music_rig_device_midi_shadow_config shadow_config;
     music_rig_device_midi_shadow_observer observer = {0};
     music_rig_output_adoption_adapter output_adapter;
+    music_rig_output_control_context control_context;
     music_rig_result result;
     music_rig_result stop_result = MUSIC_RIG_RESULT_OK;
     bool host_started = false;
@@ -393,6 +470,8 @@ static int run_output_runtime(
     memset(&server, 0, sizeof(server));
     server.listener = -1;
     server.client = -1;
+    memset(&control_context, 0, sizeof(control_context));
+    control_context.server = &server;
     result = music_rig_linux_host_paths_from_process(&paths);
     if (result == MUSIC_RIG_RESULT_OK &&
         mkdir(paths.runtime_directory, 0700) != 0 && errno != EEXIST) {
@@ -432,12 +511,12 @@ static int run_output_runtime(
     memset(&interfaces, 0, sizeof(interfaces));
     interfaces.abi_version = MUSIC_RIG_RUNTIME_ABI_VERSION;
     interfaces.clock.now_ns = daemon_clock;
-    interfaces.control.context = &server;
-    interfaces.control.start = music_rig_linux_control_server_start;
-    interfaces.control.poll = music_rig_linux_control_server_poll;
-    interfaces.control.wait = music_rig_linux_control_server_wait;
-    interfaces.control.respond = music_rig_linux_control_server_respond;
-    interfaces.control.stop = music_rig_linux_control_server_stop;
+    interfaces.control.context = &control_context;
+    interfaces.control.start = output_control_start;
+    interfaces.control.poll = output_control_poll;
+    interfaces.control.wait = output_control_wait;
+    interfaces.control.respond = output_control_respond;
+    interfaces.control.stop = output_control_stop;
     interfaces.storage = storage;
     memset(&runtime_config, 0, sizeof(runtime_config));
     runtime_config.initial_generation = &generation;
@@ -487,6 +566,9 @@ static int run_output_runtime(
     }
     if (result == MUSIC_RIG_RESULT_OK) {
         output_adapter = music_rig_jack_midi_output_adapter(&output_host);
+        control_context.host = &output_host;
+        control_context.adoption = &output_adapter;
+        control_context.runtime = &runtime;
         result = music_rig_runtime_enable_output(&runtime, &output_adapter);
     }
     if (result == MUSIC_RIG_RESULT_OK) {
@@ -510,6 +592,7 @@ static int run_output_runtime(
     }
     printf("output-mode enabled\n");
     printf("output-events %" PRIu64 "\n", output_host.metrics.output_events);
+    printf("backend-reconnects %" PRIu64 "\n", output_host.metrics.reconnects);
     return MUSIC_RIG_RESULT_OK;
 }
 #endif
