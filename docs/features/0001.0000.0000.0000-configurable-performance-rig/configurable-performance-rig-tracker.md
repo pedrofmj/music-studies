@@ -44,6 +44,7 @@ Documents:
 | Output adoption acknowledgement | ✅ Atomic generation/timestamp and IPC rendering pass |
 | Output-enabled switch benchmark | ✅ Three 1,000-sample scenarios pass commit and adoption gates |
 | Airstar output-runtime rehearsal | ✅ Output-enabled IPC switches, adoption timestamps, zero graph mutation, and 0 live validation failures; [evidence](../../tools/music-rig/benchmarks/output-runtime-airstar-2026-08-29.json) |
+| Airstar output-runtime idle resources | ✅ 60 s, 0.4% max CPU, 12,616 KB peak RSS, 5 threads, 0 xrun/dropout/deadline events; [evidence](../../tools/music-rig/benchmarks/output-runtime-idle-airstar-2026-08-29.json) |
 | Clang isolated suite | ✅ 60/60 passed |
 | GCC with Linux JSON/JACK adapters | ✅ 67/67 passed |
 | Clang with Linux JSON/JACK adapters | ✅ 67/67 passed |
@@ -502,7 +503,8 @@ benchmarks.
   synthetic high-load labels. It enforces the 20 ms control-commit p95 gate,
   reports non-blocking adoption timestamps, and enforces the one-processing-
   period-plus-margin atomic adoption bound. Daemon resource, xrun, dropout,
-  and live-audio measurements remain pending.
+  and live-audio measurements are partly covered by the Airstar 60-second idle
+  result; musical-load, live-audio, and long-soak measurements remain pending.
 
 ## Milestone 5: MIDI Management Triggers
 

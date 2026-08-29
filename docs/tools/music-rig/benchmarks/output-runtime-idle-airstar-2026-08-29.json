@@ -1,0 +1,31 @@
+{
+  "schema": "music-studies/music-rig-output-runtime-idle-airstar/v1",
+  "date": "2026-08-29",
+  "host": "airstar",
+  "source_commit": "0aec9a7",
+  "launch": "pw-jack",
+  "duration_seconds": 60,
+  "output_mode": "enabled",
+  "control_requests": 0,
+  "midi_input_events": 0,
+  "output_events": 0,
+  "output_reserve_failures": 0,
+  "backend_reconnects": 0,
+  "max_cpu_percent": 0.4,
+  "peak_rss_kb": 12616,
+  "peak_rss_bytes": 12918784,
+  "max_threads": 5,
+  "xrun_dropout_deadline_events": 0,
+  "protected_validation_before_failures": 0,
+  "protected_validation_after_failures": 0,
+  "patchbay_links_before": 116,
+  "patchbay_links_after": 116,
+  "link_hash_before": "sha256:9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+  "link_hash_after": "sha256:9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+  "graph_mutated": false,
+  "temporary_artifacts_removed": true,
+  "notes": [
+    "The output host registered no graph links and was run with isolated XDG state.",
+    "This is an idle resource and stability observation; live musical audio-output certification remains pending."
+  ]
+}
