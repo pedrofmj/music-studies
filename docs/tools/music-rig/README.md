@@ -165,8 +165,8 @@ loop handles decoded protocol v2 inspection, dry-runs, and durable
 output-suppressed global and per-device switch transactions with bounded
 rollback. State v3 persists the active Rig Profile and device overrides while
 still reading v1 and v2 frames. Production IPC is available through the
-authenticated Linux control socket; output-enabled adoption remains
-unavailable.
+authenticated Linux control socket; output-enabled adoption requires the
+separate explicit Linux JACK output host and is not a default command.
 
 [`runtime/core/music_rig_device_ports.c`](runtime/core/music_rig_device_ports.c)
 derives fixed `device.<slot>.midi-input` and `.midi-output` identities from
@@ -200,10 +200,13 @@ shadow-integration boundaries.
 [`runtime/adapters/music_rig_device_midi_shadow.c`](runtime/adapters/music_rig_device_midi_shadow.c)
 adopts immutable generations and dispatches numeric MIDI events for every
 stable slot without allocation, locks, JSON traversal, filesystem access, or
-hot-path string comparison. Calculated behavior messages are counted and
-observable only as suppressed decisions. The optional Linux JACK host opens
-with `JackNoStartServer`, registers only stable input ports, and has no output
-or graph-connect symbol. See [DEVICE-MIDI-SHADOW.md](DEVICE-MIDI-SHADOW.md).
+hot-path string comparison. Calculated behavior messages are suppressed by
+default. The optional Linux JACK shadow host opens with `JackNoStartServer`,
+registers only stable input ports, and has no graph-connect symbol. The
+separate `runtime/linux/music_rig_jack_midi_output.c` host provides the
+explicit output-enabled boundary with paired stable ports and no graph
+mutation. See [DEVICE-MIDI-SHADOW.md](DEVICE-MIDI-SHADOW.md) and
+[DEVICE-MIDI-OUTPUT.md](DEVICE-MIDI-OUTPUT.md).
 
 [`runtime/platform/include/music_rig/file_storage.h`](runtime/platform/include/music_rig/file_storage.h)
 defines explicit caller-owned UTF-8 paths. Linux and Windows implementations

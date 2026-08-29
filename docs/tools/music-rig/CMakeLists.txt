@@ -135,6 +135,22 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
             C_EXTENSIONS OFF
         )
 
+        add_library(music_rig_jack_midi_output STATIC
+            runtime/linux/music_rig_jack_midi_output.c
+        )
+        target_include_directories(music_rig_jack_midi_output
+            PUBLIC
+                "${CMAKE_CURRENT_SOURCE_DIR}/runtime/platform/include"
+        )
+        target_link_libraries(music_rig_jack_midi_output
+            PUBLIC music_rig_device_midi_shadow
+            PRIVATE "${MUSIC_RIG_JACK_LIBRARY}"
+        )
+        target_compile_features(music_rig_jack_midi_output PUBLIC c_std_17)
+        set_target_properties(music_rig_jack_midi_output PROPERTIES
+            C_EXTENSIONS OFF
+        )
+
         add_library(music_rig_jack_smc_mixer_relay STATIC
             runtime/linux/music_rig_jack_smc_mixer_relay.c
         )
@@ -325,6 +341,14 @@ else()
             -Werror
         )
     endif()
+    if(TARGET music_rig_jack_midi_output)
+        target_compile_options(music_rig_jack_midi_output PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+    endif()
     if(TARGET music_rig_jack_smc_mixer_relay)
         target_compile_options(music_rig_jack_smc_mixer_relay PRIVATE
             -Wall
@@ -459,6 +483,29 @@ if(BUILD_TESTING)
         set_target_properties(
             music_rig_jack_midi_shadow_offline_test PROPERTIES
                 C_EXTENSIONS OFF
+        )
+        add_executable(music_rig_jack_midi_output_offline_test
+            tests/jack-midi-output-offline-test.c
+            runtime/linux/music_rig_jack_midi_output.c
+        )
+        target_include_directories(music_rig_jack_midi_output_offline_test
+            PRIVATE
+                "${CMAKE_CURRENT_SOURCE_DIR}/runtime/platform/include"
+        )
+        target_link_libraries(music_rig_jack_midi_output_offline_test
+            PRIVATE music_rig_device_midi_shadow
+        )
+        target_compile_features(
+            music_rig_jack_midi_output_offline_test PRIVATE c_std_17
+        )
+        set_target_properties(music_rig_jack_midi_output_offline_test PROPERTIES
+            C_EXTENSIONS OFF
+        )
+        target_compile_options(music_rig_jack_midi_output_offline_test PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
         )
         add_executable(music_rig_jack_smc_mixer_relay_offline_test
             tests/jack-smc-mixer-relay-offline-test.c
@@ -695,6 +742,10 @@ if(BUILD_TESTING)
         add_test(
             NAME music_rig_jack_midi_shadow_offline_test
             COMMAND music_rig_jack_midi_shadow_offline_test
+        )
+        add_test(
+            NAME music_rig_jack_midi_output_offline_test
+            COMMAND music_rig_jack_midi_output_offline_test
         )
         add_test(
             NAME music_rig_jack_smc_mixer_relay_offline_test

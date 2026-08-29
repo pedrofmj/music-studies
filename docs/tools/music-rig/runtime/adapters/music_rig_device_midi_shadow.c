@@ -236,7 +236,9 @@ music_rig_result music_rig_device_midi_shadow_init(
     if (shadow == NULL || config == NULL ||
         config->abi_version != MUSIC_RIG_DEVICE_MIDI_SHADOW_ABI_VERSION ||
         config->generations == NULL ||
-        config->output_mode != MUSIC_RIG_OUTPUT_SUPPRESSED ||
+        (config->output_mode != MUSIC_RIG_OUTPUT_SUPPRESSED &&
+         (config->output_mode != MUSIC_RIG_OUTPUT_ENABLED ||
+          config->observer.output_midi == NULL)) ||
         config->observer.abi_version !=
             MUSIC_RIG_DEVICE_MIDI_SHADOW_OBSERVER_ABI_VERSION ||
         !music_rig_generation_slot_is_lock_free(config->generations)) {

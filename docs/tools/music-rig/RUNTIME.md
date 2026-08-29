@@ -349,13 +349,18 @@ recall. See [BEHAVIORS.md](BEHAVIORS.md) for the full contract.
 The separate fixed-storage event engine owns per-slot parser and behavior state,
 adopts immutable table generations once per callback cycle, and resolves MIDI
 through the numeric dispatch index. Current Arturia and SMK-25 calculated
-messages terminate at a suppression observer; the engine has no output adapter.
+messages terminate at a suppression observer by default. An explicit output
+observer enables the separate Linux JACK output host described below.
 
-The Linux JACK host opens with no-server-start, registers only stable input
-ports, and contains no connect or output API. Fake-backend and complete
-five-device definition tests exercise its process lifecycle without a live
-graph. See [DEVICE-MIDI-SHADOW.md](DEVICE-MIDI-SHADOW.md) for the command,
-ownership, hot-path, metric, failure, and verification contracts.
+The Linux JACK shadow host opens with no-server-start, registers only stable
+input ports, and contains no connect or output API. The separate Linux output
+host registers paired stable ports and emits only through its explicit output
+observer; it never changes links. Fake-backend and complete five-device
+definition tests exercise the shadow lifecycle without a live graph. See
+[DEVICE-MIDI-SHADOW.md](DEVICE-MIDI-SHADOW.md) for the command, ownership,
+hot-path, metric, failure, and verification contracts. See
+[DEVICE-MIDI-OUTPUT.md](DEVICE-MIDI-OUTPUT.md) for the output-host
+initialization and adoption boundary.
 
 ## Milestone 3 Evidence
 
