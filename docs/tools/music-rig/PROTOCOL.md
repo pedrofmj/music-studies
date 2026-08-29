@@ -57,12 +57,13 @@ resource, contacts a device, or changes a graph.
 
 The non-mutating table dispatcher still rejects every commit-capable request.
 The portable runtime transaction accepts non-dry-run global and device requests
-while output remains suppressed. It checks the expected generation,
+in output-suppressed mode and through an explicit output adapter in
+output-enabled mode. It checks the expected generation,
 reuses only validated control-only table images, reserves bounded rollback
 storage, publishes a monotonically increasing immutable generation, and
-atomically persists the active Rig Profile and device override set. A persistence failure republishes
-the previous table image with a newer generation and reports rollback success
-or failure explicitly. Output-enabled adoption remains unsupported.
+atomically persists the active Rig Profile and device override set. A persistence
+failure republishes the previous table image with a newer generation and reports
+rollback success or failure explicitly.
 
 ## Response Frame
 
@@ -85,7 +86,7 @@ profiles allowed by compiled-table ABI v1.
 | 64 | 4 | Rollback status |
 | 68 | 4 | Warning flags |
 | 72 | 4 | Profile row count, at most 16 |
-| 76 | 4 | Reserved, zero |
+| 76 | 4 | Output mode, `0` suppressed or `1` enabled |
 | 80 | 65 | Active Rig Profile |
 | 145 | 65 | Selected device slot, when applicable |
 | 210 | 65 | Selected target profile, when applicable |

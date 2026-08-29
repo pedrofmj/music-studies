@@ -160,6 +160,7 @@ static bool response_is_valid(const music_rig_protocol_response *response)
         response->readiness > UINT32_C(3) ||
         response->request_id == UINT64_C(0) ||
         response->rollback_status > (uint32_t)MUSIC_RIG_ROLLBACK_FAILED ||
+        response->output_mode > MUSIC_RIG_OUTPUT_ENABLED ||
         (response->warning_flags & ~(MUSIC_RIG_WARNING_COLD_REQUIRED |
             MUSIC_RIG_WARNING_UNAVAILABLE_BINDING)) != UINT32_C(0) ||
         !bounded_text(response->active_rig_profile, false) ||
@@ -252,6 +253,7 @@ music_rig_result music_rig_protocol_encode_response(
     put_u64_le(output + 56, response->adopted_at_ns);
     put_u32_le(output + 64, response->rollback_status);
     put_u32_le(output + 68, response->warning_flags);
+    put_u32_le(output + 76, (uint32_t)response->output_mode);
     put_u32_le(output + 72, response->profile_count);
     put_text(output + 80, response->active_rig_profile);
     put_text(output + 145, response->selected_device_slot);
@@ -282,7 +284,6 @@ music_rig_result music_rig_protocol_decode_response(
     if (input == NULL || response == NULL ||
         input_size != MUSIC_RIG_PROTOCOL_RESPONSE_SIZE ||
         get_u32_le(input) != MUSIC_RIG_PROTOCOL_MAGIC ||
-        !bytes_are_zero(input + 76, 4) ||
         !bytes_are_zero(input + 275, 13)) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
@@ -305,6 +306,10 @@ music_rig_result music_rig_protocol_decode_response(
     response->adopted_at_ns = get_u64_le(input + 56);
     response->rollback_status = get_u32_le(input + 64);
     response->warning_flags = get_u32_le(input + 68);
+    response->output_mode = (music_rig_output_mode)get_u32_le(input + 76);
+    if (response->output_mode > MUSIC_RIG_OUTPUT_ENABLED) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
     response->profile_count = profile_count;
     memcpy(response->active_rig_profile, input + 80,
         sizeof(response->active_rig_profile));

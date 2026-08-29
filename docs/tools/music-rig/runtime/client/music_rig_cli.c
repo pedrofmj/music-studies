@@ -348,6 +348,12 @@ static const char *readiness_name(uint32_t readiness)
     return readiness <= UINT32_C(3) ? names[readiness] : "invalid";
 }
 
+static const char *output_mode_name(uint32_t output_mode)
+{
+    return output_mode == (uint32_t)MUSIC_RIG_OUTPUT_ENABLED
+        ? "enabled" : "suppressed";
+}
+
 static void append_format(output_builder *builder, const char *format, ...)
 {
     va_list arguments;
@@ -386,7 +392,8 @@ static void render_human(
     append_format(builder, "rig-profile %s\n", response->active_rig_profile);
     append_format(builder, "readiness %s\n",
         readiness_name(response->readiness));
-    append_format(builder, "output-mode suppressed\n");
+    append_format(builder, "output-mode %s\n",
+        output_mode_name((uint32_t)response->output_mode));
     append_format(builder, "dry-run %s\n",
         (response->flags & MUSIC_RIG_RESPONSE_DRY_RUN) != UINT32_C(0)
             ? "yes" : "no");
@@ -424,7 +431,7 @@ static void render_json(
         "\"operation\":\"%s\",\"result\":\"%s\","
         "\"previous_generation\":%llu,\"resulting_generation\":%llu,"
         "\"active_rig_profile\":\"%s\",\"readiness\":\"%s\","
-        "\"output_mode\":\"suppressed\",\"dry_run\":%s,"
+         "\"output_mode\":\"%s\",\"dry_run\":%s,"
         "\"valid\":%s,\"graph_delta\":\"%s\","
         "\"control_duration_ns\":%llu,\"adopted_at_ns\":%llu,"
         "\"rollback\":\"not-required\",\"warning_flags\":%u,"
@@ -437,6 +444,7 @@ static void render_json(
         (unsigned long long)response->resulting_generation,
         response->active_rig_profile,
         readiness_name(response->readiness),
+        output_mode_name((uint32_t)response->output_mode),
         (response->flags & MUSIC_RIG_RESPONSE_DRY_RUN) != UINT32_C(0)
             ? "true" : "false",
         (response->flags & MUSIC_RIG_RESPONSE_VALID) != UINT32_C(0)

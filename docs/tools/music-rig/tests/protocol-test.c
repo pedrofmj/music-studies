@@ -110,6 +110,7 @@ static int test_response(void)
     expected.previous_generation = UINT64_C(41);
     expected.resulting_generation = UINT64_C(41);
     expected.rollback_status = (uint32_t)MUSIC_RIG_ROLLBACK_NOT_REQUIRED;
+    expected.output_mode = MUSIC_RIG_OUTPUT_SUPPRESSED;
     copy_text(expected.active_rig_profile, "full-live-rack");
     expected.readiness = UINT32_C(1);
     expected.profile_count = UINT32_C(1);
@@ -135,6 +136,13 @@ static int test_response(void)
         ) != MUSIC_RIG_RESULT_OK ||
         memcmp(&decoded, &expected, sizeof(expected)) != 0) {
         fputs("response protocol round trip failed\n", stderr);
+        return 1;
+    }
+    encoded[76] = UINT8_C(2);
+    if (music_rig_protocol_decode_response(
+            encoded, sizeof(encoded), &decoded
+        ) != MUSIC_RIG_RESULT_INVALID_ARGUMENT) {
+        fputs("invalid response output mode was accepted\n", stderr);
         return 1;
     }
 

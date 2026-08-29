@@ -230,6 +230,13 @@ int main(void)
         return 1;
     }
 
+    mock.snapshot.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
+    if (run_command(5, status, &mock, MUSIC_RIG_RESULT_OK,
+            "\"output_mode\":\"enabled\"")) {
+        fputs("enabled output mode was not rendered\n", stderr);
+        return 1;
+    }
+
     if (music_rig_cli_parse(4, unsafe, UINT64_C(1), &command) !=
             MUSIC_RIG_RESULT_OK ||
         command.request.flags != UINT32_C(0) ||

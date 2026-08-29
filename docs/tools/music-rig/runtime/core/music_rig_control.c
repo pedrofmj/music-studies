@@ -496,6 +496,7 @@ music_rig_result music_rig_control_dispatch_prepared(
     response->previous_generation = snapshot->generation_id;
     response->resulting_generation = snapshot->generation_id;
     response->rollback_status = (uint32_t)MUSIC_RIG_ROLLBACK_NOT_REQUIRED;
+    response->output_mode = snapshot->output_mode;
     copy_text(response->active_rig_profile, snapshot->active_rig_profile);
 
     if (snapshot->output_mode != MUSIC_RIG_OUTPUT_SUPPRESSED &&

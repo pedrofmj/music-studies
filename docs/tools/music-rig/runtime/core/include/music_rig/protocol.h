@@ -2,6 +2,7 @@
 #define MUSIC_RIG_PROTOCOL_H
 
 #include "music_rig/core.h"
+#include "music_rig/state.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -74,6 +75,7 @@ typedef struct music_rig_protocol_response {
     uint64_t adopted_at_ns;
     uint32_t rollback_status;
     uint32_t warning_flags;
+    music_rig_output_mode output_mode;
     char active_rig_profile[MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY];
     char selected_device_slot[MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY];
     char selected_profile[MUSIC_RIG_PROTOCOL_IDENTIFIER_CAPACITY];

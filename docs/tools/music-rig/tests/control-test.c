@@ -42,6 +42,7 @@ static int dispatch_expect(
         response->previous_generation != snapshot->generation_id ||
         response->resulting_generation != snapshot->generation_id ||
         response->adopted_at_ns != UINT64_C(0) ||
+        response->output_mode != snapshot->output_mode ||
         response->rollback_status !=
             (uint32_t)MUSIC_RIG_ROLLBACK_NOT_REQUIRED) {
         fputs("control response contract failed\n", stderr);
@@ -68,7 +69,8 @@ static int dispatch_prepared_expect(
         ) != MUSIC_RIG_RESULT_OK ||
         response->result_code != (uint32_t)expected ||
         response->previous_generation != snapshot->generation_id ||
-        response->resulting_generation != snapshot->generation_id) {
+        response->resulting_generation != snapshot->generation_id ||
+        response->output_mode != snapshot->output_mode) {
         fputs("prepared control response contract failed\n", stderr);
         return 1;
     }
