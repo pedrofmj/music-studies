@@ -472,39 +472,9 @@ static int run_midi_shadow(const char *path, const char *fingerprint)
 
 static int run_midi_output(const char *path, const char *fingerprint)
 {
-    music_rig_compiled_definition definition = {0};
-    music_rig_generation generation = {0};
-    music_rig_generation_slot generations;
-    music_rig_device_midi_shadow_config config;
-    music_rig_device_midi_shadow shadow;
-    music_rig_jack_midi_output host;
-    music_rig_result result;
-
-    result = load_definition(path, fingerprint, &definition, &generation);
-    if (result == MUSIC_RIG_RESULT_OK) {
-        result = music_rig_generation_slot_init(&generations, &generation);
-    }
-    music_rig_device_midi_shadow_config_init(&config);
-    config.generations = &generations;
-    if (result == MUSIC_RIG_RESULT_OK) {
-        configure_current_behaviors(&config);
-        config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
-        result = music_rig_device_midi_shadow_init(&shadow, &config);
-    }
-    if (result == MUSIC_RIG_RESULT_OK) {
-        result = music_rig_jack_midi_output_init(&host, &shadow);
-    }
-    if (result == MUSIC_RIG_RESULT_OK) {
-        result = music_rig_jack_midi_output_start(&host);
-    }
-    if (result == MUSIC_RIG_RESULT_OK) {
-        result = MUSIC_RIG_RESULT_UNSUPPORTED;
-        (void)music_rig_jack_midi_output_stop(&host);
-    }
-    if (result != MUSIC_RIG_RESULT_OK) {
-        fprintf(stderr, "MIDI output failed: result %d\n", (int)result);
-    }
-    return (int)result;
+    (void)path;
+    (void)fingerprint;
+    return MUSIC_RIG_RESULT_UNSUPPORTED;
 }
 #endif
 
