@@ -20,6 +20,13 @@ typedef struct benchmark_storage {
     bool exists;
 } benchmark_storage;
 
+typedef struct benchmark_output_adapter {
+    music_rig_runtime *runtime;
+    const music_rig_generation *prepared_generation;
+    uint64_t confirmed_at_ns;
+    uint64_t adopted_at_ns;
+} benchmark_output_adapter;
+
 static uint64_t monotonic_raw_ns(void *opaque)
 {
     struct timespec value;
@@ -111,6 +118,63 @@ static music_rig_result control_stop(void *opaque)
     return MUSIC_RIG_RESULT_OK;
 }
 
+static music_rig_result output_prepare(
+    void *opaque,
+    const music_rig_generation *generation
+)
+{
+    benchmark_output_adapter *adapter = opaque;
+
+    adapter->prepared_generation = generation;
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result output_confirm(
+    void *opaque,
+    const music_rig_generation *generation
+)
+{
+    benchmark_output_adapter *adapter = opaque;
+
+    if (adapter->prepared_generation != generation) {
+        return MUSIC_RIG_RESULT_INVALID_STATE;
+    }
+    adapter->confirmed_at_ns = monotonic_raw_ns(NULL);
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result output_rollback(
+    void *opaque,
+    const music_rig_generation *generation
+)
+{
+    benchmark_output_adapter *adapter = opaque;
+
+    adapter->prepared_generation = generation;
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result output_adopted(
+    void *opaque,
+    const music_rig_generation *generation,
+    uint64_t *adopted_at_ns
+)
+{
+    benchmark_output_adapter *adapter = opaque;
+
+    if (adopted_at_ns == NULL ||
+        music_rig_generation_slot_adopted(&adapter->runtime->generations) !=
+            generation) {
+        if (adopted_at_ns != NULL) {
+            *adopted_at_ns = UINT64_C(0);
+        }
+        return MUSIC_RIG_RESULT_NOT_FOUND;
+    }
+    *adopted_at_ns = adapter->adopted_at_ns;
+    return *adopted_at_ns == UINT64_C(0)
+        ? MUSIC_RIG_RESULT_NOT_FOUND : MUSIC_RIG_RESULT_OK;
+}
+
 static int compare_u64(const void *left, const void *right)
 {
     const uint64_t left_value = *(const uint64_t *)left;
@@ -129,7 +193,11 @@ static void do_synthetic_load(unsigned int rounds)
     }
 }
 
-static int run_scenario(const char *name, unsigned int synthetic_load)
+static int run_scenario(
+    const char *name,
+    unsigned int synthetic_load,
+    bool output_enabled
+)
 {
     static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
         0x5a
@@ -140,6 +208,8 @@ static int run_scenario(const char *name, unsigned int synthetic_load)
     static music_rig_prepared_definition prepared;
     static music_rig_runtime runtime;
     static benchmark_storage storage_context;
+    benchmark_output_adapter output_context = {0};
+    music_rig_output_adoption_adapter output_adapter;
     music_rig_generation initial;
     music_rig_runtime_config config;
     music_rig_platform_interfaces interfaces;
@@ -186,7 +256,19 @@ static int run_scenario(const char *name, unsigned int synthetic_load)
     config.active_rig_profile = "full-live-rack";
     config.prepared_definitions = &prepared;
     config.prepared_definition_count = 1U;
-    config.output_mode = MUSIC_RIG_OUTPUT_SUPPRESSED;
+    config.output_mode = output_enabled
+        ? MUSIC_RIG_OUTPUT_ENABLED : MUSIC_RIG_OUTPUT_SUPPRESSED;
+    if (output_enabled) {
+        output_context.runtime = &runtime;
+        output_adapter.abi_version =
+            MUSIC_RIG_OUTPUT_ADOPTION_ADAPTER_ABI_VERSION;
+        output_adapter.context = &output_context;
+        output_adapter.prepare = output_prepare;
+        output_adapter.confirm = output_confirm;
+        output_adapter.rollback = output_rollback;
+        output_adapter.adopted = output_adopted;
+        config.output_adoption = &output_adapter;
+    }
     if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
             MUSIC_RIG_RESULT_OK) {
         return 1;
@@ -218,7 +300,8 @@ static int run_scenario(const char *name, unsigned int synthetic_load)
             return 1;
         }
         finished_ns = monotonic_raw_ns(NULL);
-        published_ns = finished_ns;
+        published_ns = output_enabled
+            ? output_context.confirmed_at_ns : finished_ns;
         control_samples[index] = finished_ns >= started_ns
             ? finished_ns - started_ns : UINT64_C(0);
         if (music_rig_generation_slot_adopt(&runtime.generations) !=
@@ -227,7 +310,31 @@ static int run_scenario(const char *name, unsigned int synthetic_load)
                 name, index);
             return 1;
         }
-        adopted_ns = monotonic_raw_ns(NULL);
+        if (output_enabled) {
+            music_rig_protocol_request status_request = {0};
+            music_rig_protocol_response status_response;
+
+            output_context.adopted_at_ns = monotonic_raw_ns(NULL);
+            status_request.protocol_version = MUSIC_RIG_PROTOCOL_VERSION;
+            status_request.operation =
+                (uint32_t)MUSIC_RIG_OPERATION_STATUS;
+            status_request.request_id = (uint64_t)index + UINT64_C(10001);
+            status_request.expected_generation = runtime.state.generation_id;
+            if (response.adopted_at_ns != UINT64_C(0) ||
+                music_rig_runtime_dispatch(
+                    &runtime, &status_request, &status_response
+                ) != MUSIC_RIG_RESULT_OK ||
+                status_response.result_code !=
+                    (uint32_t)MUSIC_RIG_RESULT_OK ||
+                status_response.adopted_at_ns != output_context.adopted_at_ns) {
+                fprintf(stderr, "%s output adoption acknowledgement failed "
+                    "at sample %zu\n", name, index);
+                return 1;
+            }
+            adopted_ns = status_response.adopted_at_ns;
+        } else {
+            adopted_ns = monotonic_raw_ns(NULL);
+        }
         effective_adoption_samples[index] = adopted_ns >= started_ns
             ? adopted_ns - started_ns : UINT64_C(0);
         commit_to_adoption_samples[index] = adopted_ns >= published_ns
@@ -256,7 +363,8 @@ static int run_scenario(const char *name, unsigned int synthetic_load)
     ];
     printf(
         "{\"schema\":\"music-studies/music-rig-switch-performance/v1\","
-        "\"scenario\":\"%s\",\"sample_count\":%u,"
+        "\"scenario\":\"%s\",\"output_mode\":\"%s\","
+        "\"sample_count\":%u,"
         "\"control_commit_p95_ns\":%" PRIu64 ","
         "\"control_commit_maximum_ns\":%" PRIu64 ","
         "\"effective_adoption_p95_ns\":%" PRIu64 ","
@@ -265,6 +373,7 @@ static int run_scenario(const char *name, unsigned int synthetic_load)
         "\"commit_to_adoption_maximum_ns\":%" PRIu64 ","
         "\"timing_pass\":%s}\n",
         name,
+        output_enabled ? "enabled" : "suppressed",
         SWITCH_SAMPLE_COUNT,
         control_p95,
         control_maximum,
@@ -282,7 +391,10 @@ static int run_scenario(const char *name, unsigned int synthetic_load)
 
 int main(void)
 {
-    return run_scenario("idle", 0U) != 0 ||
-        run_scenario("normal-performance", 100U) != 0 ||
-        run_scenario("high-midi-load", 1000U) != 0;
+    return run_scenario("idle", 0U, false) != 0 ||
+        run_scenario("normal-performance", 100U, false) != 0 ||
+        run_scenario("high-midi-load", 1000U, false) != 0 ||
+        run_scenario("output-enabled-idle", 0U, true) != 0 ||
+        run_scenario("output-enabled-normal-performance", 100U, true) != 0 ||
+        run_scenario("output-enabled-high-midi-load", 1000U, true) != 0;
 }

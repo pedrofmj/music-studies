@@ -42,6 +42,7 @@ Documents:
 | Complete local schema-enabled suite | ✅ 63/63 passed on 2026-08-29 |
 | Complete local JSON/JACK suite | ✅ 73/73 passed on 2026-08-29 |
 | Output adoption acknowledgement | ✅ Atomic generation/timestamp and IPC rendering pass |
+| Output-enabled switch benchmark | ✅ Three 1,000-sample scenarios pass commit and adoption gates |
 | Clang isolated suite | ✅ 60/60 passed |
 | GCC with Linux JSON/JACK adapters | ✅ 67/67 passed |
 | Clang with Linux JSON/JACK adapters | ✅ 67/67 passed |
@@ -493,11 +494,12 @@ benchmarks.
   covers confirmation failure, previous-generation restoration, monotonic
   rollback publication, and failed-runtime refusal.
 - 🟡 Meet switch latency, resource, and xrun thresholds. The offline runtime
-  benchmark now exercises 1,000 alternating device switch/reset transactions
-  under idle, normal-performance, and synthetic high-load labels and enforces
-  the 20 ms control-commit p95 gate plus the one-processing-period-plus-margin
-  atomic adoption bound. Daemon resource, xrun, dropout, and live-audio
-  measurements remain pending.
+  benchmark now exercises 1,000 alternating device switch/reset transactions in
+  both suppressed and output-enabled modes under idle, normal-performance, and
+  synthetic high-load labels. It enforces the 20 ms control-commit p95 gate,
+  reports non-blocking adoption timestamps, and enforces the one-processing-
+  period-plus-margin atomic adoption bound. Daemon resource, xrun, dropout,
+  and live-audio measurements remain pending.
 
 ## Milestone 5: MIDI Management Triggers
 
