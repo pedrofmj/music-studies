@@ -40,7 +40,7 @@ Documents:
 | --- | --- |
 | GCC isolated suite | ✅ 60/60 passed |
 | Complete local schema-enabled suite | ✅ 63/63 passed on 2026-08-29 |
-| Complete local JSON/JACK suite | ✅ 71/71 passed on 2026-08-29 |
+| Complete local JSON/JACK suite | ✅ 72/72 passed on 2026-08-29 |
 | Clang isolated suite | ✅ 60/60 passed |
 | GCC with Linux JSON/JACK adapters | ✅ 67/67 passed |
 | Clang with Linux JSON/JACK adapters | ✅ 67/67 passed |
@@ -471,7 +471,10 @@ benchmarks.
 - 🟡 Implement the explicit Linux Device/MIDI output host. The fake-JACK gate
   proves paired stable-port registration, generated MIDI emission, adoption
   callbacks, shutdown, and registration-failure cleanup; default daemon
-  activation remains opt-in and live backend adoption remains pending.
+  activation remains opt-in and live backend adoption remains pending. The
+  fake-JACK daemon process gate also proves explicit acknowledgement, startup,
+  SIGTERM shutdown, paired-port registration, zero unsolicited output, and
+  cleanup.
 - 🟡 Prove atomicity, takeover safety, reconnect behavior, and rollback.
   Global generation/persistence atomicity has injected rollback-success and
   rollback-failure coverage. The Linux daemon now has end-to-end commit,

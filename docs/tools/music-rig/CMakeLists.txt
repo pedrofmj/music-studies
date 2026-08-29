@@ -1135,6 +1135,42 @@ if(BUILD_TESTING)
                 -Werror
             )
         endif()
+        if(TARGET music_rig_jack_midi_output)
+            add_library(music_rig_fake_jack_midi_output SHARED
+                tests/fake-jack-midi-output.c
+            )
+            target_compile_features(
+                music_rig_fake_jack_midi_output PRIVATE c_std_17
+            )
+            set_target_properties(
+                music_rig_fake_jack_midi_output PROPERTIES C_EXTENSIONS OFF
+            )
+            target_compile_options(music_rig_fake_jack_midi_output PRIVATE
+                -Wall
+                -Wextra
+                -Wpedantic
+                -Werror
+                -fno-sanitize=all
+            )
+            target_link_options(music_rig_fake_jack_midi_output PRIVATE
+                -fno-sanitize=all
+            )
+            add_executable(music_rig_midi_output_process_test
+                tests/midi-output-process-test.c
+            )
+            target_compile_features(
+                music_rig_midi_output_process_test PRIVATE c_std_17
+            )
+            set_target_properties(
+                music_rig_midi_output_process_test PROPERTIES C_EXTENSIONS OFF
+            )
+            target_compile_options(music_rig_midi_output_process_test PRIVATE
+                -Wall
+                -Wextra
+                -Wpedantic
+                -Werror
+            )
+        endif()
         if(TARGET music_rig_jack_smc_mixer_relay)
             add_library(music_rig_fake_jack_smc_mixer_relay SHARED
                 tests/fake-jack-smc-mixer-relay.c
@@ -1327,6 +1363,19 @@ if(BUILD_TESTING)
             )
             set_tests_properties(
                 music_rig_midi_shadow_process PROPERTIES TIMEOUT 5
+            )
+        endif()
+        if(TARGET music_rig_midi_output_process_test)
+            add_test(
+                NAME music_rig_midi_output_process
+                COMMAND music_rig_midi_output_process_test
+                    $<TARGET_FILE:music-rigd>
+                    "${MUSIC_RIG_JSON_DEFINITION_FIXTURE}"
+                    "${MUSIC_RIG_JSON_DEFINITION_FINGERPRINT}"
+                    $<TARGET_FILE:music_rig_fake_jack_midi_output>
+            )
+            set_tests_properties(
+                music_rig_midi_output_process PROPERTIES TIMEOUT 5
             )
         endif()
         if(TARGET music_rig_smc_mixer_relay_process_test)
