@@ -48,7 +48,8 @@ Documents:
 | Airstar protected-rack musical-load observation | 🟡 65 s, 1,314 live MIDI events, graph unchanged, and 0 validator failures; speaker-sink `pw-top` ERR increased by 4, so the zero-xrun gate did not pass; [evidence](../../tools/music-rig/benchmarks/protected-rack-musical-load-airstar-2026-08-29.json) |
 | Airstar synthetic note-only isolation | 🟡 65 s, 753 generated note messages, no SMC-MIX EQ counter increase, and graph restored; speaker-sink `pw-top` ERR increased by 1, so the zero-xrun gate remains open; [evidence](../../tools/music-rig/benchmarks/synthetic-notes-airstar-2026-08-30.json) |
 | Airstar settled synthetic note-only observation | ✅ 65 s steady-state note stream, 780 generated messages, no sink/Carla/EQ error-counter delta, zero journal errors, and graph restored; [evidence](../../tools/music-rig/benchmarks/synthetic-notes-settled-airstar-2026-08-30.json) |
-| Airstar offline Carla CC reproduction | 🟡 Carla copy blocked by Flatpak/JACK incompatibility; fallback SMC-MIX/JACK harness passed 5/5 without touching the live graph; [evidence](../../tools/music-rig/benchmarks/smc-mixer-offline-reproduction-airstar-2026-08-30.json) |
+| Airstar Flatpak Carla isolation attempt | 🟡 Carla copy blocked by Flatpak/JACK incompatibility; fallback SMC-MIX/JACK harness passed 5/5 without touching the live graph; [evidence](../../tools/music-rig/benchmarks/smc-mixer-offline-reproduction-airstar-2026-08-30.json) |
+| Airstar native offline Carla CC reproduction | ✅ 65 s, 2,816 mapped CC events through all eight SMC-EQ stages, 0 offline JACK xruns/errors, and no live graph change; [evidence](../../tools/music-rig/benchmarks/smc-mixer-offline-carla-cc-airstar-2026-08-30.json) |
 | Clang isolated suite | ✅ 60/60 passed |
 | GCC with Linux JSON/JACK adapters | ✅ 67/67 passed |
 | Clang with Linux JSON/JACK adapters | ✅ 67/67 passed |
@@ -518,10 +519,12 @@ benchmarks.
   settled the temporary link before measurement generated 780 note messages
   with no sink, Carla, or EQ counter delta, proving steady-state note
   processing is stable. The operator/control-change xrun result, audible
-  output, and long-soak measurements remain pending. An isolated Carla-copy
-  reproduction was blocked by the installed Carla packaging/JACK boundary;
-  the fallback SMC-MIX/JACK harness passed 5/5, but Carla plugin behavior and
-  the operator/control-change xrun remain unverified.
+  output, and long-soak measurements remain pending. The initial Flatpak
+  Carla-copy attempt was blocked by its JACK boundary, but a native Ubuntu
+  Carla 2.5.8 package extracted user-locally loaded the copied project and
+  processed 2,816 mapped CC events through all eight SMC-EQ stages with zero
+  offline JACK xruns/errors. The operator/control-change xrun, live audio,
+  and long-soak gates remain unverified.
 
 ## Milestone 5: MIDI Management Triggers
 

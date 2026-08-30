@@ -1,0 +1,62 @@
+{
+  "schema": "music-studies/smc-mixer-offline-carla-cc-airstar/v1",
+  "captured_on": "2026-08-30",
+  "source_commit": "b753873",
+  "environment": {
+    "carla_version": "2.5.8-0ubuntu5 extracted user-locally",
+    "jack_version": "1.9.21",
+    "server": "music-rig-native-cc3",
+    "backend": "dummy",
+    "realtime": false,
+    "sample_rate": 48000,
+    "period_frames": 1024,
+    "configuration_isolated": true,
+    "live_pipewire_used": false
+  },
+  "project": {
+    "source": "/c/music/carla/pedro.uproject",
+    "copy": "temporary user-local project copy",
+    "registered_jack_ports": 286,
+    "live_external_links": false
+  },
+  "cc_load": {
+    "measure_start_utc": "2026-08-30T12:59:58Z",
+    "measure_end_utc": "2026-08-30T13:01:03Z",
+    "duration_seconds": 65,
+    "generator_runtime_seconds": 75,
+    "controllers": [40, 41, 42, 43, 44, 45, 46, 47],
+    "target_stages": 8,
+    "successful_connections": 8,
+    "emitted_cc_events": 2816,
+    "source_xrun_callbacks": 0
+  },
+  "health": {
+    "jack_server_xrun_or_error_messages": 0,
+    "jack_message_buffer_overruns": 0,
+    "carla_runtime_error_lines": 0,
+    "carla_assertion_or_crash": false,
+    "known_fluidynth_no_preset_warnings": 74,
+    "known_broken_parameter_warnings": 1
+  },
+  "cleanup": {
+    "temporary_processes_removed": true,
+    "temporary_project_removed": true,
+    "temporary_package_tree_removed": true,
+    "live_graph_unchanged": true,
+    "live_validator_failures": 0,
+    "live_link_hash": "sha256:9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d"
+  },
+  "evaluation": {
+    "carla_project_load_pass": true,
+    "mapped_cc_path_pass": true,
+    "zero_offline_jack_xrun_pass": true,
+    "full_live_audio_pass": false,
+    "accepted_as_live_milestone4_pass": false
+  },
+  "notes": [
+    "The copied Carla project registered all eight SMC-EQ control stages and accepted the mapped CC stream on the isolated dummy JACK server.",
+    "The offline run produced no JACK xrun callbacks, server xrun/error messages, Carla runtime errors, assertions, or crashes.",
+    "FluidSynth missing-preset messages and one broken Filter select parameter warning are project-load warnings, not CC-path failures.",
+    "This proves offline Carla/plugin-chain control handling only; it does not replace live PipeWire audio or operator/control-change acceptance evidence."
+  ]
+}
