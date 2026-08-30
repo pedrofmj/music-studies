@@ -82,6 +82,7 @@ midi_summary=$(jq -Rn '
         event_count: length,
         first_arrival: (.[0].timestamp // null),
         last_arrival: (.[-1].timestamp // null),
+        arrivals: map({timestamp, source, event}),
         event_types: (
             group_by(.event)
             | map({event: .[0].event, count: length})
