@@ -1,0 +1,54 @@
+{
+  "schema": "music-studies/smc-mixer-relay-no-link-rehearsal-airstar/v1",
+  "captured_on": "2026-08-30",
+  "source_commit": "e3249b8",
+  "host": "airstar",
+  "daemon_sha256": "1dd6d6b6d8d0d77b4d91fb57b2ddb52171e56f23b7884ae779bf06ce1cd2a314",
+  "definition_fingerprint": "sha256:b5988448d8346ffdca61bbcebd3d0b8bd4c62ae214923fe55bf1ffdbffbb22c3",
+  "command": "run-smc-mixer-relay --output-enabled --acknowledge-smc-mixer-cutover",
+  "preflight": {
+    "protected_verifier_before": 0,
+    "legacy_route_before": "8/8",
+    "preview_status": 0,
+    "legacy_route_during": "8/8",
+    "protected_verifier_after": 0
+  },
+  "relay": {
+    "startup_pass": true,
+    "input_ports": 1,
+    "output_ports": 1,
+    "cycles": 26,
+    "input_events": 0,
+    "emitted_events": 0,
+    "coalesced_events": 0,
+    "adapter_failures": 0,
+    "output_mode": "enabled-smc-mixer-only",
+    "shutdown_status": 0
+  },
+  "protected_graph": {
+    "relay_input_links_during": 0,
+    "relay_output_links_during": 0,
+    "link_hash_before": "sha256:9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "link_hash_after": "sha256:9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "legacy_route_after": "8/8",
+    "cutover_executed": false,
+    "rollback_executed": false,
+    "graph_mutated": false
+  },
+  "cleanup": {
+    "temporary_staging_removed": true,
+    "temporary_process_removed": true,
+    "temporary_definition_removed": true
+  },
+  "evaluation": {
+    "no_link_rehearsal_pass": true,
+    "coalescing_status_path_pass": true,
+    "cutover_gate_pass": false,
+    "accepted_as_live_cutover": false
+  },
+  "notes": [
+    "The coalesced relay started with explicit output acknowledgement and registered exactly one stable input/output pair.",
+    "No graph links were created; the protected legacy route remained 8/8 throughout and the link hash was unchanged.",
+    "This is a no-link startup rehearsal only. Cutover, rollback, fader exercise through the relay, and live relay stability remain pending."
+  ]
+}

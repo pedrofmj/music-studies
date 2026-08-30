@@ -112,6 +112,8 @@ changing ownership:
 3. Stage only a checksummed daemon, compiled definition, link tool, and evidence
    directory under `/tmp`; install and enable nothing.
 4. Start the relay without links and verify its exact two-port inventory.
+   The coalesced no-link Airstar rehearsal passed this step with the legacy
+   route preserved and zero relay links.
 5. Run `--cutover`, exercise all eight faders, confirm sound and stability, and
    require every per-CC counter to be positive in the shutdown transcript.
 6. Run `--rollback` while the relay is alive and verify all eight direct links.
