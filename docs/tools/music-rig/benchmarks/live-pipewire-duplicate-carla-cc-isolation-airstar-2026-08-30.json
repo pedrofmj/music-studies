@@ -1,0 +1,55 @@
+{
+  "schema": "music-studies/live-pipewire-duplicate-carla-cc-isolation-airstar/v1",
+  "captured_on": "2026-08-30",
+  "measure_start_utc": "2026-08-30T13:19:35Z",
+  "measure_end_utc": "2026-08-30T13:20:39Z",
+  "source_commit": "c45c2be",
+  "isolation": {
+    "project_copy": "temporary no-external-Patchbay copy",
+    "client_prefix": "offline.756",
+    "duplicate_plugins": 49,
+    "external_patchbay_entries": 0,
+    "protected_links_changed": false
+  },
+  "control_load": {
+    "duration_seconds": 65,
+    "target_stages": 8,
+    "successful_connections": 8,
+    "emitted_cc_events": 2816,
+    "source_xrun_callbacks": 0,
+    "journal_xrun_dropout_deadline_events": 0
+  },
+  "pipewire_observation": {
+    "pw_top_samples": 65,
+    "pw_top_reported_zeroed_scheduler_fields": true,
+    "measurement_valid_for_live_xrun_attribution": false,
+    "last_verified_sink_err_before_duplicate_load": 25,
+    "sink_err_after_cleanup": 75,
+    "sink_err_delta_from_last_verified_baseline": 50,
+    "last_verified_smc_mixer_eq_err_before_duplicate_load": 11,
+    "smc_mixer_eq_err_after_cleanup": 25,
+    "smc_mixer_eq_err_delta_from_last_verified_baseline": 14
+  },
+  "protected_state": {
+    "patchbay_links_before": 116,
+    "patchbay_links_after": 116,
+    "link_hash_before": "sha256:9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "link_hash_after": "sha256:9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "live_validator_failures": 0,
+    "temporary_clients_removed": true,
+    "temporary_files_removed": true
+  },
+  "evaluation": {
+    "cc_source_generation_pass": true,
+    "eight_target_connections_pass": true,
+    "protected_graph_restore_pass": true,
+    "live_validator_pass": true,
+    "live_xrun_attribution_pass": false,
+    "accepted_as_live_cc_evidence": false
+  },
+  "notes": [
+    "The duplicate Carla copy processed the bounded CC stream on live PipeWire without touching the protected Patchbay links.",
+    "The 49 temporary Carla nodes themselves perturbed cumulative protected sink and SMC-MIX error counters; pw-top reported zeroed scheduler fields during the interval, so this run cannot attribute those deltas to the CC stream.",
+    "This method is rejected for acceptance and will not be repeated. Offline native Carla passed the same mapped CC load; the physical live control-change xrun remains unresolved."
+  ]
+}
