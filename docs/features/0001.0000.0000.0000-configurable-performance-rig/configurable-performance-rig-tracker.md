@@ -57,6 +57,7 @@ Documents:
 | Airstar mixed musical/control soak | 🟡 300 s observation, 2,084 arrivals (`2,030` mirrored mixer CCs and `54` Arturia notes), zero changed `pw-top` nodes, zero journal matches, and unchanged graph hash; activity occupied only 7.755242 s; [evidence](../../tools/music-rig/benchmarks/mixed-musical-control-soak-airstar-2026-08-30.json) |
 | Airstar sustained mixed musical/control soak | 🟡 300 s, 6,592 arrivals across 229.669036 active seconds, but sink `ERR +5` and SMC-MIX EQ `ERR +3`; graph hash unchanged and validator passed; [evidence](../../tools/music-rig/benchmarks/sustained-mixed-control-soak-airstar-2026-08-30.json) |
 | Airstar sustained Arturia-only note load | ✅ 300 s, 4,167 Arturia-port events across 299.144290 active seconds, zero changed `pw-top` nodes, zero journal matches, and unchanged graph hash; [evidence](../../tools/music-rig/benchmarks/arturia-only-sustained-note-load-airstar-2026-08-30.json) |
+| Airstar sustained SMC-MIX-only control load | 🟡 300 s, 54,774 mirrored CC arrivals across 287.881699 active seconds, but sink `ERR +1` and SMC-MIX EQ `ERR +2`; graph hash unchanged and validator passed; [evidence](../../tools/music-rig/benchmarks/smc-mixer-only-sustained-control-airstar-2026-08-30.json) |
 | Clang isolated suite | ✅ 60/60 passed |
 | GCC with Linux JSON/JACK adapters | ✅ 67/67 passed |
 | Clang with Linux JSON/JACK adapters | ✅ 67/67 passed |
@@ -551,7 +552,11 @@ benchmarks.
   open. A five-minute Arturia-only run then covered 299.144290 active seconds
   with 1,225 note-ons, 1,224 note-offs, and 1,718 Arturia-port CCs without any
   PipeWire counter or journal delta, narrowing the failure to SMC-MIX activity
-  or its interaction with sustained musical input.
+  or its interaction with sustained musical input. A five-minute SMC-MIX-only
+  run then produced 54,774 mirrored CC arrivals across 287.881699 active
+  seconds and reproduced the fault without notes: SMC-MIX EQ gained two
+  `pw-top` ERR counts and the speaker sink gained one. The live failure is now
+  isolated to sustained mixer-control activity or its event-rate handling.
 
 ## Milestone 5: MIDI Management Triggers
 

@@ -1,0 +1,4262 @@
+{
+  "captured_at_utc": {
+    "end": "2026-08-30T18:24:41Z",
+    "start": "2026-08-30T18:19:41Z"
+  },
+  "command_status": {
+    "aseqdump_timeout_status": 124,
+    "pw_top_status": 0,
+    "temporary_cleanup": true
+  },
+  "duration_seconds": 300,
+  "midi": {
+    "arrival_buckets": [
+      {
+        "count": 10,
+        "event_types": [
+          {
+            "count": 10,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 5,
+            "source": "20:0"
+          },
+          {
+            "count": 5,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:19:53Z"
+      },
+      {
+        "count": 122,
+        "event_types": [
+          {
+            "count": 122,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 61,
+            "source": "20:0"
+          },
+          {
+            "count": 61,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:19:54Z"
+      },
+      {
+        "count": 208,
+        "event_types": [
+          {
+            "count": 208,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 104,
+            "source": "20:0"
+          },
+          {
+            "count": 104,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:19:55Z"
+      },
+      {
+        "count": 228,
+        "event_types": [
+          {
+            "count": 228,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 114,
+            "source": "20:0"
+          },
+          {
+            "count": 114,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:19:56Z"
+      },
+      {
+        "count": 138,
+        "event_types": [
+          {
+            "count": 138,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 69,
+            "source": "20:0"
+          },
+          {
+            "count": 69,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:19:57Z"
+      },
+      {
+        "count": 130,
+        "event_types": [
+          {
+            "count": 130,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 65,
+            "source": "20:0"
+          },
+          {
+            "count": 65,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:19:58Z"
+      },
+      {
+        "count": 254,
+        "event_types": [
+          {
+            "count": 254,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 127,
+            "source": "20:0"
+          },
+          {
+            "count": 127,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:19:59Z"
+      },
+      {
+        "count": 254,
+        "event_types": [
+          {
+            "count": 254,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 127,
+            "source": "20:0"
+          },
+          {
+            "count": 127,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:00Z"
+      },
+      {
+        "count": 254,
+        "event_types": [
+          {
+            "count": 254,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 127,
+            "source": "20:0"
+          },
+          {
+            "count": 127,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:01Z"
+      },
+      {
+        "count": 168,
+        "event_types": [
+          {
+            "count": 168,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 84,
+            "source": "20:0"
+          },
+          {
+            "count": 84,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:02Z"
+      },
+      {
+        "count": 292,
+        "event_types": [
+          {
+            "count": 292,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 146,
+            "source": "20:0"
+          },
+          {
+            "count": 146,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:03Z"
+      },
+      {
+        "count": 308,
+        "event_types": [
+          {
+            "count": 308,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 154,
+            "source": "20:0"
+          },
+          {
+            "count": 154,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:04Z"
+      },
+      {
+        "count": 254,
+        "event_types": [
+          {
+            "count": 254,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 127,
+            "source": "20:0"
+          },
+          {
+            "count": 127,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:05Z"
+      },
+      {
+        "count": 224,
+        "event_types": [
+          {
+            "count": 224,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 112,
+            "source": "20:0"
+          },
+          {
+            "count": 112,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:06Z"
+      },
+      {
+        "count": 254,
+        "event_types": [
+          {
+            "count": 254,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 127,
+            "source": "20:0"
+          },
+          {
+            "count": 127,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:07Z"
+      },
+      {
+        "count": 238,
+        "event_types": [
+          {
+            "count": 238,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 119,
+            "source": "20:0"
+          },
+          {
+            "count": 119,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:08Z"
+      },
+      {
+        "count": 262,
+        "event_types": [
+          {
+            "count": 262,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 131,
+            "source": "20:0"
+          },
+          {
+            "count": 131,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:09Z"
+      },
+      {
+        "count": 170,
+        "event_types": [
+          {
+            "count": 170,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 85,
+            "source": "20:0"
+          },
+          {
+            "count": 85,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:10Z"
+      },
+      {
+        "count": 326,
+        "event_types": [
+          {
+            "count": 326,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 163,
+            "source": "20:0"
+          },
+          {
+            "count": 163,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:11Z"
+      },
+      {
+        "count": 237,
+        "event_types": [
+          {
+            "count": 237,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 119,
+            "source": "20:0"
+          },
+          {
+            "count": 118,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:12Z"
+      },
+      {
+        "count": 206,
+        "event_types": [
+          {
+            "count": 206,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 103,
+            "source": "20:0"
+          },
+          {
+            "count": 103,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:13Z"
+      },
+      {
+        "count": 246,
+        "event_types": [
+          {
+            "count": 246,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 123,
+            "source": "20:0"
+          },
+          {
+            "count": 123,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:14Z"
+      },
+      {
+        "count": 228,
+        "event_types": [
+          {
+            "count": 228,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 114,
+            "source": "20:0"
+          },
+          {
+            "count": 114,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:15Z"
+      },
+      {
+        "count": 234,
+        "event_types": [
+          {
+            "count": 234,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 117,
+            "source": "20:0"
+          },
+          {
+            "count": 117,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:16Z"
+      },
+      {
+        "count": 231,
+        "event_types": [
+          {
+            "count": 231,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 115,
+            "source": "20:0"
+          },
+          {
+            "count": 116,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:17Z"
+      },
+      {
+        "count": 247,
+        "event_types": [
+          {
+            "count": 247,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 124,
+            "source": "20:0"
+          },
+          {
+            "count": 123,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:18Z"
+      },
+      {
+        "count": 248,
+        "event_types": [
+          {
+            "count": 248,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 124,
+            "source": "20:0"
+          },
+          {
+            "count": 124,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:19Z"
+      },
+      {
+        "count": 216,
+        "event_types": [
+          {
+            "count": 216,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 108,
+            "source": "20:0"
+          },
+          {
+            "count": 108,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:20Z"
+      },
+      {
+        "count": 436,
+        "event_types": [
+          {
+            "count": 436,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 218,
+            "source": "20:0"
+          },
+          {
+            "count": 218,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:21Z"
+      },
+      {
+        "count": 483,
+        "event_types": [
+          {
+            "count": 483,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 241,
+            "source": "20:0"
+          },
+          {
+            "count": 242,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:22Z"
+      },
+      {
+        "count": 146,
+        "event_types": [
+          {
+            "count": 146,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 73,
+            "source": "20:0"
+          },
+          {
+            "count": 73,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:23Z"
+      },
+      {
+        "count": 150,
+        "event_types": [
+          {
+            "count": 150,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 75,
+            "source": "20:0"
+          },
+          {
+            "count": 75,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:24Z"
+      },
+      {
+        "count": 132,
+        "event_types": [
+          {
+            "count": 132,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 66,
+            "source": "20:0"
+          },
+          {
+            "count": 66,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:31Z"
+      },
+      {
+        "count": 124,
+        "event_types": [
+          {
+            "count": 124,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 62,
+            "source": "20:0"
+          },
+          {
+            "count": 62,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:32Z"
+      },
+      {
+        "count": 230,
+        "event_types": [
+          {
+            "count": 230,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 115,
+            "source": "20:0"
+          },
+          {
+            "count": 115,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:33Z"
+      },
+      {
+        "count": 400,
+        "event_types": [
+          {
+            "count": 400,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 200,
+            "source": "20:0"
+          },
+          {
+            "count": 200,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:34Z"
+      },
+      {
+        "count": 134,
+        "event_types": [
+          {
+            "count": 134,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 67,
+            "source": "20:0"
+          },
+          {
+            "count": 67,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:35Z"
+      },
+      {
+        "count": 358,
+        "event_types": [
+          {
+            "count": 358,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 179,
+            "source": "20:0"
+          },
+          {
+            "count": 179,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:36Z"
+      },
+      {
+        "count": 244,
+        "event_types": [
+          {
+            "count": 244,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 122,
+            "source": "20:0"
+          },
+          {
+            "count": 122,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:37Z"
+      },
+      {
+        "count": 278,
+        "event_types": [
+          {
+            "count": 278,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 139,
+            "source": "20:0"
+          },
+          {
+            "count": 139,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:38Z"
+      },
+      {
+        "count": 232,
+        "event_types": [
+          {
+            "count": 232,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 116,
+            "source": "20:0"
+          },
+          {
+            "count": 116,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:39Z"
+      },
+      {
+        "count": 359,
+        "event_types": [
+          {
+            "count": 359,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 180,
+            "source": "20:0"
+          },
+          {
+            "count": 179,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:40Z"
+      },
+      {
+        "count": 226,
+        "event_types": [
+          {
+            "count": 226,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 113,
+            "source": "20:0"
+          },
+          {
+            "count": 113,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:41Z"
+      },
+      {
+        "count": 237,
+        "event_types": [
+          {
+            "count": 237,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 118,
+            "source": "20:0"
+          },
+          {
+            "count": 119,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:42Z"
+      },
+      {
+        "count": 219,
+        "event_types": [
+          {
+            "count": 219,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 110,
+            "source": "20:0"
+          },
+          {
+            "count": 109,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:43Z"
+      },
+      {
+        "count": 236,
+        "event_types": [
+          {
+            "count": 236,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 118,
+            "source": "20:0"
+          },
+          {
+            "count": 118,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:44Z"
+      },
+      {
+        "count": 244,
+        "event_types": [
+          {
+            "count": 244,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 122,
+            "source": "20:0"
+          },
+          {
+            "count": 122,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:45Z"
+      },
+      {
+        "count": 248,
+        "event_types": [
+          {
+            "count": 248,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 124,
+            "source": "20:0"
+          },
+          {
+            "count": 124,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:46Z"
+      },
+      {
+        "count": 252,
+        "event_types": [
+          {
+            "count": 252,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 126,
+            "source": "20:0"
+          },
+          {
+            "count": 126,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:47Z"
+      },
+      {
+        "count": 216,
+        "event_types": [
+          {
+            "count": 216,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 108,
+            "source": "20:0"
+          },
+          {
+            "count": 108,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:48Z"
+      },
+      {
+        "count": 339,
+        "event_types": [
+          {
+            "count": 339,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 169,
+            "source": "20:0"
+          },
+          {
+            "count": 170,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:49Z"
+      },
+      {
+        "count": 616,
+        "event_types": [
+          {
+            "count": 616,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 308,
+            "source": "20:0"
+          },
+          {
+            "count": 308,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:50Z"
+      },
+      {
+        "count": 374,
+        "event_types": [
+          {
+            "count": 374,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 187,
+            "source": "20:0"
+          },
+          {
+            "count": 187,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:51Z"
+      },
+      {
+        "count": 228,
+        "event_types": [
+          {
+            "count": 228,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 114,
+            "source": "20:0"
+          },
+          {
+            "count": 114,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:52Z"
+      },
+      {
+        "count": 362,
+        "event_types": [
+          {
+            "count": 362,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 181,
+            "source": "20:0"
+          },
+          {
+            "count": 181,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:53Z"
+      },
+      {
+        "count": 364,
+        "event_types": [
+          {
+            "count": 364,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 182,
+            "source": "20:0"
+          },
+          {
+            "count": 182,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:54Z"
+      },
+      {
+        "count": 290,
+        "event_types": [
+          {
+            "count": 290,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 145,
+            "source": "20:0"
+          },
+          {
+            "count": 145,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:55Z"
+      },
+      {
+        "count": 352,
+        "event_types": [
+          {
+            "count": 352,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 176,
+            "source": "20:0"
+          },
+          {
+            "count": 176,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:56Z"
+      },
+      {
+        "count": 396,
+        "event_types": [
+          {
+            "count": 396,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 198,
+            "source": "20:0"
+          },
+          {
+            "count": 198,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:57Z"
+      },
+      {
+        "count": 374,
+        "event_types": [
+          {
+            "count": 374,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 187,
+            "source": "20:0"
+          },
+          {
+            "count": 187,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:58Z"
+      },
+      {
+        "count": 232,
+        "event_types": [
+          {
+            "count": 232,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 116,
+            "source": "20:0"
+          },
+          {
+            "count": 116,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:20:59Z"
+      },
+      {
+        "count": 146,
+        "event_types": [
+          {
+            "count": 146,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 73,
+            "source": "20:0"
+          },
+          {
+            "count": 73,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:00Z"
+      },
+      {
+        "count": 256,
+        "event_types": [
+          {
+            "count": 256,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 128,
+            "source": "20:0"
+          },
+          {
+            "count": 128,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:01Z"
+      },
+      {
+        "count": 174,
+        "event_types": [
+          {
+            "count": 174,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 87,
+            "source": "20:0"
+          },
+          {
+            "count": 87,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:02Z"
+      },
+      {
+        "count": 12,
+        "event_types": [
+          {
+            "count": 12,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 6,
+            "source": "20:0"
+          },
+          {
+            "count": 6,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:03Z"
+      },
+      {
+        "count": 344,
+        "event_types": [
+          {
+            "count": 344,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 172,
+            "source": "20:0"
+          },
+          {
+            "count": 172,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:04Z"
+      },
+      {
+        "count": 108,
+        "event_types": [
+          {
+            "count": 108,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 54,
+            "source": "20:0"
+          },
+          {
+            "count": 54,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:05Z"
+      },
+      {
+        "count": 275,
+        "event_types": [
+          {
+            "count": 275,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 138,
+            "source": "20:0"
+          },
+          {
+            "count": 137,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:06Z"
+      },
+      {
+        "count": 223,
+        "event_types": [
+          {
+            "count": 223,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 111,
+            "source": "20:0"
+          },
+          {
+            "count": 112,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:07Z"
+      },
+      {
+        "count": 75,
+        "event_types": [
+          {
+            "count": 75,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 38,
+            "source": "20:0"
+          },
+          {
+            "count": 37,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:08Z"
+      },
+      {
+        "count": 244,
+        "event_types": [
+          {
+            "count": 244,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 122,
+            "source": "20:0"
+          },
+          {
+            "count": 122,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:09Z"
+      },
+      {
+        "count": 201,
+        "event_types": [
+          {
+            "count": 201,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 100,
+            "source": "20:0"
+          },
+          {
+            "count": 101,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:10Z"
+      },
+      {
+        "count": 255,
+        "event_types": [
+          {
+            "count": 255,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 128,
+            "source": "20:0"
+          },
+          {
+            "count": 127,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:11Z"
+      },
+      {
+        "count": 339,
+        "event_types": [
+          {
+            "count": 339,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 169,
+            "source": "20:0"
+          },
+          {
+            "count": 170,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:12Z"
+      },
+      {
+        "count": 141,
+        "event_types": [
+          {
+            "count": 141,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 71,
+            "source": "20:0"
+          },
+          {
+            "count": 70,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:13Z"
+      },
+      {
+        "count": 285,
+        "event_types": [
+          {
+            "count": 285,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 142,
+            "source": "20:0"
+          },
+          {
+            "count": 143,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:14Z"
+      },
+      {
+        "count": 214,
+        "event_types": [
+          {
+            "count": 214,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 107,
+            "source": "20:0"
+          },
+          {
+            "count": 107,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:15Z"
+      },
+      {
+        "count": 318,
+        "event_types": [
+          {
+            "count": 318,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 159,
+            "source": "20:0"
+          },
+          {
+            "count": 159,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:16Z"
+      },
+      {
+        "count": 243,
+        "event_types": [
+          {
+            "count": 243,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 122,
+            "source": "20:0"
+          },
+          {
+            "count": 121,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:17Z"
+      },
+      {
+        "count": 195,
+        "event_types": [
+          {
+            "count": 195,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 97,
+            "source": "20:0"
+          },
+          {
+            "count": 98,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:18Z"
+      },
+      {
+        "count": 160,
+        "event_types": [
+          {
+            "count": 160,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 80,
+            "source": "20:0"
+          },
+          {
+            "count": 80,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:19Z"
+      },
+      {
+        "count": 350,
+        "event_types": [
+          {
+            "count": 350,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 175,
+            "source": "20:0"
+          },
+          {
+            "count": 175,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:20Z"
+      },
+      {
+        "count": 80,
+        "event_types": [
+          {
+            "count": 80,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 40,
+            "source": "20:0"
+          },
+          {
+            "count": 40,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:21Z"
+      },
+      {
+        "count": 368,
+        "event_types": [
+          {
+            "count": 368,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 184,
+            "source": "20:0"
+          },
+          {
+            "count": 184,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:22Z"
+      },
+      {
+        "count": 242,
+        "event_types": [
+          {
+            "count": 242,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 121,
+            "source": "20:0"
+          },
+          {
+            "count": 121,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:23Z"
+      },
+      {
+        "count": 10,
+        "event_types": [
+          {
+            "count": 10,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 5,
+            "source": "20:0"
+          },
+          {
+            "count": 5,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:24Z"
+      },
+      {
+        "count": 20,
+        "event_types": [
+          {
+            "count": 20,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 10,
+            "source": "20:0"
+          },
+          {
+            "count": 10,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:25Z"
+      },
+      {
+        "count": 314,
+        "event_types": [
+          {
+            "count": 314,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 157,
+            "source": "20:0"
+          },
+          {
+            "count": 157,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:26Z"
+      },
+      {
+        "count": 192,
+        "event_types": [
+          {
+            "count": 192,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 96,
+            "source": "20:0"
+          },
+          {
+            "count": 96,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:27Z"
+      },
+      {
+        "count": 310,
+        "event_types": [
+          {
+            "count": 310,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 155,
+            "source": "20:0"
+          },
+          {
+            "count": 155,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:28Z"
+      },
+      {
+        "count": 174,
+        "event_types": [
+          {
+            "count": 174,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 87,
+            "source": "20:0"
+          },
+          {
+            "count": 87,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:29Z"
+      },
+      {
+        "count": 116,
+        "event_types": [
+          {
+            "count": 116,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 58,
+            "source": "20:0"
+          },
+          {
+            "count": 58,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:30Z"
+      },
+      {
+        "count": 68,
+        "event_types": [
+          {
+            "count": 68,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 34,
+            "source": "20:0"
+          },
+          {
+            "count": 34,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:32Z"
+      },
+      {
+        "count": 84,
+        "event_types": [
+          {
+            "count": 84,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 43,
+            "source": "20:0"
+          },
+          {
+            "count": 41,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:33Z"
+      },
+      {
+        "count": 185,
+        "event_types": [
+          {
+            "count": 185,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 92,
+            "source": "20:0"
+          },
+          {
+            "count": 93,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:34Z"
+      },
+      {
+        "count": 133,
+        "event_types": [
+          {
+            "count": 133,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 66,
+            "source": "20:0"
+          },
+          {
+            "count": 67,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:35Z"
+      },
+      {
+        "count": 258,
+        "event_types": [
+          {
+            "count": 258,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 129,
+            "source": "20:0"
+          },
+          {
+            "count": 129,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:36Z"
+      },
+      {
+        "count": 249,
+        "event_types": [
+          {
+            "count": 249,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 125,
+            "source": "20:0"
+          },
+          {
+            "count": 124,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:37Z"
+      },
+      {
+        "count": 244,
+        "event_types": [
+          {
+            "count": 244,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 122,
+            "source": "20:0"
+          },
+          {
+            "count": 122,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:38Z"
+      },
+      {
+        "count": 274,
+        "event_types": [
+          {
+            "count": 274,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 137,
+            "source": "20:0"
+          },
+          {
+            "count": 137,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:39Z"
+      },
+      {
+        "count": 419,
+        "event_types": [
+          {
+            "count": 419,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 209,
+            "source": "20:0"
+          },
+          {
+            "count": 210,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:40Z"
+      },
+      {
+        "count": 152,
+        "event_types": [
+          {
+            "count": 152,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 76,
+            "source": "20:0"
+          },
+          {
+            "count": 76,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:41Z"
+      },
+      {
+        "count": 334,
+        "event_types": [
+          {
+            "count": 334,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 167,
+            "source": "20:0"
+          },
+          {
+            "count": 167,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:42Z"
+      },
+      {
+        "count": 64,
+        "event_types": [
+          {
+            "count": 64,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 32,
+            "source": "20:0"
+          },
+          {
+            "count": 32,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:43Z"
+      },
+      {
+        "count": 44,
+        "event_types": [
+          {
+            "count": 44,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 22,
+            "source": "20:0"
+          },
+          {
+            "count": 22,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:44Z"
+      },
+      {
+        "count": 52,
+        "event_types": [
+          {
+            "count": 52,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 26,
+            "source": "20:0"
+          },
+          {
+            "count": 26,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:45Z"
+      },
+      {
+        "count": 64,
+        "event_types": [
+          {
+            "count": 64,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 32,
+            "source": "20:0"
+          },
+          {
+            "count": 32,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:46Z"
+      },
+      {
+        "count": 780,
+        "event_types": [
+          {
+            "count": 780,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 391,
+            "source": "20:0"
+          },
+          {
+            "count": 389,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:47Z"
+      },
+      {
+        "count": 266,
+        "event_types": [
+          {
+            "count": 266,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 132,
+            "source": "20:0"
+          },
+          {
+            "count": 134,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:48Z"
+      },
+      {
+        "count": 1088,
+        "event_types": [
+          {
+            "count": 1088,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 546,
+            "source": "20:0"
+          },
+          {
+            "count": 542,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:49Z"
+      },
+      {
+        "count": 1376,
+        "event_types": [
+          {
+            "count": 1376,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 686,
+            "source": "20:0"
+          },
+          {
+            "count": 690,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:50Z"
+      },
+      {
+        "count": 1389,
+        "event_types": [
+          {
+            "count": 1389,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 695,
+            "source": "20:0"
+          },
+          {
+            "count": 694,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:51Z"
+      },
+      {
+        "count": 837,
+        "event_types": [
+          {
+            "count": 837,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 418,
+            "source": "20:0"
+          },
+          {
+            "count": 419,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:52Z"
+      },
+      {
+        "count": 78,
+        "event_types": [
+          {
+            "count": 78,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 39,
+            "source": "20:0"
+          },
+          {
+            "count": 39,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:53Z"
+      },
+      {
+        "count": 28,
+        "event_types": [
+          {
+            "count": 28,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 14,
+            "source": "20:0"
+          },
+          {
+            "count": 14,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:54Z"
+      },
+      {
+        "count": 22,
+        "event_types": [
+          {
+            "count": 22,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 11,
+            "source": "20:0"
+          },
+          {
+            "count": 11,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:55Z"
+      },
+      {
+        "count": 52,
+        "event_types": [
+          {
+            "count": 52,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 26,
+            "source": "20:0"
+          },
+          {
+            "count": 26,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:56Z"
+      },
+      {
+        "count": 22,
+        "event_types": [
+          {
+            "count": 22,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 11,
+            "source": "20:0"
+          },
+          {
+            "count": 11,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:58Z"
+      },
+      {
+        "count": 260,
+        "event_types": [
+          {
+            "count": 260,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 130,
+            "source": "20:0"
+          },
+          {
+            "count": 130,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:21:59Z"
+      },
+      {
+        "count": 224,
+        "event_types": [
+          {
+            "count": 224,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 112,
+            "source": "20:0"
+          },
+          {
+            "count": 112,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:22:00Z"
+      },
+      {
+        "count": 189,
+        "event_types": [
+          {
+            "count": 189,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 95,
+            "source": "20:0"
+          },
+          {
+            "count": 94,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:22:01Z"
+      },
+      {
+        "count": 207,
+        "event_types": [
+          {
+            "count": 207,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 103,
+            "source": "20:0"
+          },
+          {
+            "count": 104,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:22:02Z"
+      },
+      {
+        "count": 322,
+        "event_types": [
+          {
+            "count": 322,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 161,
+            "source": "20:0"
+          },
+          {
+            "count": 161,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:22:03Z"
+      },
+      {
+        "count": 370,
+        "event_types": [
+          {
+            "count": 370,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 185,
+            "source": "20:0"
+          },
+          {
+            "count": 185,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:22:04Z"
+      },
+      {
+        "count": 126,
+        "event_types": [
+          {
+            "count": 126,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 63,
+            "source": "20:0"
+          },
+          {
+            "count": 63,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:22:05Z"
+      },
+      {
+        "count": 258,
+        "event_types": [
+          {
+            "count": 258,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 129,
+            "source": "20:0"
+          },
+          {
+            "count": 129,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:22:06Z"
+      },
+      {
+        "count": 224,
+        "event_types": [
+          {
+            "count": 224,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 112,
+            "source": "20:0"
+          },
+          {
+            "count": 112,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:22:07Z"
+      },
+      {
+        "count": 296,
+        "event_types": [
+          {
+            "count": 296,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 148,
+            "source": "20:0"
+          },
+          {
+            "count": 148,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:22:08Z"
+      },
+      {
+        "count": 262,
+        "event_types": [
+          {
+            "count": 262,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 131,
+            "source": "20:0"
+          },
+          {
+            "count": 131,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:22:09Z"
+      },
+      {
+        "count": 340,
+        "event_types": [
+          {
+            "count": 340,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 170,
+            "source": "20:0"
+          },
+          {
+            "count": 170,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:22:10Z"
+      },
+      {
+        "count": 350,
+        "event_types": [
+          {
+            "count": 350,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 175,
+            "source": "20:0"
+          },
+          {
+            "count": 175,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:22:11Z"
+      },
+      {
+        "count": 300,
+        "event_types": [
+          {
+            "count": 300,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 150,
+            "source": "20:0"
+          },
+          {
+            "count": 150,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:22:12Z"
+      },
+      {
+        "count": 306,
+        "event_types": [
+          {
+            "count": 306,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 153,
+            "source": "20:0"
+          },
+          {
+            "count": 153,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:22:13Z"
+      },
+      {
+        "count": 252,
+        "event_types": [
+          {
+            "count": 252,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 126,
+            "source": "20:0"
+          },
+          {
+            "count": 126,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:21Z"
+      },
+      {
+        "count": 154,
+        "event_types": [
+          {
+            "count": 154,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 77,
+            "source": "20:0"
+          },
+          {
+            "count": 77,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:22Z"
+      },
+      {
+        "count": 252,
+        "event_types": [
+          {
+            "count": 252,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 126,
+            "source": "20:0"
+          },
+          {
+            "count": 126,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:23Z"
+      },
+      {
+        "count": 332,
+        "event_types": [
+          {
+            "count": 332,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 166,
+            "source": "20:0"
+          },
+          {
+            "count": 166,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:24Z"
+      },
+      {
+        "count": 189,
+        "event_types": [
+          {
+            "count": 189,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 95,
+            "source": "20:0"
+          },
+          {
+            "count": 94,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:25Z"
+      },
+      {
+        "count": 161,
+        "event_types": [
+          {
+            "count": 161,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 80,
+            "source": "20:0"
+          },
+          {
+            "count": 81,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:26Z"
+      },
+      {
+        "count": 251,
+        "event_types": [
+          {
+            "count": 251,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 126,
+            "source": "20:0"
+          },
+          {
+            "count": 125,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:27Z"
+      },
+      {
+        "count": 212,
+        "event_types": [
+          {
+            "count": 212,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 106,
+            "source": "20:0"
+          },
+          {
+            "count": 106,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:28Z"
+      },
+      {
+        "count": 233,
+        "event_types": [
+          {
+            "count": 233,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 116,
+            "source": "20:0"
+          },
+          {
+            "count": 117,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:29Z"
+      },
+      {
+        "count": 247,
+        "event_types": [
+          {
+            "count": 247,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 124,
+            "source": "20:0"
+          },
+          {
+            "count": 123,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:30Z"
+      },
+      {
+        "count": 263,
+        "event_types": [
+          {
+            "count": 263,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 132,
+            "source": "20:0"
+          },
+          {
+            "count": 131,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:31Z"
+      },
+      {
+        "count": 307,
+        "event_types": [
+          {
+            "count": 307,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 153,
+            "source": "20:0"
+          },
+          {
+            "count": 154,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:32Z"
+      },
+      {
+        "count": 307,
+        "event_types": [
+          {
+            "count": 307,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 153,
+            "source": "20:0"
+          },
+          {
+            "count": 154,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:33Z"
+      },
+      {
+        "count": 108,
+        "event_types": [
+          {
+            "count": 108,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 54,
+            "source": "20:0"
+          },
+          {
+            "count": 54,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:34Z"
+      },
+      {
+        "count": 56,
+        "event_types": [
+          {
+            "count": 56,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 28,
+            "source": "20:0"
+          },
+          {
+            "count": 28,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:35Z"
+      },
+      {
+        "count": 60,
+        "event_types": [
+          {
+            "count": 60,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 30,
+            "source": "20:0"
+          },
+          {
+            "count": 30,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:36Z"
+      },
+      {
+        "count": 54,
+        "event_types": [
+          {
+            "count": 54,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 27,
+            "source": "20:0"
+          },
+          {
+            "count": 27,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:37Z"
+      },
+      {
+        "count": 307,
+        "event_types": [
+          {
+            "count": 307,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 154,
+            "source": "20:0"
+          },
+          {
+            "count": 153,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:38Z"
+      },
+      {
+        "count": 205,
+        "event_types": [
+          {
+            "count": 205,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 102,
+            "source": "20:0"
+          },
+          {
+            "count": 103,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:39Z"
+      },
+      {
+        "count": 350,
+        "event_types": [
+          {
+            "count": 350,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 175,
+            "source": "20:0"
+          },
+          {
+            "count": 175,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:40Z"
+      },
+      {
+        "count": 264,
+        "event_types": [
+          {
+            "count": 264,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 132,
+            "source": "20:0"
+          },
+          {
+            "count": 132,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:41Z"
+      },
+      {
+        "count": 342,
+        "event_types": [
+          {
+            "count": 342,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 171,
+            "source": "20:0"
+          },
+          {
+            "count": 171,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:42Z"
+      },
+      {
+        "count": 222,
+        "event_types": [
+          {
+            "count": 222,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 111,
+            "source": "20:0"
+          },
+          {
+            "count": 111,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:43Z"
+      },
+      {
+        "count": 381,
+        "event_types": [
+          {
+            "count": 381,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 191,
+            "source": "20:0"
+          },
+          {
+            "count": 190,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:44Z"
+      },
+      {
+        "count": 159,
+        "event_types": [
+          {
+            "count": 159,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 79,
+            "source": "20:0"
+          },
+          {
+            "count": 80,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:45Z"
+      },
+      {
+        "count": 178,
+        "event_types": [
+          {
+            "count": 178,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 89,
+            "source": "20:0"
+          },
+          {
+            "count": 89,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:46Z"
+      },
+      {
+        "count": 280,
+        "event_types": [
+          {
+            "count": 280,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 140,
+            "source": "20:0"
+          },
+          {
+            "count": 140,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:47Z"
+      },
+      {
+        "count": 176,
+        "event_types": [
+          {
+            "count": 176,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 88,
+            "source": "20:0"
+          },
+          {
+            "count": 88,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:48Z"
+      },
+      {
+        "count": 154,
+        "event_types": [
+          {
+            "count": 154,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 77,
+            "source": "20:0"
+          },
+          {
+            "count": 77,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:49Z"
+      },
+      {
+        "count": 172,
+        "event_types": [
+          {
+            "count": 172,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 86,
+            "source": "20:0"
+          },
+          {
+            "count": 86,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:50Z"
+      },
+      {
+        "count": 122,
+        "event_types": [
+          {
+            "count": 122,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 61,
+            "source": "20:0"
+          },
+          {
+            "count": 61,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:51Z"
+      },
+      {
+        "count": 174,
+        "event_types": [
+          {
+            "count": 174,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 87,
+            "source": "20:0"
+          },
+          {
+            "count": 87,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:52Z"
+      },
+      {
+        "count": 172,
+        "event_types": [
+          {
+            "count": 172,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 86,
+            "source": "20:0"
+          },
+          {
+            "count": 86,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:53Z"
+      },
+      {
+        "count": 40,
+        "event_types": [
+          {
+            "count": 40,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 20,
+            "source": "20:0"
+          },
+          {
+            "count": 20,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:23:54Z"
+      },
+      {
+        "count": 136,
+        "event_types": [
+          {
+            "count": 136,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 68,
+            "source": "20:0"
+          },
+          {
+            "count": 68,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:00Z"
+      },
+      {
+        "count": 275,
+        "event_types": [
+          {
+            "count": 275,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 138,
+            "source": "20:0"
+          },
+          {
+            "count": 137,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:01Z"
+      },
+      {
+        "count": 301,
+        "event_types": [
+          {
+            "count": 301,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 150,
+            "source": "20:0"
+          },
+          {
+            "count": 151,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:02Z"
+      },
+      {
+        "count": 250,
+        "event_types": [
+          {
+            "count": 250,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 125,
+            "source": "20:0"
+          },
+          {
+            "count": 125,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:03Z"
+      },
+      {
+        "count": 212,
+        "event_types": [
+          {
+            "count": 212,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 106,
+            "source": "20:0"
+          },
+          {
+            "count": 106,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:04Z"
+      },
+      {
+        "count": 276,
+        "event_types": [
+          {
+            "count": 276,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 138,
+            "source": "20:0"
+          },
+          {
+            "count": 138,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:05Z"
+      },
+      {
+        "count": 152,
+        "event_types": [
+          {
+            "count": 152,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 76,
+            "source": "20:0"
+          },
+          {
+            "count": 76,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:06Z"
+      },
+      {
+        "count": 182,
+        "event_types": [
+          {
+            "count": 182,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 91,
+            "source": "20:0"
+          },
+          {
+            "count": 91,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:07Z"
+      },
+      {
+        "count": 354,
+        "event_types": [
+          {
+            "count": 354,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 177,
+            "source": "20:0"
+          },
+          {
+            "count": 177,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:08Z"
+      },
+      {
+        "count": 150,
+        "event_types": [
+          {
+            "count": 150,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 75,
+            "source": "20:0"
+          },
+          {
+            "count": 75,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:09Z"
+      },
+      {
+        "count": 290,
+        "event_types": [
+          {
+            "count": 290,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 145,
+            "source": "20:0"
+          },
+          {
+            "count": 145,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:10Z"
+      },
+      {
+        "count": 264,
+        "event_types": [
+          {
+            "count": 264,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 132,
+            "source": "20:0"
+          },
+          {
+            "count": 132,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:11Z"
+      },
+      {
+        "count": 130,
+        "event_types": [
+          {
+            "count": 130,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 65,
+            "source": "20:0"
+          },
+          {
+            "count": 65,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:12Z"
+      },
+      {
+        "count": 308,
+        "event_types": [
+          {
+            "count": 308,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 154,
+            "source": "20:0"
+          },
+          {
+            "count": 154,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:13Z"
+      },
+      {
+        "count": 150,
+        "event_types": [
+          {
+            "count": 150,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 75,
+            "source": "20:0"
+          },
+          {
+            "count": 75,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:14Z"
+      },
+      {
+        "count": 432,
+        "event_types": [
+          {
+            "count": 432,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 216,
+            "source": "20:0"
+          },
+          {
+            "count": 216,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:15Z"
+      },
+      {
+        "count": 718,
+        "event_types": [
+          {
+            "count": 718,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 359,
+            "source": "20:0"
+          },
+          {
+            "count": 359,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:16Z"
+      },
+      {
+        "count": 410,
+        "event_types": [
+          {
+            "count": 410,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 205,
+            "source": "20:0"
+          },
+          {
+            "count": 205,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:17Z"
+      },
+      {
+        "count": 305,
+        "event_types": [
+          {
+            "count": 305,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 153,
+            "source": "20:0"
+          },
+          {
+            "count": 152,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:18Z"
+      },
+      {
+        "count": 271,
+        "event_types": [
+          {
+            "count": 271,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 135,
+            "source": "20:0"
+          },
+          {
+            "count": 136,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:19Z"
+      },
+      {
+        "count": 261,
+        "event_types": [
+          {
+            "count": 261,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 131,
+            "source": "20:0"
+          },
+          {
+            "count": 130,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:20Z"
+      },
+      {
+        "count": 253,
+        "event_types": [
+          {
+            "count": 253,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 126,
+            "source": "20:0"
+          },
+          {
+            "count": 127,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:21Z"
+      },
+      {
+        "count": 235,
+        "event_types": [
+          {
+            "count": 235,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 118,
+            "source": "20:0"
+          },
+          {
+            "count": 117,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:22Z"
+      },
+      {
+        "count": 221,
+        "event_types": [
+          {
+            "count": 221,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 111,
+            "source": "20:0"
+          },
+          {
+            "count": 110,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:23Z"
+      },
+      {
+        "count": 250,
+        "event_types": [
+          {
+            "count": 250,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 126,
+            "source": "20:0"
+          },
+          {
+            "count": 124,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:24Z"
+      },
+      {
+        "count": 245,
+        "event_types": [
+          {
+            "count": 245,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 122,
+            "source": "20:0"
+          },
+          {
+            "count": 123,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:25Z"
+      },
+      {
+        "count": 238,
+        "event_types": [
+          {
+            "count": 238,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 118,
+            "source": "20:0"
+          },
+          {
+            "count": 120,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:26Z"
+      },
+      {
+        "count": 237,
+        "event_types": [
+          {
+            "count": 237,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 118,
+            "source": "20:0"
+          },
+          {
+            "count": 119,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:27Z"
+      },
+      {
+        "count": 313,
+        "event_types": [
+          {
+            "count": 313,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 157,
+            "source": "20:0"
+          },
+          {
+            "count": 156,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:28Z"
+      },
+      {
+        "count": 1063,
+        "event_types": [
+          {
+            "count": 1063,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 531,
+            "source": "20:0"
+          },
+          {
+            "count": 532,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:29Z"
+      },
+      {
+        "count": 777,
+        "event_types": [
+          {
+            "count": 777,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 389,
+            "source": "20:0"
+          },
+          {
+            "count": 388,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:30Z"
+      },
+      {
+        "count": 543,
+        "event_types": [
+          {
+            "count": 543,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 271,
+            "source": "20:0"
+          },
+          {
+            "count": 272,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:31Z"
+      },
+      {
+        "count": 251,
+        "event_types": [
+          {
+            "count": 251,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 127,
+            "source": "20:0"
+          },
+          {
+            "count": 124,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:32Z"
+      },
+      {
+        "count": 451,
+        "event_types": [
+          {
+            "count": 451,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 224,
+            "source": "20:0"
+          },
+          {
+            "count": 227,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:33Z"
+      },
+      {
+        "count": 474,
+        "event_types": [
+          {
+            "count": 474,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 237,
+            "source": "20:0"
+          },
+          {
+            "count": 237,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:34Z"
+      },
+      {
+        "count": 362,
+        "event_types": [
+          {
+            "count": 362,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 181,
+            "source": "20:0"
+          },
+          {
+            "count": 181,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:35Z"
+      },
+      {
+        "count": 56,
+        "event_types": [
+          {
+            "count": 56,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 28,
+            "source": "20:0"
+          },
+          {
+            "count": 28,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:36Z"
+      },
+      {
+        "count": 182,
+        "event_types": [
+          {
+            "count": 182,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 91,
+            "source": "20:0"
+          },
+          {
+            "count": 91,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:37Z"
+      },
+      {
+        "count": 340,
+        "event_types": [
+          {
+            "count": 340,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 170,
+            "source": "20:0"
+          },
+          {
+            "count": 170,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:38Z"
+      },
+      {
+        "count": 238,
+        "event_types": [
+          {
+            "count": 238,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 119,
+            "source": "20:0"
+          },
+          {
+            "count": 119,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:39Z"
+      },
+      {
+        "count": 296,
+        "event_types": [
+          {
+            "count": 296,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 148,
+            "source": "20:0"
+          },
+          {
+            "count": 148,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:40Z"
+      },
+      {
+        "count": 108,
+        "event_types": [
+          {
+            "count": 108,
+            "event": "Control change"
+          }
+        ],
+        "sources": [
+          {
+            "count": 54,
+            "source": "20:0"
+          },
+          {
+            "count": 54,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T18:24:41Z"
+      }
+    ],
+    "event_count": 54774,
+    "event_types": [
+      {
+        "count": 54774,
+        "event": "Control change"
+      }
+    ],
+    "first_arrival": "2026-08-30T18:19:53.491554141Z",
+    "last_arrival": "2026-08-30T18:24:41.373253410Z",
+    "sources": [
+      {
+        "count": 27387,
+        "source": "20:0"
+      },
+      {
+        "count": 27387,
+        "source": "20:1"
+      }
+    ]
+  },
+  "midi_ports": "20:0,20:1",
+  "notes": [
+    "MIDI timestamps are observer arrival times grouped into UTC-second buckets, not device-event timestamps.",
+    "pw-top ERR is the PipeWire cumulative xrun/error counter; changed nodes require attribution review.",
+    "This observer never creates or removes links and does not control services, Carla, EQ parameters, or quantum."
+  ],
+  "pipewire": {
+    "journal_xrun_dropout_deadline_lines": {
+      "before": 0,
+      "during_and_after": 0
+    },
+    "pw_top": {
+      "changed_nodes": [
+        {
+          "err_after": 109,
+          "err_before": 108,
+          "err_delta": 1,
+          "id": 100,
+          "name": "S32LE 2 48000 alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__sink",
+          "samples": 300
+        },
+        {
+          "err_after": 45,
+          "err_before": 43,
+          "err_delta": 2,
+          "id": 381,
+          "name": "+ SMC-MIX - 8-Band EQ",
+          "samples": 300
+        }
+      ],
+      "samples": 300,
+      "total_err_delta": 3
+    }
+  },
+  "protected_graph": {
+    "link_hash_after": "9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "link_hash_before": "9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "unchanged": true
+  },
+  "safety": {
+    "changes_parameters": false,
+    "controls_services": false,
+    "mode": "read-only",
+    "mutates_graph": false,
+    "remote_files": "temporary-only"
+  },
+  "schema": "music-studies/airstar-control-xrun-correlation/v1"
+}
