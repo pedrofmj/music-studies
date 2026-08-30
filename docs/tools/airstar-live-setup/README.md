@@ -54,6 +54,9 @@ then reinstalls the protected setup. It does not launch Carla automatically.
 - materialize-patchbay.py maps the reference output links to the target machine's current default stereo sink.
 - capture-from-airstar refreshes the versioned project and graph artifacts
   after an intentional live-rack change.
+- capture-control-xrun-correlation records timestamped MIDI arrivals and
+  PipeWire xrun/error-counter deltas without changing links, services, Carla,
+  EQ parameters, or quantum.
 - [Controller Profiles](controller-profiles.md) records the hardware settings
   that must be applied in Arturia software or CubeSuite.
 
@@ -154,6 +157,24 @@ exists because this operation replaces protected artifacts; it is not used for
 experiments or diagnostics. Review and commit the result, then deliberately
 update the protected-baseline fingerprints. If the rack gains or loses plugins,
 update the manifest and validators rather than bypassing the structural check.
+
+## Control And Xrun Correlation
+
+Run this observer while an operator moves the SMC-Mixer. It is read-only; it
+uses temporary remote files and removes them before returning. MIDI timestamps
+are observer arrival times, not device timestamps:
+
+~~~bash
+docs/tools/airstar-live-setup/capture-control-xrun-correlation \
+  --duration 60 \
+  --midi-ports 20:1 \
+  --output-json /tmp/airstar-control-xrun.json
+~~~
+
+The report compares the protected Patchbay hash before and after, records
+`pw-top` changed-node counters, and captures xrun/dropout/deadline journal
+matches. It never connects or disconnects ports and does not change Carla,
+parameters, services, or PipeWire quantum.
 
 ## Windows Boundary
 

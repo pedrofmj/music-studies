@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+readonly OBSERVER="${SCRIPT_DIR}/control-xrun-observer"
+
+host=pedro.ferreira@airstar
+duration=60
+midi_ports=20:1
+output_json=-
+
+usage() {
+    printf '%s\n' \
+        "Usage: $(basename "$0") [OPTIONS]" \
+        "" \
+        "Capture read-only MIDI arrival and PipeWire xrun correlation data." \
+        "" \
+        "  --host HOST              SSH host (default: pedro.ferreira@airstar)" \
+        "  --duration SECONDS      Observation length, 1..900 (default: 60)" \
+        "  --midi-ports PORTS      ALSA ports, e.g. 20:1 or 16:0,20:1 (default: 20:1)" \
+        "  --output-json PATH      Write JSON locally; '-' writes stdout" \
+        "  --help                  Show this help"
+}
+
+while (($#)); do
+    case $1 in
+        --host)
+            [[ -n ${2-} ]] || { printf '%s\n' "--host requires a value" >&2; exit 2; }
+            host=$2
+            shift
+            ;;
+        --duration)
+            [[ -n ${2-} ]] || { printf '%s\n' "--duration requires a value" >&2; exit 2; }
+            duration=$2
+            shift
+            ;;
+        --midi-ports)
+            [[ -n ${2-} ]] || { printf '%s\n' "--midi-ports requires a value" >&2; exit 2; }
+            midi_ports=$2
+            shift
+            ;;
+        --output-json)
+            [[ -n ${2-} ]] || { printf '%s\n' "--output-json requires a value" >&2; exit 2; }
+            output_json=$2
+            shift
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            printf 'Unknown option: %s\n' "$1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
+
+[[ $host =~ ^[A-Za-z0-9._-]+@[A-Za-z0-9._-]+$ ]] || {
+    printf 'Unsafe SSH host value: %s\n' "$host" >&2
+    exit 2
+}
+[[ $duration =~ ^[1-9][0-9]*$ && $duration -le 900 ]] || {
+    printf 'Duration must be an integer from 1 to 900 seconds.\n' >&2
+    exit 2
+}
+[[ $midi_ports =~ ^[0-9]+:[0-9]+(,[0-9]+:[0-9]+)*$ ]] || {
+    printf 'MIDI ports must use client:port[,client:port...] syntax.\n' >&2
+    exit 2
+}
+command -v ssh >/dev/null 2>&1 || {
+    printf '%s\n' 'Required command not found: ssh' >&2
+    exit 2
+}
+
+observation=$(ssh -o BatchMode=yes "$host" bash -s -- "$duration" "$midi_ports" < "$OBSERVER")
+
+if [[ $output_json == - ]]; then
+    printf '%s\n' "$observation"
+else
+    [[ -d $(dirname -- "$output_json") ]] || {
+        printf 'Output directory does not exist: %s\n' "$(dirname -- "$output_json")" >&2
+        exit 2
+    }
+    printf '%s\n' "$observation" > "$output_json"
+    printf 'Wrote %s\n' "$output_json"
+fi

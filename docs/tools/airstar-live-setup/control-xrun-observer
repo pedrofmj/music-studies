@@ -1,0 +1,173 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly DURATION=${1:?duration is required}
+readonly MIDI_PORTS=${2:?MIDI port is required}
+
+if [[ ! $DURATION =~ ^[1-9][0-9]*$ || $DURATION -gt 900 ]]; then
+    printf 'Duration must be an integer from 1 to 900 seconds.\n' >&2
+    exit 2
+fi
+if [[ ! $MIDI_PORTS =~ ^[0-9]+:[0-9]+(,[0-9]+:[0-9]+)*$ ]]; then
+    printf 'MIDI ports must use client:port[,client:port...] syntax.\n' >&2
+    exit 2
+fi
+
+for command in aseqdump date journalctl jq mktemp pw-link pw-top sha256sum stdbuf timeout wc; do
+    command -v "$command" >/dev/null 2>&1 || {
+        printf 'Required observation command not found: %s\n' "$command" >&2
+        exit 2
+    }
+done
+
+readonly started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+readonly started_epoch=$(date +%s)
+readonly temporary=$(mktemp -d "${TMPDIR:-/tmp}/music-rig-control-xrun.XXXXXX")
+
+cleanup() {
+    rm -rf "$temporary"
+}
+trap cleanup EXIT
+
+link_hash_before=$(pw-link -l | sha256sum)
+link_hash_before=${link_hash_before%% *}
+journalctl --user --since "@$started_epoch" --grep='xrun|dropout|deadline' --no-pager -q \
+    > "$temporary/journal-before.txt" 2>/dev/null || true
+
+(
+    timeout --signal=INT --kill-after=2s "${DURATION}s" \
+        stdbuf -oL aseqdump -p "$MIDI_PORTS" 2>&1 |
+        while IFS= read -r line; do
+            case "$line" in
+                *'Note on '*|*'Note off '*|*'Control change '*)
+                    printf '%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)" "$line"
+                    ;;
+            esac
+        done
+    pipeline_status=${PIPESTATUS[0]}
+    exit "$pipeline_status"
+) > "$temporary/midi.tsv" 2>&1 &
+midi_pid=$!
+
+pw-top -b -n "$((DURATION + 1))" > "$temporary/pw-top.txt" 2>&1 &
+pw_top_pid=$!
+
+set +e
+wait "$midi_pid"
+midi_status=$?
+wait "$pw_top_pid"
+pw_top_status=$?
+set -e
+
+readonly ended_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+readonly ended_epoch=$(date +%s)
+link_hash_after=$(pw-link -l | sha256sum)
+link_hash_after=${link_hash_after%% *}
+journalctl --user --since "@$started_epoch" --until "@$ended_epoch" \
+    --grep='xrun|dropout|deadline' --no-pager -q \
+    > "$temporary/journal-after.txt" 2>/dev/null || true
+
+midi_summary=$(jq -Rn '
+    [
+        inputs
+        | split("\t")
+        | select(length == 2)
+        | {timestamp: .[0], raw: .[1]}
+        | . as $event
+        | ($event.raw
+            | capture("^\\s*(?<source>[0-9]+:[0-9]+)\\s+(?<event>Note on|Note off|Control change)")) as $match
+        | $event + {source: $match.source, event: $match.event}
+    ]
+    | {
+        event_count: length,
+        first_arrival: (.[0].timestamp // null),
+        last_arrival: (.[-1].timestamp // null),
+        event_types: (
+            group_by(.event)
+            | map({event: .[0].event, count: length})
+        ),
+        sources: (
+            group_by(.source)
+            | map({source: .[0].source, count: length})
+        )
+    }
+' < "$temporary/midi.tsv")
+
+pipewire_summary=$(jq -Rn '
+    [
+        inputs
+        | capture("^R\\s+(?<id>[0-9]+)\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+(?<err>[0-9]+)\\s+(?<rest>.*)$")?
+        | select(. != null)
+        | .id |= tonumber
+        | .err |= tonumber
+    ]
+    | group_by(.id)
+    | map({
+        id: .[0].id,
+        name: .[0].rest,
+        samples: length,
+        err_before: .[0].err,
+        err_after: .[-1].err,
+        err_delta: (.[-1].err - .[0].err)
+    })
+    | {
+        samples: (map(.samples) | max // 0),
+        total_err_delta: (map(.err_delta) | add // 0),
+        changed_nodes: map(select(.err_delta != 0))
+    }
+' < "$temporary/pw-top.txt")
+
+journal_before_lines=$(wc -l < "$temporary/journal-before.txt")
+journal_after_lines=$(wc -l < "$temporary/journal-after.txt")
+
+jq -nS \
+    --arg schema 'music-studies/airstar-control-xrun-correlation/v1' \
+    --arg started_at "$started_at" \
+    --arg ended_at "$ended_at" \
+    --argjson duration "$DURATION" \
+    --arg midi_ports "$MIDI_PORTS" \
+    --arg link_hash_before "$link_hash_before" \
+    --arg link_hash_after "$link_hash_after" \
+    --argjson midi "$midi_summary" \
+    --argjson pipewire "$pipewire_summary" \
+    --argjson journal_before "$journal_before_lines" \
+    --argjson journal_after "$journal_after_lines" \
+    --argjson midi_status "$midi_status" \
+    --argjson pw_top_status "$pw_top_status" '
+    {
+        schema: $schema,
+        safety: {
+            mode: "read-only",
+            mutates_graph: false,
+            controls_services: false,
+            changes_parameters: false,
+            remote_files: "temporary-only"
+        },
+        captured_at_utc: {start: $started_at, end: $ended_at},
+        duration_seconds: $duration,
+        midi_ports: $midi_ports,
+        midi: $midi,
+        pipewire: {
+            pw_top: $pipewire,
+            journal_xrun_dropout_deadline_lines: {
+                before: $journal_before,
+                during_and_after: $journal_after
+            }
+        },
+        protected_graph: {
+            link_hash_before: $link_hash_before,
+            link_hash_after: $link_hash_after,
+            unchanged: ($link_hash_before == $link_hash_after)
+        },
+        command_status: {
+            aseqdump_timeout_status: $midi_status,
+            pw_top_status: $pw_top_status,
+            temporary_cleanup: true
+        },
+        notes: [
+            "MIDI timestamps are observer arrival times, not device-event timestamps.",
+            "pw-top ERR is the PipeWire cumulative xrun/error counter; changed nodes require attribution review.",
+            "This observer never creates or removes links and does not control services, Carla, EQ parameters, or quantum."
+        ]
+    }
+'
