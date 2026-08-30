@@ -1,0 +1,317 @@
+{
+  "captured_at_utc": {
+    "end": "2026-08-30T17:57:01Z",
+    "start": "2026-08-30T17:52:01Z"
+  },
+  "command_status": {
+    "aseqdump_timeout_status": 124,
+    "pw_top_status": 0,
+    "temporary_cleanup": true
+  },
+  "duration_seconds": 300,
+  "midi": {
+    "arrival_buckets": [
+      {
+        "count": 5,
+        "event_types": [
+          {
+            "count": 2,
+            "event": "Note off"
+          },
+          {
+            "count": 3,
+            "event": "Note on"
+          }
+        ],
+        "sources": [
+          {
+            "count": 5,
+            "source": "16:0"
+          }
+        ],
+        "timestamp": "2026-08-30T17:56:54Z"
+      },
+      {
+        "count": 122,
+        "event_types": [
+          {
+            "count": 116,
+            "event": "Control change"
+          },
+          {
+            "count": 3,
+            "event": "Note off"
+          },
+          {
+            "count": 3,
+            "event": "Note on"
+          }
+        ],
+        "sources": [
+          {
+            "count": 6,
+            "source": "16:0"
+          },
+          {
+            "count": 58,
+            "source": "20:0"
+          },
+          {
+            "count": 58,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T17:56:55Z"
+      },
+      {
+        "count": 282,
+        "event_types": [
+          {
+            "count": 276,
+            "event": "Control change"
+          },
+          {
+            "count": 3,
+            "event": "Note off"
+          },
+          {
+            "count": 3,
+            "event": "Note on"
+          }
+        ],
+        "sources": [
+          {
+            "count": 6,
+            "source": "16:0"
+          },
+          {
+            "count": 138,
+            "source": "20:0"
+          },
+          {
+            "count": 138,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T17:56:56Z"
+      },
+      {
+        "count": 262,
+        "event_types": [
+          {
+            "count": 258,
+            "event": "Control change"
+          },
+          {
+            "count": 2,
+            "event": "Note off"
+          },
+          {
+            "count": 2,
+            "event": "Note on"
+          }
+        ],
+        "sources": [
+          {
+            "count": 4,
+            "source": "16:0"
+          },
+          {
+            "count": 129,
+            "source": "20:0"
+          },
+          {
+            "count": 129,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T17:56:57Z"
+      },
+      {
+        "count": 125,
+        "event_types": [
+          {
+            "count": 114,
+            "event": "Control change"
+          },
+          {
+            "count": 6,
+            "event": "Note off"
+          },
+          {
+            "count": 5,
+            "event": "Note on"
+          }
+        ],
+        "sources": [
+          {
+            "count": 11,
+            "source": "16:0"
+          },
+          {
+            "count": 57,
+            "source": "20:0"
+          },
+          {
+            "count": 57,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T17:56:58Z"
+      },
+      {
+        "count": 269,
+        "event_types": [
+          {
+            "count": 260,
+            "event": "Control change"
+          },
+          {
+            "count": 3,
+            "event": "Note off"
+          },
+          {
+            "count": 6,
+            "event": "Note on"
+          }
+        ],
+        "sources": [
+          {
+            "count": 9,
+            "source": "16:0"
+          },
+          {
+            "count": 130,
+            "source": "20:0"
+          },
+          {
+            "count": 130,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T17:56:59Z"
+      },
+      {
+        "count": 277,
+        "event_types": [
+          {
+            "count": 268,
+            "event": "Control change"
+          },
+          {
+            "count": 6,
+            "event": "Note off"
+          },
+          {
+            "count": 3,
+            "event": "Note on"
+          }
+        ],
+        "sources": [
+          {
+            "count": 9,
+            "source": "16:0"
+          },
+          {
+            "count": 134,
+            "source": "20:0"
+          },
+          {
+            "count": 134,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T17:57:00Z"
+      },
+      {
+        "count": 742,
+        "event_types": [
+          {
+            "count": 738,
+            "event": "Control change"
+          },
+          {
+            "count": 4,
+            "event": "Note on"
+          }
+        ],
+        "sources": [
+          {
+            "count": 4,
+            "source": "16:0"
+          },
+          {
+            "count": 369,
+            "source": "20:0"
+          },
+          {
+            "count": 369,
+            "source": "20:1"
+          }
+        ],
+        "timestamp": "2026-08-30T17:57:01Z"
+      }
+    ],
+    "event_count": 2084,
+    "event_types": [
+      {
+        "count": 2030,
+        "event": "Control change"
+      },
+      {
+        "count": 25,
+        "event": "Note off"
+      },
+      {
+        "count": 29,
+        "event": "Note on"
+      }
+    ],
+    "first_arrival": "2026-08-30T17:56:54.229959006Z",
+    "last_arrival": "2026-08-30T17:57:01.985201070Z",
+    "sources": [
+      {
+        "count": 54,
+        "source": "16:0"
+      },
+      {
+        "count": 1015,
+        "source": "20:0"
+      },
+      {
+        "count": 1015,
+        "source": "20:1"
+      }
+    ]
+  },
+  "midi_ports": "16:0,20:0,20:1,32:0,32:1",
+  "notes": [
+    "MIDI timestamps are observer arrival times grouped into UTC-second buckets, not device-event timestamps.",
+    "pw-top ERR is the PipeWire cumulative xrun/error counter; changed nodes require attribution review.",
+    "This observer never creates or removes links and does not control services, Carla, EQ parameters, or quantum."
+  ],
+  "pipewire": {
+    "journal_xrun_dropout_deadline_lines": {
+      "before": 0,
+      "during_and_after": 0
+    },
+    "pw_top": {
+      "changed_nodes": [],
+      "samples": 300,
+      "total_err_delta": 0
+    }
+  },
+  "protected_graph": {
+    "link_hash_after": "9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "link_hash_before": "9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "unchanged": true
+  },
+  "safety": {
+    "changes_parameters": false,
+    "controls_services": false,
+    "mode": "read-only",
+    "mutates_graph": false,
+    "remote_files": "temporary-only"
+  },
+  "schema": "music-studies/airstar-control-xrun-correlation/v1"
+}
