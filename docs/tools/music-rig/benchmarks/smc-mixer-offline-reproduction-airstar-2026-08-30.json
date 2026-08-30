@@ -1,0 +1,50 @@
+{
+  "schema": "music-studies/smc-mixer-offline-reproduction-airstar/v1",
+  "captured_on": "2026-08-30",
+  "source_commit": "0e3a985",
+  "requested_reproduction": "mapped SMC-MIX CC control path in an isolated Carla copy",
+  "carla_copy_attempts": [
+    {
+      "environment": "Carla Flatpak 2.5.10 with separate dummy JACK server",
+      "result": "blocked",
+      "reason": "The Flatpak sandbox could not attach to the external JACK server; all copied Carla target ports were unavailable."
+    },
+    {
+      "environment": "Carla Flatpak 2.5.10 with private PipeWire socket",
+      "result": "blocked",
+      "reason": "Carla reached the sandbox but failed to create a JACK client on the private core."
+    },
+    {
+      "environment": "Carla deployment run directly outside Flatpak",
+      "result": "blocked",
+      "reason": "The deployment lacked host PyQt5.QtSvg and its bundled libjack reported incompatible shared-memory metadata against host jackd."
+    }
+  ],
+  "fallback_harness": {
+    "build_directory": "docs/tools/music-rig/build-schema",
+    "command": "ctest --test-dir docs/tools/music-rig/build-schema --output-on-failure -R 'music_rig_(smc_mixer_relay|jack_smc_mixer_relay|smc_mixer_links)'",
+    "tests": {
+      "music_rig_smc_mixer_relay_test": "passed",
+      "music_rig_jack_smc_mixer_relay_offline_test": "passed",
+      "music_rig_smc_mixer_relay_boundary": "passed",
+      "music_rig_jack_smc_mixer_relay_boundary": "passed",
+      "music_rig_smc_mixer_links_transaction": "passed"
+    },
+    "passed": 5,
+    "failed": 0,
+    "carla_plugin_behavior_reproduced": false
+  },
+  "live_protected_state": {
+    "live_graph_touched": false,
+    "temporary_artifacts_removed": true
+  },
+  "evaluation": {
+    "offline_control_harness_pass": true,
+    "isolated_carla_copy_pass": false,
+    "accepted_as_carla_reproduction": false
+  },
+  "notes": [
+    "The repository harness verifies the mapped relay and link-transaction contracts but does not instantiate the Carla LV2 chain or measure PipeWire audio xruns.",
+    "The live SMC-MIX control-change xrun remains unresolved and requires either a native Carla/JACK-compatible offline environment or an approved live restoration procedure."
+  ]
+}
