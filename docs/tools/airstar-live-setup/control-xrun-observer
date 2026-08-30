@@ -82,7 +82,21 @@ midi_summary=$(jq -Rn '
         event_count: length,
         first_arrival: (.[0].timestamp // null),
         last_arrival: (.[-1].timestamp // null),
-        arrivals: map({timestamp, source, event}),
+        arrival_buckets: (
+            group_by(.timestamp[0:19])
+            | map({
+                timestamp: (.[0].timestamp[0:19] + "Z"),
+                count: length,
+                event_types: (
+                    group_by(.event)
+                    | map({event: .[0].event, count: length})
+                ),
+                sources: (
+                    group_by(.source)
+                    | map({source: .[0].source, count: length})
+                )
+            })
+        ),
         event_types: (
             group_by(.event)
             | map({event: .[0].event, count: length})
@@ -169,7 +183,7 @@ jq -nS \
             temporary_cleanup: true
         },
         notes: [
-            "MIDI timestamps are observer arrival times, not device-event timestamps.",
+            "MIDI timestamps are observer arrival times grouped into UTC-second buckets, not device-event timestamps.",
             "pw-top ERR is the PipeWire cumulative xrun/error counter; changed nodes require attribution review.",
             "This observer never creates or removes links and does not control services, Carla, EQ parameters, or quantum."
         ]

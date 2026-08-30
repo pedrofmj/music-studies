@@ -162,7 +162,7 @@ update the manifest and validators rather than bypassing the structural check.
 
 Run this observer while an operator moves the SMC-Mixer. It is read-only; it
 uses temporary remote files and removes them before returning. MIDI timestamps
-are observer arrival times, not device timestamps:
+are observer arrival times grouped into one-second UTC buckets, not device timestamps:
 
 ~~~bash
 docs/tools/airstar-live-setup/capture-control-xrun-correlation \
