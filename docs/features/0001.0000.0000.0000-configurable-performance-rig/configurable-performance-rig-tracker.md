@@ -55,6 +55,7 @@ Documents:
 | Airstar SMC-MIX no-touch correlation repeat | ✅ 60 s with no device interaction, 0 MIDI events, zero changed `pw-top` nodes, zero journal matches, and unchanged graph hash; [evidence](../../tools/music-rig/benchmarks/smc-mixer-control-correlation-no-touch-airstar-2026-08-30.json) |
 | Airstar SMC-MIX intentional fader sweep | ✅ 60 s, 7,132 mirrored control arrivals (`3,566` per port), approximately 93.5 events/s per port, zero changed `pw-top` nodes, zero journal matches, and unchanged graph hash; [evidence](../../tools/music-rig/benchmarks/smc-mixer-fader-sweep-correlation-airstar-2026-08-30.json) |
 | Airstar mixed musical/control soak | 🟡 300 s observation, 2,084 arrivals (`2,030` mirrored mixer CCs and `54` Arturia notes), zero changed `pw-top` nodes, zero journal matches, and unchanged graph hash; activity occupied only 7.755242 s; [evidence](../../tools/music-rig/benchmarks/mixed-musical-control-soak-airstar-2026-08-30.json) |
+| Airstar sustained mixed musical/control soak | 🟡 300 s, 6,592 arrivals across 229.669036 active seconds, but sink `ERR +5` and SMC-MIX EQ `ERR +3`; graph hash unchanged and validator passed; [evidence](../../tools/music-rig/benchmarks/sustained-mixed-control-soak-airstar-2026-08-30.json) |
 | Clang isolated suite | ✅ 60/60 passed |
 | GCC with Linux JSON/JACK adapters | ✅ 67/67 passed |
 | Clang with Linux JSON/JACK adapters | ✅ 67/67 passed |
@@ -542,7 +543,11 @@ benchmarks.
   300-second mixed observation captured 2,030 mirrored mixer CCs and 54
   Arturia note events with no error-counter or journal delta, but all activity
   occupied only 7.755242 seconds, so sustained long-soak evidence remains
-  pending.
+  pending. A subsequent 300-second sustained mixed run covered 229.669036
+  active seconds and reproduced the live failure: the speaker sink gained five
+  `pw-top` ERR counts and SMC-MIX EQ gained three, despite zero matching journal
+  lines and exact graph restoration. The zero-xrun and long-soak gates remain
+  open.
 
 ## Milestone 5: MIDI Management Triggers
 
