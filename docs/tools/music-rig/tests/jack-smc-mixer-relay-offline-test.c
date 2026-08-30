@@ -231,21 +231,23 @@ static int test_relay_lifecycle(void)
         registered_flags[0] == 1UL && registered_flags[1] == 2UL,
         "fixed input/output registration");
     queue_input(0U, UINT32_C(7), UINT8_C(0xb0), UINT8_C(40), UINT8_C(91));
-    queue_input(1U, UINT32_C(8), UINT8_C(0xb0), UINT8_C(39), UINT8_C(22));
+    queue_input(1U, UINT32_C(8), UINT8_C(0xb0), UINT8_C(40), UINT8_C(92));
+    queue_input(2U, UINT32_C(9), UINT8_C(0xb0), UINT8_C(39), UINT8_C(22));
     CHECK(registered_process(UINT32_C(128), registered_process_context) == 0,
         "process callback");
     CHECK(fake_buffers[1].count == UINT32_C(1) && clear_count == 1 &&
-        fake_buffers[1].events[0].time == UINT32_C(7) &&
+        fake_buffers[1].events[0].time == UINT32_C(8) &&
         memcmp(fake_buffers[1].events[0].data,
-            fake_buffers[0].events[0].data, 3U) == 0 &&
+            (uint8_t[]){UINT8_C(0xb0), UINT8_C(40), UINT8_C(92)}, 3U) == 0 &&
         host.last_process_result == MUSIC_RIG_RESULT_OK,
         "byte-for-byte JACK relay");
     metrics = music_rig_smc_mixer_relay_metrics_read(&host.relay);
     CHECK(metrics != NULL && metrics->cycles == UINT64_C(1) &&
-        metrics->input_events == UINT64_C(2) &&
-        metrics->mapped_events == UINT64_C(1) &&
-        metrics->control_mapped_events[0] == UINT64_C(1) &&
+        metrics->input_events == UINT64_C(3) &&
+        metrics->mapped_events == UINT64_C(2) &&
+        metrics->control_mapped_events[0] == UINT64_C(2) &&
         metrics->emitted_events == UINT64_C(1) &&
+        metrics->coalesced_events == UINT64_C(1) &&
         metrics->unmapped_events == UINT64_C(1),
         "relay metrics");
     CHECK(music_rig_jack_smc_mixer_relay_stop(&host) == MUSIC_RIG_RESULT_OK &&

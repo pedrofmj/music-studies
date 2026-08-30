@@ -936,6 +936,7 @@ static int run_smc_mixer_relay(const char *path, const char *fingerprint)
         );
     }
     printf("emitted-events %" PRIu64 "\n", metrics->emitted_events);
+    printf("coalesced-events %" PRIu64 "\n", metrics->coalesced_events);
     printf("unmapped-events %" PRIu64 "\n", metrics->unmapped_events);
     printf("malformed-events %" PRIu64 "\n", metrics->malformed_events);
     printf("adapter-failures %" PRIu64 "\n", metrics->adapter_failures);

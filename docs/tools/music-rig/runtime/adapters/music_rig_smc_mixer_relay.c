@@ -126,6 +126,46 @@ static music_rig_result validate_parity_tables(
     return music_rig_device_port_catalogue_build(tables, ports);
 }
 
+static void clear_pending(
+    music_rig_smc_mixer_relay *relay
+)
+{
+    size_t index;
+
+    relay->pending_count = UINT8_C(0);
+    for (index = 0U; index < MUSIC_RIG_SMC_MIXER_CONTROL_COUNT; ++index) {
+        relay->pending_controls[index] = false;
+    }
+}
+
+static music_rig_result flush_pending(
+    music_rig_smc_mixer_relay *relay
+)
+{
+    music_rig_result result = MUSIC_RIG_RESULT_OK;
+    size_t order;
+
+    for (order = 0U;
+         result == MUSIC_RIG_RESULT_OK && order < relay->pending_count;
+         ++order) {
+        const size_t control = relay->pending_order[order];
+
+        result = relay->emit(
+            relay->emit_context,
+            relay->pending_frames[control],
+            relay->pending_messages[control],
+            sizeof(relay->pending_messages[control])
+        );
+        if (result == MUSIC_RIG_RESULT_OK) {
+            increment(&relay->metrics.emitted_events);
+        } else {
+            increment(&relay->metrics.adapter_failures);
+        }
+    }
+    clear_pending(relay);
+    return result;
+}
+
 void music_rig_smc_mixer_relay_config_init(
     music_rig_smc_mixer_relay_config *config
 )
@@ -191,6 +231,7 @@ music_rig_result music_rig_smc_mixer_relay_init(
     relay->emit = config->emit;
     relay->emit_context = config->emit_context;
     relay->profile_index = profile_index;
+    relay->coalesce_per_cycle = config->coalesce_per_cycle;
     memcpy(relay->input_port_id, input->id, sizeof(relay->input_port_id));
     memcpy(relay->output_port_id, output->id, sizeof(relay->output_port_id));
     atomic_init(&relay->prepared_generation, generation);
@@ -259,6 +300,7 @@ music_rig_result music_rig_smc_mixer_relay_begin_cycle(
     if (!valid_relay(relay)) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
+    clear_pending(relay);
     generation = music_rig_generation_slot_adopt(relay->generations);
     if (generation == NULL || generation->mapping == NULL) {
         return MUSIC_RIG_RESULT_INVALID_STATE;
@@ -292,6 +334,18 @@ music_rig_result music_rig_smc_mixer_relay_begin_cycle(
     );
     increment(&relay->metrics.generation_adoptions);
     return MUSIC_RIG_RESULT_OK;
+}
+
+music_rig_result music_rig_smc_mixer_relay_end_cycle(
+    music_rig_smc_mixer_relay *relay
+)
+{
+    if (!valid_relay(relay)) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+    return relay->coalesce_per_cycle
+        ? flush_pending(relay)
+        : MUSIC_RIG_RESULT_OK;
 }
 
 music_rig_result music_rig_smc_mixer_relay_process(
@@ -332,11 +386,25 @@ music_rig_result music_rig_smc_mixer_relay_process(
         return MUSIC_RIG_RESULT_OK;
     }
     increment(&relay->metrics.mapped_events);
-    increment(
-        &relay->metrics.control_mapped_events[
-            (size_t)(message[1] - UINT8_C(40))
-        ]
-    );
+    {
+        const size_t control = (size_t)(message[1] - UINT8_C(40));
+
+        increment(&relay->metrics.control_mapped_events[control]);
+        if (relay->coalesce_per_cycle) {
+            if (!relay->pending_controls[control]) {
+                relay->pending_controls[control] = true;
+                relay->pending_order[relay->pending_count] = (uint8_t)control;
+                relay->pending_count += UINT8_C(1);
+            } else {
+                increment(&relay->metrics.coalesced_events);
+            }
+            relay->pending_frames[control] = frame;
+            relay->pending_messages[control][0] = message[0];
+            relay->pending_messages[control][1] = message[1];
+            relay->pending_messages[control][2] = message[2];
+            return MUSIC_RIG_RESULT_OK;
+        }
+    }
     result = relay->emit(
         relay->emit_context,
         frame,

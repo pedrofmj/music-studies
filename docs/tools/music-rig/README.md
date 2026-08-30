@@ -176,8 +176,10 @@ that host can change links or emit events.
 
 The Milestone 4 SMC-Mixer relay is a separate portable event engine. It accepts
 only the exact compiled current EQ contract and relays mapped CC bytes through
-one stable input/output pair. Its explicit Linux JACK host can emit MIDI but
-contains no discovery, connect, disconnect, audio, allocation, or lock surface.
+one stable input/output pair. Its explicit Linux JACK host coalesces repeated
+updates for each fader within one JACK cycle, emits the latest value/frame, and
+reports the discarded intermediate updates. It contains no discovery, connect,
+disconnect, audio, allocation, or lock surface.
 The separate deployment transaction owns the reversible fixed links; neither
 profile activation nor the real-time callback can mutate the graph.
 

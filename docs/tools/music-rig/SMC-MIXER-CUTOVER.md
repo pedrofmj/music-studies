@@ -25,14 +25,20 @@ Every next immutable generation is fully parity-validated on the control thread
 before publication. Callback-cycle adoption is one atomic prepared-pointer
 comparison. An unprepared publication drops all prior table references before
 failing closed, so acknowledged generations remain reclaimable. For every
-accepted event, the callback performs one fixed numeric table lookup and writes
-the original three MIDI bytes at the original JACK frame.
-It performs no allocation, lock, JSON traversal, filesystem operation, string
-comparison, scaling, or graph operation. Unmapped, non-channel-1, non-CC, and
-malformed messages produce no output. Saturating metrics separate input,
-mapped, emitted, unmapped, malformed, and adapter-failure counts, with separate
-mapped-event counters for CC 40 through 47. The JACK host latches the first
-callback failure until shutdown so a later quiet cycle cannot hide it.
+accepted event, the callback performs one fixed numeric table lookup. The
+portable default writes the original three MIDI bytes at the original JACK
+frame. The Linux JACK host enables fixed-storage per-cycle coalescing: repeated
+updates for one fader retain only the latest value and frame, then emit at most
+one update for that fader when the cycle ends. This bounds control fan-out while
+preserving the final fader position; `coalesced-events` reports discarded
+intermediate updates.
+Neither path performs allocation, lock, JSON traversal, filesystem operation,
+string comparison, scaling, or graph operation in the callback. Unmapped,
+non-channel-1, non-CC, and malformed messages produce no output. Saturating
+metrics separate input, mapped, emitted, coalesced, unmapped, malformed, and
+adapter-failure counts, with separate mapped-event counters for CC 40 through
+47. The JACK host latches the first callback failure until shutdown so a later
+quiet cycle cannot hide it.
 
 The exhaustive portable test compares all 1,024 CC/value combinations. The
 fake-JACK test proves exact frame and byte preservation, one input and one

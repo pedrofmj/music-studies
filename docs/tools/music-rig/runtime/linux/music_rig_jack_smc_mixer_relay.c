@@ -146,6 +146,9 @@ static int process_cycle(jack_nframes_t frame_count, void *opaque)
                     event.size
                 );
             }
+            if (result == MUSIC_RIG_RESULT_OK) {
+                result = music_rig_smc_mixer_relay_end_cycle(&host->relay);
+            }
             host->cycle_output_buffer = NULL;
         }
         if (result != MUSIC_RIG_RESULT_OK) {
@@ -190,6 +193,7 @@ music_rig_result music_rig_jack_smc_mixer_relay_init(
     music_rig_smc_mixer_relay_config_init(&config);
     config.generations = generations;
     config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
+    config.coalesce_per_cycle = true;
     config.emit = emit_output;
     config.emit_context = host;
     result = music_rig_smc_mixer_relay_init(&host->relay, &config);

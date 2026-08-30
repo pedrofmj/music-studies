@@ -42,6 +42,12 @@ typedef struct emit_capture {
     bool fail;
 } emit_capture;
 
+typedef struct coalesced_emit_capture {
+    uint32_t frames[8];
+    uint8_t messages[8][3];
+    size_t count;
+} coalesced_emit_capture;
+
 #define CHECK(condition, message) do { \
     if (!(condition)) { \
         fprintf(stderr, "SMC-Mixer relay test failed: %s\n", message); \
@@ -149,6 +155,24 @@ static music_rig_result capture_emit(
         memcmp(message, capture->expected, 3U) != 0) {
         capture->mismatch = true;
     }
+    capture->count += 1U;
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result capture_coalesced_emit(
+    void *opaque,
+    uint32_t frame,
+    const uint8_t *message,
+    size_t message_size
+)
+{
+    coalesced_emit_capture *capture = opaque;
+
+    if (capture->count >= 8U || message == NULL || message_size != 3U) {
+        return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    }
+    capture->frames[capture->count] = frame;
+    memcpy(capture->messages[capture->count], message, 3U);
     capture->count += 1U;
     return MUSIC_RIG_RESULT_OK;
 }
@@ -285,6 +309,74 @@ static int test_exhaustive_parity(void)
     return 0;
 }
 
+static int test_coalesced_cycle(void)
+{
+    static music_rig_compiled_tables tables;
+    music_rig_generation generation = {UINT64_C(1), &tables};
+    music_rig_generation_slot generations;
+    music_rig_smc_mixer_relay_config config;
+    music_rig_smc_mixer_relay relay;
+    coalesced_emit_capture capture = {0};
+    const music_rig_smc_mixer_relay_metrics *metrics;
+    uint8_t message[3] = {UINT8_C(0xb0), UINT8_C(40), UINT8_C(10)};
+
+    CHECK(init_tables(&tables) == MUSIC_RIG_RESULT_OK &&
+        music_rig_generation_slot_init(&generations, &generation) ==
+            MUSIC_RIG_RESULT_OK,
+        "coalescing fixture");
+    music_rig_smc_mixer_relay_config_init(&config);
+    config.generations = &generations;
+    config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
+    config.coalesce_per_cycle = true;
+    config.emit = capture_coalesced_emit;
+    config.emit_context = &capture;
+    CHECK(music_rig_smc_mixer_relay_init(&relay, &config) ==
+            MUSIC_RIG_RESULT_OK &&
+        music_rig_smc_mixer_relay_begin_cycle(&relay) ==
+            MUSIC_RIG_RESULT_OK,
+        "coalescing initialization");
+    CHECK(music_rig_smc_mixer_relay_process(
+            &relay, UINT32_C(5), message, sizeof(message)
+        ) == MUSIC_RIG_RESULT_OK,
+        "first coalesced event");
+    message[1] = UINT8_C(41);
+    message[2] = UINT8_C(20);
+    CHECK(music_rig_smc_mixer_relay_process(
+            &relay, UINT32_C(6), message, sizeof(message)
+        ) == MUSIC_RIG_RESULT_OK,
+        "second coalesced control");
+    message[1] = UINT8_C(40);
+    message[2] = UINT8_C(11);
+    CHECK(music_rig_smc_mixer_relay_process(
+            &relay, UINT32_C(7), message, sizeof(message)
+        ) == MUSIC_RIG_RESULT_OK,
+        "latest coalesced value");
+    message[1] = UINT8_C(41);
+    message[2] = UINT8_C(21);
+    CHECK(music_rig_smc_mixer_relay_process(
+            &relay, UINT32_C(8), message, sizeof(message)
+        ) == MUSIC_RIG_RESULT_OK &&
+        music_rig_smc_mixer_relay_end_cycle(&relay) ==
+            MUSIC_RIG_RESULT_OK,
+        "coalesced cycle flush");
+    CHECK(capture.count == 2U && capture.frames[0] == UINT32_C(7) &&
+        capture.frames[1] == UINT32_C(8) &&
+        capture.messages[0][1] == UINT8_C(40) &&
+        capture.messages[0][2] == UINT8_C(11) &&
+        capture.messages[1][1] == UINT8_C(41) &&
+        capture.messages[1][2] == UINT8_C(21),
+        "latest values and frames");
+    metrics = music_rig_smc_mixer_relay_metrics_read(&relay);
+    CHECK(metrics != NULL && metrics->input_events == UINT64_C(4) &&
+        metrics->mapped_events == UINT64_C(4) &&
+        metrics->control_mapped_events[0] == UINT64_C(2) &&
+        metrics->control_mapped_events[1] == UINT64_C(2) &&
+        metrics->emitted_events == UINT64_C(2) &&
+        metrics->coalesced_events == UINT64_C(2),
+        "coalescing metrics");
+    return 0;
+}
+
 static int test_fail_closed_initialization(void)
 {
     static music_rig_compiled_tables tables;
@@ -322,6 +414,7 @@ static int test_fail_closed_initialization(void)
 int main(void)
 {
     if (test_exhaustive_parity() != 0 ||
+        test_coalesced_cycle() != 0 ||
         test_fail_closed_initialization() != 0) {
         return 1;
     }

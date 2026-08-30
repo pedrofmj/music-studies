@@ -293,9 +293,11 @@ supplied fingerprint, `--output-enabled`, and
 `--acknowledge-smc-mixer-cutover`. That command registers the exact
 `smc-mixer-main` input/output pair but cannot discover or change links; the
 separate reversible transaction owns the topology. It reports the runtime,
-storage, diagnostic, compiled, and applicable JACK host ABIs. No build has a
-configured IPC transport, installation target, or default-start path, and
-ordinary builds contain no output-capable command.
+storage, diagnostic, compiled, and applicable JACK host ABIs. The Linux
+SMC-MIX JACK host uses fixed-storage per-cycle latest-value coalescing and
+reports coalesced intermediate control updates. No build has a configured IPC
+transport, installation target, or default-start path, and ordinary builds
+contain no output-capable command.
 
 `music-rig` now has a portable parser, transport interface, and human/JSON
 renderer for `status`, `profiles list`, `validate`, explicit global/device
