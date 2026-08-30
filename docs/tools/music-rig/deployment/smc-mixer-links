@@ -41,7 +41,7 @@ link_exists() {
     local listing
 
     listing="$($PW_LINK_BIN -l "$output" "$input")" || return 2
-    [[ "$listing" == *"$input"* && "$listing" == *"$output"* ]]
+    [[ "$listing" == *"|<- $output"* || "$listing" == *"|-> $input"* ]]
 }
 
 connect_if_missing() {

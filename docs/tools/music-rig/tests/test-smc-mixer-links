@@ -27,10 +27,14 @@ calls="${MUSIC_RIG_FAKE_CALLS:?}"
 if [[ "$1" == '-l' ]]; then
     output="$2"
     input="$3"
+    printf '%s\n' "$input"
     while IFS= read -r link; do
-        if [[ "$link" == "$output|$input" ]]; then
-            printf '%s\n  |<- %s\n' "$input" "$output"
-            break
+        link_output=${link%%|*}
+        link_input=${link#*|}
+        if [[ "$link_output" == "$output" ]]; then
+            printf '%s\n  |-> %s\n' "$link_output" "$link_input"
+        elif [[ "$link_input" == "$input" ]]; then
+            printf '%s\n  |<- %s\n' "$link_input" "$link_output"
         fi
     done <"$state"
     exit 0
