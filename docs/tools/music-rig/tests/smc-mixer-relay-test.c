@@ -1,5 +1,6 @@
 #include "music_rig/smc_mixer_relay.h"
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -47,6 +48,10 @@ typedef struct coalesced_emit_capture {
     uint8_t messages[8][3];
     size_t count;
 } coalesced_emit_capture;
+
+typedef struct coalescing_benchmark_capture {
+    uint64_t emitted_events;
+} coalescing_benchmark_capture;
 
 #define CHECK(condition, message) do { \
     if (!(condition)) { \
@@ -174,6 +179,25 @@ static music_rig_result capture_coalesced_emit(
     capture->frames[capture->count] = frame;
     memcpy(capture->messages[capture->count], message, 3U);
     capture->count += 1U;
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result capture_coalescing_benchmark_emit(
+    void *opaque,
+    uint32_t frame,
+    const uint8_t *message,
+    size_t message_size
+)
+{
+    coalescing_benchmark_capture *capture = opaque;
+
+    (void)frame;
+    if (message == NULL || message_size != 3U ||
+        message[0] != UINT8_C(0xb0) || message[1] < UINT8_C(40) ||
+        message[1] > UINT8_C(47) || message[2] > UINT8_C(127)) {
+        return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    }
+    capture->emitted_events += UINT64_C(1);
     return MUSIC_RIG_RESULT_OK;
 }
 
@@ -377,6 +401,83 @@ static int test_coalesced_cycle(void)
     return 0;
 }
 
+static int test_high_rate_coalescing(void)
+{
+    static music_rig_compiled_tables tables;
+    music_rig_generation generation = {UINT64_C(1), &tables};
+    music_rig_generation_slot generations;
+    music_rig_smc_mixer_relay_config config;
+    music_rig_smc_mixer_relay relay;
+    coalescing_benchmark_capture capture = {0};
+    const music_rig_smc_mixer_relay_metrics *metrics;
+    uint64_t remaining = UINT64_C(27387);
+    uint64_t cycles = UINT64_C(0);
+
+    CHECK(init_tables(&tables) == MUSIC_RIG_RESULT_OK &&
+        music_rig_generation_slot_init(&generations, &generation) ==
+            MUSIC_RIG_RESULT_OK,
+        "high-rate fixture");
+    music_rig_smc_mixer_relay_config_init(&config);
+    config.generations = &generations;
+    config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
+    config.coalesce_per_cycle = true;
+    config.emit = capture_coalescing_benchmark_emit;
+    config.emit_context = &capture;
+    CHECK(music_rig_smc_mixer_relay_init(&relay, &config) ==
+            MUSIC_RIG_RESULT_OK,
+        "high-rate initialization");
+    while (remaining != UINT64_C(0)) {
+        uint64_t event_count =
+            cycles % UINT64_C(3) == UINT64_C(0) && remaining >= UINT64_C(4)
+                ? UINT64_C(4)
+                : UINT64_C(1);
+        uint64_t event;
+
+        CHECK(music_rig_smc_mixer_relay_begin_cycle(&relay) ==
+                MUSIC_RIG_RESULT_OK,
+            "high-rate cycle start");
+        for (event = UINT64_C(0); event < event_count; ++event) {
+            uint8_t message[3] = {
+                UINT8_C(0xb0),
+                (uint8_t)(UINT8_C(40) + (uint8_t)(cycles % UINT64_C(8))),
+                (uint8_t)((cycles + event) & UINT64_C(127))
+            };
+
+            CHECK(music_rig_smc_mixer_relay_process(
+                    &relay,
+                    (uint32_t)(cycles * UINT64_C(1024) + event),
+                    message,
+                    sizeof(message)
+                ) == MUSIC_RIG_RESULT_OK,
+                "high-rate event");
+        }
+        CHECK(music_rig_smc_mixer_relay_end_cycle(&relay) ==
+                MUSIC_RIG_RESULT_OK,
+            "high-rate cycle end");
+        remaining -= event_count;
+        cycles += UINT64_C(1);
+    }
+    metrics = music_rig_smc_mixer_relay_metrics_read(&relay);
+    CHECK(metrics != NULL && metrics->input_events == UINT64_C(27387) &&
+        metrics->mapped_events == UINT64_C(27387) &&
+        metrics->emitted_events == capture.emitted_events &&
+        metrics->coalesced_events ==
+            metrics->mapped_events - metrics->emitted_events &&
+        metrics->emitted_events < metrics->mapped_events &&
+        metrics->adapter_failures == UINT64_C(0),
+        "high-rate coalescing metrics");
+    printf(
+        "SMC-Mixer coalescing benchmark: input=%" PRIu64
+        " emitted=%" PRIu64 " coalesced=%" PRIu64
+        " cycles=%" PRIu64 "\n",
+        metrics->input_events,
+        metrics->emitted_events,
+        metrics->coalesced_events,
+        cycles
+    );
+    return 0;
+}
+
 static int test_fail_closed_initialization(void)
 {
     static music_rig_compiled_tables tables;
@@ -415,6 +516,7 @@ int main(void)
 {
     if (test_exhaustive_parity() != 0 ||
         test_coalesced_cycle() != 0 ||
+        test_high_rate_coalescing() != 0 ||
         test_fail_closed_initialization() != 0) {
         return 1;
     }

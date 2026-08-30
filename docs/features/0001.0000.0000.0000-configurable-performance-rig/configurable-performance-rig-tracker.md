@@ -43,6 +43,7 @@ Documents:
 | Complete local JSON/JACK suite | ✅ 73/73 passed on 2026-08-29 |
 | Output adoption acknowledgement | ✅ Atomic generation/timestamp and IPC rendering pass |
 | Output-enabled switch benchmark | ✅ Three 1,000-sample scenarios pass commit and adoption gates |
+| Offline SMC-MIX CC coalescing benchmark | ✅ 27,387 mapped inputs across 13,695 cycles; 13,695 emitted, 13,692 coalesced, 0 adapter failures |
 | Airstar output-runtime rehearsal | ✅ Output-enabled IPC switches, adoption timestamps, zero graph mutation, and 0 live validation failures; [evidence](../../tools/music-rig/benchmarks/output-runtime-airstar-2026-08-29.json) |
 | Airstar output-runtime idle resources | ✅ 60 s, 0.4% max CPU, 12,616 KB peak RSS, 5 threads, 0 xrun/dropout/deadline events; [evidence](../../tools/music-rig/benchmarks/output-runtime-idle-airstar-2026-08-29.json) |
 | Airstar protected-rack musical-load observation | 🟡 65 s, 1,314 live MIDI events, graph unchanged, and 0 validator failures; speaker-sink `pw-top` ERR increased by 4, so the zero-xrun gate did not pass; [evidence](../../tools/music-rig/benchmarks/protected-rack-musical-load-airstar-2026-08-29.json) |

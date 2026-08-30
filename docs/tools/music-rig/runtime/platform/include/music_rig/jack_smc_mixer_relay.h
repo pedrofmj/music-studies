@@ -7,7 +7,7 @@
 #include <stdatomic.h>
 #include <stdint.h>
 
-#define MUSIC_RIG_JACK_SMC_MIXER_RELAY_ABI_VERSION UINT32_C(1)
+#define MUSIC_RIG_JACK_SMC_MIXER_RELAY_ABI_VERSION UINT32_C(2)
 
 /* Caller-owned Linux JACK host. Read metrics only after stop. */
 typedef struct music_rig_jack_smc_mixer_relay {

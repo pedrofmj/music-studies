@@ -269,7 +269,7 @@ static int run_runtime(
     music_rig_runtime_config config;
     music_rig_platform_interfaces interfaces;
     music_rig_file_storage storage_file = {0};
-    music_rig_storage_adapter storage;
+    music_rig_storage_adapter storage = {0};
     music_rig_linux_control_server server;
     music_rig_host_paths paths;
     music_rig_result result;

@@ -47,6 +47,12 @@ and complete cleanup. Source guards reject allocation, locks, graph discovery,
 connection APIs, server startup, platform leakage in the portable layer, and
 non-MIDI JACK surfaces.
 
+The offline coalescing benchmark drives 27,387 mapped CC events across 13,695
+fixed 1,024-frame cycles using deterministic bursts. It emits 13,695 latest
+updates, coalesces 13,692 intermediate updates, and reports zero adapter
+failures. This is a 49.99% reduction for that observed burst shape; the live
+control path remains subject to the first explicit cutover gate below.
+
 ## Explicit Runtime Boundary
 
 Only the JSON-enabled Linux build exposes:
