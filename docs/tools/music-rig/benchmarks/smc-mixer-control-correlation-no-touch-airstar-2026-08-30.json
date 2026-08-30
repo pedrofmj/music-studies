@@ -1,0 +1,50 @@
+{
+  "captured_at_utc": {
+    "end": "2026-08-30T17:20:54Z",
+    "start": "2026-08-30T17:19:54Z"
+  },
+  "command_status": {
+    "aseqdump_timeout_status": 124,
+    "pw_top_status": 0,
+    "temporary_cleanup": true
+  },
+  "duration_seconds": 60,
+  "midi": {
+    "arrivals": [],
+    "event_count": 0,
+    "event_types": [],
+    "first_arrival": null,
+    "last_arrival": null,
+    "sources": []
+  },
+  "midi_ports": "20:1",
+  "notes": [
+    "MIDI timestamps are observer arrival times, not device-event timestamps.",
+    "pw-top ERR is the PipeWire cumulative xrun/error counter; changed nodes require attribution review.",
+    "This observer never creates or removes links and does not control services, Carla, EQ parameters, or quantum."
+  ],
+  "pipewire": {
+    "journal_xrun_dropout_deadline_lines": {
+      "before": 0,
+      "during_and_after": 0
+    },
+    "pw_top": {
+      "changed_nodes": [],
+      "samples": 60,
+      "total_err_delta": 0
+    }
+  },
+  "protected_graph": {
+    "link_hash_after": "9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "link_hash_before": "9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "unchanged": true
+  },
+  "safety": {
+    "changes_parameters": false,
+    "controls_services": false,
+    "mode": "read-only",
+    "mutates_graph": false,
+    "remote_files": "temporary-only"
+  },
+  "schema": "music-studies/airstar-control-xrun-correlation/v1"
+}

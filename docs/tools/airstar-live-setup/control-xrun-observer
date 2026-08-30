@@ -118,6 +118,9 @@ pipewire_summary=$(jq -Rn '
     }
 ' < "$temporary/pw-top.txt")
 
+printf '%s\n' "$midi_summary" > "$temporary/midi-summary.json"
+printf '%s\n' "$pipewire_summary" > "$temporary/pipewire-summary.json"
+
 journal_before_lines=$(wc -l < "$temporary/journal-before.txt")
 journal_after_lines=$(wc -l < "$temporary/journal-after.txt")
 
@@ -129,8 +132,8 @@ jq -nS \
     --arg midi_ports "$MIDI_PORTS" \
     --arg link_hash_before "$link_hash_before" \
     --arg link_hash_after "$link_hash_after" \
-    --argjson midi "$midi_summary" \
-    --argjson pipewire "$pipewire_summary" \
+    --slurpfile midi "$temporary/midi-summary.json" \
+    --slurpfile pipewire "$temporary/pipewire-summary.json" \
     --argjson journal_before "$journal_before_lines" \
     --argjson journal_after "$journal_after_lines" \
     --argjson midi_status "$midi_status" \
@@ -147,9 +150,9 @@ jq -nS \
         captured_at_utc: {start: $started_at, end: $ended_at},
         duration_seconds: $duration,
         midi_ports: $midi_ports,
-        midi: $midi,
+        midi: $midi[0],
         pipewire: {
-            pw_top: $pipewire,
+            pw_top: $pipewire[0],
             journal_xrun_dropout_deadline_lines: {
                 before: $journal_before,
                 during_and_after: $journal_after

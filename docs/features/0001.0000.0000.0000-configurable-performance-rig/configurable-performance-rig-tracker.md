@@ -52,6 +52,7 @@ Documents:
 | Airstar native offline Carla CC reproduction | ✅ 65 s, 2,816 mapped CC events through all eight SMC-EQ stages, 0 offline JACK xruns/errors, and no live graph change; [evidence](../../tools/music-rig/benchmarks/smc-mixer-offline-carla-cc-airstar-2026-08-30.json) |
 | Airstar live PipeWire duplicate-Carla CC isolation | 🟡 2,816 CC events reached 8/8 duplicate stages, but 49 temporary Carla nodes perturbed cumulative live error counters and invalidated xrun attribution; graph restored and validator passed; [evidence](../../tools/music-rig/benchmarks/live-pipewire-duplicate-carla-cc-isolation-airstar-2026-08-30.json) |
 | Airstar SMC-MIX control/xrun correlation | ✅ 60 s, 2,643 control changes on `20:1`, zero changed `pw-top` nodes, zero journal matches, and unchanged graph hash; [evidence](../../tools/music-rig/benchmarks/smc-mixer-control-correlation-airstar-2026-08-30.json) |
+| Airstar SMC-MIX no-touch correlation repeat | ✅ 60 s with no device interaction, 0 MIDI events, zero changed `pw-top` nodes, zero journal matches, and unchanged graph hash; [evidence](../../tools/music-rig/benchmarks/smc-mixer-control-correlation-no-touch-airstar-2026-08-30.json) |
 | Clang isolated suite | ✅ 60/60 passed |
 | GCC with Linux JSON/JACK adapters | ✅ 67/67 passed |
 | Clang with Linux JSON/JACK adapters | ✅ 67/67 passed |
@@ -529,7 +530,7 @@ benchmarks.
   and long-soak gates remain unverified. A read-only SMC-MIX correlation window
   then captured 2,643 control changes with no changed `pw-top` node counters,
   no journal matches, and an unchanged graph hash; a later retry had zero input
-  and is excluded from evidence. A live-PipeWire duplicate-Carla
+  and is recorded as a no-touch baseline. A live-PipeWire duplicate-Carla
   attempt was rejected because its 49 temporary nodes perturbed cumulative
   live error counters and `pw-top` reported zeroed scheduler fields; it did
   not provide valid xrun attribution.
