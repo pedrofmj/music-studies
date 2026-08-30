@@ -1,0 +1,53 @@
+{
+  "schema": "music-studies/synthetic-notes-airstar/v1",
+  "captured_on": "2026-08-30",
+  "captured_at_utc": {
+    "start": "2026-08-30T11:56:34Z",
+    "end": "2026-08-30T11:57:41Z"
+  },
+  "host": "airstar",
+  "source_commit": "dfd00c0",
+  "generator": {
+    "binary": "temporary /tmp/music-rig-note-source",
+    "target_input": "AR Controls - Sustain Scale:events-in",
+    "temporary_link_count": 1,
+    "message_policy": "note-on and note-off only; no control-change or program-change messages",
+    "cycles": 3094,
+    "emitted_midi_events": 753
+  },
+  "pipewire_health": {
+    "samples": 70,
+    "quantum": 1024,
+    "speaker_sink_id": 100,
+    "speaker_sink_err_before": 24,
+    "speaker_sink_err_after": 25,
+    "speaker_sink_err_delta": 1,
+    "smc_mixer_eq_err_before": 11,
+    "smc_mixer_eq_err_after": 11,
+    "journal_xrun_dropout_deadline_events": 0
+  },
+  "protected_graph": {
+    "patchbay_links_before": 116,
+    "patchbay_links_after": 116,
+    "link_hash_before": "sha256:9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "link_hash_after": "sha256:9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "temporary_link_removed": true,
+    "persistent_graph_mutated": false,
+    "live_validator_failures": 0,
+    "temporary_artifacts_removed": true
+  },
+  "evaluation": {
+    "synthetic_note_generation_pass": true,
+    "temporary_link_restoration_pass": true,
+    "smc_mixer_eq_zero_delta_pass": true,
+    "zero_xrun_pass": false,
+    "audible_output_independently_verified": false,
+    "accepted_as_milestone4_pass": false
+  },
+  "notes": [
+    "The synthetic source generated paired low-velocity notes through the existing AR Controls route without physical controllers.",
+    "The source exited cleanly and removed its temporary link automatically; the later explicit disconnect found no remaining source port.",
+    "The speaker sink accumulated one additional pw-top ERR count while the SMC-MIX EQ counter did not change, so the earlier EQ-specific cause was not reproduced.",
+    "This is a diagnostic result, not a zero-xrun or audible-output acceptance result."
+  ]
+}

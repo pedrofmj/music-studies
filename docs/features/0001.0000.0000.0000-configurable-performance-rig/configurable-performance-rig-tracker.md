@@ -46,6 +46,7 @@ Documents:
 | Airstar output-runtime rehearsal | ✅ Output-enabled IPC switches, adoption timestamps, zero graph mutation, and 0 live validation failures; [evidence](../../tools/music-rig/benchmarks/output-runtime-airstar-2026-08-29.json) |
 | Airstar output-runtime idle resources | ✅ 60 s, 0.4% max CPU, 12,616 KB peak RSS, 5 threads, 0 xrun/dropout/deadline events; [evidence](../../tools/music-rig/benchmarks/output-runtime-idle-airstar-2026-08-29.json) |
 | Airstar protected-rack musical-load observation | 🟡 65 s, 1,314 live MIDI events, graph unchanged, and 0 validator failures; speaker-sink `pw-top` ERR increased by 4, so the zero-xrun gate did not pass; [evidence](../../tools/music-rig/benchmarks/protected-rack-musical-load-airstar-2026-08-29.json) |
+| Airstar synthetic note-only isolation | 🟡 65 s, 753 generated note messages, no SMC-MIX EQ counter increase, and graph restored; speaker-sink `pw-top` ERR increased by 1, so the zero-xrun gate remains open; [evidence](../../tools/music-rig/benchmarks/synthetic-notes-airstar-2026-08-30.json) |
 | Clang isolated suite | ✅ 60/60 passed |
 | GCC with Linux JSON/JACK adapters | ✅ 67/67 passed |
 | Clang with Linux JSON/JACK adapters | ✅ 67/67 passed |
@@ -508,7 +509,10 @@ benchmarks.
   result. A 65-second operator-input observation captured 1,314 live MIDI events
   without graph mutation, but the speaker sink accumulated four additional
   `pw-top` ERR counts, so the zero-xrun musical-load gate remains unmet. Audible
-  output and long-soak measurements remain pending.
+  output and long-soak measurements remain pending. A bounded synthetic
+  note-only isolation generated 753 messages without changing the EQ counter,
+  but the speaker sink accumulated one further ERR count; the platform xrun
+  source therefore remains unresolved.
 
 ## Milestone 5: MIDI Management Triggers
 
