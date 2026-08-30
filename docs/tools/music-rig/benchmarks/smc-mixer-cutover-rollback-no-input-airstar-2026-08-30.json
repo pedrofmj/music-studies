@@ -1,0 +1,59 @@
+{
+  "schema": "music-studies/smc-mixer-cutover-rollback-no-input-airstar/v1",
+  "captured_on": "2026-08-30",
+  "source_commit": "9c72c7e",
+  "host": "airstar",
+  "staged_daemon_sha256": "1dd6d6b6d8d0d77b4d91fb57b2ddb52171e56f23b7884ae779bf06ce1cd2a314",
+  "definition_fingerprint": "sha256:b5988448d8346ffdca61bbcebd3d0b8bd4c62ae214923fe55bf1ffdbffbb22c3",
+  "preflight": {
+    "protected_verifier_before": 0,
+    "legacy_route_before": "8/8",
+    "relay_input_links_before": 0,
+    "relay_output_links_before": 0,
+    "relay_startup_pass": true,
+    "relay_input_ports": 1,
+    "relay_output_ports": 1
+  },
+  "cutover": {
+    "status": 0,
+    "legacy_route_during": "0/8",
+    "relay_input_links_during": 1,
+    "relay_output_links_during": 8,
+    "link_hash_during": "sha256:6d4e8b477a3c8cdb8776187c6b5f2c2c049ce176908743089cfc036b45f78120"
+  },
+  "exercise": {
+    "duration_seconds": 60,
+    "midi_ports": "20:0,20:1",
+    "midi_events": 0,
+    "pw_top_samples": 60,
+    "pw_top_error_delta": 0,
+    "journal_xrun_dropout_deadline_lines": 0
+  },
+  "rollback": {
+    "status": 0,
+    "legacy_route_after": "8/8",
+    "relay_input_links_after": 0,
+    "relay_output_links_after": 0,
+    "link_hash_before": "sha256:9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "link_hash_after": "sha256:9e0dd3fc6e1cce099712b4bde836a4cbd6758cdb0afde31cf5650ff4e9d1bf4d",
+    "graph_restored": true
+  },
+  "validation": {
+    "protected_verifier_after": 0,
+    "live_validator_failures": 0,
+    "temporary_processes_removed": true,
+    "temporary_staging_removed": true
+  },
+  "evaluation": {
+    "cutover_transaction_pass": true,
+    "rollback_transaction_pass": true,
+    "zero_xrun_pass_for_no_input_window": true,
+    "fader_exercise_evidence_present": false,
+    "accepted_as_full_live_cutover": false
+  },
+  "notes": [
+    "The corrected link tool completed the live cutover and rollback transaction without leaving relay links behind.",
+    "The 60-second exercise window received no MIDI events, so no relay coalescing counters or audible stability result can be claimed.",
+    "The protected graph and services were restored and validated; a new operator-input window is required before acceptance."
+  ]
+}
