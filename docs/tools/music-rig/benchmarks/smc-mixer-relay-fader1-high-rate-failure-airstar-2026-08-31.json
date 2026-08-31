@@ -1,0 +1,58 @@
+{
+  "schema": "music-studies/smc-mixer-relay-fader1-high-rate-failure-airstar/v1",
+  "captured_on": "2026-08-31",
+  "source_commit": "dba98a0",
+  "host": "airstar",
+  "cutover": {
+    "status": 0,
+    "legacy_links_during": 0,
+    "relay_input_links_during": 1,
+    "relay_output_links_during": 8,
+    "relay_verify_status": 0
+  },
+  "synchronized_probe": {
+    "duration_seconds": 10,
+    "midi_events": 2844,
+    "sources": {"20:0": 1422, "20:1": 1422},
+    "pw_top_error_delta": 0
+  },
+  "full_retest": {
+    "duration_seconds": 60,
+    "active_span_seconds": 57.310382,
+    "midi_events": 10786,
+    "sources": {"20:0": 5393, "20:1": 5393},
+    "pw_top_error_delta": 0,
+    "journal_xrun_dropout_deadline_lines": 0
+  },
+  "relay_shutdown": {
+    "result": 4,
+    "failure_diagnostics_available": false,
+    "relay_metrics_available": false
+  },
+  "rollback": {
+    "status": 0,
+    "verify_legacy_status": 0,
+    "legacy_route_after": "8/8",
+    "relay_input_links_after": 0,
+    "relay_output_links_after": 0,
+    "graph_restored": true
+  },
+  "final_validation": {
+    "four_mvave_devices": true,
+    "patchbay_links": 116,
+    "unresolved_endpoints": 0,
+    "live_validator_failures": 0,
+    "temporary_cleanup": true
+  },
+  "evaluation": {
+    "physical_fader1_activity_pass": true,
+    "live_pipewire_zero_xrun_pass": true,
+    "relay_process_pass": false,
+    "accepted_as_full_live_cutover": false
+  },
+  "notes": [
+    "The synchronized external observer captured high-rate fader-1 control activity while the coalesced relay owned the route.",
+    "PipeWire and journal counters remained clean, but the relay process returned result 4 before reporting internal counters; the later diagnostic-output change was not present in this binary.",
+    "Rollback restored the complete legacy route and final protected validation passed."
+  ]
+}
