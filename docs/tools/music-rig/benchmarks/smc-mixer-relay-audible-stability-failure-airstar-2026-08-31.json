@@ -69,13 +69,15 @@
     "pipewire_error_delta_pass": false,
     "audible_stability_gate_pass": false,
     "audible_operator_report": "pending",
+    "smc_mixer_events_in_failed_probe": false,
+    "source_attribution": "not_established",
     "accepted_as_live_audible_gate": false
   },
   "notes": [
-    "The corrected physical endpoints captured Arturia and SMC-PAD activity; the SMC-MIX relay also received all eight mapped CC controls.",
+    "The corrected physical endpoints captured Arturia and SMC-PAD activity, but no SMC-MIX events occurred during this specific 120-second observer window.",
     "The live audio path accumulated 22 additional pw-top ERR counts, including speaker sink +8, during the 120-second operator window.",
-    "The relay returned result 0 with zero adapter failures, so this failure is not a relay output-write failure.",
+    "The relay returned result 0 with zero adapter failures, and its cumulative counters include earlier activity outside the failed observer window; this run does not attribute the audio failure to SMC-MIX control traffic.",
     "The graph remained unchanged during measurement and was rolled back exactly; final protected validation passed.",
-    "Operator audible observations must be preserved separately if reported; the machine zero-error gate already fails this run."
+    "Operator audible observations must be preserved separately if reported; the machine zero-error gate already fails this run. A synchronized SMC-MIX-plus-audio probe remains required."
   ]
 }
