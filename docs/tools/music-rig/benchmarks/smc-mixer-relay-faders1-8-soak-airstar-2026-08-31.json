@@ -1,0 +1,75 @@
+{
+  "schema": "music-studies/smc-mixer-relay-faders1-8-soak-airstar/v1",
+  "captured_on": "2026-08-31",
+  "source_commit": "095043e",
+  "host": "airstar",
+  "cutover": {
+    "status": 0,
+    "legacy_links_during": 0,
+    "relay_input_links_during": 1,
+    "relay_output_links_during": 8,
+    "relay_verify_status": 0
+  },
+  "synchronized_probe": {
+    "duration_seconds": 300,
+    "active_seconds": 299.946745649,
+    "midi_events": 79834,
+    "sources": {"20:0": 39917, "20:1": 39917},
+    "pw_top_samples": 300,
+    "pw_top_error_delta": 0,
+    "changed_nodes": [],
+    "graph_hash_during": "sha256:3835b8b71bf003719000a405a5fd0b9bf8d721fc978453183bbe64bc1e615059"
+  },
+  "relay_session": {
+    "result": 0,
+    "stop_result": 0,
+    "last_process_result": 0,
+    "cycles": 18329,
+    "input_events": 41820,
+    "mapped_events": 41820,
+    "control_cc_40_mapped_events": 6608,
+    "control_cc_41_mapped_events": 5348,
+    "control_cc_42_mapped_events": 5203,
+    "control_cc_43_mapped_events": 5398,
+    "control_cc_44_mapped_events": 4823,
+    "control_cc_45_mapped_events": 5195,
+    "control_cc_46_mapped_events": 4851,
+    "control_cc_47_mapped_events": 4394,
+    "emitted_events": 7272,
+    "coalesced_events": 34548,
+    "unmapped_events": 0,
+    "malformed_events": 0,
+    "adapter_failures": 0
+  },
+  "rollback": {
+    "status": 0,
+    "verify_legacy_status": 0,
+    "legacy_route_after": "8/8",
+    "relay_input_links_after": 0,
+    "relay_output_links_after": 0,
+    "graph_restored": true
+  },
+  "final_validation": {
+    "four_mvave_devices": true,
+    "patchbay_links": 116,
+    "unresolved_endpoints": 0,
+    "live_validator_failures": 0,
+    "temporary_cleanup": true
+  },
+  "evaluation": {
+    "physical_faders_1_to_8_activity_pass": true,
+    "coalescing_pass": true,
+    "adapter_failure_pass": true,
+    "pipewire_error_delta_pass": true,
+    "five_minute_relay_soak_pass": true,
+    "accepted_as_coalesced_relay_long_soak": true,
+    "audible_output_independently_verified": false
+  },
+  "notes": [
+    "The five-minute synchronized movement exercised all eight faders repeatedly through the fixed frame-ordered relay.",
+    "The observer saw 79,834 mirrored CC arrivals over 300 seconds with no PipeWire error-counter delta or changed pw-top nodes.",
+    "Relay counters cover the complete staged session and are not limited to the observer window; duplicate mirrored arrivals explain the larger observer count.",
+    "The previous result 4 and adapter failures did not recur after frame-order sorting.",
+    "Rollback and final protected validation passed; legacy ownership remains restored."
+  ]
+}
