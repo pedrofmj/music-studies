@@ -1,0 +1,78 @@
+{
+  "schema": "music-studies/smc-mixer-relay-single-fader-audible-failure-airstar/v1",
+  "captured_on": "2026-08-31",
+  "source_commit": "095043e",
+  "host": "airstar",
+  "route": "coalesced-smc-mix-relay",
+  "observed_midi_ports": "20:0,20:1,28:0",
+  "cutover": {
+    "status": 0,
+    "legacy_links_during": 0,
+    "relay_input_links_during": 1,
+    "relay_output_links_during": 8,
+    "relay_verify_status": 0
+  },
+  "operator_probe": {
+    "duration_seconds": 120,
+    "active_seconds": 119.904041056,
+    "midi_events": 28460,
+    "sources": {"20:0": 13922, "20:1": 13922, "28:0": 616},
+    "pw_top_samples": 120,
+    "pw_top_error_delta": 14,
+    "changed_nodes": [
+      {"id": 100, "name": "S32LE 2 48000 alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__sink", "err_delta": 10},
+      {"id": 381, "name": "+ SMC-MIX - 8-Band EQ", "err_delta": 4}
+    ],
+    "graph_hash_before": "sha256:3835b8b71bf003719000a405a5fd0b9bf8d721fc978453183bbe64bc1e615059",
+    "graph_hash_after": "sha256:3835b8b71bf003719000a405a5fd0b9bf8d721fc978453183bbe64bc1e615059"
+  },
+  "relay_session": {
+    "result": 0,
+    "stop_result": 0,
+    "last_process_result": 0,
+    "input_events": 16001,
+    "mapped_events": 16001,
+    "control_cc_40_mapped_events": 15981,
+    "control_cc_41_mapped_events": 2,
+    "control_cc_42_mapped_events": 0,
+    "control_cc_43_mapped_events": 5,
+    "control_cc_44_mapped_events": 0,
+    "control_cc_45_mapped_events": 4,
+    "control_cc_46_mapped_events": 4,
+    "control_cc_47_mapped_events": 5,
+    "emitted_events": 3809,
+    "coalesced_events": 12192,
+    "unmapped_events": 0,
+    "malformed_events": 0,
+    "adapter_failures": 0
+  },
+  "rollback": {
+    "status": 0,
+    "verify_legacy_status": 0,
+    "legacy_route_after": "8/8",
+    "relay_input_links_after": 0,
+    "relay_output_links_after": 0,
+    "graph_restored": true
+  },
+  "final_validation": {
+    "four_mvave_devices": true,
+    "patchbay_links": 116,
+    "unresolved_endpoints": 0,
+    "live_validator_failures": 0,
+    "temporary_cleanup": true
+  },
+  "evaluation": {
+    "single_fader_activity_pass": true,
+    "relay_processing_pass": true,
+    "pipewire_error_delta_pass": false,
+    "multi_fader_ordering_fault_reproduced": false,
+    "audible_stability_gate_pass": false,
+    "accepted_as_live_audible_gate": false
+  },
+  "notes": [
+    "The operator played Arturia notes while moving only SMC-MIX fader 1; faders 2 through 8 were left untouched.",
+    "The relay returned result 0 with zero adapter failures, so the previous multi-fader output-order failure did not recur.",
+    "Even this single-fader control path added 14 PipeWire ERR counts, including speaker sink +10 and SMC-MIX EQ +4.",
+    "Rollback and final protected validation passed."
+  ]
+}
