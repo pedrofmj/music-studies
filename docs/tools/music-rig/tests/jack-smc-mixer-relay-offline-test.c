@@ -57,10 +57,10 @@ static const char *const SORTED_TARGETS[] = {
 };
 
 static struct _jack_client fake_client;
-static struct _jack_port fake_ports[2];
-static fake_buffer fake_buffers[2];
-static char registered_names[2][MUSIC_RIG_DEVICE_PORT_ID_CAPACITY];
-static unsigned long registered_flags[2];
+static struct _jack_port fake_ports[9];
+static fake_buffer fake_buffers[9];
+static char registered_names[9][MUSIC_RIG_DEVICE_PORT_ID_CAPACITY];
+static unsigned long registered_flags[9];
 static int (*registered_process)(jack_nframes_t, void *);
 static void *registered_process_context;
 static void (*registered_shutdown)(void *);
@@ -75,6 +75,17 @@ static int deactivate_count;
 static int close_count;
 static int clear_count;
 static int fake_contract_failed;
+
+static const char *const RELAY_OUTPUT_NAMES[] = {
+    "device.smc-mixer-main.fader-1-midi-output",
+    "device.smc-mixer-main.fader-2-midi-output",
+    "device.smc-mixer-main.fader-3-midi-output",
+    "device.smc-mixer-main.fader-4-midi-output",
+    "device.smc-mixer-main.fader-5-midi-output",
+    "device.smc-mixer-main.fader-6-midi-output",
+    "device.smc-mixer-main.fader-7-midi-output",
+    "device.smc-mixer-main.fader-8-midi-output"
+};
 
 #define CHECK(condition, message) do { \
     if (!(condition)) { \
@@ -222,31 +233,58 @@ static int test_relay_lifecycle(void)
     CHECK(music_rig_jack_smc_mixer_relay_start(&host) ==
             MUSIC_RIG_RESULT_OK,
         "host start");
-    CHECK(open_count == 1 && activate_count == 1 && registered_count == 2U,
+    CHECK(open_count == 1 && activate_count == 1 && registered_count == 9U,
         "lifecycle counts");
     CHECK(strcmp(registered_names[0],
             "device.smc-mixer-main.midi-input") == 0 &&
-        strcmp(registered_names[1],
-            "device.smc-mixer-main.midi-output") == 0 &&
-        registered_flags[0] == 1UL && registered_flags[1] == 2UL,
+        registered_flags[0] == 1UL,
         "fixed input/output registration");
+    for (size_t control = 0U;
+         control < MUSIC_RIG_SMC_MIXER_CONTROL_COUNT;
+         ++control) {
+        CHECK(strcmp(registered_names[control + 1U],
+                RELAY_OUTPUT_NAMES[control]) == 0 &&
+            registered_flags[control + 1U] == 2UL,
+            "fixed fader output registration");
+    }
     queue_input(0U, UINT32_C(7), UINT8_C(0xb0), UINT8_C(40), UINT8_C(91));
     queue_input(1U, UINT32_C(8), UINT8_C(0xb0), UINT8_C(40), UINT8_C(92));
     queue_input(2U, UINT32_C(9), UINT8_C(0xb0), UINT8_C(39), UINT8_C(22));
+    queue_input(3U, UINT32_C(10), UINT8_C(0xb0), UINT8_C(41), UINT8_C(33));
+    queue_input(4U, UINT32_C(11), UINT8_C(0xb0), UINT8_C(47), UINT8_C(77));
     CHECK(registered_process(UINT32_C(128), registered_process_context) == 0,
         "process callback");
-    CHECK(fake_buffers[1].count == UINT32_C(1) && clear_count == 1 &&
+    CHECK(fake_buffers[1].count == UINT32_C(1) && clear_count == 8 &&
         fake_buffers[1].events[0].time == UINT32_C(8) &&
         memcmp(fake_buffers[1].events[0].data,
             (uint8_t[]){UINT8_C(0xb0), UINT8_C(40), UINT8_C(92)}, 3U) == 0 &&
         host.last_process_result == MUSIC_RIG_RESULT_OK,
         "byte-for-byte JACK relay");
+    CHECK(fake_buffers[2].count == UINT32_C(1) &&
+        fake_buffers[2].events[0].time == UINT32_C(10) &&
+        memcmp(fake_buffers[2].events[0].data,
+            (uint8_t[]){UINT8_C(0xb0), UINT8_C(41), UINT8_C(33)}, 3U) == 0 &&
+        fake_buffers[8].count == UINT32_C(1) &&
+        fake_buffers[8].events[0].time == UINT32_C(11) &&
+        memcmp(fake_buffers[8].events[0].data,
+            (uint8_t[]){UINT8_C(0xb0), UINT8_C(47), UINT8_C(77)}, 3U) == 0,
+        "target-specific fader routing");
+    for (size_t control = 1U;
+         control < MUSIC_RIG_SMC_MIXER_CONTROL_COUNT;
+         ++control) {
+        if (control != 1U && control != 7U) {
+            CHECK(fake_buffers[control + 1U].count == UINT32_C(0),
+                "fader output routing");
+        }
+    }
     metrics = music_rig_smc_mixer_relay_metrics_read(&host.relay);
     CHECK(metrics != NULL && metrics->cycles == UINT64_C(1) &&
-        metrics->input_events == UINT64_C(3) &&
-        metrics->mapped_events == UINT64_C(2) &&
+        metrics->input_events == UINT64_C(5) &&
+        metrics->mapped_events == UINT64_C(4) &&
         metrics->control_mapped_events[0] == UINT64_C(2) &&
-        metrics->emitted_events == UINT64_C(1) &&
+        metrics->control_mapped_events[1] == UINT64_C(1) &&
+        metrics->control_mapped_events[7] == UINT64_C(1) &&
+        metrics->emitted_events == UINT64_C(3) &&
         metrics->coalesced_events == UINT64_C(1) &&
         metrics->unmapped_events == UINT64_C(1),
         "relay metrics");
@@ -350,7 +388,9 @@ int jack_client_close(jack_client_t *client)
 int jack_activate(jack_client_t *client)
 {
     activate_count += 1;
-    return client == &fake_client ? fail_activation : -1;
+    return client == &fake_client && registered_count == 9U
+        ? fail_activation
+        : -1;
 }
 
 int jack_deactivate(jack_client_t *client)
@@ -395,7 +435,7 @@ jack_port_t *jack_port_register(
 {
     size_t index = registered_count;
 
-    if (client != &fake_client || index >= 2U ||
+    if (client != &fake_client || index >= 9U ||
         index == fail_registration_at || name == NULL ||
         strcmp(type, "8 bit raw midi") != 0 || buffer_size != 0UL) {
         return NULL;
@@ -410,7 +450,7 @@ jack_port_t *jack_port_register(
 void *jack_port_get_buffer(jack_port_t *port, jack_nframes_t frame_count)
 {
     (void)frame_count;
-    return port != NULL && port->index < 2U ? &fake_buffers[port->index] : NULL;
+    return port != NULL && port->index < 9U ? &fake_buffers[port->index] : NULL;
 }
 
 uint32_t jack_midi_get_event_count(void *port_buffer)

@@ -290,9 +290,9 @@ additionally supports `run-midi-shadow` only with a named definition, expected
 fingerprint, and `--output-suppressed`. Only the JSON-enabled Linux JACK build
 also exposes `run-smc-mixer-relay`, requiring a named definition, independently
 supplied fingerprint, `--output-enabled`, and
-`--acknowledge-smc-mixer-cutover`. That command registers the exact
-`smc-mixer-main` input/output pair but cannot discover or change links; the
-separate reversible transaction owns the topology. It reports the runtime,
+`--acknowledge-smc-mixer-cutover`. That command registers one exact
+`smc-mixer-main` input and eight fader-specific outputs but cannot discover or
+change links; the separate reversible transaction owns the topology. It reports the runtime,
 storage, diagnostic, compiled, and applicable JACK host ABIs. The Linux
 SMC-MIX JACK host uses fixed-storage per-cycle latest-value coalescing and orders
 retained MIDI events by frame. It reports coalesced intermediate control updates.

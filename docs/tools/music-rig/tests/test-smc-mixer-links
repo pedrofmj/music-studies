@@ -9,7 +9,16 @@ readonly CALLS="${WORK}/calls"
 readonly FAKE="${WORK}/pw-link"
 readonly PHYSICAL='Midi-Bridge:Jieli Technology SINCO at usb-0000:00:14-0-4-4- full speed:(capture_1) SINCO SMC-Mixer-Master'
 readonly RELAY_INPUT='music-rigd-smc-mixer:device.smc-mixer-main.midi-input'
-readonly RELAY_OUTPUT='music-rigd-smc-mixer:device.smc-mixer-main.midi-output'
+readonly RELAY_OUTPUTS=(
+    'music-rigd-smc-mixer:device.smc-mixer-main.fader-1-midi-output'
+    'music-rigd-smc-mixer:device.smc-mixer-main.fader-2-midi-output'
+    'music-rigd-smc-mixer:device.smc-mixer-main.fader-3-midi-output'
+    'music-rigd-smc-mixer:device.smc-mixer-main.fader-4-midi-output'
+    'music-rigd-smc-mixer:device.smc-mixer-main.fader-5-midi-output'
+    'music-rigd-smc-mixer:device.smc-mixer-main.fader-6-midi-output'
+    'music-rigd-smc-mixer:device.smc-mixer-main.fader-7-midi-output'
+    'music-rigd-smc-mixer:device.smc-mixer-main.fader-8-midi-output'
+)
 
 cleanup() {
     rm -rf -- "$WORK"
@@ -97,7 +106,10 @@ run_tool() {
 seed_legacy
 run_tool --verify-legacy >/dev/null
 run_tool --cutover >/dev/null
-[[ "$(grep -Fc -- "$RELAY_OUTPUT|" "$STATE")" == 8 ]]
+for index in "${!RELAY_OUTPUTS[@]}"; do
+    grep -Fqx -- "${RELAY_OUTPUTS[$index]}|SMC-EQ-$((index + 1)) CC Scale:events-in" \
+        "$STATE"
+done
 grep -Fqx -- "$PHYSICAL|$RELAY_INPUT" "$STATE"
 if grep -Fq -- "$PHYSICAL|SMC-EQ-" "$STATE"; then
     printf '%s\n' 'Legacy links remained after cutover.' >&2
@@ -115,8 +127,7 @@ for failure in 5 12 17; do
         exit 1
     fi
     run_tool --verify-legacy >/dev/null
-    if grep -Fq -- "$RELAY_OUTPUT|" "$STATE" ||
-        grep -Fqx -- "$PHYSICAL|$RELAY_INPUT" "$STATE"; then
+    if grep -Fq -- 'music-rigd-smc-mixer:' "$STATE"; then
         printf 'Injected failure %s left relay links behind.\n' \
             "$failure" >&2
         exit 1
