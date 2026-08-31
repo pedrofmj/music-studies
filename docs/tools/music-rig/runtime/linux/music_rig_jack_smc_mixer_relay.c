@@ -21,7 +21,6 @@ typedef struct jack_midi_event {
 #define JACK_NO_START_SERVER UINT32_C(1)
 #define JACK_PORT_IS_INPUT 1UL
 #define JACK_PORT_IS_OUTPUT 2UL
-#define MUSIC_RIG_SMC_MIXER_RELAY_COALESCE_CYCLE_PERIOD UINT32_C(1)
 
 static const char jack_default_midi_type[] = "8 bit raw midi";
 
@@ -195,8 +194,6 @@ music_rig_result music_rig_jack_smc_mixer_relay_init(
     config.generations = generations;
     config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
     config.coalesce_per_cycle = true;
-    config.coalesce_cycle_period =
-        MUSIC_RIG_SMC_MIXER_RELAY_COALESCE_CYCLE_PERIOD;
     config.emit = emit_output;
     config.emit_context = host;
     result = music_rig_smc_mixer_relay_init(&host->relay, &config);

@@ -10,7 +10,7 @@
 #include <stdatomic.h>
 #include <stdint.h>
 
-#define MUSIC_RIG_SMC_MIXER_RELAY_ABI_VERSION UINT32_C(4)
+#define MUSIC_RIG_SMC_MIXER_RELAY_ABI_VERSION UINT32_C(3)
 #define MUSIC_RIG_SMC_MIXER_CONTROL_COUNT UINT32_C(8)
 
 typedef music_rig_result (*music_rig_smc_mixer_emit_fn)(
@@ -25,8 +25,6 @@ typedef struct music_rig_smc_mixer_relay_config {
     music_rig_generation_slot *generations;
     music_rig_output_mode output_mode;
     bool coalesce_per_cycle;
-    /* One emits every cycle; larger values retain only the latest update. */
-    uint32_t coalesce_cycle_period;
     music_rig_smc_mixer_emit_fn emit;
     void *emit_context;
 } music_rig_smc_mixer_relay_config;
@@ -57,8 +55,6 @@ typedef struct music_rig_smc_mixer_relay {
     void *emit_context;
     uint16_t profile_index;
     bool coalesce_per_cycle;
-    uint32_t coalesce_cycle_period;
-    uint32_t coalesce_cycles;
     bool pending_controls[MUSIC_RIG_SMC_MIXER_CONTROL_COUNT];
     uint8_t pending_order[MUSIC_RIG_SMC_MIXER_CONTROL_COUNT];
     uint8_t pending_count;
