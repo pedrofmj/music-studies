@@ -1,0 +1,63 @@
+{
+  "schema": "music-studies/smc-mixer-relay-audio-only-airstar/v1",
+  "captured_on": "2026-08-31",
+  "source_commit": "095043e",
+  "host": "airstar",
+  "route": "coalesced-smc-mix-relay",
+  "relay_active": true,
+  "observed_midi_ports": "16:1,20:0,20:1,24:1,28:0,32:1",
+  "cutover": {
+    "status": 0,
+    "legacy_links_during": 0,
+    "relay_input_links_during": 1,
+    "relay_output_links_during": 8,
+    "relay_verify_status": 0
+  },
+  "probe": {
+    "duration_seconds": 120,
+    "active_seconds": 119.992211663,
+    "midi_events": 1354,
+    "sources": {"28:0": 1354},
+    "pw_top_samples": 120,
+    "pw_top_error_delta": 0,
+    "changed_nodes": [],
+    "graph_hash_before": "sha256:3835b8b71bf003719000a405a5fd0b9bf8d721fc978453183bbe64bc1e615059",
+    "graph_hash_after": "sha256:3835b8b71bf003719000a405a5fd0b9bf8d721fc978453183bbe64bc1e615059"
+  },
+  "relay_session": {
+    "result": 0,
+    "stop_result": 0,
+    "last_process_result": 0,
+    "input_events": 0,
+    "mapped_events": 0,
+    "emitted_events": 0,
+    "coalesced_events": 0,
+    "adapter_failures": 0
+  },
+  "rollback": {
+    "status": 0,
+    "verify_legacy_status": 0,
+    "legacy_route_after": "8/8",
+    "relay_input_links_after": 0,
+    "relay_output_links_after": 0,
+    "graph_restored": true
+  },
+  "final_validation": {
+    "four_mvave_devices": true,
+    "patchbay_links": 116,
+    "unresolved_endpoints": 0,
+    "live_validator_failures": 0,
+    "temporary_cleanup": true
+  },
+  "evaluation": {
+    "relay_presence_audio_only_pass": true,
+    "pipewire_error_delta_pass": true,
+    "smc_mixer_audio_interaction_isolated": true,
+    "audible_stability_gate": "not_this_test"
+  },
+  "notes": [
+    "The relay was active and the Arturia produced 1,354 note events while SMC-MIX faders remained untouched.",
+    "The relay received no SMC-MIX events and the audio path accumulated zero PipeWire error-counter delta.",
+    "Together with the clean relay-inactive baseline and failed relay-active control probe, this isolates the remaining failure to SMC-MIX control traffic interacting with active audio processing."
+  ]
+}

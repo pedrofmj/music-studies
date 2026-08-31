@@ -9,7 +9,7 @@
   "observed_midi_ports": "16:1,20:0,20:1,24:1,28:0,32:1",
   "probe": {
     "duration_seconds": 120,
-    "active_seconds": 119.836606605,
+    "active_seconds": 119.836605273,
     "midi_events": 2756,
     "sources": {"20:0": 770, "20:1": 770, "24:1": 430, "28:0": 786},
     "pw_top_samples": 120,
