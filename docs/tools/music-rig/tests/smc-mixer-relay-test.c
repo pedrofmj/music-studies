@@ -390,13 +390,24 @@ static int test_coalesced_cycle(void)
         capture.messages[1][1] == UINT8_C(40) &&
         capture.messages[1][2] == UINT8_C(11),
         "latest values and frame-ordered output");
+    message[1] = UINT8_C(40);
+    message[2] = UINT8_C(11);
+    CHECK(music_rig_smc_mixer_relay_begin_cycle(&relay) ==
+            MUSIC_RIG_RESULT_OK &&
+        music_rig_smc_mixer_relay_process(
+            &relay, UINT32_C(12), message, sizeof(message)
+        ) == MUSIC_RIG_RESULT_OK &&
+        music_rig_smc_mixer_relay_end_cycle(&relay) ==
+            MUSIC_RIG_RESULT_OK && capture.count == 2U,
+        "duplicate value suppression");
     metrics = music_rig_smc_mixer_relay_metrics_read(&relay);
-    CHECK(metrics != NULL && metrics->input_events == UINT64_C(4) &&
-        metrics->mapped_events == UINT64_C(4) &&
-        metrics->control_mapped_events[0] == UINT64_C(2) &&
+    CHECK(metrics != NULL && metrics->input_events == UINT64_C(5) &&
+        metrics->mapped_events == UINT64_C(5) &&
+        metrics->control_mapped_events[0] == UINT64_C(3) &&
         metrics->control_mapped_events[1] == UINT64_C(2) &&
         metrics->emitted_events == UINT64_C(2) &&
-        metrics->coalesced_events == UINT64_C(2),
+        metrics->coalesced_events == UINT64_C(2) &&
+        metrics->duplicate_events == UINT64_C(1),
         "coalescing metrics");
     return 0;
 }
@@ -463,6 +474,7 @@ static int test_high_rate_coalescing(void)
         metrics->emitted_events == capture.emitted_events &&
         metrics->coalesced_events ==
             metrics->mapped_events - metrics->emitted_events &&
+        metrics->duplicate_events == UINT64_C(0) &&
         metrics->emitted_events < metrics->mapped_events &&
         metrics->adapter_failures == UINT64_C(0),
         "high-rate coalescing metrics");

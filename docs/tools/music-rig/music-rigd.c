@@ -926,6 +926,7 @@ static int run_smc_mixer_relay(const char *path, const char *fingerprint)
                 "SMC-Mixer relay diagnostics: result %d stop-result %d "
                 "last-process-result %d input-events %" PRIu64
                 " emitted-events %" PRIu64 " coalesced-events %" PRIu64
+                " duplicate-events %" PRIu64
                 " adapter-failures %" PRIu64 "\n",
                 (int)result,
                 (int)stop_result,
@@ -936,6 +937,7 @@ static int run_smc_mixer_relay(const char *path, const char *fingerprint)
                 metrics->input_events,
                 metrics->emitted_events,
                 metrics->coalesced_events,
+                metrics->duplicate_events,
                 metrics->adapter_failures
             );
         }
@@ -959,6 +961,7 @@ static int run_smc_mixer_relay(const char *path, const char *fingerprint)
     }
     printf("emitted-events %" PRIu64 "\n", metrics->emitted_events);
     printf("coalesced-events %" PRIu64 "\n", metrics->coalesced_events);
+    printf("duplicate-events %" PRIu64 "\n", metrics->duplicate_events);
     printf("unmapped-events %" PRIu64 "\n", metrics->unmapped_events);
     printf("malformed-events %" PRIu64 "\n", metrics->malformed_events);
     printf("adapter-failures %" PRIu64 "\n", metrics->adapter_failures);

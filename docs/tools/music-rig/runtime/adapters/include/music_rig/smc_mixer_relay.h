@@ -10,7 +10,7 @@
 #include <stdatomic.h>
 #include <stdint.h>
 
-#define MUSIC_RIG_SMC_MIXER_RELAY_ABI_VERSION UINT32_C(3)
+#define MUSIC_RIG_SMC_MIXER_RELAY_ABI_VERSION UINT32_C(4)
 #define MUSIC_RIG_SMC_MIXER_CONTROL_COUNT UINT32_C(8)
 
 typedef music_rig_result (*music_rig_smc_mixer_emit_fn)(
@@ -37,6 +37,7 @@ typedef struct music_rig_smc_mixer_relay_metrics {
     uint64_t control_mapped_events[MUSIC_RIG_SMC_MIXER_CONTROL_COUNT];
     uint64_t emitted_events;
     uint64_t coalesced_events;
+    uint64_t duplicate_events;
     uint64_t unmapped_events;
     uint64_t malformed_events;
     uint64_t adapter_failures;
@@ -60,6 +61,8 @@ typedef struct music_rig_smc_mixer_relay {
     uint8_t pending_count;
     uint32_t pending_frames[MUSIC_RIG_SMC_MIXER_CONTROL_COUNT];
     uint8_t pending_messages[MUSIC_RIG_SMC_MIXER_CONTROL_COUNT][3];
+    bool last_emitted_controls[MUSIC_RIG_SMC_MIXER_CONTROL_COUNT];
+    uint8_t last_emitted_messages[MUSIC_RIG_SMC_MIXER_CONTROL_COUNT][3];
     char input_port_id[MUSIC_RIG_DEVICE_PORT_ID_CAPACITY];
     char output_port_id[MUSIC_RIG_DEVICE_PORT_ID_CAPACITY];
     music_rig_smc_mixer_relay_metrics metrics;

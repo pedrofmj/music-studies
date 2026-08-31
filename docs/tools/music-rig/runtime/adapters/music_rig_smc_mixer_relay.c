@@ -169,6 +169,16 @@ static music_rig_result flush_pending(
         }
         control = relay->pending_order[order];
 
+        if (relay->last_emitted_controls[control] &&
+            memcmp(
+                relay->last_emitted_messages[control],
+                relay->pending_messages[control],
+                sizeof(relay->pending_messages[control])
+            ) == 0) {
+            increment(&relay->metrics.duplicate_events);
+            continue;
+        }
+
         result = relay->emit(
             relay->emit_context,
             relay->pending_frames[control],
@@ -176,6 +186,12 @@ static music_rig_result flush_pending(
             sizeof(relay->pending_messages[control])
         );
         if (result == MUSIC_RIG_RESULT_OK) {
+            relay->last_emitted_controls[control] = true;
+            memcpy(
+                relay->last_emitted_messages[control],
+                relay->pending_messages[control],
+                sizeof(relay->pending_messages[control])
+            );
             increment(&relay->metrics.emitted_events);
         } else {
             increment(&relay->metrics.adapter_failures);

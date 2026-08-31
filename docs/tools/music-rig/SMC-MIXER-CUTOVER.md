@@ -31,7 +31,8 @@ frame. The Linux JACK host enables fixed-storage per-cycle coalescing: repeated
 updates for one fader retain only the latest value and frame, then emit at most
 one update for that fader when the cycle ends. This bounds control fan-out while
 preserving the final fader position; `coalesced-events` reports discarded
-intermediate updates.
+intermediate updates and `duplicate-events` reports repeated values suppressed
+across cycles.
 Neither path performs allocation, lock, JSON traversal, filesystem operation,
 string comparison, scaling, or graph operation in the callback. Unmapped,
 non-channel-1, non-CC, and malformed messages produce no output. Saturating
