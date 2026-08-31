@@ -1,0 +1,76 @@
+{
+  "schema": "music-studies/smc-mixer-relay-target-specific-routing-failure-airstar/v1",
+  "captured_on": "2026-08-31",
+  "source_commit": "52abf85",
+  "host": "airstar",
+  "route": "target-specific-smc-mix-relay",
+  "observed_midi_ports": "20:0,20:1,28:0",
+  "topology": {
+    "relay_input_links": 1,
+    "relay_output_links": 8,
+    "relay_output_routing": "fader-n to SMC-EQ-n CC Scale"
+  },
+  "cutover": {
+    "status": 0,
+    "legacy_links_during": 0,
+    "relay_input_links_during": 1,
+    "relay_output_links_during": 8,
+    "relay_verify_status": 0
+  },
+  "operator_probe": {
+    "duration_seconds": 120,
+    "midi_events": 16815,
+    "sources": {"20:0": 8276, "20:1": 8276, "28:0": 263},
+    "pw_top_samples": 120,
+    "pw_top_error_delta": 300,
+    "changed_nodes": [
+      {"id": 100, "name": "S32LE 2 48000 alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__sink", "err_delta": 171},
+      {"id": 381, "name": "+ SMC-MIX - 8-Band EQ", "err_delta": 129}
+    ],
+    "graph_hash_before": "sha256:d08e479a7c3487705b2026f0695f2d0d68715cad42bface2060d117b9eb8e33f",
+    "graph_hash_after": "sha256:d08e479a7c3487705b2026f0695f2d0d68715cad42bface2060d117b9eb8e33f"
+  },
+  "relay_session": {
+    "result": 0,
+    "stop_result": 0,
+    "last_process_result": 0,
+    "output_ports": 8,
+    "input_events": 10011,
+    "mapped_events": 10011,
+    "control_cc_40_mapped_events": 10011,
+    "control_cc_41_to_47_mapped_events": 0,
+    "emitted_events": 3836,
+    "coalesced_events": 6175,
+    "unmapped_events": 0,
+    "malformed_events": 0,
+    "adapter_failures": 0
+  },
+  "rollback": {
+    "status": 0,
+    "verify_legacy_status": 0,
+    "legacy_route_after": "8/8",
+    "relay_input_links_after": 0,
+    "relay_output_links_after": 0,
+    "graph_restored": true
+  },
+  "final_validation": {
+    "four_mvave_devices": true,
+    "patchbay_links": 116,
+    "unresolved_endpoints": 0,
+    "live_validator_failures": 0,
+    "temporary_cleanup": true
+  },
+  "evaluation": {
+    "target_specific_routing_pass": true,
+    "relay_processing_pass": true,
+    "pipewire_error_delta_pass": false,
+    "topology_tuning_pass": false,
+    "accepted_as_live_relay_topology": false,
+    "audible_stability_gate": "open"
+  },
+  "notes": [
+    "All eight target-specific output links were verified and the relay processed the active fader path without adapter failures.",
+    "The 120-second single-fader-plus-Arturia probe accumulated 300 PipeWire ERR counts, so target-specific fan-out did not resolve the audio condition.",
+    "This is a failed candidate topology; the protected legacy route was restored and final validation passed."
+  ]
+}
