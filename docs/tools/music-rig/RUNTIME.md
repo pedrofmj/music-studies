@@ -294,8 +294,10 @@ supplied fingerprint, `--output-enabled`, and
 `smc-mixer-main` input/output pair but cannot discover or change links; the
 separate reversible transaction owns the topology. It reports the runtime,
 storage, diagnostic, compiled, and applicable JACK host ABIs. The Linux
-SMC-MIX JACK host uses fixed-storage per-cycle latest-value coalescing and
-reports coalesced intermediate control updates. No build has a configured IPC
+SMC-MIX JACK host uses fixed-storage latest-value coalescing, orders retained MIDI
+events by frame, and uses a two-cycle output flush period to reduce control-rate
+pressure on the live EQ path. It reports coalesced intermediate control updates.
+No build has a configured IPC
 transport, installation target, or default-start path, and ordinary builds
 contain no output-capable command.
 
