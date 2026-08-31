@@ -23,17 +23,6 @@ typedef struct jack_midi_event {
 #define JACK_PORT_IS_OUTPUT 2UL
 
 static const char jack_default_midi_type[] = "8 bit raw midi";
-static const char *const OUTPUT_PORT_NAMES[] = {
-    "device.smc-mixer-main.fader-1-midi-output",
-    "device.smc-mixer-main.fader-2-midi-output",
-    "device.smc-mixer-main.fader-3-midi-output",
-    "device.smc-mixer-main.fader-4-midi-output",
-    "device.smc-mixer-main.fader-5-midi-output",
-    "device.smc-mixer-main.fader-6-midi-output",
-    "device.smc-mixer-main.fader-7-midi-output",
-    "device.smc-mixer-main.fader-8-midi-output"
-};
-
 extern jack_client_t *jack_client_open(
     const char *name,
     jack_options_t options,
@@ -92,18 +81,12 @@ static music_rig_result emit_output(
 )
 {
     music_rig_jack_smc_mixer_relay *host = opaque;
-    size_t control;
 
-    if (!valid_host(host) || message == NULL || message_size != 3U ||
-        message[1] < UINT8_C(40) || message[1] > UINT8_C(47)) {
-        return MUSIC_RIG_RESULT_INVALID_STATE;
-    }
-    control = (size_t)(message[1] - UINT8_C(40));
-    if (host->cycle_output_buffers[control] == NULL) {
+    if (!valid_host(host) || host->cycle_output_buffer == NULL) {
         return MUSIC_RIG_RESULT_INVALID_STATE;
     }
     return jack_midi_event_write(
-        host->cycle_output_buffers[control],
+        host->cycle_output_buffer,
         frame,
         message,
         message_size
@@ -116,27 +99,22 @@ static int process_cycle(jack_nframes_t frame_count, void *opaque)
 {
     music_rig_jack_smc_mixer_relay *host = opaque;
     music_rig_result result = MUSIC_RIG_RESULT_INVALID_ARGUMENT;
-    size_t control;
 
     if (valid_host(host)) {
-        for (control = 0U;
-             control < MUSIC_RIG_SMC_MIXER_CONTROL_COUNT;
-             ++control) {
-            host->cycle_output_buffers[control] = jack_port_get_buffer(
-                host->output_ports[control],
-                frame_count
-            );
-            if (host->cycle_output_buffers[control] == NULL) {
-                result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
-            } else {
-                jack_midi_clear_buffer(host->cycle_output_buffers[control]);
-            }
-        }
-        if (result == MUSIC_RIG_RESULT_INVALID_ARGUMENT) {
+        void *output_buffer = jack_port_get_buffer(
+            host->output_port,
+            frame_count
+        );
+
+        if (output_buffer == NULL) {
+            result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+        } else {
             void *input_buffer;
             uint32_t event_count;
             uint32_t event_index;
 
+            jack_midi_clear_buffer(output_buffer);
+            host->cycle_output_buffer = output_buffer;
             result = music_rig_smc_mixer_relay_begin_cycle(&host->relay);
             input_buffer = result == MUSIC_RIG_RESULT_OK
                 ? jack_port_get_buffer(host->input_port, frame_count)
@@ -170,11 +148,7 @@ static int process_cycle(jack_nframes_t frame_count, void *opaque)
             if (result == MUSIC_RIG_RESULT_OK) {
                 result = music_rig_smc_mixer_relay_end_cycle(&host->relay);
             }
-        }
-        for (control = 0U;
-             control < MUSIC_RIG_SMC_MIXER_CONTROL_COUNT;
-             ++control) {
-            host->cycle_output_buffers[control] = NULL;
+            host->cycle_output_buffer = NULL;
         }
         if (result != MUSIC_RIG_RESULT_OK) {
             atomic_store_explicit(
@@ -192,13 +166,7 @@ static void backend_shutdown(void *opaque)
     music_rig_jack_smc_mixer_relay *host = opaque;
 
     if (valid_host(host)) {
-        size_t control;
-
-        for (control = 0U;
-             control < MUSIC_RIG_SMC_MIXER_CONTROL_COUNT;
-             ++control) {
-            host->cycle_output_buffers[control] = NULL;
-        }
+        host->cycle_output_buffer = NULL;
         atomic_store_explicit(
             &host->backend_shutdown,
             true,
@@ -280,34 +248,19 @@ music_rig_result music_rig_jack_smc_mixer_relay_start(
         JACK_PORT_IS_INPUT,
         0UL
     );
-    for (size_t control = 0U;
-         control < MUSIC_RIG_SMC_MIXER_CONTROL_COUNT;
-         ++control) {
-        host->output_ports[control] = jack_port_register(
-            client,
-            OUTPUT_PORT_NAMES[control],
-            jack_default_midi_type,
-            JACK_PORT_IS_OUTPUT,
-            0UL
-        );
-    }
-    if (host->input_port == NULL) {
+    host->output_port = jack_port_register(
+        client,
+        music_rig_smc_mixer_relay_output_port_id(&host->relay),
+        jack_default_midi_type,
+        JACK_PORT_IS_OUTPUT,
+        0UL
+    );
+    if (host->input_port == NULL || host->output_port == NULL) {
         (void)jack_client_close(client);
         host->client = NULL;
         host->input_port = NULL;
-        memset(host->output_ports, 0, sizeof(host->output_ports));
+        host->output_port = NULL;
         return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
-    }
-    for (size_t control = 0U;
-         control < MUSIC_RIG_SMC_MIXER_CONTROL_COUNT;
-         ++control) {
-        if (host->output_ports[control] == NULL) {
-            (void)jack_client_close(client);
-            host->client = NULL;
-            host->input_port = NULL;
-            memset(host->output_ports, 0, sizeof(host->output_ports));
-            return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
-        }
     }
     atomic_store_explicit(
         &host->backend_shutdown,
@@ -325,7 +278,7 @@ music_rig_result music_rig_jack_smc_mixer_relay_start(
         (void)jack_client_close(client);
         host->client = NULL;
         host->input_port = NULL;
-        memset(host->output_ports, 0, sizeof(host->output_ports));
+        host->output_port = NULL;
         return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
     }
     return MUSIC_RIG_RESULT_OK;
@@ -350,12 +303,12 @@ music_rig_result music_rig_jack_smc_mixer_relay_stop(
         result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
     }
     atomic_store_explicit(&host->active, false, memory_order_release);
-    memset(host->cycle_output_buffers, 0, sizeof(host->cycle_output_buffers));
+    host->cycle_output_buffer = NULL;
     if (jack_client_close(client) != 0 && result == MUSIC_RIG_RESULT_OK) {
         result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
     }
     host->client = NULL;
     host->input_port = NULL;
-    memset(host->output_ports, 0, sizeof(host->output_ports));
+    host->output_port = NULL;
     return result;
 }

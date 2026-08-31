@@ -132,7 +132,7 @@ int main(int argc, char **argv)
         strstr(output, "definition-generation 1") == NULL ||
         strstr(output, "slot smc-mixer-main") == NULL ||
         strstr(output, "input-ports 1") == NULL ||
-        strstr(output, "output-ports 8") == NULL ||
+        strstr(output, "output-ports 1") == NULL ||
         strstr(output, "input-events 0") == NULL ||
         strstr(output, "control-cc-40-mapped-events 0") == NULL ||
         strstr(output, "control-cc-47-mapped-events 0") == NULL ||

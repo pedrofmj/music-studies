@@ -7,9 +7,7 @@ all audio links, all plugins, Carla, and protected services unchanged.
 
 The cutover is not a profile switch. It provisions the profile-independent
 stable relay links once. Later control-only profiles reuse those fixed links
-and change only immutable mapping/state generations. The relay has one input
-and eight stable output ports, one per fader, so each CC reaches only its
-corresponding CC Scale stage.
+and change only immutable mapping/state generations.
 
 ## Parity Contract
 
@@ -43,9 +41,9 @@ adapter-failure counts, with separate mapped-event counters for CC 40 through
 quiet cycle cannot hide it.
 
 The exhaustive portable test compares all 1,024 CC/value combinations. The
-fake-JACK test proves exact frame and byte preservation, one input and eight
-target-specific outputs, output-buffer clearing, write-failure propagation,
-backend shutdown, and complete cleanup. Source guards reject allocation, locks,
+fake-JACK test proves exact frame and byte preservation, one input and one
+output, output-buffer clearing, write-failure propagation, backend shutdown,
+and complete cleanup. Source guards reject allocation, locks, graph discovery,
 connection APIs, server startup, platform leakage in the portable layer, and
 non-MIDI JACK surfaces.
 
@@ -69,18 +67,11 @@ music-rigd run-smc-mixer-relay \
 
 Every argument is mandatory. The command verifies the independently supplied
 definition fingerprint before opening JACK, uses `JackNoStartServer`, and
-registers only the following fixed input and fader-specific outputs:
+registers only:
 
 ~~~text
 music-rigd-smc-mixer:device.smc-mixer-main.midi-input
-music-rigd-smc-mixer:device.smc-mixer-main.fader-1-midi-output
-music-rigd-smc-mixer:device.smc-mixer-main.fader-2-midi-output
-music-rigd-smc-mixer:device.smc-mixer-main.fader-3-midi-output
-music-rigd-smc-mixer:device.smc-mixer-main.fader-4-midi-output
-music-rigd-smc-mixer:device.smc-mixer-main.fader-5-midi-output
-music-rigd-smc-mixer:device.smc-mixer-main.fader-6-midi-output
-music-rigd-smc-mixer:device.smc-mixer-main.fader-7-midi-output
-music-rigd-smc-mixer:device.smc-mixer-main.fader-8-midi-output
+music-rigd-smc-mixer:device.smc-mixer-main.midi-output
 ~~~
 
 It neither discovers nor changes graph links. No-argument daemon startup,
@@ -99,15 +90,14 @@ docs/tools/music-rig/deployment/smc-mixer-links --verify-relay
 ~~~
 
 `--cutover` requires all eight protected physical-to-CC-scale links and no
-relay links. It connects each fader-specific relay output to its corresponding
-scale input,
+relay links. It connects the relay output to the same eight scale inputs,
 removes the eight direct links, and connects the physical mixer to the relay
 input last. Any failed operation immediately restores the complete legacy
 route. A successful relay topology contains zero direct links, one relay input
 link, and eight relay output links.
 
 `--rollback` disconnects the relay input first, restores all eight direct
-links, removes all eight relay output links, and verifies the legacy topology. It is
+links, removes relay output fan-out, and verifies the legacy topology. It is
 idempotent and restores the direct links even after an unexpected daemon exit,
 when relay ports and their links have already disappeared.
 

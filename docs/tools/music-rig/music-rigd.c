@@ -946,7 +946,7 @@ static int run_smc_mixer_relay(const char *path, const char *fingerprint)
     printf("definition-generation %" PRIu64 "\n", generation.id);
     puts("slot smc-mixer-main");
     puts("input-ports 1");
-    puts("output-ports 8");
+    puts("output-ports 1");
     printf("cycles %" PRIu64 "\n", metrics->cycles);
     printf("input-events %" PRIu64 "\n", metrics->input_events);
     printf("mapped-events %" PRIu64 "\n", metrics->mapped_events);

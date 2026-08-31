@@ -7,7 +7,7 @@
 #include <stdatomic.h>
 #include <stdint.h>
 
-#define MUSIC_RIG_JACK_SMC_MIXER_RELAY_ABI_VERSION UINT32_C(3)
+#define MUSIC_RIG_JACK_SMC_MIXER_RELAY_ABI_VERSION UINT32_C(2)
 
 /* Caller-owned Linux JACK host. Read metrics only after stop. */
 typedef struct music_rig_jack_smc_mixer_relay {
@@ -15,8 +15,8 @@ typedef struct music_rig_jack_smc_mixer_relay {
     music_rig_smc_mixer_relay relay;
     void *client;
     void *input_port;
-    void *output_ports[MUSIC_RIG_SMC_MIXER_CONTROL_COUNT];
-    void *cycle_output_buffers[MUSIC_RIG_SMC_MIXER_CONTROL_COUNT];
+    void *output_port;
+    void *cycle_output_buffer;
     _Atomic music_rig_result last_process_result;
     _Atomic bool active;
     _Atomic bool backend_shutdown;
