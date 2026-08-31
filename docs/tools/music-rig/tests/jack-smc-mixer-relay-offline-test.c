@@ -235,14 +235,24 @@ static int test_relay_lifecycle(void)
     queue_input(2U, UINT32_C(9), UINT8_C(0xb0), UINT8_C(39), UINT8_C(22));
     CHECK(registered_process(UINT32_C(128), registered_process_context) == 0,
         "process callback");
-    CHECK(fake_buffers[1].count == UINT32_C(1) && clear_count == 1 &&
+    CHECK(fake_buffers[1].count == UINT32_C(0) && clear_count == 1 &&
+        host.last_process_result == MUSIC_RIG_RESULT_OK,
+        "first cycle defers coalesced output");
+    fake_buffers[0].count = UINT32_C(0);
+    CHECK(registered_process(UINT32_C(128), registered_process_context) == 0 &&
+        fake_buffers[1].count == UINT32_C(0) && clear_count == 2 &&
+        host.last_process_result == MUSIC_RIG_RESULT_OK,
+        "second cycle defers coalesced output");
+    fake_buffers[0].count = UINT32_C(0);
+    CHECK(registered_process(UINT32_C(128), registered_process_context) == 0 &&
+        fake_buffers[1].count == UINT32_C(1) && clear_count == 3 &&
         fake_buffers[1].events[0].time == UINT32_C(8) &&
         memcmp(fake_buffers[1].events[0].data,
             (uint8_t[]){UINT8_C(0xb0), UINT8_C(40), UINT8_C(92)}, 3U) == 0 &&
         host.last_process_result == MUSIC_RIG_RESULT_OK,
         "byte-for-byte JACK relay");
     metrics = music_rig_smc_mixer_relay_metrics_read(&host.relay);
-    CHECK(metrics != NULL && metrics->cycles == UINT64_C(1) &&
+    CHECK(metrics != NULL && metrics->cycles == UINT64_C(3) &&
         metrics->input_events == UINT64_C(3) &&
         metrics->mapped_events == UINT64_C(2) &&
         metrics->control_mapped_events[0] == UINT64_C(2) &&
@@ -290,6 +300,16 @@ static int test_fail_closed_cleanup(void)
         "write failure start");
     queue_input(0U, UINT32_C(9), UINT8_C(0xb0), UINT8_C(40), UINT8_C(12));
     fail_write = 1;
+    CHECK(registered_process(UINT32_C(128), registered_process_context) == 0 &&
+        host.last_process_result == MUSIC_RIG_RESULT_OK &&
+        fake_buffers[1].count == UINT32_C(0),
+        "write failure deferral");
+    fake_buffers[0].count = UINT32_C(0);
+    CHECK(registered_process(UINT32_C(128), registered_process_context) == 0 &&
+        host.last_process_result == MUSIC_RIG_RESULT_OK &&
+        fake_buffers[1].count == UINT32_C(0),
+        "second write failure deferral");
+    fake_buffers[0].count = UINT32_C(0);
     CHECK(registered_process(UINT32_C(128), registered_process_context) == 0 &&
         host.last_process_result == MUSIC_RIG_RESULT_ADAPTER_FAILURE &&
         fake_buffers[1].count == UINT32_C(0),

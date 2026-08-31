@@ -478,6 +478,64 @@ static int test_high_rate_coalescing(void)
     return 0;
 }
 
+static int test_coalescing_cycle_period(void)
+{
+    static music_rig_compiled_tables tables;
+    music_rig_generation generation = {UINT64_C(1), &tables};
+    music_rig_generation_slot generations;
+    music_rig_smc_mixer_relay_config config;
+    music_rig_smc_mixer_relay relay;
+    coalesced_emit_capture capture = {0};
+    const music_rig_smc_mixer_relay_metrics *metrics;
+    uint8_t message[3] = {UINT8_C(0xb0), UINT8_C(40), UINT8_C(10)};
+
+    CHECK(init_tables(&tables) == MUSIC_RIG_RESULT_OK &&
+        music_rig_generation_slot_init(&generations, &generation) ==
+            MUSIC_RIG_RESULT_OK,
+        "period fixture");
+    music_rig_smc_mixer_relay_config_init(&config);
+    config.generations = &generations;
+    config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
+    config.coalesce_per_cycle = true;
+    config.coalesce_cycle_period = UINT32_C(3);
+    config.emit = capture_coalesced_emit;
+    config.emit_context = &capture;
+    CHECK(music_rig_smc_mixer_relay_init(&relay, &config) ==
+            MUSIC_RIG_RESULT_OK &&
+        music_rig_smc_mixer_relay_begin_cycle(&relay) ==
+            MUSIC_RIG_RESULT_OK &&
+        music_rig_smc_mixer_relay_process(
+            &relay, UINT32_C(5), message, sizeof(message)
+        ) == MUSIC_RIG_RESULT_OK &&
+        music_rig_smc_mixer_relay_end_cycle(&relay) ==
+            MUSIC_RIG_RESULT_OK && capture.count == 0U,
+        "period defers first flush");
+    message[2] = UINT8_C(11);
+    CHECK(music_rig_smc_mixer_relay_begin_cycle(&relay) ==
+            MUSIC_RIG_RESULT_OK &&
+        music_rig_smc_mixer_relay_process(
+            &relay, UINT32_C(7), message, sizeof(message)
+        ) == MUSIC_RIG_RESULT_OK &&
+        music_rig_smc_mixer_relay_end_cycle(&relay) ==
+            MUSIC_RIG_RESULT_OK && capture.count == 0U,
+        "period defers second flush");
+    CHECK(music_rig_smc_mixer_relay_begin_cycle(&relay) ==
+            MUSIC_RIG_RESULT_OK &&
+        music_rig_smc_mixer_relay_end_cycle(&relay) ==
+            MUSIC_RIG_RESULT_OK && capture.count == 1U &&
+        capture.frames[0] == UINT32_C(7) &&
+        capture.messages[0][2] == UINT8_C(11),
+        "period emits latest value");
+    metrics = music_rig_smc_mixer_relay_metrics_read(&relay);
+    CHECK(metrics != NULL && metrics->input_events == UINT64_C(2) &&
+        metrics->mapped_events == UINT64_C(2) &&
+        metrics->emitted_events == UINT64_C(1) &&
+        metrics->coalesced_events == UINT64_C(1) &&
+        metrics->adapter_failures == UINT64_C(0),
+        "period metrics");
+    return 0;
+}
+
 static int test_fail_closed_initialization(void)
 {
     static music_rig_compiled_tables tables;
@@ -517,6 +575,7 @@ int main(void)
     if (test_exhaustive_parity() != 0 ||
         test_coalesced_cycle() != 0 ||
         test_high_rate_coalescing() != 0 ||
+        test_coalescing_cycle_period() != 0 ||
         test_fail_closed_initialization() != 0) {
         return 1;
     }

@@ -195,6 +195,7 @@ void music_rig_smc_mixer_relay_config_init(
     memset(config, 0, sizeof(*config));
     config->abi_version = MUSIC_RIG_SMC_MIXER_RELAY_ABI_VERSION;
     config->output_mode = MUSIC_RIG_OUTPUT_SUPPRESSED;
+    config->coalesce_cycle_period = UINT32_C(1);
 }
 
 music_rig_result music_rig_smc_mixer_relay_init(
@@ -212,6 +213,7 @@ music_rig_result music_rig_smc_mixer_relay_init(
     if (relay == NULL || config == NULL ||
         config->abi_version != MUSIC_RIG_SMC_MIXER_RELAY_ABI_VERSION ||
         config->generations == NULL || config->emit == NULL ||
+        config->coalesce_cycle_period == UINT32_C(0) ||
         config->output_mode != MUSIC_RIG_OUTPUT_ENABLED ||
         !music_rig_generation_slot_is_lock_free(config->generations)) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
@@ -251,6 +253,7 @@ music_rig_result music_rig_smc_mixer_relay_init(
     relay->emit_context = config->emit_context;
     relay->profile_index = profile_index;
     relay->coalesce_per_cycle = config->coalesce_per_cycle;
+    relay->coalesce_cycle_period = config->coalesce_cycle_period;
     memcpy(relay->input_port_id, input->id, sizeof(relay->input_port_id));
     memcpy(relay->output_port_id, output->id, sizeof(relay->output_port_id));
     atomic_init(&relay->prepared_generation, generation);
@@ -319,9 +322,10 @@ music_rig_result music_rig_smc_mixer_relay_begin_cycle(
     if (!valid_relay(relay)) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
-    clear_pending(relay);
     generation = music_rig_generation_slot_adopt(relay->generations);
     if (generation == NULL || generation->mapping == NULL) {
+        clear_pending(relay);
+        relay->coalesce_cycles = UINT32_C(0);
         return MUSIC_RIG_RESULT_INVALID_STATE;
     }
     increment(&relay->metrics.cycles);
@@ -341,6 +345,8 @@ music_rig_result music_rig_smc_mixer_relay_begin_cycle(
         relay->current_generation = generation;
         relay->current_generation_id = generation->id;
         relay->tables = NULL;
+        clear_pending(relay);
+        relay->coalesce_cycles = UINT32_C(0);
         return MUSIC_RIG_RESULT_INVALID_DATA;
     }
     relay->current_generation = generation;
@@ -359,12 +365,23 @@ music_rig_result music_rig_smc_mixer_relay_end_cycle(
     music_rig_smc_mixer_relay *relay
 )
 {
+    music_rig_result result;
+
     if (!valid_relay(relay)) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
-    return relay->coalesce_per_cycle
-        ? flush_pending(relay)
-        : MUSIC_RIG_RESULT_OK;
+    if (!relay->coalesce_per_cycle || relay->pending_count == UINT8_C(0)) {
+        return MUSIC_RIG_RESULT_OK;
+    }
+    if (relay->coalesce_cycles != UINT32_MAX) {
+        relay->coalesce_cycles += UINT32_C(1);
+    }
+    if (relay->coalesce_cycles < relay->coalesce_cycle_period) {
+        return MUSIC_RIG_RESULT_OK;
+    }
+    result = flush_pending(relay);
+    relay->coalesce_cycles = UINT32_C(0);
+    return result;
 }
 
 music_rig_result music_rig_smc_mixer_relay_process(
