@@ -1,0 +1,48 @@
+{
+  "schema": "music-studies/smc-mixer-cutover-rollback-repeat-airstar/v1",
+  "captured_on": "2026-08-31",
+  "source_commit": "9c72c7e",
+  "host": "airstar",
+  "staged_daemon_sha256": "1dd6d6b6d8d0d77b4d91fb57b2ddb52171e56f23b7884ae779bf06ce1cd2a314",
+  "definition_fingerprint": "sha256:b5988448d8346ffdca61bbcebd3d0b8bd4c62ae214923fe55bf1ffdbffbb22c3",
+  "cutover": {
+    "status": 0,
+    "legacy_route_during": "0/8",
+    "relay_input_links_during": 1,
+    "relay_output_links_during": 8,
+    "exercise_duration_seconds": 60,
+    "exercise_midi_events": 0,
+    "exercise_pw_top_error_delta": 0,
+    "exercise_journal_xrun_dropout_deadline_lines": 0
+  },
+  "rollback": {
+    "status": 0,
+    "verify_legacy_status": 0,
+    "legacy_route_after": "8/8",
+    "relay_input_links_after": 0,
+    "relay_output_links_after": 0,
+    "graph_hash_before": "sha256:26f5fe20dcd23bf6cbb927a2294a35eb415056d0c3de516851093d2edc1c3083",
+    "graph_hash_after": "sha256:26f5fe20dcd23bf6cbb927a2294a35eb415056d0c3de516851093d2edc1c3083",
+    "graph_restored": true
+  },
+  "post_validation": {
+    "protected_verifier_failures": 0,
+    "live_validator_failures": 2,
+    "missing_mvave_devices": 1,
+    "enumerated_mvave_devices": 3,
+    "unresolved_saved_endpoints": 2,
+    "temporary_cleanup": true
+  },
+  "evaluation": {
+    "cutover_transaction_pass": true,
+    "rollback_transaction_pass": true,
+    "fader_exercise_evidence_present": false,
+    "live_setup_validation_pass": false,
+    "accepted_as_full_live_cutover": false
+  },
+  "notes": [
+    "The corrected staged link tool completed cutover and rollback without leaving relay links behind.",
+    "The relay shutdown reported zero input events, so coalescing and audible live behavior were not exercised.",
+    "Post-rollback live validation found only three of four M-VAVE devices and two unresolved saved endpoints; no automatic repair was attempted."
+  ]
+}
