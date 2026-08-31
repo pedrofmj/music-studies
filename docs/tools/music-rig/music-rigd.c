@@ -880,6 +880,7 @@ static int run_smc_mixer_relay(const char *path, const char *fingerprint)
     const music_rig_smc_mixer_relay_metrics *metrics;
     music_rig_result result;
     music_rig_result stop_result = MUSIC_RIG_RESULT_OK;
+    bool relay_initialized = false;
     size_t index;
 
     result = load_definition(path, fingerprint, &definition, &generation);
@@ -888,6 +889,7 @@ static int run_smc_mixer_relay(const char *path, const char *fingerprint)
     }
     if (result == MUSIC_RIG_RESULT_OK) {
         result = music_rig_jack_smc_mixer_relay_init(&host, &generations);
+        relay_initialized = result == MUSIC_RIG_RESULT_OK;
     }
     if (result == MUSIC_RIG_RESULT_OK) {
         result = music_rig_journal_diagnostics_init(
@@ -917,6 +919,26 @@ static int run_smc_mixer_relay(const char *path, const char *fingerprint)
         }
     }
     if (result != MUSIC_RIG_RESULT_OK) {
+        if (relay_initialized) {
+            metrics = music_rig_smc_mixer_relay_metrics_read(&host.relay);
+            fprintf(
+                stderr,
+                "SMC-Mixer relay diagnostics: result %d stop-result %d "
+                "last-process-result %d input-events %" PRIu64
+                " emitted-events %" PRIu64 " coalesced-events %" PRIu64
+                " adapter-failures %" PRIu64 "\n",
+                (int)result,
+                (int)stop_result,
+                (int)atomic_load_explicit(
+                    &host.last_process_result,
+                    memory_order_acquire
+                ),
+                metrics->input_events,
+                metrics->emitted_events,
+                metrics->coalesced_events,
+                metrics->adapter_failures
+            );
+        }
         fprintf(stderr, "SMC-Mixer relay failed: result %d\n", (int)result);
         return (int)result;
     }
