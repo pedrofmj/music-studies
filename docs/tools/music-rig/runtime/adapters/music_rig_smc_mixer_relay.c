@@ -148,7 +148,26 @@ static music_rig_result flush_pending(
     for (order = 0U;
          result == MUSIC_RIG_RESULT_OK && order < relay->pending_count;
          ++order) {
-        const size_t control = relay->pending_order[order];
+        size_t next = order;
+        size_t candidate;
+        size_t control;
+
+        /* JACK requires MIDI events to be written in nondecreasing frame order. */
+        for (candidate = order + 1U;
+             candidate < relay->pending_count;
+             ++candidate) {
+            if (relay->pending_frames[relay->pending_order[candidate]] <
+                relay->pending_frames[relay->pending_order[next]]) {
+                next = candidate;
+            }
+        }
+        if (next != order) {
+            const uint8_t pending_control = relay->pending_order[order];
+
+            relay->pending_order[order] = relay->pending_order[next];
+            relay->pending_order[next] = pending_control;
+        }
+        control = relay->pending_order[order];
 
         result = relay->emit(
             relay->emit_context,

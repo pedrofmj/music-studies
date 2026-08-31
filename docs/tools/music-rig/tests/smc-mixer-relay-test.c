@@ -360,36 +360,36 @@ static int test_coalesced_cycle(void)
             MUSIC_RIG_RESULT_OK,
         "coalescing initialization");
     CHECK(music_rig_smc_mixer_relay_process(
-            &relay, UINT32_C(5), message, sizeof(message)
+            &relay, UINT32_C(3), message, sizeof(message)
         ) == MUSIC_RIG_RESULT_OK,
         "first coalesced event");
     message[1] = UINT8_C(41);
     message[2] = UINT8_C(20);
     CHECK(music_rig_smc_mixer_relay_process(
-            &relay, UINT32_C(6), message, sizeof(message)
+            &relay, UINT32_C(5), message, sizeof(message)
         ) == MUSIC_RIG_RESULT_OK,
         "second coalesced control");
-    message[1] = UINT8_C(40);
-    message[2] = UINT8_C(11);
-    CHECK(music_rig_smc_mixer_relay_process(
-            &relay, UINT32_C(7), message, sizeof(message)
-        ) == MUSIC_RIG_RESULT_OK,
-        "latest coalesced value");
     message[1] = UINT8_C(41);
     message[2] = UINT8_C(21);
     CHECK(music_rig_smc_mixer_relay_process(
-            &relay, UINT32_C(8), message, sizeof(message)
+            &relay, UINT32_C(7), message, sizeof(message)
+        ) == MUSIC_RIG_RESULT_OK,
+        "latest second-control value");
+    message[1] = UINT8_C(40);
+    message[2] = UINT8_C(11);
+    CHECK(music_rig_smc_mixer_relay_process(
+            &relay, UINT32_C(9), message, sizeof(message)
         ) == MUSIC_RIG_RESULT_OK &&
         music_rig_smc_mixer_relay_end_cycle(&relay) ==
             MUSIC_RIG_RESULT_OK,
         "coalesced cycle flush");
     CHECK(capture.count == 2U && capture.frames[0] == UINT32_C(7) &&
-        capture.frames[1] == UINT32_C(8) &&
-        capture.messages[0][1] == UINT8_C(40) &&
-        capture.messages[0][2] == UINT8_C(11) &&
-        capture.messages[1][1] == UINT8_C(41) &&
-        capture.messages[1][2] == UINT8_C(21),
-        "latest values and frames");
+        capture.frames[1] == UINT32_C(9) &&
+        capture.messages[0][1] == UINT8_C(41) &&
+        capture.messages[0][2] == UINT8_C(21) &&
+        capture.messages[1][1] == UINT8_C(40) &&
+        capture.messages[1][2] == UINT8_C(11),
+        "latest values and frame-ordered output");
     metrics = music_rig_smc_mixer_relay_metrics_read(&relay);
     CHECK(metrics != NULL && metrics->input_events == UINT64_C(4) &&
         metrics->mapped_events == UINT64_C(4) &&
