@@ -21,7 +21,7 @@ typedef struct jack_midi_event {
 #define JACK_NO_START_SERVER UINT32_C(1)
 #define JACK_PORT_IS_INPUT 1UL
 #define JACK_PORT_IS_OUTPUT 2UL
-#define MUSIC_RIG_SMC_MIXER_RELAY_COALESCE_CYCLE_PERIOD UINT32_C(2)
+#define MUSIC_RIG_SMC_MIXER_RELAY_COALESCE_CYCLE_PERIOD UINT32_C(1)
 
 static const char jack_default_midi_type[] = "8 bit raw midi";
 

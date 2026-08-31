@@ -62,6 +62,7 @@ Documents:
 | Airstar coalesced SMC-MIX relay realistic-rate audible probe | 🟡 Two-minute sustained Arturia-plus-mixer exercise captured 10,448 mirrored mixer events and 720 Arturia events; relay processing had 0 adapter failures, but speaker sink ERR increased by 11 and SMC-MIX EQ by 13; rollback and final validation passed; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-realistic-audible-failure-airstar-2026-08-31.json) |
 | Airstar realistic-rate legacy mixer/audio comparison | 🟡 Same slow-fader/Arturia pattern on legacy captured 18,280 mirrored mixer events and 184 Arturia events, with speaker sink ERR +47 and SMC-MIX EQ +35; event mix differed, but the relay’s +24 result remains materially lower; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-realistic-legacy-comparison-airstar-2026-08-31.json) |
 | Airstar coalesced SMC-MIX relay single-fader audible probe | 🟡 Two-minute Arturia-plus-fader-1 exercise reproduced 14 PipeWire ERR counts (speaker sink +10, SMC-MIX EQ +4) with relay result 0 and 0 adapter failures; multi-fader ordering was not involved; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-single-fader-audible-failure-airstar-2026-08-31.json) |
+| Airstar coalesced SMC-MIX relay two-cycle tuning trial | 🟡 Deferring flushes to every second JACK cycle did not improve the single-fader/audio probe: PipeWire ERR increased by 119 (speaker sink +62, SMC-MIX EQ +57); relay result 0, adapter failures 0, rollback and final validation passed; tuning rejected; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-two-cycle-tuning-failure-airstar-2026-08-31.json) |
 | Airstar output-runtime idle resources | ✅ 60 s, 0.4% max CPU, 12,616 KB peak RSS, 5 threads, 0 xrun/dropout/deadline events; [evidence](../../tools/music-rig/benchmarks/output-runtime-idle-airstar-2026-08-29.json) |
 | Airstar protected-rack musical-load observation | 🟡 65 s, 1,314 live MIDI events, graph unchanged, and 0 validator failures; speaker-sink `pw-top` ERR increased by 4, so the zero-xrun gate did not pass; [evidence](../../tools/music-rig/benchmarks/protected-rack-musical-load-airstar-2026-08-29.json) |
 | Airstar synthetic note-only isolation | 🟡 65 s, 753 generated note messages, no SMC-MIX EQ counter increase, and graph restored; speaker-sink `pw-top` ERR increased by 1, so the zero-xrun gate remains open; [evidence](../../tools/music-rig/benchmarks/synthetic-notes-airstar-2026-08-30.json) |
@@ -597,6 +598,8 @@ benchmarks.
   A slower legacy comparison reproduced 82 ERR increases versus 24 in the
   relay-active run, but the controller event mix differed; the mitigation is
   supported while final audio attribution and the zero-error gate remain open.
+  A two-cycle cross-cycle flush trial was rejected after a +119 ERR result in
+  the single-fader/audio probe; the Linux host is restored to one-cycle flushes.
 
 ## Milestone 5: MIDI Management Triggers
 
