@@ -54,6 +54,7 @@ Documents:
 | Airstar coalesced SMC-MIX relay fader-1 diagnostic retest | 🟡 Synchronized probe saw 2,734 CCs with zero PipeWire error delta; relay received 5,967 mapped events, emitted 1,217, coalesced 4,750, and had 0 adapter failures; faders 2–8 remain pending; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-fader1-diagnostic-retest-airstar-2026-08-31.json) |
 | Airstar coalesced SMC-MIX relay faders 1–8 fixed confirmation | ✅ Frame-ordered output passed synchronized physical movement on all eight faders: 4,225 mapped events, 833 emitted, 3,392 coalesced, 0 adapter failures, zero PipeWire error delta, clean rollback, and 0 final validation failures; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-faders1-8-fixed-airstar-2026-08-31.json) |
 | Airstar coalesced SMC-MIX relay faders 1–8 sustained soak | ✅ Five-minute synchronized movement passed all eight controls: 41,820 mapped events, 7,272 emitted, 34,548 coalesced, 0 adapter failures, zero PipeWire error delta, clean rollback, and 0 final validation failures; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-faders1-8-soak-airstar-2026-08-31.json) |
+| Airstar coalesced SMC-MIX relay audible-stability probe | 🟡 Correct physical endpoints captured 1,664 Arturia/pad events and the relay remained healthy with 0 adapter failures, but the 120-second window added 22 PipeWire `pw-top` ERR counts, including speaker sink +8; rollback and final validation passed; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-audible-stability-failure-airstar-2026-08-31.json) |
 | Airstar output-runtime idle resources | ✅ 60 s, 0.4% max CPU, 12,616 KB peak RSS, 5 threads, 0 xrun/dropout/deadline events; [evidence](../../tools/music-rig/benchmarks/output-runtime-idle-airstar-2026-08-29.json) |
 | Airstar protected-rack musical-load observation | 🟡 65 s, 1,314 live MIDI events, graph unchanged, and 0 validator failures; speaker-sink `pw-top` ERR increased by 4, so the zero-xrun gate did not pass; [evidence](../../tools/music-rig/benchmarks/protected-rack-musical-load-airstar-2026-08-29.json) |
 | Airstar synthetic note-only isolation | 🟡 65 s, 753 generated note messages, no SMC-MIX EQ counter increase, and graph restored; speaker-sink `pw-top` ERR increased by 1, so the zero-xrun gate remains open; [evidence](../../tools/music-rig/benchmarks/synthetic-notes-airstar-2026-08-30.json) |
@@ -573,7 +574,10 @@ benchmarks.
   adapter failures, and exact rollback. This closes the coalesced relay
   long-soak gate; audible output remains independently unverified, and the
   older direct-route failure remains recorded as a separate legacy-path
-  condition.
+  condition. A subsequent two-minute operator probe with corrected Arturia and
+  pad endpoints kept the relay at zero adapter failures but reproduced 22 live
+  PipeWire error-counter increases, including speaker sink +8; the audible
+  stability gate therefore remains open.
 
 ## Milestone 5: MIDI Management Triggers
 
