@@ -1,0 +1,59 @@
+{
+  "schema": "music-studies/smc-mixer-cutover-rollback-full-baseline-no-input-airstar/v1",
+  "captured_on": "2026-08-31",
+  "source_commit": "9c72c7e",
+  "host": "airstar",
+  "staged_daemon_sha256": "1dd6d6b6d8d0d77b4d91fb57b2ddb52171e56f23b7884ae779bf06ce1cd2a314",
+  "definition_fingerprint": "sha256:b5988448d8346ffdca61bbcebd3d0b8bd4c62ae214923fe55bf1ffdbffbb22c3",
+  "baseline": {
+    "protected_verifier_before_failures": 0,
+    "live_validator_before_failures": 0,
+    "mvave_devices_before": 4,
+    "patchbay_links_before": 116,
+    "unresolved_endpoints_before": 0
+  },
+  "cutover": {
+    "status": 0,
+    "legacy_links_during": 0,
+    "relay_input_links_during": 1,
+    "relay_output_links_during": 8,
+    "relay_verify_status": 0
+  },
+  "exercise": {
+    "duration_seconds": 60,
+    "midi_ports": "20:0,20:1",
+    "midi_events": 0,
+    "pw_top_samples": 60,
+    "pw_top_error_delta": 0,
+    "journal_xrun_dropout_deadline_lines": 0
+  },
+  "rollback": {
+    "status": 0,
+    "legacy_links_after": 8,
+    "relay_input_links_after": 0,
+    "relay_output_links_after": 0,
+    "relay_shutdown_input_events": 0,
+    "relay_shutdown_emitted_events": 0,
+    "relay_shutdown_coalesced_events": 0
+  },
+  "final_validation": {
+    "protected_verifier_failures": 0,
+    "live_validator_failures": 0,
+    "mvave_devices_after": 4,
+    "patchbay_links_after": 116,
+    "unresolved_endpoints_after": 0,
+    "temporary_cleanup": true
+  },
+  "evaluation": {
+    "cutover_transaction_pass": true,
+    "rollback_transaction_pass": true,
+    "full_baseline_pass": true,
+    "fader_exercise_evidence_present": false,
+    "accepted_as_full_live_cutover": false
+  },
+  "notes": [
+    "This run confirms the corrected link transaction on a fully validated four-device baseline.",
+    "The 60-second relay-owned exercise received no MIDI events, so relay coalescing and live audible behavior were not exercised.",
+    "The legacy route and protected setup were restored and validated before cleanup."
+  ]
+}
