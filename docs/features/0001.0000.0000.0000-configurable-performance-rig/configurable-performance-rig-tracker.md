@@ -58,6 +58,7 @@ Documents:
 | Airstar relay-inactive audible-stability legacy baseline | ✅ Read-only 120-second comparison captured 2,756 events across SMC-MIX, SMC-PAD, and Arturia with zero PipeWire error delta and unchanged graph; the same workload is clean with the relay inactive; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-audible-stability-legacy-baseline-airstar-2026-08-31.json) |
 | Airstar coalesced SMC-MIX relay audio-only isolation | ✅ Relay-active 120-second Arturia-only comparison captured 1,354 note events with zero relay input and zero PipeWire error delta; graph and rollback remained clean, showing relay presence alone did not reproduce the failure; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-audio-only-airstar-2026-08-31.json) |
 | Airstar coalesced SMC-MIX relay synchronized mixer/audio attribution | 🟡 Synchronized 120-second capture saw 39,718 mirrored SMC-MIX events plus 686 Arturia events; relay returned 0 with no adapter failures, but PipeWire ERR increased by 5 (speaker sink +2, SMC-MIX EQ +3); matched high-rate legacy comparison pending; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-mixer-arturia-attribution-airstar-2026-08-31.json) |
+| Airstar matched high-rate legacy mixer/audio comparison | 🟡 Comparable legacy-route capture saw 38,678 mirrored SMC-MIX events plus 681 Arturia events and reproduced 103 PipeWire ERR increases (speaker sink +48, SMC-MIX EQ +55); coalescing reduced the comparable relay result to +5, but strict zero-error acceptance remains open; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-mixer-arturia-legacy-comparison-airstar-2026-08-31.json) |
 | Airstar output-runtime idle resources | ✅ 60 s, 0.4% max CPU, 12,616 KB peak RSS, 5 threads, 0 xrun/dropout/deadline events; [evidence](../../tools/music-rig/benchmarks/output-runtime-idle-airstar-2026-08-29.json) |
 | Airstar protected-rack musical-load observation | 🟡 65 s, 1,314 live MIDI events, graph unchanged, and 0 validator failures; speaker-sink `pw-top` ERR increased by 4, so the zero-xrun gate did not pass; [evidence](../../tools/music-rig/benchmarks/protected-rack-musical-load-airstar-2026-08-29.json) |
 | Airstar synthetic note-only isolation | 🟡 65 s, 753 generated note messages, no SMC-MIX EQ counter increase, and graph restored; speaker-sink `pw-top` ERR increased by 1, so the zero-xrun gate remains open; [evidence](../../tools/music-rig/benchmarks/synthetic-notes-airstar-2026-08-30.json) |
@@ -586,7 +587,10 @@ benchmarks.
   five PipeWire ERR increases at a much higher mixer event rate, while the
   relay itself remained at result 0 with zero adapter failures; a matched
   high-rate legacy-route comparison is required before attributing that delta
-  specifically to relay routing.
+  specifically to relay routing. The matched legacy run then reproduced 103
+  ERR increases at comparable rates, versus +5 with the relay, showing that
+  coalescing materially reduces the control/audio error load but does not yet
+  satisfy the strict zero-error audible gate.
 
 ## Milestone 5: MIDI Management Triggers
 

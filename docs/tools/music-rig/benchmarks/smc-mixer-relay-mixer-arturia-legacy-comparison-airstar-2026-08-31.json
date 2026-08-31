@@ -1,0 +1,58 @@
+{
+  "schema": "music-studies/smc-mixer-relay-mixer-arturia-legacy-comparison-airstar/v1",
+  "captured_on": "2026-08-31",
+  "source_commit": "095043e",
+  "host": "airstar",
+  "route": "protected-legacy",
+  "relay_active": false,
+  "observed_midi_ports": "20:0,20:1,28:0",
+  "probe": {
+    "duration_seconds": 120,
+    "active_seconds": 119.792616106,
+    "midi_events": 39359,
+    "sources": {"20:0": 19339, "20:1": 19339, "28:0": 681},
+    "pw_top_samples": 120,
+    "pw_top_error_delta": 103,
+    "changed_nodes": [
+      {"id": 100, "name": "S32LE 2 48000 alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__sink", "err_delta": 48},
+      {"id": 381, "name": "+ SMC-MIX - 8-Band EQ", "err_delta": 55}
+    ],
+    "graph_hash_before": "sha256:d9063cbda6e3ef744335c642f1ff6e173f14f8aa9a0ad3fc452d588e71adaf70",
+    "graph_hash_after": "sha256:d9063cbda6e3ef744335c642f1ff6e173f14f8aa9a0ad3fc452d588e71adaf70"
+  },
+  "command_status": {
+    "aseqdump_timeout_status": 124,
+    "pw_top_status": 0,
+    "temporary_cleanup": true
+  },
+  "matched_relay_comparison": {
+    "relay_evidence": "smc-mixer-relay-mixer-arturia-attribution-airstar-2026-08-31.json",
+    "relay_mirrored_mixer_events": 39718,
+    "legacy_mirrored_mixer_events": 38678,
+    "relay_arturia_events": 686,
+    "legacy_arturia_events": 681,
+    "relay_error_delta": 5,
+    "legacy_error_delta": 103,
+    "error_delta_reduction_counts": 98,
+    "matched_rate_comparison": true
+  },
+  "final_validation": {
+    "legacy_route": "8/8",
+    "four_mvave_devices": true,
+    "patchbay_links": 116,
+    "unresolved_endpoints": 0,
+    "live_validator_failures": 0
+  },
+  "evaluation": {
+    "legacy_high_rate_zero_error_pass": false,
+    "coalescing_reduces_error_load": true,
+    "coalesced_relay_zero_error_pass": false,
+    "audible_stability_gate": "open"
+  },
+  "notes": [
+    "This matched legacy-route run used the same two-minute Arturia-plus-SMC-MIX exercise as the relay-active attribution run.",
+    "The legacy route produced 98 more cumulative PipeWire ERR counts than the coalesced relay at comparable controller rates.",
+    "The comparison supports coalescing as a substantial mitigation, but the relay-active +5 delta means strict audible zero-error acceptance is not yet proven.",
+    "The graph remained unchanged and the protected legacy route required no rollback."
+  ]
+}
