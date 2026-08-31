@@ -1,0 +1,43 @@
+{
+  "schema": "music-studies/smc-mixer-relay-audible-stability-legacy-baseline-airstar/v1",
+  "captured_on": "2026-08-31",
+  "source_commit": "095043e",
+  "host": "airstar",
+  "route": "protected-legacy",
+  "relay_active": false,
+  "relay_ports_present": false,
+  "observed_midi_ports": "16:1,20:0,20:1,24:1,28:0,32:1",
+  "probe": {
+    "duration_seconds": 120,
+    "active_seconds": 119.836606605,
+    "midi_events": 2756,
+    "sources": {"20:0": 770, "20:1": 770, "24:1": 430, "28:0": 786},
+    "pw_top_samples": 120,
+    "pw_top_error_delta": 0,
+    "changed_nodes": [],
+    "graph_hash_before": "sha256:d9063cbda6e3ef744335c642f1ff6e173f14f8aa9a0ad3fc452d588e71adaf70",
+    "graph_hash_after": "sha256:d9063cbda6e3ef744335c642f1ff6e173f14f8aa9a0ad3fc452d588e71adaf70"
+  },
+  "command_status": {
+    "aseqdump_timeout_status": 124,
+    "pw_top_status": 0,
+    "temporary_cleanup": true
+  },
+  "final_validation": {
+    "legacy_route": "8/8",
+    "four_mvave_devices": true,
+    "patchbay_links": 116,
+    "unresolved_endpoints": 0,
+    "live_validator_failures": 0
+  },
+  "evaluation": {
+    "same_workload_zero_error_baseline": true,
+    "relay_attribution_possible": true,
+    "audible_stability_gate": "not_this_test"
+  },
+  "notes": [
+    "This read-only comparison used the corrected physical/master endpoints and the protected legacy route with no relay client present.",
+    "The same two-minute controller exercise that produced +22 errors with the relay active produced zero PipeWire error-counter delta here.",
+    "The result isolates the remaining failure to the relay-active audio condition, not merely to the operator workload or controller input."
+  ]
+}
