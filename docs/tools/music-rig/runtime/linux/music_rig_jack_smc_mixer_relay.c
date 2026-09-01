@@ -4,6 +4,7 @@
 #include <stdatomic.h>
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
 
 typedef uint32_t jack_nframes_t;
 typedef uint32_t jack_options_t;
@@ -32,6 +33,7 @@ extern jack_client_t *jack_client_open(
 extern int jack_client_close(jack_client_t *client);
 extern int jack_activate(jack_client_t *client);
 extern int jack_deactivate(jack_client_t *client);
+extern jack_nframes_t jack_get_sample_rate(jack_client_t *client);
 extern int jack_set_process_callback(
     jack_client_t *client,
     int (*callback)(jack_nframes_t, void *),
@@ -95,12 +97,67 @@ static music_rig_result emit_output(
         : MUSIC_RIG_RESULT_ADAPTER_FAILURE;
 }
 
+static void record_trace(
+    music_rig_jack_smc_mixer_relay *host,
+    jack_nframes_t frame_count,
+    uint64_t input_events,
+    uint64_t mapped_events,
+    uint64_t emitted_events,
+    uint64_t coalesced_events,
+    uint64_t unmapped_events,
+    uint64_t malformed_events,
+    uint64_t adapter_failures
+)
+{
+    uint64_t second;
+    music_rig_jack_smc_mixer_relay_trace *trace;
+
+    if (host->trace_sample_rate == UINT32_C(0)) {
+        return;
+    }
+    second = host->trace_elapsed_frames / host->trace_sample_rate;
+    trace = &host->trace[
+        second % MUSIC_RIG_JACK_SMC_MIXER_RELAY_TRACE_SECOND_CAP
+    ];
+    if (trace->second != second) {
+        memset(trace, 0, sizeof(*trace));
+        trace->second = second;
+    }
+    trace->input_events += input_events;
+    trace->mapped_events += mapped_events;
+    trace->emitted_events += emitted_events;
+    trace->coalesced_events += coalesced_events;
+    trace->unmapped_events += unmapped_events;
+    trace->malformed_events += malformed_events;
+    trace->adapter_failures += adapter_failures;
+    if (host->trace_elapsed_frames <= UINT64_MAX - frame_count) {
+        host->trace_elapsed_frames += frame_count;
+    } else {
+        host->trace_elapsed_frames = UINT64_MAX;
+    }
+    host->trace_last_second = second;
+}
+
 static int process_cycle(jack_nframes_t frame_count, void *opaque)
 {
     music_rig_jack_smc_mixer_relay *host = opaque;
     music_rig_result result = MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    uint64_t input_events_before = 0U;
+    uint64_t mapped_events_before = 0U;
+    uint64_t emitted_events_before = 0U;
+    uint64_t coalesced_events_before = 0U;
+    uint64_t unmapped_events_before = 0U;
+    uint64_t malformed_events_before = 0U;
+    uint64_t adapter_failures_before = 0U;
 
     if (valid_host(host)) {
+        input_events_before = host->relay.metrics.input_events;
+        mapped_events_before = host->relay.metrics.mapped_events;
+        emitted_events_before = host->relay.metrics.emitted_events;
+        coalesced_events_before = host->relay.metrics.coalesced_events;
+        unmapped_events_before = host->relay.metrics.unmapped_events;
+        malformed_events_before = host->relay.metrics.malformed_events;
+        adapter_failures_before = host->relay.metrics.adapter_failures;
         void *output_buffer = jack_port_get_buffer(
             host->output_port,
             frame_count
@@ -150,6 +207,17 @@ static int process_cycle(jack_nframes_t frame_count, void *opaque)
             }
             host->cycle_output_buffer = NULL;
         }
+        record_trace(
+            host,
+            frame_count,
+            host->relay.metrics.input_events - input_events_before,
+            host->relay.metrics.mapped_events - mapped_events_before,
+            host->relay.metrics.emitted_events - emitted_events_before,
+            host->relay.metrics.coalesced_events - coalesced_events_before,
+            host->relay.metrics.unmapped_events - unmapped_events_before,
+            host->relay.metrics.malformed_events - malformed_events_before,
+            host->relay.metrics.adapter_failures - adapter_failures_before
+        );
         if (result != MUSIC_RIG_RESULT_OK) {
             atomic_store_explicit(
                 &host->last_process_result,
@@ -235,6 +303,17 @@ music_rig_result music_rig_jack_smc_mixer_relay_start(
         return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
     }
     host->client = client;
+    host->trace_sample_rate = jack_get_sample_rate(client);
+    {
+        const time_t now = time(NULL);
+
+        host->trace_start_epoch = now == (time_t)-1
+            ? UINT64_C(0)
+            : (uint64_t)now;
+    }
+    host->trace_elapsed_frames = UINT64_C(0);
+    host->trace_last_second = UINT64_C(0);
+    memset(host->trace, 0, sizeof(host->trace));
     if (jack_set_process_callback(client, process_cycle, host) != 0) {
         (void)jack_client_close(client);
         host->client = NULL;

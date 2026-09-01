@@ -59,6 +59,11 @@ int jack_activate(jack_client_t *value)
     return value == &client && registered_count == 2U ? 0 : -1;
 }
 
+jack_nframes_t jack_get_sample_rate(jack_client_t *value)
+{
+    return value == &client ? UINT32_C(48000) : UINT32_C(0);
+}
+
 int jack_deactivate(jack_client_t *value)
 {
     return value == &client ? 0 : -1;

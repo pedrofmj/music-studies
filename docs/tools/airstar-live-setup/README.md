@@ -175,6 +175,8 @@ The report compares the protected Patchbay hash before and after, records
 `pw-top` changed-node counters, and captures xrun/dropout/deadline journal
 matches. It never connects or disconnects ports and does not change Carla,
 parameters, services, or PipeWire quantum.
+Its `correlation.per_second` array joins the MIDI arrival buckets to the
+per-node PipeWire ERR snapshots and deltas for each observation second.
 
 ## Windows Boundary
 

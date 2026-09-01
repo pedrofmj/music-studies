@@ -353,6 +353,11 @@ int jack_activate(jack_client_t *client)
     return client == &fake_client ? fail_activation : -1;
 }
 
+jack_nframes_t jack_get_sample_rate(jack_client_t *client)
+{
+    return client == &fake_client ? UINT32_C(48000) : UINT32_C(0);
+}
+
 int jack_deactivate(jack_client_t *client)
 {
     deactivate_count += 1;

@@ -38,7 +38,9 @@ non-channel-1, non-CC, and malformed messages produce no output. Saturating
 metrics separate input, mapped, emitted, coalesced, unmapped, malformed, and
 adapter-failure counts, with separate mapped-event counters for CC 40 through
 47. The JACK host latches the first callback failure until shutdown so a later
-quiet cycle cannot hide it.
+quiet cycle cannot hide it. A successful Linux run also prints a fixed-size
+per-second relay trace after shutdown for correlation with the read-only Airstar
+observer.
 
 The exhaustive portable test compares all 1,024 CC/value combinations. The
 fake-JACK test proves exact frame and byte preservation, one input and one

@@ -296,6 +296,9 @@ separate reversible transaction owns the topology. It reports the runtime,
 storage, diagnostic, compiled, and applicable JACK host ABIs. The Linux
 SMC-MIX JACK host uses fixed-storage per-cycle latest-value coalescing and orders
 retained MIDI events by frame. It reports coalesced intermediate control updates.
+Successful relay runs also print a fixed-size per-second trace ring after
+shutdown, including input, mapped, emitted, coalesced, unmapped, malformed, and
+adapter-failure counts with the relay start epoch and JACK sample rate.
 No build has a configured IPC
 transport, installation target, or default-start path, and ordinary builds
 contain no output-capable command.

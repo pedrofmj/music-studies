@@ -962,6 +962,42 @@ static int run_smc_mixer_relay(const char *path, const char *fingerprint)
     printf("unmapped-events %" PRIu64 "\n", metrics->unmapped_events);
     printf("malformed-events %" PRIu64 "\n", metrics->malformed_events);
     printf("adapter-failures %" PRIu64 "\n", metrics->adapter_failures);
+    printf("trace-start-epoch %" PRIu64 "\n", host.trace_start_epoch);
+    printf("trace-sample-rate %" PRIu32 "\n", host.trace_sample_rate);
+    if (host.trace_sample_rate != UINT32_C(0)) {
+        const uint64_t trace_capacity =
+            (uint64_t)MUSIC_RIG_JACK_SMC_MIXER_RELAY_TRACE_SECOND_CAP;
+        const uint64_t first_second = host.trace_last_second >= trace_capacity
+            ? host.trace_last_second - trace_capacity + UINT64_C(1)
+            : UINT64_C(0);
+        uint64_t second;
+
+        for (second = first_second;
+             second <= host.trace_last_second;
+             ++second) {
+            const music_rig_jack_smc_mixer_relay_trace *trace =
+                &host.trace[second % trace_capacity];
+
+            if (trace->second != second) {
+                continue;
+            }
+            printf(
+                "trace-second %" PRIu64 " input-events %" PRIu64
+                " mapped-events %" PRIu64 " emitted-events %" PRIu64
+                " coalesced-events %" PRIu64 " unmapped-events %" PRIu64
+                " malformed-events %" PRIu64 " adapter-failures %" PRIu64
+                "\n",
+                trace->second,
+                trace->input_events,
+                trace->mapped_events,
+                trace->emitted_events,
+                trace->coalesced_events,
+                trace->unmapped_events,
+                trace->malformed_events,
+                trace->adapter_failures
+            );
+        }
+    }
     puts("output-mode enabled-smc-mixer-only");
     return MUSIC_RIG_RESULT_OK;
 }
