@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    printf '%s\n' \
+        "Usage: $(basename "$0") OBSERVER_JSON RELAY_LOG OUTPUT_JSON" \
+        "Join the read-only observer with the stopped relay's per-second trace."
+}
+
+if [[ ${1-} == --help || ${1-} == -h ]]; then
+    usage
+    exit 0
+fi
+if [[ $# != 3 ]]; then
+    usage >&2
+    exit 2
+fi
+
+observer_json=$1
+relay_log=$2
+output_json=$3
+
+for path in "$observer_json" "$relay_log"; do
+    [[ -f $path ]] || {
+        printf 'Input file not found: %s\n' "$path" >&2
+        exit 2
+    }
+done
+[[ -d $(dirname -- "$output_json") ]] || {
+    printf 'Output directory does not exist: %s\n' "$(dirname -- "$output_json")" >&2
+    exit 2
+}
+command -v jq >/dev/null 2>&1 || {
+    printf '%s\n' 'Required command not found: jq' >&2
+    exit 2
+}
+
+jq empty "$observer_json"
+relay_trace=$(jq -Rn '
+    reduce inputs as $line (
+        {start_epoch: null, sample_rate: null, traces: []};
+        if ($line | test("^trace-start-epoch [0-9]+$")) then
+            .start_epoch = (($line | capture("^trace-start-epoch (?<value>[0-9]+)$")).value | tonumber)
+        elif ($line | test("^trace-sample-rate [0-9]+$")) then
+            .sample_rate = (($line | capture("^trace-sample-rate (?<value>[0-9]+)$")).value | tonumber)
+        elif ($line | startswith("trace-second ")) then
+            .traces += [
+                ($line | capture(
+                    "^trace-second (?<second>[0-9]+) input-events (?<input>[0-9]+) mapped-events (?<mapped>[0-9]+) emitted-events (?<emitted>[0-9]+) coalesced-events (?<coalesced>[0-9]+) unmapped-events (?<unmapped>[0-9]+) malformed-events (?<malformed>[0-9]+) adapter-failures (?<failures>[0-9]+)$"
+                )
+                | {
+                    second: (.second | tonumber),
+                    input_events: (.input | tonumber),
+                    mapped_events: (.mapped | tonumber),
+                    emitted_events: (.emitted | tonumber),
+                    coalesced_events: (.coalesced | tonumber),
+                    unmapped_events: (.unmapped | tonumber),
+                    malformed_events: (.malformed | tonumber),
+                    adapter_failures: (.failures | tonumber)
+                })
+            ]
+        else
+            .
+        end
+    )
+' < "$relay_log")
+
+jq -nS \
+    --slurpfile observer "$observer_json" \
+    --argjson relay "$relay_trace" '
+    $observer[0] as $observer
+    | $relay as $relay
+    | ($observer.captured_at_utc.start | fromdateiso8601) as $observer_start
+    | {
+        schema: "music-studies/airstar-relay-control-xrun-correlation/v1",
+        observer_schema: $observer.schema,
+        relay: {
+            start_epoch: $relay.start_epoch,
+            sample_rate: $relay.sample_rate,
+            trace_seconds: ($relay.traces | length)
+        },
+        per_second: [
+            $observer.correlation.per_second[]
+            | . as $second
+            | (($observer_start + $second.second) - $relay.start_epoch) as $relay_second
+            | .pipewire_error_delta = (
+                [$second.pipewire.nodes[]?.err_delta] | add // 0
+            )
+            | .relay = (
+                [$relay.traces[] | select(.second == $relay_second)]
+                | .[0] // null
+            )
+            | .relay_second = $relay_second
+        ]
+    }
+' > "$output_json"
+
+printf 'Wrote %s\n' "$output_json"
