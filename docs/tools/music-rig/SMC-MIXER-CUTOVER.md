@@ -27,10 +27,9 @@ comparison. An unprepared publication drops all prior table references before
 failing closed, so acknowledged generations remain reclaimable. For every
 accepted event, the callback performs one fixed numeric table lookup. The
 portable default writes the original three MIDI bytes at the original JACK
-frame. The Linux JACK host enables fixed-storage latest-value coalescing: repeated
+frame. The Linux JACK host enables fixed-storage per-cycle coalescing: repeated
 updates for one fader retain only the latest value and frame, then emit at most
-one update for that fader at the configured flush period. Linux uses three JACK
-cycles as the flush period. This bounds control fan-out while
+one update for that fader when the cycle ends. This bounds control fan-out while
 preserving the final fader position; `coalesced-events` reports discarded
 intermediate updates.
 Neither path performs allocation, lock, JSON traversal, filesystem operation,
