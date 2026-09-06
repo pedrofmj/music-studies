@@ -1,0 +1,91 @@
+{
+  "schema": "music-studies/smc-mixer-relay-correlation-preflight-airstar/v1",
+  "captured_on": "2026-09-05",
+  "host": "airstar",
+  "source_commit": "ae346239a29b0b7c39f5a72c4493c1147f7f3ce4",
+  "status": "preflight-complete-awaiting-operator",
+  "staging_directory": "/tmp/music-rig-correlation-airstar-20260905.ezDrrG",
+  "artifacts": {
+    "daemon_sha256": "c5d136354384a5e317dc9d48fae89a2d01aaf72f05d816d2f6bdd322de826610",
+    "compiled_definition_sha256": "2a0d06a54542a8c6bbd6e96d9902d046e80642022df9064d9de76046de503a57",
+    "definition_fingerprint": "sha256:b5988448d8346ffdca61bbcebd3d0b8bd4c62ae214923fe55bf1ffdbffbb22c3",
+    "link_tool_sha256": "2018fd5cf71747968442581fb6fe797c6393444a83986098f06c43c6d1cbc073",
+    "observer_sha256": "40dc8ba573c8eb14c4b744d623a0030ef00b9a477d86d2f857038778ac068ee6",
+    "probe_script_sha256": "2950b107317e93f028e0f5e695218c0f095bbe293e39c31315dca9d4dcbd5ffc",
+    "remote_checksums_match": true
+  },
+  "preflight": {
+    "local_protected_checks": 30,
+    "remote_protected_checks": 30,
+    "protected_failures": 0,
+    "live_validation_failures": 0,
+    "controllers_present": 5,
+    "services_active": 4,
+    "patchbay_links_present": 116,
+    "unresolved_endpoints": 0,
+    "quantum_frames": 1024,
+    "legacy_mixer_links": 8,
+    "relay_input_links": 0,
+    "relay_output_links": 0,
+    "midi_ports": {
+      "mixer_private": "20:0",
+      "mixer_master": "20:1",
+      "arturia": "28:0"
+    }
+  },
+  "observer_smoke": {
+    "start_utc": "2026-09-05T17:50:19Z",
+    "duration_seconds": 2,
+    "midi_events": 0,
+    "pipewire_samples": 2,
+    "pipewire_error_delta": 0,
+    "graph_hash_before": "43f87fb0ce57b84538bcdcbc13cbcfc767964233d1b15a43ef7e3e6a787cc713",
+    "graph_hash_after": "43f87fb0ce57b84538bcdcbc13cbcfc767964233d1b15a43ef7e3e6a787cc713",
+    "aseqdump_timeout_status": 124,
+    "pw_top_status": 0
+  },
+  "relay_no_link_smoke": {
+    "start_epoch": 1788630860,
+    "timeout_seconds": 20,
+    "exit_status": 0,
+    "input_ports": 1,
+    "output_ports": 1,
+    "cycles": 935,
+    "input_events": 0,
+    "emitted_events": 0,
+    "adapter_failures": 0,
+    "sample_rate_hz": 48000,
+    "trace_seconds": 20,
+    "links_created": 0,
+    "process_remaining": false
+  },
+  "post_relay_observer": {
+    "start_utc": "2026-09-05T17:55:09Z",
+    "duration_seconds": 3,
+    "midi_events": 0,
+    "pipewire_samples": 3,
+    "pipewire_error_delta": 0,
+    "graph_unchanged": true,
+    "overlaps_relay": false
+  },
+  "final_validation": {
+    "live_validation_failures": 0,
+    "patchbay_links_present": 116,
+    "unresolved_endpoints": 0,
+    "legacy_mixer_links": 8
+  },
+  "pending_probe": {
+    "duration_seconds": 120,
+    "operator_input": "Arturia playing plus SMC-MIX fader movement",
+    "script": "run-probe.sh",
+    "cutover_performed": false,
+    "audible_stability_gate": "open"
+  },
+  "notes": [
+    "The observer contains the uncommitted September 5 fixes; its exact checksum identifies the tested revision.",
+    "The observer smoke windows and the unconnected relay run did not overlap, so these results do not establish synchronized live correlation or audio stability.",
+    "Only files under the named temporary staging directory were uploaded. The relay created ports without connecting links and stopped automatically.",
+    "The prepared probe revalidates the baseline, cuts over only SMC-MIX, settles for ten seconds, records for 120 seconds, rolls back before stopping the relay, and validates the rack again.",
+    "Temporary staging is retained for the pending operator exercise; no service was installed, enabled, or stopped."
+  ]
+}

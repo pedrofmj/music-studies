@@ -25,6 +25,10 @@ for path in "$observer_json" "$relay_log"; do
         printf 'Input file not found: %s\n' "$path" >&2
         exit 2
     }
+    [[ ! $output_json -ef $path ]] || {
+        printf 'Output must not overwrite an input file: %s\n' "$path" >&2
+        exit 2
+    }
 done
 [[ -d $(dirname -- "$output_json") ]] || {
     printf 'Output directory does not exist: %s\n' "$(dirname -- "$output_json")" >&2
@@ -35,19 +39,24 @@ command -v jq >/dev/null 2>&1 || {
     exit 2
 }
 
-jq empty "$observer_json"
-relay_trace=$(jq -Rn '
+joined=$(jq -RnS --slurpfile observer "$observer_json" '
     reduce inputs as $line (
         {start_epoch: null, sample_rate: null, traces: []};
-        if ($line | test("^trace-start-epoch [0-9]+$")) then
-            .start_epoch = (($line | capture("^trace-start-epoch (?<value>[0-9]+)$")).value | tonumber)
-        elif ($line | test("^trace-sample-rate [0-9]+$")) then
-            .sample_rate = (($line | capture("^trace-sample-rate (?<value>[0-9]+)$")).value | tonumber)
-        elif ($line | startswith("trace-second ")) then
+        if ($line | startswith("trace-start-epoch")) then
+            if .start_epoch != null then error("Duplicate trace start epoch") else
+                .start_epoch = (($line | capture("^trace-start-epoch (?<value>[0-9]+)$")
+                    // error("Malformed trace start epoch")).value | tonumber)
+            end
+        elif ($line | startswith("trace-sample-rate")) then
+            if .sample_rate != null then error("Duplicate trace sample rate") else
+                .sample_rate = (($line | capture("^trace-sample-rate (?<value>[0-9]+)$")
+                    // error("Malformed trace sample rate")).value | tonumber)
+            end
+        elif ($line | startswith("trace-second")) then
             .traces += [
                 ($line | capture(
                     "^trace-second (?<second>[0-9]+) input-events (?<input>[0-9]+) mapped-events (?<mapped>[0-9]+) emitted-events (?<emitted>[0-9]+) coalesced-events (?<coalesced>[0-9]+) unmapped-events (?<unmapped>[0-9]+) malformed-events (?<malformed>[0-9]+) adapter-failures (?<failures>[0-9]+)$"
-                )
+                ) // error("Malformed trace second")
                 | {
                     second: (.second | tonumber),
                     input_events: (.input | tonumber),
@@ -63,17 +72,35 @@ relay_trace=$(jq -Rn '
             .
         end
     )
-' < "$relay_log")
-
-jq -nS \
-    --slurpfile observer "$observer_json" \
-    --argjson relay "$relay_trace" '
-    $observer[0] as $observer
-    | $relay as $relay
+    | if .start_epoch == null or .start_epoch <= 0 or
+         .sample_rate == null or .sample_rate <= 0 or
+         (.traces | length) == 0 then
+          error("Relay log requires a positive start epoch, sample rate, and trace seconds")
+      elif (.traces | map(.second) | unique | length) != (.traces | length) then
+          error("Duplicate relay trace second")
+      else . end
+    | . as $relay
+    | if ($observer | length) != 1 or
+         $observer[0].schema != "music-studies/airstar-control-xrun-correlation/v1" or
+         ($observer[0].correlation.per_second | type) != "array" or
+         ($observer[0].correlation.per_second | length) == 0 then
+          error("Expected one control/xrun observer report with per-second correlation")
+      else . end
+    | $observer[0] as $observer
+    | if all($observer.correlation.per_second[];
+          (.second | type) == "number" and .second >= 0 and
+          .second == (.second | floor) and (.pipewire.nodes | type) == "array" and
+          all(.pipewire.nodes[]; (.err_delta | type) == "number")) and
+          ($observer.correlation.per_second | map(.second) | unique | length) ==
+          ($observer.correlation.per_second | length) then .
+      else error("Invalid or duplicate observer second") end
     | ($observer.captured_at_utc.start | fromdateiso8601) as $observer_start
     | {
         schema: "music-studies/airstar-relay-control-xrun-correlation/v1",
         observer_schema: $observer.schema,
+        observation: ($observer | {
+            captured_at_utc, duration_seconds, safety, protected_graph, command_status
+        }),
         relay: {
             start_epoch: $relay.start_epoch,
             sample_rate: $relay.sample_rate,
@@ -93,6 +120,9 @@ jq -nS \
             | .relay_second = $relay_second
         ]
     }
-' > "$output_json"
+    | .relay.matched_seconds = ([.per_second[] | select(.relay != null)] | length)
+' < "$relay_log")
+
+printf '%s\n' "$joined" > "$output_json"
 
 printf 'Wrote %s\n' "$output_json"

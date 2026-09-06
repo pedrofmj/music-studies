@@ -1,0 +1,227 @@
+{
+  "schema": "music-studies/carla-eq-smoothing-profile/v1",
+  "captured_on": "2026-09-06",
+  "status": "isolated smoothing/rebuild call path confirmed; live acceptance remains open",
+  "environment": {
+    "host": "centralstar",
+    "carla_native_package": "2.5.8-0ubuntu5",
+    "lsp_package": "1.2.14-1",
+    "lsp_binary_sha256": "12a8ff7a08419c4e927d41946b45639ee851c10f1352eb2c6f63349e4df35a5c",
+    "lsp_build_id": "83bbb6d60bfd39a139582b2082882785e1875c68",
+    "audio_server_used": false,
+    "hardware_connections": false,
+    "plugin_ui_opened": false,
+    "remote_processes_launched": false,
+    "production_changes": false,
+    "kernel_profiling_settings_changed": false
+  },
+  "prior_unprofiled_measurement": "carla-eq-parameter-isolation-centralstar-2026-09-06.json",
+  "profile": {
+    "collector": "GNU gprofng 2.42",
+    "kernel_counters_used": false,
+    "perf_unavailable_reason": "perf stat task-clock denied with perf_event_paranoid=4; kernel policy was not changed",
+    "command": "runner --profile gprofng --blocks 1024 --profile-symbols /tmp/music-rig-eq-isolation-20260906.0uzGPJ/symbols/usr/lib/debug/.build-id/83",
+    "captured_at_utc": {
+      "start": "2026-09-06T11:01:46.530630+00:00",
+      "end": "2026-09-06T11:02:28.462831+00:00"
+    },
+    "quantitative_profile_valid": false,
+    "interpretation": "qualitative stacks only; percentages and sample-weighted CPU totals are not accepted",
+    "warnings": [
+      "*** Collector Warning: Collection interval timer period was changed (10007 -> 0); profile data may be unreliable",
+      "*** Warning: system has variable clock frequency, which may cause variable execution times and inaccurate conversions of cycle counts into time."
+    ],
+    "sampled_call_path": [
+      "lsp::plugins::para_equalizer::process",
+      "lsp::dspu::Equalizer::process",
+      "lsp::dspu::Equalizer::reconfigure",
+      "lsp::dspu::Filter::rebuild",
+      "lsp::dspu::Filter::calc_rlc_filter",
+      "atanf"
+    ],
+    "matrix_health": {
+      "scenarios": 15,
+      "sample_rate": 48000,
+      "frames_per_block": 1024,
+      "measured_blocks": 15360,
+      "mapped_midi_events": 32768,
+      "mapping_errors": 0,
+      "invalid_audio_samples": 0,
+      "assertion_lines": 0,
+      "wall_over_quantum_blocks": 0,
+      "known_filter_select_warnings": 1
+    }
+  },
+  "debugger_confirmation": {
+    "tool": "GDB with matching Ubuntu separate debug symbols",
+    "attached_to_live_process": false,
+    "method": "Launched the isolated native harness; during MIDI gain calibration, stopped at para_equalizer::process, then process_channel line 1184, then Filter::rebuild.",
+    "observed_stack_leaf_first": [
+      {
+        "function": "lsp::dspu::Filter::rebuild",
+        "source": "Filter.cpp",
+        "line": 206
+      },
+      {
+        "function": "lsp::dspu::Equalizer::reconfigure",
+        "source": "Equalizer.cpp",
+        "line": 247
+      },
+      {
+        "function": "lsp::dspu::Equalizer::reconfigure",
+        "source": "Equalizer.cpp",
+        "line": 238
+      },
+      {
+        "function": "lsp::dspu::Equalizer::process",
+        "source": "Equalizer.cpp",
+        "line": 440,
+        "samples": 1
+      },
+      {
+        "function": "lsp::plugins::para_equalizer::process_channel",
+        "source": "para_equalizer.cpp",
+        "line": 1184
+      },
+      {
+        "function": "lsp::plugins::para_equalizer::process",
+        "source": "para_equalizer.cpp",
+        "line": 1272,
+        "samples": 1024
+      },
+      {
+        "function": "lsp::lv2::Wrapper::run",
+        "source": "wrapper.h",
+        "line": 593,
+        "samples": 1024
+      },
+      {
+        "function": "lsp::lv2::run",
+        "source": "lv2.cpp",
+        "line": 188,
+        "samples": 1024
+      },
+      {
+        "function": "Carla native host",
+        "frames": 4
+      },
+      {
+        "function": "calibrate",
+        "source": "carla-eq-parameter-isolation.c",
+        "line": 112
+      },
+      {
+        "function": "main",
+        "source": "carla-eq-parameter-isolation.c",
+        "line": 172
+      }
+    ],
+    "timing_measurement": false,
+    "completed_benchmark": false,
+    "cleanup": "GDB quit after the backtrace, terminating its own local inferior.",
+    "caveats": [
+      "Optimized frames inline some functions and omit some arguments.",
+      "Build-time source paths were absent locally; exact-tag source files were fetched separately.",
+      "Earlier eq-stack.txt and eq-stack2.txt do not establish this process_channel-to-rebuild path and are excluded."
+    ]
+  },
+  "source_findings": [
+    "The LSP 1.2.14 module manifest selects para-equalizer 1.0.21 and dsp-units 1.0.19.",
+    "Gain, frequency, or quality changes with stable filter type/slope enable bSmoothMode.",
+    "In smooth mode, process_channel loops over every audio sample and all filter slots, interpolates parameters with logf/expf, and calls Equalizer::process with samples=1.",
+    "Equalizer::set_params marks the bank for rebuilding when parameters differ. Equalizer::process calls reconfigure, which rebuilds every filter when the bank is dirty.",
+    "Filter::rebuild performs coefficient calculations, including the RLC path and trigonometric functions.",
+    "This explains why a single moving band can cause full-bank work. It identifies an expensive isolated path, not a complete explanation of live PipeWire deadline failures."
+  ],
+  "sources": [
+    {
+      "url": "https://github.com/lsp-plugins/lsp-plugins/blob/1.2.14/modules.mk",
+      "local_file": "lsp-modules-1.2.14.mk",
+      "sha256": "9bed5a07ad2a155574f53f08dc552c4cb67ebc5157237f4f7dce0f31af94c550",
+      "relevant_lines": [
+        41,
+        295
+      ]
+    },
+    {
+      "url": "https://github.com/lsp-plugins/lsp-plugins-para-equalizer/blob/1.0.21/src/main/plug/para_equalizer.cpp",
+      "local_file": "para_equalizer-1.0.21.cpp",
+      "sha256": "cbf7a27963d8ab3181cd170c85fb97aa68b80da0e8c977efc2f9aa9fa2099afa",
+      "relevant_lines": [
+        970,
+        1156,
+        1184,
+        1272
+      ]
+    },
+    {
+      "url": "https://github.com/lsp-plugins/lsp-dsp-units/blob/1.0.19/src/main/filters/Equalizer.cpp",
+      "local_file": "Equalizer-1.0.19.cpp",
+      "sha256": "6c56ab8898012f7873af011eb5c7dda477945978330d0e134ee85d32e93e37b8",
+      "relevant_lines": [
+        234,
+        247,
+        440
+      ]
+    },
+    {
+      "url": "https://github.com/lsp-plugins/lsp-dsp-units/blob/1.0.19/src/main/filters/Filter.cpp",
+      "local_file": "Filter-1.0.19.cpp",
+      "sha256": "c56148cc4a795c2c7ed7e9493492015b59f70dc5e16774611910ba7971c36c44",
+      "relevant_lines": [
+        206,
+        230
+      ]
+    }
+  ],
+  "debug_symbols": {
+    "url": "http://ddebs.ubuntu.com/pool/universe/l/lsp-plugins/lsp-plugins-lv2-dbgsym_1.2.14-1_amd64.ddeb",
+    "package_sha256": "b26b8a9ae1cb65a9f9cc4dd584657f2c1ad4699e3343068cb51ebb377da9cbd0",
+    "debug_file": "symbols/usr/lib/debug/.build-id/83/bbb6d60bfd39a139582b2082882785e1875c68.debug",
+    "debug_file_sha256": "554470060791aa8cb52d684a513dc256a7f8f2793604d13260c82d019acd75e7",
+    "matching_build_id_verified": true,
+    "installed_globally": false,
+    "plugin_binary_modified": false
+  },
+  "raw_evidence": {
+    "root": "/tmp/music-rig-eq-isolation-20260906.0uzGPJ",
+    "files": [
+      {
+        "path": "profile2/report.json",
+        "sha256": "42214a6f2193c034cadf4c890696580af507e55cc9b6b1c8abaea487e337883f"
+      },
+      {
+        "path": "profile2/profile-summary.txt",
+        "sha256": "cc27425e60e56b43fad25eee4716c1c768ca31ea13decd8e868e3e1de4d81aa3"
+      },
+      {
+        "path": "profile2/blocks.csv",
+        "sha256": "d042871f46dfc095b629a1f9620dea803d6efaa7ad403c258ca905766d218126"
+      },
+      {
+        "path": "eq-stack3.txt",
+        "sha256": "5836e956fc4f0d3b52ddd20aa769735382bd987e72f74e094e0fe694d5cf746f"
+      },
+      {
+        "path": "eq-stack.gdb",
+        "sha256": "5147dcf3476cd487618f4c468bcdf99d9ffc2ff4aace10a8d257978b6fc90860"
+      }
+    ]
+  },
+  "verification": {
+    "eq_isolation_contract_cases": 16,
+    "local_ctest_passed": 75,
+    "local_ctest_failed": 0,
+    "protected_baseline_checks": 30,
+    "protected_baseline_failures": 0
+  },
+  "limitations": [
+    "The profiler covers initialization, calibration, warmup, measurement, cleanup, and worker threads; it is not scenario-attributed.",
+    "Collector warnings and the mismatch between sample-weighted totals and process CPU prohibit precise profiling percentages.",
+    "The independent debugger confirms execution of the rebuild path but does not measure its frequency or duration.",
+    "The copied production LSP binary runs under a different Carla host/version and scheduling environment from Airstar.",
+    "No physical mixed-load retest or operator audio assessment occurred during this local profiling step."
+  ],
+  "next_step": "Compare an offline smoothing/coefficient-update optimization or newer upstream implementation, checking steady-state preset response, gain transitions, mapping parity, and block cost before proposing any live change.",
+  "live_zero_xrun_acceptance": false
+}

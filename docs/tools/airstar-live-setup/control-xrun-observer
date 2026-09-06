@@ -20,8 +20,8 @@ for command in aseqdump date journalctl jq mktemp pw-link pw-top sha256sum stdbu
     }
 done
 
-readonly started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 readonly started_epoch=$(date +%s)
+readonly started_at=$(date -u -d "@$started_epoch" +%Y-%m-%dT%H:%M:%SZ)
 readonly temporary=$(mktemp -d "${TMPDIR:-/tmp}/music-rig-control-xrun.XXXXXX")
 
 cleanup() {
@@ -68,6 +68,25 @@ journalctl --user --since "@$started_epoch" --until "@$ended_epoch" \
     > "$temporary/journal-after.txt" 2>/dev/null || true
 
 midi_summary=$(jq -Rn --argjson started_epoch "$started_epoch" '
+    def control_payload:
+        (capture("Control change\\s+(?<channel>[0-9]+),\\s+controller\\s+(?<controller>[0-9]+),\\s+value\\s+(?<value>[0-9]+)\\s*$") // null)
+        | if . == null then null else
+            map_values(tonumber)
+            | if .channel < 16 and .controller < 128 and .value < 128 then . else null end
+          end;
+    def control_summary:
+        map(select(.event == "Control change" and .control != null))
+        | group_by([.source, .control.channel, .control.controller])
+        | map({
+            source: .[0].source,
+            channel: .[0].control.channel,
+            controller: .[0].control.controller,
+            count: length,
+            value_first: .[0].control.value,
+            value_last: .[-1].control.value,
+            value_min: (map(.control.value) | min),
+            value_max: (map(.control.value) | max)
+        });
     [
         inputs
         | split("\t")
@@ -77,17 +96,26 @@ midi_summary=$(jq -Rn --argjson started_epoch "$started_epoch" '
         | ($event.raw
             | capture("^\\s*(?<source>[0-9]+:[0-9]+)\\s+(?<event>Note on|Note off|Control change)")) as $match
         | $event + {source: $match.source, event: $match.event}
+        | .control = (if .event == "Control change" then .raw | control_payload else null end)
     ]
     | {
         event_count: length,
         first_arrival: (.[0].timestamp // null),
         last_arrival: (.[-1].timestamp // null),
+        control_changes: control_summary,
+        unparsed_control_change_count: (
+            map(select(.event == "Control change" and .control == null)) | length
+        ),
         arrival_buckets: (
             group_by(.timestamp[0:19])
              | map({
                  timestamp: (.[0].timestamp[0:19] + "Z"),
-                 second: ((.[0].timestamp[0:19] | fromdateiso8601) - $started_epoch),
+                 second: ((.[0].timestamp[0:19] + "Z" | fromdateiso8601) - $started_epoch),
                  count: length,
+                 control_changes: control_summary,
+                 unparsed_control_change_count: (
+                     map(select(.event == "Control change" and .control == null)) | length
+                 ),
                 event_types: (
                     group_by(.event)
                     | map({event: .[0].event, count: length})
@@ -109,39 +137,21 @@ midi_summary=$(jq -Rn --argjson started_epoch "$started_epoch" '
     }
 ' < "$temporary/midi.tsv")
 
-pipewire_summary=$(jq -Rn '
-    [
-        inputs
-        | capture("^R\\s+(?<id>[0-9]+)\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+(?<err>[0-9]+)\\s+(?<rest>.*)$")?
-        | select(. != null)
-        | .id |= tonumber
-        | .err |= tonumber
-    ]
-    | group_by(.id)
-    | map({
-        id: .[0].id,
-        name: .[0].rest,
-        samples: length,
-        err_before: .[0].err,
-        err_after: .[-1].err,
-        err_delta: (.[-1].err - .[0].err)
-    })
-    | {
-        samples: (map(.samples) | max // 0),
-        total_err_delta: (map(.err_delta) | add // 0),
-        changed_nodes: map(select(.err_delta != 0))
-    }
-' < "$temporary/pw-top.txt")
-
 pipewire_samples=$(jq -Rn '
+    def duration_us:
+        (capture("^(?<value>[0-9]+(?:\\.[0-9]+)?)(?<unit>ns|us|ms|s)$") // null) as $duration
+        | if $duration == null then null else
+            ($duration.value | tonumber) *
+            ({ns: 0.001, us: 1, ms: 1000, s: 1000000}[$duration.unit])
+          end;
     reduce inputs as $line (
         {sample: 0, rows: []};
         if ($line | test("^S\\s+ID\\s+QUANT")) then
-            if (.rows | length) > 0 then .sample += 1 else .sample = 1 end
+            .sample += 1
         elif ($line | startswith("R ")) then
             ($line | capture(
-                "^R\\s+(?<id>[0-9]+)\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+(?<err>[0-9]+)\\s+(?<name>.*)$"
-            )?) as $match
+                "^R\\s+(?<id>[0-9]+)\\s+(?<quantum>[0-9]+)\\s+(?<rate>[0-9]+)\\s+(?<wait>\\S+)\\s+(?<busy>\\S+)\\s+(?<wait_ratio>\\S+)\\s+(?<busy_ratio>\\S+)\\s+(?<err>[0-9]+)\\s+(?<name>.*)$"
+            ) // null) as $match
             | if $match == null then
                   .
               else
@@ -149,7 +159,19 @@ pipewire_samples=$(jq -Rn '
                       sample: .sample,
                       id: ($match.id | tonumber),
                       err: ($match.err | tonumber),
-                      name: $match.name
+                      name: $match.name,
+                      timing: {
+                          quantum_frames: ($match.quantum | tonumber),
+                          rate_hz: ($match.rate | tonumber),
+                          wait_raw: $match.wait,
+                          busy_raw: $match.busy,
+                          wait_us: ($match.wait | duration_us),
+                          busy_us: ($match.busy | duration_us),
+                          wait_quantum_ratio_raw: $match.wait_ratio,
+                          busy_quantum_ratio_raw: $match.busy_ratio,
+                          wait_quantum_ratio: ($match.wait_ratio | tonumber? // null),
+                          busy_quantum_ratio: ($match.busy_ratio | tonumber? // null)
+                      }
                   }]
               end
         else
@@ -160,7 +182,7 @@ pipewire_samples=$(jq -Rn '
     | group_by(.sample)
     | map({
         second: (.[0].sample - 1),
-        nodes: map({id, name, err})
+        nodes: map({id, name, err, timing})
     })
     | reduce .[] as $sample (
         {previous: {}, output: []};
@@ -175,7 +197,7 @@ pipewire_samples=$(jq -Rn '
             }
         )) as $nodes
         | .output += [{second: $sample.second, nodes: $nodes}]
-        | .previous = (
+        | .previous += (
             $nodes
             | map({key: (.id | tostring), value: .err})
             | from_entries
@@ -185,6 +207,36 @@ pipewire_samples=$(jq -Rn '
 ' < "$temporary/pw-top.txt")
 
 printf '%s\n' "$pipewire_samples" > "$temporary/pw-samples.json"
+
+pipewire_summary=$(jq '
+    [.[] | .nodes[]]
+    | group_by(.id)
+    | . as $groups
+    | map({
+        id: .[0].id,
+        name: .[0].name,
+        samples: length,
+        err_before: .[0].err,
+        err_after: .[-1].err,
+        err_delta: (.[-1].err - .[0].err)
+    })
+    | {
+        samples: (map(.samples) | max // 0),
+        total_err_delta: (map(.err_delta) | add // 0),
+        changed_nodes: map(select(.err_delta != 0)),
+        timing_nodes: ($groups | map({
+            id: .[0].id,
+            name: .[0].name,
+            samples: length,
+            wait_samples: (map(.timing.wait_us | select(. != null)) | length),
+            busy_samples: (map(.timing.busy_us | select(. != null)) | length),
+            wait_us_max: (map(.timing.wait_us) | max),
+            busy_us_max: (map(.timing.busy_us) | max),
+            wait_quantum_ratio_max: (map(.timing.wait_quantum_ratio) | max),
+            busy_quantum_ratio_max: (map(.timing.busy_quantum_ratio) | max)
+        }))
+    }
+' "$temporary/pw-samples.json")
 
 printf '%s\n' "$midi_summary" > "$temporary/midi-summary.json"
 printf '%s\n' "$pipewire_summary" > "$temporary/pipewire-summary.json"
@@ -235,7 +287,10 @@ jq -nS \
         },
         correlation: {
             per_second: [
-                range(0; $duration) as $second
+                range(0; (
+                    [$duration] + ($midi[0].arrival_buckets | map(.second)) +
+                    ($pw_samples[0] | map(.second)) | max
+                ) + 1) as $second
                 | {
                     second: $second,
                     midi: (
@@ -244,6 +299,8 @@ jq -nS \
                         | .[0] // {
                             second: $second,
                             count: 0,
+                            control_changes: [],
+                            unparsed_control_change_count: 0,
                             event_types: [],
                             sources: []
                         }
@@ -263,6 +320,9 @@ jq -nS \
         },
         notes: [
             "MIDI timestamps are observer arrival times grouped into UTC-second buckets, not device-event timestamps.",
+            "Control-change groups preserve ALSA source, zero-based MIDI channel, controller number, arrival count, and first/last/minimum/maximum values; mirrored ports remain separate.",
+            "PipeWire seconds are nominal snapshot indices; deltas cover the interval since each node was last sampled. The final boundary sample is retained.",
+            "PipeWire timing contains sampled pw-top WAIT/BUSY and W/Q/B/Q fields, not per-cycle maxima. Unknown markers remain in raw fields with null numeric values; zero follower quantum/rate values are preserved.",
             "pw-top ERR is the PipeWire cumulative xrun/error counter; changed nodes require attribution review.",
             "This observer never creates or removes links and does not control services, Carla, EQ parameters, or quantum."
         ]

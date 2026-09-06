@@ -1,0 +1,77 @@
+{
+  "schema": "music-studies/airstar-smc-mixer-relay-correlation/v1",
+  "captured_at_utc": {
+    "observer_start": "2026-09-06T18:25:41Z",
+    "observer_end": "2026-09-06T18:27:41Z",
+    "relay_trace_start": "2026-09-06T18:24:26Z"
+  },
+  "host": "airstar",
+  "source_commit": "ae346239a29b0b7c39f5a72c4493c1147f7f3ce4",
+  "definition_fingerprint": "sha256:b5988448d8346ffdca61bbcebd3d0b8bd4c62ae214923fe55bf1ffdbffbb22c3",
+  "staged_artifacts": {
+    "music_rigd_sha256": "9a80d5bec49b073f493b40b40afadbc049c2e54012ea38cc6997af8ff3637dc9",
+    "definition_sha256": "2a0d06a54542a8c6bbd6e96d9902d046e80642022df9064d9de76046de503a57"
+  },
+  "relay": {
+    "cycles": 11239,
+    "input_events": 19178,
+    "mapped_events": 19178,
+    "emitted_events": 4089,
+    "coalesced_events": 15089,
+    "unmapped_events": 0,
+    "malformed_events": 0,
+    "adapter_failures": 0,
+    "control_cc_40_47_mapped_events": [2163, 1659, 2005, 2277, 2387, 2912, 3016, 2759]
+  },
+  "observer": {
+    "duration_seconds": 120,
+    "midi_ports": "20:1",
+    "event_count": 14748,
+    "event_type": "Control change",
+    "unparsed_control_change_count": 0,
+    "controls": {
+      "40": {"count": 1780, "value_min": 0, "value_max": 127},
+      "41": {"count": 1592, "value_min": 0, "value_max": 127},
+      "42": {"count": 1683, "value_min": 0, "value_max": 127},
+      "43": {"count": 1900, "value_min": 0, "value_max": 127},
+      "44": {"count": 1892, "value_min": 0, "value_max": 127},
+      "45": {"count": 1886, "value_min": 0, "value_max": 127},
+      "46": {"count": 2139, "value_min": 0, "value_max": 127},
+      "47": {"count": 1876, "value_min": 0, "value_max": 127}
+    },
+    "pipewire_err_delta": 0,
+    "pipewire_changed_nodes": [],
+    "journal_xrun_dropout_deadline_lines": 0,
+    "temporary_cleanup": true
+  },
+  "rollback": {
+    "legacy_links": "8/8",
+    "relay_input_links": "0/1",
+    "relay_output_links": "0/8",
+    "remote_staging_removed": true,
+    "final_protected_validation": "30/30",
+    "final_raw_graph_links": 118,
+    "final_midi_graph_links": 68,
+    "final_quantum_frames": 1024,
+    "final_active_services": 4
+  },
+  "evaluation": {
+    "relay_control_gate": "pass",
+    "zero_error_gate": "pass",
+    "operator_audio_assessment": "subtle audible occurrences reported; much fewer than prior equivalent tests",
+    "audible_stability_gate": "open",
+    "production_promotion": false
+  },
+  "raw_evidence": {
+    "observer_sha256": "526b1933b8304f54b462e4b72be3676d09249c596df3738a8d3768f5887caa9d",
+    "relay_trace_sha256": "ac91a5689476b6a44dfd3ae90845c68122debd62cdb9ed3371b0d6208bb3caa8",
+    "joined_correlation_sha256": "7168cfa3b521d41309884d728afa61c4792db1efc924520cff0488c90ac1f2fe"
+  },
+  "notes": [
+    "The initial native JACK launch failed closed with result 4 before relay ports; the retry used pw-jack and passed.",
+    "The two-minute observer and relay trace use different startup epochs; the joiner matched 121 observer seconds to 240 relay trace seconds.",
+    "This is protected-plugin relay evidence, not live evidence for the uninstalled upstream LSP candidate.",
+    "The operator reported a very subtle audible issue with few occurrences, materially less than prior equivalent tests.",
+    "No production preset, plugin, service, or installation path was changed."
+  ]
+}

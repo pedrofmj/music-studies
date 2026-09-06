@@ -177,6 +177,53 @@ matches. It never connects or disconnects ports and does not change Carla,
 parameters, services, or PipeWire quantum.
 Its `correlation.per_second` array joins the MIDI arrival buckets to the
 per-node PipeWire ERR snapshots and deltas for each observation second.
+The array includes the final boundary snapshot and any later observed MIDI
+bucket, so the closing ERR delta is retained. Empty snapshots retain their
+positions, and a returning node is compared with its last available counter.
+
+`midi.control_changes` and each arrival bucket preserve CC activity grouped by
+ALSA source, zero-based MIDI channel, and controller number. Each group records
+arrival count and first, last, minimum, and maximum values. Mirrored Private
+and Master ports remain separate. Unrecognized or out-of-range CC payloads
+remain in event totals and increment `unparsed_control_change_count`.
+
+Each PipeWire node sample includes `timing`: raw `WAIT`, `BUSY`, `W/Q`, and
+`B/Q` fields, numeric wait/busy values in microseconds, numeric load ratios,
+quantum frames, and rate. Unknown markers retain their raw text with null
+numeric values. A follower quantum or rate of zero remains zero.
+`pipewire.pw_top.timing_nodes` gives maxima across available samples and the
+number of valid timing samples for each node. All parsing occurs after capture;
+the relay callback and capture command set are unchanged.
+
+For a driver, `WAIT` describes elapsed graph processing; for a follower, it
+describes scheduling delay before processing starts. `BUSY` describes the
+node's processing duration. These are sampled readings, so maxima in this
+report are not per-cycle worst cases and may miss a brief fault. See the
+[PipeWire pw-top documentation](https://docs.pipewire.org/page_man_pw-top_1.html)
+for the field definitions.
+
+After the relay has stopped and printed its trace, join the two local files:
+
+~~~bash
+docs/tools/airstar-live-setup/join-relay-control-xrun-correlation \
+  /tmp/airstar-control-xrun.json /tmp/airstar-relay.log \
+  /tmp/airstar-relay-correlation.json
+~~~
+
+The joiner validates the observer schema and relay timestamps, sample rate,
+and unique trace seconds before writing. Invalid input preserves an existing
+output file; output cannot alias either input. Missing relay seconds remain
+`null`, and `relay.matched_seconds` reports coverage. The joined report also
+retains observer command status and protected-graph evidence.
+Per-control groups and node timing fields also pass through the join unchanged.
+
+Alignment is approximate: MIDI uses UTC arrival buckets, PipeWire uses nominal
+snapshot indices, and the relay uses processed frames from a whole-second
+startup epoch. ERR deltas cover the interval since a node was last sampled;
+these reports do not establish exact event timing or causation.
+
+The `music_rig_control_xrun_correlation` CTest regression runs both commands
+against mocked MIDI, PipeWire, clock, and journal inputs without a live backend.
 
 ## Windows Boundary
 

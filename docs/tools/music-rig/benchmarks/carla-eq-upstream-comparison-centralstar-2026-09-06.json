@@ -1,0 +1,63 @@
+{
+  "schema": "music-studies/carla-eq-isolation-comparison/v1",
+  "captured_at_utc": "2026-09-06T17:42:42.942270+00:00",
+  "host": "centralstar",
+  "provenance": {
+    "carla_library": "/usr/lib/carla/libcarla_host-plugin.so",
+    "baseline_lsp_binary_sha256": "12a8ff7a08419c4e927d41946b45639ee851c10f1352eb2c6f63349e4df35a5c",
+    "candidate_lsp_binary_sha256": "6fdc551f9d2f2657c144605433f59f7a34af60fecbaba8c9a2850218a9ac6cf9",
+    "candidate_source": "lsp-plugins-para-equalizer 1.0.40",
+    "source_project_sha256": "48ea4f777c68ebd39105902739258795edfa96fefd8820b62fb31d4efe329974"
+  },
+  "measurement": {
+    "sample_rate": 48000,
+    "frames": 1024,
+    "blocks_per_scenario": 2048,
+    "warmup_blocks": 128,
+    "scenario_count": 15
+  },
+  "acceptance": {
+    "mapping_parity": true,
+    "finite_audio": true,
+    "event_parity": true,
+    "candidate_zero_over_quantum_blocks": true,
+    "max_energy_relative_delta": 0.011090884222471066,
+    "energy_tolerance": 0.02,
+    "offline_comparison_passed": true,
+    "live_acceptance_passed": false
+  },
+  "timing_summary_us": {
+    "audio_direct_all": {
+      "baseline_thread_cpu_mean": 3766.034,
+      "candidate_thread_cpu_mean": 122.141,
+      "mean_speedup": 30.83349571396992,
+      "baseline_thread_cpu_p99": 8358.581,
+      "candidate_thread_cpu_p99": 265.809,
+      "p99_speedup": 31.44581635685774
+    },
+    "audio_midi_all_frame0": {
+      "baseline_thread_cpu_mean": 2224.671,
+      "candidate_thread_cpu_mean": 130.968,
+      "mean_speedup": 16.986370716510905,
+      "baseline_thread_cpu_p99": 3153.885,
+      "candidate_thread_cpu_p99": 322.276,
+      "p99_speedup": 9.786285668185034
+    },
+    "audio_midi_all_spread": {
+      "baseline_thread_cpu_mean": 2428.133,
+      "candidate_thread_cpu_mean": 121.178,
+      "mean_speedup": 20.03773787321131,
+      "baseline_thread_cpu_p99": 5130.408,
+      "candidate_thread_cpu_p99": 282.537,
+      "p99_speedup": 18.158358020365476
+    },
+    "individual_band_mean_speedup_min": 13.483834856808189,
+    "individual_band_mean_speedup_max": 26.045059102844824
+  },
+  "limitations": [
+    "Device-free plugin blocks are not live JACK or PipeWire scheduling.",
+    "Energy parity is a coarse response check, not an impulse or frequency-response match.",
+    "The upstream candidate is not installed, activated, or promoted.",
+    "The protected LSP 1.2.14 binary and production preset were unchanged."
+  ]
+}

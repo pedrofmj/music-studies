@@ -1617,6 +1617,30 @@ if(BUILD_TESTING)
                 music_rig_current_rack_startup_contract
                 PROPERTIES TIMEOUT 10
             )
+            add_test(
+                NAME music_rig_control_xrun_correlation
+                COMMAND "${Python3_EXECUTABLE}"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-control-xrun-correlation.py"
+            )
+            set_tests_properties(
+                music_rig_control_xrun_correlation PROPERTIES TIMEOUT 30
+            )
+            add_test(
+                NAME music_rig_carla_eq_isolation_contract
+                COMMAND "${Python3_EXECUTABLE}"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-carla-eq-parameter-isolation.py"
+            )
+            set_tests_properties(
+                music_rig_carla_eq_isolation_contract PROPERTIES TIMEOUT 10
+            )
+            add_test(
+                NAME music_rig_carla_eq_isolation_comparison_contract
+                COMMAND "${Python3_EXECUTABLE}"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-carla-eq-isolation-comparison.py"
+            )
+            set_tests_properties(
+                music_rig_carla_eq_isolation_comparison_contract PROPERTIES TIMEOUT 10
+            )
 
         endif()
         add_test(

@@ -1,0 +1,453 @@
+{
+  "schema": "music-studies/carla-eq-parameter-isolation/v1",
+  "captured_at_utc": {
+    "start": "2026-09-06T10:40:11.906656+00:00",
+    "end": "2026-09-06T10:41:20.958715+00:00"
+  },
+  "environment": {
+    "host": "centralstar",
+    "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "carla_library": "/usr/lib/carla/libcarla_host-plugin.so",
+    "lv2_bundle": "/tmp/music-rig-eq-isolation-20260906.0uzGPJ/lsp-plugins.lv2",
+    "audio_server_used": false,
+    "hardware_connections": false,
+    "plugin_ui_opened": false,
+    "plugin_offline_hint": false
+  },
+  "source_project": {
+    "path": "/c/development/egt/customers/ped/music-studies/src/audio-software/carla/projects/pedro-live-rack/pedro.uproject",
+    "sha256": "48ea4f777c68ebd39105902739258795edfa96fefd8820b62fb31d4efe329974"
+  },
+  "sha256": {
+    "carla_library": "d5505e3cf213430be53c735d8f96b86796717d7f0e1d20b536a5222e97ebf4a2",
+    "lsp_binary": "12a8ff7a08419c4e927d41946b45639ee851c10f1352eb2c6f63349e4df35a5c",
+    "lsp_metadata": "b29a5267d5d0851ded43349e67a091ffeb19dcf19c0f1250f21df1a68888f3d6",
+    "isolated_project": "51183d9b0caa7fa4dbf6ce4b0bc0d66300f2d6a2787b9eaaf039943a6ee6f3aa",
+    "harness_source": "5c05e1599287732ce4c669a3098f5a0debecad186c2d26200a50f2dd0f764b56",
+    "runner_source": "6740d1483a9ecc7555a526f87dbe0ce0bfbe55fdc262beb6928ccd7db31348fd",
+    "harness_binary": "5110ba9814de2c9a15c6c27ba91c9ad8ebcbde4080bfd3a693f6a5041f39b6a1",
+    "headers": {
+      "CarlaDefines.h": "7fc8c878fedc7f186d107087097f908046af15dd866bd645b6c3d0bb6219cc3b",
+      "CarlaNative.h": "c1b1a806a95ee2e4935eec9699c233e6a3ee27fcc8da37002bb0034c9d81854f",
+      "CarlaBackend.h": "0092e48f709397af804754c0f48b92c02930a96d1bbaa770b7f93dcdfd46c037",
+      "CarlaHost.h": "1789a2a56eb4664dee092de98229297eef8f465f82209aeec54f2e85e635bff2"
+    },
+    "blocks_csv": "9b6aae0541732fbb0986c756aeca79fc6f74083a87067ef977fa409029d441a6"
+  },
+  "measurement": {
+    "sample_rate": 48000,
+    "frames": 1024,
+    "blocks_per_scenario": 2048,
+    "warmup_blocks": 128,
+    "options_enabled": 1,
+    "mapping_verified": true,
+    "mapping_endpoints": [
+      0.251188636,
+      3.98107171
+    ],
+    "scenarios": [
+      {
+        "name": "silence_hold",
+        "midi_events": 0,
+        "mapping_errors": 0,
+        "invalid_audio_samples": 0,
+        "output_energy": 0,
+        "wall": {
+          "mean_us": 38.461,
+          "p50_us": 37.576,
+          "p99_us": 54.42,
+          "max_us": 165.334,
+          "over_quantum_blocks": 0
+        },
+        "thread_cpu": {
+          "mean_us": 37.831,
+          "p50_us": 37.041,
+          "p99_us": 53.763,
+          "max_us": 128.98,
+          "over_quantum_blocks": 0
+        }
+      },
+      {
+        "name": "audio_hold",
+        "midi_events": 0,
+        "mapping_errors": 0,
+        "invalid_audio_samples": 0,
+        "output_energy": 7300.64697493,
+        "wall": {
+          "mean_us": 55.075,
+          "p50_us": 51.537,
+          "p99_us": 77.865,
+          "max_us": 2467.219,
+          "over_quantum_blocks": 0
+        },
+        "thread_cpu": {
+          "mean_us": 52.377,
+          "p50_us": 50.947,
+          "p99_us": 76.434,
+          "max_us": 144.469,
+          "over_quantum_blocks": 0
+        }
+      },
+      {
+        "name": "audio_direct_all",
+        "midi_events": 0,
+        "mapping_errors": 0,
+        "invalid_audio_samples": 0,
+        "output_energy": 4113018.05744,
+        "wall": {
+          "mean_us": 3781.123,
+          "p50_us": 2802.691,
+          "p99_us": 8375.137,
+          "max_us": 10751.379,
+          "over_quantum_blocks": 0
+        },
+        "thread_cpu": {
+          "mean_us": 3766.034,
+          "p50_us": 2802.007,
+          "p99_us": 8358.581,
+          "max_us": 9535.236,
+          "over_quantum_blocks": 0
+        },
+        "direct_setter_thread_cpu": {
+          "mean_us": 2.082,
+          "p50_us": 1.243,
+          "p99_us": 6.404,
+          "max_us": 19.089,
+          "over_quantum_blocks": 0
+        }
+      },
+      {
+        "name": "audio_midi_all_frame0",
+        "midi_events": 16384,
+        "mapping_errors": 0,
+        "invalid_audio_samples": 0,
+        "output_energy": 4113018.05744,
+        "wall": {
+          "mean_us": 2225.877,
+          "p50_us": 2073.497,
+          "p99_us": 3155.847,
+          "max_us": 4444.116,
+          "over_quantum_blocks": 0
+        },
+        "thread_cpu": {
+          "mean_us": 2224.671,
+          "p50_us": 2072.698,
+          "p99_us": 3153.885,
+          "max_us": 4292.852,
+          "over_quantum_blocks": 0
+        }
+      },
+      {
+        "name": "audio_midi_all_spread",
+        "midi_events": 16384,
+        "mapping_errors": 0,
+        "invalid_audio_samples": 0,
+        "output_energy": 4113018.05744,
+        "wall": {
+          "mean_us": 2436.614,
+          "p50_us": 2009.644,
+          "p99_us": 5374.592,
+          "max_us": 5969.841,
+          "over_quantum_blocks": 0
+        },
+        "thread_cpu": {
+          "mean_us": 2428.133,
+          "p50_us": 2008.672,
+          "p99_us": 5130.408,
+          "max_us": 5878.257,
+          "over_quantum_blocks": 0
+        }
+      },
+      {
+        "name": "silence_midi_all_spread",
+        "midi_events": 16384,
+        "mapping_errors": 0,
+        "invalid_audio_samples": 0,
+        "output_energy": 4.32147794982e-66,
+        "wall": {
+          "mean_us": 2870.507,
+          "p50_us": 2579.87,
+          "p99_us": 5971.704,
+          "max_us": 6766.306,
+          "over_quantum_blocks": 0
+        },
+        "thread_cpu": {
+          "mean_us": 2845.416,
+          "p50_us": 2578.387,
+          "p99_us": 5854.004,
+          "max_us": 6176.426,
+          "over_quantum_blocks": 0
+        }
+      },
+      {
+        "name": "audio_midi_band1",
+        "midi_events": 2048,
+        "mapping_errors": 0,
+        "invalid_audio_samples": 0,
+        "output_energy": 7416.47665794,
+        "wall": {
+          "mean_us": 3131.298,
+          "p50_us": 2582.495,
+          "p99_us": 6710.319,
+          "max_us": 7016.909,
+          "over_quantum_blocks": 0
+        },
+        "thread_cpu": {
+          "mean_us": 3104.545,
+          "p50_us": 2581.534,
+          "p99_us": 6613.938,
+          "max_us": 6908.509,
+          "over_quantum_blocks": 0
+        }
+      },
+      {
+        "name": "audio_midi_band2",
+        "midi_events": 2048,
+        "mapping_errors": 0,
+        "invalid_audio_samples": 0,
+        "output_energy": 14293.5050549,
+        "wall": {
+          "mean_us": 1967.975,
+          "p50_us": 1850.562,
+          "p99_us": 3351.99,
+          "max_us": 4601.188,
+          "over_quantum_blocks": 0
+        },
+        "thread_cpu": {
+          "mean_us": 1966.863,
+          "p50_us": 1849.957,
+          "p99_us": 3349.818,
+          "max_us": 4599.179,
+          "over_quantum_blocks": 0
+        }
+      },
+      {
+        "name": "audio_midi_band3",
+        "midi_events": 2048,
+        "mapping_errors": 0,
+        "invalid_audio_samples": 0,
+        "output_energy": 14562.1010025,
+        "wall": {
+          "mean_us": 1854.352,
+          "p50_us": 1797.725,
+          "p99_us": 2716.407,
+          "max_us": 4469.498,
+          "over_quantum_blocks": 0
+        },
+        "thread_cpu": {
+          "mean_us": 1853.66,
+          "p50_us": 1797.324,
+          "p99_us": 2714.731,
+          "max_us": 4467.79,
+          "over_quantum_blocks": 0
+        }
+      },
+      {
+        "name": "audio_midi_band4",
+        "midi_events": 2048,
+        "mapping_errors": 0,
+        "invalid_audio_samples": 0,
+        "output_energy": 11947.8769031,
+        "wall": {
+          "mean_us": 2200.613,
+          "p50_us": 2010.917,
+          "p99_us": 4461.782,
+          "max_us": 4642.754,
+          "over_quantum_blocks": 0
+        },
+        "thread_cpu": {
+          "mean_us": 2199.632,
+          "p50_us": 2010.28,
+          "p99_us": 4459.998,
+          "max_us": 4641.031,
+          "over_quantum_blocks": 0
+        }
+      },
+      {
+        "name": "audio_midi_band5",
+        "midi_events": 2048,
+        "mapping_errors": 0,
+        "invalid_audio_samples": 0,
+        "output_energy": 10650.2966223,
+        "wall": {
+          "mean_us": 2977.3,
+          "p50_us": 2546.151,
+          "p99_us": 6114.557,
+          "max_us": 6371.093,
+          "over_quantum_blocks": 0
+        },
+        "thread_cpu": {
+          "mean_us": 2975.315,
+          "p50_us": 2545.198,
+          "p99_us": 6112.366,
+          "max_us": 6369.055,
+          "over_quantum_blocks": 0
+        }
+      },
+      {
+        "name": "audio_midi_band6",
+        "midi_events": 2048,
+        "mapping_errors": 0,
+        "invalid_audio_samples": 0,
+        "output_energy": 9934.9949567,
+        "wall": {
+          "mean_us": 2453.458,
+          "p50_us": 2230.232,
+          "p99_us": 5676.666,
+          "max_us": 5797.004,
+          "over_quantum_blocks": 0
+        },
+        "thread_cpu": {
+          "mean_us": 2425.95,
+          "p50_us": 2229.317,
+          "p99_us": 5672.199,
+          "max_us": 5793.744,
+          "over_quantum_blocks": 0
+        }
+      },
+      {
+        "name": "audio_midi_band7",
+        "midi_events": 2048,
+        "mapping_errors": 0,
+        "invalid_audio_samples": 0,
+        "output_energy": 8550.41168087,
+        "wall": {
+          "mean_us": 2003.852,
+          "p50_us": 1788.664,
+          "p99_us": 4100.587,
+          "max_us": 4716.397,
+          "over_quantum_blocks": 0
+        },
+        "thread_cpu": {
+          "mean_us": 2001.576,
+          "p50_us": 1787.83,
+          "p99_us": 4077.23,
+          "max_us": 4714.59,
+          "over_quantum_blocks": 0
+        }
+      },
+      {
+        "name": "audio_midi_band8",
+        "midi_events": 2048,
+        "mapping_errors": 0,
+        "invalid_audio_samples": 0,
+        "output_energy": 7383.36115819,
+        "wall": {
+          "mean_us": 1819.654,
+          "p50_us": 1754.679,
+          "p99_us": 2806.05,
+          "max_us": 4145.158,
+          "over_quantum_blocks": 0
+        },
+        "thread_cpu": {
+          "mean_us": 1818.821,
+          "p50_us": 1753.939,
+          "p99_us": 2804.859,
+          "max_us": 4143.531,
+          "over_quantum_blocks": 0
+        }
+      },
+      {
+        "name": "audio_hold_nonflat",
+        "midi_events": 0,
+        "mapping_errors": 0,
+        "invalid_audio_samples": 0,
+        "output_energy": 634385.272146,
+        "wall": {
+          "mean_us": 30.642,
+          "p50_us": 29.756,
+          "p99_us": 74.818,
+          "max_us": 108.649,
+          "over_quantum_blocks": 0
+        },
+        "thread_cpu": {
+          "mean_us": 30.292,
+          "p50_us": 29.431,
+          "p99_us": 73.907,
+          "max_us": 108.289,
+          "over_quantum_blocks": 0
+        }
+      }
+    ]
+  },
+  "host_log_health": {
+    "assertion_lines": 0,
+    "known_filter_select_warnings": 1,
+    "hidden_ui_update_messages": 46599
+  },
+  "limitations": [
+    "This is the EQ slice in Carla's native rack API, not the full live multiple-client graph.",
+    "CC102-109 enter the EQ directly; the upstream CC40-47 scaling intermediaries are excluded.",
+    "The deterministic stereo tones and noise are not a replay of Arturia audio.",
+    "Blocks run as fast as possible on the calling thread, without realtime scheduling or device deadlines.",
+    "Elapsed-time over-quantum blocks are diagnostic timings, not measured JACK or PipeWire xruns.",
+    "Wall and calling-thread CPU timings include direct setter calls in the direct-update scenario.",
+    "The plugin uses its normal realtime mode, with no UI; GUI and worker-thread costs are not isolated."
+  ],
+  "captured_on": "2026-09-06",
+  "source_commit": "ae346239a29b0b7c39f5a72c4493c1147f7f3ce4",
+  "packages": {
+    "local_carla": "2.5.8-0ubuntu5",
+    "airstar_lsp_plugins_lv2": "1.2.14-1",
+    "live_carla": "Flatpak 2.5.10 (prior inventory; not the host library used in this test)"
+  },
+  "binary_provenance": {
+    "source_host": "airstar",
+    "source_bundle": "/home/ldap/pedro.ferreira/.lv2/lsp-plugins.lv2",
+    "identified_from": "Read-only /proc/39241/maps inspection of the running Carla process.",
+    "binary_sha256": "12a8ff7a08419c4e927d41946b45639ee851c10f1352eb2c6f63349e4df35a5c",
+    "system_copy_same_sha256": true,
+    "production_files_written": false,
+    "remote_processes_started": false
+  },
+  "raw_evidence": {
+    "local_directory": "/tmp/music-rig-eq-isolation-20260906.0uzGPJ/run4",
+    "report_sha256": "148c960f1cd2ce603dde0cac340d5ff42215ccb9587a8e5d66669794f0a0cd33",
+    "host_log_sha256": "0856651133bad7335f43648367f92dbd2d58b11746c519bce93bb35d4ffbe381"
+  },
+  "evaluation": {
+    "isolated_audio_and_mapping_contract_pass": true,
+    "assertion_free_host_pass": true,
+    "measured_blocks": 30720,
+    "measured_midi_events": 65536,
+    "nonfinite_audio_samples": 0,
+    "mapping_errors": 0,
+    "over_quantum_blocks": 0,
+    "live_xrun_reproduced": false,
+    "live_milestone4_acceptance_pass": false,
+    "production_promotion": false
+  },
+  "interpretation": [
+    "The device-free EQ slice reproduces a substantial cost increase when gains change, with no relay or CC scaling intermediaries present.",
+    "Fixed flat and non-flat audio averaged 52.377 us and 30.292 us of calling-thread CPU. Updating all gains directly averaged 3766.034 us, of which direct setters accounted for only 2.082 us.",
+    "MIDI changes to all gains averaged 2224.671 us at frame zero and 2428.133 us with events spread across the block. Individual-band change scenarios averaged 1818.821-3104.545 us. Silence plus gain changes also incurred 2845.416 us on average.",
+    "The fixed non-flat control sets all gains to Carla's calibrated value for MIDI 96. Its low steady cost distinguishes gain-change work from merely running the EQ with non-unity gains.",
+    "CPU-time growth remains when MIDI mapping is bypassed and occurs mainly during the subsequent audio block. This narrows the investigation to the hosted EQ parameter-refresh/processing path; it does not establish a specific LSP or Carla defect.",
+    "All scenarios stayed below the nominal 21.33 ms block duration in this local run. There is no audio server or realtime deadline here, so this is not proof that Airstar's live graph is stable.",
+    "CPU frequency, load, and scenario order are not controlled. Do not rank faders or infer a precise direct-versus-MIDI speed ratio from this run.",
+    "Carla emitted one known Filter select bounds warning and hidden-UI parameter notifications. No plugin UI was opened. Direct-setter timing includes synchronous notification work; any asynchronous work remains outside the calling-thread measurement."
+  ],
+  "next_diagnostic": "Profile the isolated hosted EQ's parameter-refresh and audio-processing call paths, then compare a minimal direct-LV2 host if needed. Do not change the protected EQ preset, deploy a plugin update, or retune the relay before identifying the expensive work.",
+  "discarded_drafts": {
+    "local_parent_directory": "/tmp/music-rig-eq-isolation-20260906.0uzGPJ",
+    "runs": [
+      "smoke",
+      "run1",
+      "run2",
+      "run3"
+    ],
+    "reason": "Draft harness used the standalone-only carla_engine_idle API with a native host handle, causing logged assertions outside the timed block. Smoke also mixed JSON with host logs. These drafts are not accepted evidence. The final harness uses the native dispatcher, separate JSON, and assertion-rejecting log validation."
+  },
+  "verification": {
+    "complete_local_json_jack_ctest_total": 75,
+    "complete_local_json_jack_ctest_failures": 0,
+    "eq_contract_unittest_cases": 12,
+    "eq_contract_unittest_failures": 0,
+    "protected_baseline_checks": 30,
+    "protected_baseline_failures": 0,
+    "airstar_final_live_validation_failures": 0,
+    "airstar_live_links_present": 116,
+    "airstar_live_links_unresolved": 0
+  }
+}

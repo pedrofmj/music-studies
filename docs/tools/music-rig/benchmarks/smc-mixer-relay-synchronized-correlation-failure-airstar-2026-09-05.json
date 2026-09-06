@@ -1,0 +1,1576 @@
+{
+  "schema": "music-studies/smc-mixer-relay-synchronized-correlation-airstar/v1",
+  "captured_on": "2026-09-05",
+  "host": "airstar",
+  "source_commit": "ae346239a29b0b7c39f5a72c4493c1147f7f3ce4",
+  "status": "zero-error-gate-failed",
+  "route": "one-cycle-coalesced-smc-mix-relay",
+  "source_artifacts": {
+    "daemon_sha256": "c5d136354384a5e317dc9d48fae89a2d01aaf72f05d816d2f6bdd322de826610",
+    "observer_sha256": "40dc8ba573c8eb14c4b744d623a0030ef00b9a477d86d2f857038778ac068ee6",
+    "definition_fingerprint": "sha256:b5988448d8346ffdca61bbcebd3d0b8bd4c62ae214923fe55bf1ffdbffbb22c3",
+    "uncommitted_observer_fixes": true
+  },
+  "raw_evidence": {
+    "local_directory": "/tmp/music-rig-correlation-airstar-20260905.ezDrrG",
+    "observer_json_sha256": "50fb1c8fa2e0b9c9b16be23db1412355f48dda22c20bd956d8fdb518a4eb943a",
+    "relay_log_sha256": "7a92b60f770223f0d1ea6a7661c377f907cd3575b4018078051b6898811bda36",
+    "correlation_json_sha256": "6de6bccb017ddf7c6269cf7c68489dede673fea5997f2bf0ac071d6ea181d5b5",
+    "session_status_json_sha256": "f9d828511fcb6b0f1ac87ae92b082af5aebc905fe93008560d8dde12539974d5",
+    "remote_raw_checksums_match_local": true
+  },
+  "cutover": {
+    "legacy_links": 0,
+    "relay_input_links": 1,
+    "relay_output_links": 8,
+    "settle_seconds": 10
+  },
+  "captured_at_utc": {
+    "end": "2026-09-05T18:01:53Z",
+    "start": "2026-09-05T17:59:53Z"
+  },
+  "duration_seconds": 120,
+  "midi": {
+    "event_count": 24585,
+    "event_types": [
+      {
+        "count": 24178,
+        "event": "Control change"
+      },
+      {
+        "count": 204,
+        "event": "Note off"
+      },
+      {
+        "count": 203,
+        "event": "Note on"
+      }
+    ],
+    "first_arrival": "2026-09-05T17:59:53.423988004Z",
+    "last_arrival": "2026-09-05T18:01:53.403460359Z",
+    "sources": [
+      {
+        "count": 12064,
+        "source": "20:0"
+      },
+      {
+        "count": 12064,
+        "source": "20:1"
+      },
+      {
+        "count": 457,
+        "source": "28:0"
+      }
+    ]
+  },
+  "activity": {
+    "midi_arrival_buckets": 120,
+    "mixer_active_buckets": 116,
+    "arturia_active_buckets": 87
+  },
+  "pipewire": {
+    "pw_top": {
+      "changed_nodes": [
+        {
+          "err_after": 928,
+          "err_before": 871,
+          "err_delta": 57,
+          "id": 100,
+          "name": "S32LE 2 48000 alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__sink",
+          "samples": 120
+        },
+        {
+          "err_after": 759,
+          "err_before": 702,
+          "err_delta": 57,
+          "id": 381,
+          "name": "+ SMC-MIX - 8-Band EQ",
+          "samples": 120
+        }
+      ],
+      "samples": 120,
+      "total_err_delta": 114
+    },
+    "journal": {
+      "before": 0,
+      "during_and_after": 0
+    }
+  },
+  "protected_graph": {
+    "link_hash_after": "8c1cc89f865bcb57e79ddda2eee5a9d5e8b6818d40c2a3f693fdf41a5565951a",
+    "link_hash_before": "8c1cc89f865bcb57e79ddda2eee5a9d5e8b6818d40c2a3f693fdf41a5565951a",
+    "unchanged": true
+  },
+  "command_status": {
+    "aseqdump_timeout_status": 124,
+    "pw_top_status": 0,
+    "temporary_cleanup": true
+  },
+  "relay_session": {
+    "definition_generation": 1,
+    "input_ports": 1,
+    "output_ports": 1,
+    "cycles": 6321,
+    "input_events": 13083,
+    "mapped_events": 13083,
+    "control_cc_40_mapped_events": 1108,
+    "control_cc_41_mapped_events": 1010,
+    "control_cc_42_mapped_events": 1466,
+    "control_cc_43_mapped_events": 1618,
+    "control_cc_44_mapped_events": 1935,
+    "control_cc_45_mapped_events": 2343,
+    "control_cc_46_mapped_events": 1850,
+    "control_cc_47_mapped_events": 1753,
+    "emitted_events": 3786,
+    "coalesced_events": 9297,
+    "unmapped_events": 0,
+    "malformed_events": 0,
+    "adapter_failures": 0,
+    "trace_start_epoch": 1788631181,
+    "trace_sample_rate": 48000
+  },
+  "session_status": {
+    "run_status": 0,
+    "observer_status": 0,
+    "relay_exit_status": 0,
+    "rollback_status": 0,
+    "verify_legacy_status": 0,
+    "live_validation_status": 0,
+    "protected_baseline_status": 0
+  },
+  "correlation": {
+    "relay": {
+      "matched_seconds": 121,
+      "sample_rate": 48000,
+      "start_epoch": 1788631181,
+      "trace_seconds": 135
+    },
+    "pipewire_sample_rows": 120,
+    "error_seconds": [
+      11,
+      12,
+      13,
+      42,
+      43,
+      68,
+      94,
+      95,
+      96
+    ],
+    "relay_window_totals": {
+      "input_events": 12095,
+      "emitted_events": 3463,
+      "coalesced_events": 8632,
+      "adapter_failures": 0
+    },
+    "error_bin_emitted_range": {
+      "min": 24,
+      "max": 42
+    },
+    "clean_bin_emitted_range": {
+      "min": 0,
+      "max": 46
+    },
+    "columns": [
+      "second",
+      "mixer_master_arrivals",
+      "arturia_arrivals",
+      "relay_input",
+      "relay_emitted",
+      "relay_coalesced",
+      "relay_adapter_failures",
+      "sink_err_delta",
+      "eq_err_delta"
+    ],
+    "rows": [
+      [
+        0,
+        47,
+        0,
+        67,
+        40,
+        27,
+        0,
+        null,
+        null
+      ],
+      [
+        1,
+        56,
+        0,
+        47,
+        27,
+        20,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        86,
+        0,
+        100,
+        45,
+        55,
+        0,
+        0,
+        0
+      ],
+      [
+        3,
+        62,
+        0,
+        73,
+        34,
+        39,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        31,
+        6,
+        8,
+        5,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        5,
+        67,
+        0,
+        107,
+        35,
+        72,
+        0,
+        0,
+        0
+      ],
+      [
+        6,
+        116,
+        0,
+        89,
+        37,
+        52,
+        0,
+        0,
+        0
+      ],
+      [
+        7,
+        116,
+        0,
+        100,
+        35,
+        65,
+        0,
+        0,
+        0
+      ],
+      [
+        8,
+        92,
+        0,
+        116,
+        45,
+        71,
+        0,
+        0,
+        0
+      ],
+      [
+        9,
+        45,
+        3,
+        49,
+        22,
+        27,
+        0,
+        0,
+        0
+      ],
+      [
+        10,
+        69,
+        3,
+        92,
+        37,
+        55,
+        0,
+        0,
+        0
+      ],
+      [
+        11,
+        72,
+        0,
+        124,
+        42,
+        82,
+        0,
+        1,
+        1
+      ],
+      [
+        12,
+        166,
+        0,
+        97,
+        37,
+        60,
+        0,
+        9,
+        7
+      ],
+      [
+        13,
+        76,
+        0,
+        72,
+        34,
+        38,
+        0,
+        13,
+        12
+      ],
+      [
+        14,
+        120,
+        0,
+        117,
+        42,
+        75,
+        0,
+        0,
+        0
+      ],
+      [
+        15,
+        51,
+        6,
+        19,
+        10,
+        9,
+        0,
+        0,
+        0
+      ],
+      [
+        16,
+        60,
+        0,
+        63,
+        29,
+        34,
+        0,
+        0,
+        0
+      ],
+      [
+        17,
+        114,
+        0,
+        114,
+        29,
+        85,
+        0,
+        0,
+        0
+      ],
+      [
+        18,
+        9,
+        0,
+        56,
+        19,
+        37,
+        0,
+        0,
+        0
+      ],
+      [
+        19,
+        108,
+        0,
+        64,
+        28,
+        36,
+        0,
+        0,
+        0
+      ],
+      [
+        20,
+        101,
+        2,
+        120,
+        45,
+        75,
+        0,
+        0,
+        0
+      ],
+      [
+        21,
+        65,
+        4,
+        75,
+        25,
+        50,
+        0,
+        0,
+        0
+      ],
+      [
+        22,
+        86,
+        0,
+        57,
+        29,
+        28,
+        0,
+        0,
+        0
+      ],
+      [
+        23,
+        80,
+        0,
+        117,
+        46,
+        71,
+        0,
+        0,
+        0
+      ],
+      [
+        24,
+        105,
+        0,
+        106,
+        36,
+        70,
+        0,
+        0,
+        0
+      ],
+      [
+        25,
+        69,
+        3,
+        67,
+        23,
+        44,
+        0,
+        0,
+        0
+      ],
+      [
+        26,
+        114,
+        3,
+        107,
+        32,
+        75,
+        0,
+        0,
+        0
+      ],
+      [
+        27,
+        112,
+        0,
+        106,
+        42,
+        64,
+        0,
+        0,
+        0
+      ],
+      [
+        28,
+        134,
+        0,
+        127,
+        30,
+        97,
+        0,
+        0,
+        0
+      ],
+      [
+        29,
+        88,
+        0,
+        100,
+        34,
+        66,
+        0,
+        0,
+        0
+      ],
+      [
+        30,
+        109,
+        6,
+        103,
+        27,
+        76,
+        0,
+        0,
+        0
+      ],
+      [
+        31,
+        28,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        32,
+        0,
+        20,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        33,
+        0,
+        26,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        34,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        35,
+        0,
+        8,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        36,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        37,
+        3,
+        3,
+        22,
+        9,
+        13,
+        0,
+        0,
+        0
+      ],
+      [
+        38,
+        79,
+        3,
+        101,
+        33,
+        68,
+        0,
+        0,
+        0
+      ],
+      [
+        39,
+        106,
+        0,
+        86,
+        35,
+        51,
+        0,
+        0,
+        0
+      ],
+      [
+        40,
+        72,
+        0,
+        136,
+        34,
+        102,
+        0,
+        0,
+        0
+      ],
+      [
+        41,
+        71,
+        0,
+        105,
+        26,
+        79,
+        0,
+        0,
+        0
+      ],
+      [
+        42,
+        166,
+        2,
+        56,
+        24,
+        32,
+        0,
+        3,
+        3
+      ],
+      [
+        43,
+        78,
+        2,
+        90,
+        34,
+        56,
+        0,
+        9,
+        10
+      ],
+      [
+        44,
+        100,
+        0,
+        98,
+        42,
+        56,
+        0,
+        0,
+        0
+      ],
+      [
+        45,
+        130,
+        0,
+        121,
+        31,
+        90,
+        0,
+        0,
+        0
+      ],
+      [
+        46,
+        133,
+        0,
+        127,
+        31,
+        96,
+        0,
+        0,
+        0
+      ],
+      [
+        47,
+        75,
+        0,
+        71,
+        23,
+        48,
+        0,
+        0,
+        0
+      ],
+      [
+        48,
+        32,
+        6,
+        60,
+        28,
+        32,
+        0,
+        0,
+        0
+      ],
+      [
+        49,
+        96,
+        0,
+        109,
+        37,
+        72,
+        0,
+        0,
+        0
+      ],
+      [
+        50,
+        103,
+        0,
+        112,
+        32,
+        80,
+        0,
+        0,
+        0
+      ],
+      [
+        51,
+        116,
+        8,
+        117,
+        34,
+        83,
+        0,
+        0,
+        0
+      ],
+      [
+        52,
+        123,
+        5,
+        118,
+        32,
+        86,
+        0,
+        0,
+        0
+      ],
+      [
+        53,
+        114,
+        2,
+        125,
+        32,
+        93,
+        0,
+        0,
+        0
+      ],
+      [
+        54,
+        147,
+        6,
+        148,
+        36,
+        112,
+        0,
+        0,
+        0
+      ],
+      [
+        55,
+        119,
+        6,
+        88,
+        25,
+        63,
+        0,
+        0,
+        0
+      ],
+      [
+        56,
+        89,
+        8,
+        125,
+        38,
+        87,
+        0,
+        0,
+        0
+      ],
+      [
+        57,
+        99,
+        7,
+        63,
+        35,
+        28,
+        0,
+        0,
+        0
+      ],
+      [
+        58,
+        113,
+        3,
+        129,
+        29,
+        100,
+        0,
+        0,
+        0
+      ],
+      [
+        59,
+        129,
+        6,
+        119,
+        31,
+        88,
+        0,
+        0,
+        0
+      ],
+      [
+        60,
+        41,
+        6,
+        15,
+        10,
+        5,
+        0,
+        0,
+        0
+      ],
+      [
+        61,
+        113,
+        4,
+        120,
+        41,
+        79,
+        0,
+        0,
+        0
+      ],
+      [
+        62,
+        72,
+        5,
+        86,
+        24,
+        62,
+        0,
+        0,
+        0
+      ],
+      [
+        63,
+        75,
+        6,
+        85,
+        30,
+        55,
+        0,
+        0,
+        0
+      ],
+      [
+        64,
+        127,
+        3,
+        150,
+        33,
+        117,
+        0,
+        0,
+        0
+      ],
+      [
+        65,
+        133,
+        4,
+        127,
+        42,
+        85,
+        0,
+        0,
+        0
+      ],
+      [
+        66,
+        86,
+        3,
+        55,
+        22,
+        33,
+        0,
+        0,
+        0
+      ],
+      [
+        67,
+        137,
+        6,
+        127,
+        38,
+        89,
+        0,
+        0,
+        0
+      ],
+      [
+        68,
+        138,
+        5,
+        127,
+        33,
+        94,
+        0,
+        3,
+        3
+      ],
+      [
+        69,
+        130,
+        4,
+        148,
+        36,
+        112,
+        0,
+        0,
+        0
+      ],
+      [
+        70,
+        129,
+        4,
+        153,
+        32,
+        121,
+        0,
+        0,
+        0
+      ],
+      [
+        71,
+        67,
+        5,
+        54,
+        27,
+        27,
+        0,
+        0,
+        0
+      ],
+      [
+        72,
+        90,
+        6,
+        116,
+        29,
+        87,
+        0,
+        0,
+        0
+      ],
+      [
+        73,
+        156,
+        3,
+        146,
+        35,
+        111,
+        0,
+        0,
+        0
+      ],
+      [
+        74,
+        118,
+        6,
+        127,
+        30,
+        97,
+        0,
+        0,
+        0
+      ],
+      [
+        75,
+        104,
+        5,
+        56,
+        16,
+        40,
+        0,
+        0,
+        0
+      ],
+      [
+        76,
+        119,
+        5,
+        196,
+        35,
+        161,
+        0,
+        0,
+        0
+      ],
+      [
+        77,
+        205,
+        4,
+        127,
+        22,
+        105,
+        0,
+        0,
+        0
+      ],
+      [
+        78,
+        135,
+        5,
+        175,
+        29,
+        146,
+        0,
+        0,
+        0
+      ],
+      [
+        79,
+        165,
+        4,
+        170,
+        37,
+        133,
+        0,
+        0,
+        0
+      ],
+      [
+        80,
+        53,
+        7,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        81,
+        55,
+        5,
+        60,
+        24,
+        36,
+        0,
+        0,
+        0
+      ],
+      [
+        82,
+        127,
+        4,
+        148,
+        33,
+        115,
+        0,
+        0,
+        0
+      ],
+      [
+        83,
+        127,
+        5,
+        101,
+        23,
+        78,
+        0,
+        0,
+        0
+      ],
+      [
+        84,
+        127,
+        6,
+        148,
+        23,
+        125,
+        0,
+        0,
+        0
+      ],
+      [
+        85,
+        127,
+        5,
+        106,
+        25,
+        81,
+        0,
+        0,
+        0
+      ],
+      [
+        86,
+        41,
+        6,
+        64,
+        24,
+        40,
+        0,
+        0,
+        0
+      ],
+      [
+        87,
+        57,
+        6,
+        75,
+        26,
+        49,
+        0,
+        0,
+        0
+      ],
+      [
+        88,
+        139,
+        3,
+        148,
+        41,
+        107,
+        0,
+        0,
+        0
+      ],
+      [
+        89,
+        151,
+        6,
+        173,
+        42,
+        131,
+        0,
+        0,
+        0
+      ],
+      [
+        90,
+        149,
+        4,
+        82,
+        30,
+        52,
+        0,
+        0,
+        0
+      ],
+      [
+        91,
+        51,
+        7,
+        98,
+        29,
+        69,
+        0,
+        0,
+        0
+      ],
+      [
+        92,
+        107,
+        3,
+        173,
+        36,
+        137,
+        0,
+        0,
+        0
+      ],
+      [
+        93,
+        68,
+        3,
+        156,
+        35,
+        121,
+        0,
+        0,
+        0
+      ],
+      [
+        94,
+        137,
+        3,
+        129,
+        36,
+        93,
+        0,
+        6,
+        6
+      ],
+      [
+        95,
+        264,
+        12,
+        111,
+        30,
+        81,
+        0,
+        12,
+        13
+      ],
+      [
+        96,
+        122,
+        7,
+        116,
+        33,
+        83,
+        0,
+        1,
+        2
+      ],
+      [
+        97,
+        176,
+        7,
+        138,
+        28,
+        110,
+        0,
+        0,
+        0
+      ],
+      [
+        98,
+        106,
+        3,
+        119,
+        35,
+        84,
+        0,
+        0,
+        0
+      ],
+      [
+        99,
+        110,
+        6,
+        148,
+        43,
+        105,
+        0,
+        0,
+        0
+      ],
+      [
+        100,
+        111,
+        7,
+        76,
+        32,
+        44,
+        0,
+        0,
+        0
+      ],
+      [
+        101,
+        139,
+        6,
+        127,
+        29,
+        98,
+        0,
+        0,
+        0
+      ],
+      [
+        102,
+        127,
+        6,
+        152,
+        33,
+        119,
+        0,
+        0,
+        0
+      ],
+      [
+        103,
+        206,
+        3,
+        224,
+        34,
+        190,
+        0,
+        0,
+        0
+      ],
+      [
+        104,
+        175,
+        4,
+        165,
+        30,
+        135,
+        0,
+        0,
+        0
+      ],
+      [
+        105,
+        48,
+        5,
+        10,
+        3,
+        7,
+        0,
+        0,
+        0
+      ],
+      [
+        106,
+        47,
+        3,
+        72,
+        20,
+        52,
+        0,
+        0,
+        0
+      ],
+      [
+        107,
+        157,
+        6,
+        199,
+        37,
+        162,
+        0,
+        0,
+        0
+      ],
+      [
+        108,
+        147,
+        3,
+        140,
+        36,
+        104,
+        0,
+        0,
+        0
+      ],
+      [
+        109,
+        77,
+        6,
+        46,
+        13,
+        33,
+        0,
+        0,
+        0
+      ],
+      [
+        110,
+        137,
+        4,
+        158,
+        34,
+        124,
+        0,
+        0,
+        0
+      ],
+      [
+        111,
+        117,
+        3,
+        111,
+        25,
+        86,
+        0,
+        0,
+        0
+      ],
+      [
+        112,
+        88,
+        6,
+        83,
+        22,
+        61,
+        0,
+        0,
+        0
+      ],
+      [
+        113,
+        123,
+        5,
+        138,
+        29,
+        109,
+        0,
+        0,
+        0
+      ],
+      [
+        114,
+        151,
+        5,
+        131,
+        34,
+        97,
+        0,
+        0,
+        0
+      ],
+      [
+        115,
+        133,
+        5,
+        103,
+        26,
+        77,
+        0,
+        0,
+        0
+      ],
+      [
+        116,
+        23,
+        2,
+        53,
+        17,
+        36,
+        0,
+        0,
+        0
+      ],
+      [
+        117,
+        81,
+        6,
+        107,
+        33,
+        74,
+        0,
+        0,
+        0
+      ],
+      [
+        118,
+        197,
+        6,
+        137,
+        19,
+        118,
+        0,
+        0,
+        0
+      ],
+      [
+        119,
+        127,
+        6,
+        167,
+        31,
+        136,
+        0,
+        0,
+        0
+      ],
+      [
+        120,
+        72,
+        0,
+        58,
+        17,
+        41,
+        0,
+        0,
+        0
+      ]
+    ]
+  },
+  "rollback": {
+    "legacy_links": 8,
+    "relay_input_links": 0,
+    "relay_output_links": 0,
+    "graph_hash_before": "43f87fb0ce57b84538bcdcbc13cbcfc767964233d1b15a43ef7e3e6a787cc713",
+    "graph_hash_after": "43f87fb0ce57b84538bcdcbc13cbcfc767964233d1b15a43ef7e3e6a787cc713",
+    "graph_restored": true
+  },
+  "final_validation": {
+    "controllers_present": 5,
+    "services_active": 4,
+    "patchbay_links_present": 116,
+    "unresolved_endpoints": 0,
+    "live_validation_failures": 0,
+    "protected_checks": 30,
+    "relay_process_remaining": false,
+    "remote_staging_removed": true,
+    "local_raw_evidence_retained": true
+  },
+  "evaluation": {
+    "all_eight_faders_evidenced": true,
+    "relay_processing_pass": true,
+    "pipewire_zero_error_pass": false,
+    "audible_stability_gate": "open",
+    "operator_audio_assessment": "not-reported",
+    "error_clusters_observer_seconds": [
+      [
+        11,
+        13
+      ],
+      [
+        42,
+        43
+      ],
+      [
+        68,
+        68
+      ],
+      [
+        94,
+        96
+      ]
+    ],
+    "next_diagnostic": "Capture per-control activity and EQ/sink processing timing around the error intervals."
+  },
+  "notes": [
+    "Mixer Private and Master ports mirror the same controller stream: 12,064 arrivals on each are not 24,128 independent physical changes.",
+    "The 120-second observation also captured 457 Arturia events, including 203 note-ons and 204 note-offs.",
+    "Relay session totals include startup, settling, and rollback. Correlation window totals cover nominal one-second trace bins and can differ from precise observer-window totals.",
+    "All 121 observer rows matched a relay trace. There are 120 PipeWire snapshots; the final row retains MIDI/relay data and uses null error deltas where no PipeWire sample exists.",
+    "The speaker sink and SMC-MIX EQ each gained 57 ERR counts. Their sum of 114 is a node-counter total, not a count of distinct audible interruptions.",
+    "Errors appeared in nine nominal second bins across four clusters. Relay emission rates in those bins were 24 through 42, while a clean bin reached 46; rate alone does not explain this observation.",
+    "UTC MIDI arrival buckets, nominal PipeWire snapshot indices, and frame-derived relay seconds provide approximate alignment. These data do not establish per-event causation.",
+    "No journal xrun/dropout/deadline lines were recorded despite the PipeWire ERR increases.",
+    "The original eight-link mixer route was restored before the relay stopped. Final validation passed and the full graph hash was restored.",
+    "Raw evidence was copied locally and checksum-verified before the temporary Airstar staging directory was removed."
+  ]
+}

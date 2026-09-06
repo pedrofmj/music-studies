@@ -2,7 +2,7 @@
 
 Feature: `0001.0000.0000.0000`
 
-Updated: 2026-08-31
+Updated: 2026-09-06
 
 Documents:
 
@@ -20,13 +20,145 @@ Documents:
 | ⬜ | Not started |
 | ⛔ | Blocked by a named dependency |
 
+## Current Resume Point
+
+Milestones 0 through 3 are complete; Milestone 4 remains active. The latest
+September 5 synchronized SMC-MIX-plus-Arturia retry captured all eight faders
+with per-control and processing timing, but failed the zero-error gate: the
+speaker sink gained 286 PipeWire ERR counts and SMC-MIX EQ gained 310. The
+one-cycle relay reported zero adapter failures. Mixer-only soak has passed;
+the combined control/audio workload still needs zero-error evidence.
+
+The September 1 correlation instrumentation is now covered by an offline
+regression. The September 5 resume fixed MIDI timestamp parsing, retained the
+closing PipeWire sample and counters across sampling gaps, and hardened trace
+joining against incomplete or duplicate input and output-file clobbering.
+The follow-up Airstar preflight passed with five controllers, four active
+services, 116/116 links, and zero validation failures. A 20-second unconnected
+relay run completed with 935 cycles and zero adapter failures, then stopped
+cleanly. The subsequent two-minute physical exercise captured 12,064 mixer
+Master events (also mirrored on Private) and 457 Arturia events. All eight
+faders were evidenced, the relay reported zero adapter failures, and all 121
+correlation rows matched relay traces. Errors appeared in four clusters at
+nominal observation seconds 11-13, 42-43, 68, and 94-96; their relay emission
+rates were below the highest clean-bin rate. This prompted per-control
+activity plus EQ/sink processing timing around those intervals. Audible
+operator assessment has not yet been reported.
+
+Rollback restored all eight legacy mixer links and the exact pre-probe graph
+hash; final live validation passed with zero failures. The relay stopped and
+remote staging was removed. Raw evidence remains locally at
+`/tmp/music-rig-correlation-airstar-20260905.ezDrrG`; the compact per-second
+report is [recorded here](../../tools/music-rig/benchmarks/smc-mixer-relay-synchronized-correlation-failure-airstar-2026-09-05.json).
+No production promotion was performed.
+
+Per-control source/channel/CC/value summaries and sampled PipeWire WAIT/BUSY
+and load-ratio fields are now implemented in the observer. All 15 offline
+correlation cases and the full 74/74 local JSON/JACK suite pass. The first
+two-minute run with these fields captured zero MIDI events because the
+operator started late; it is recorded as an idle baseline only, with 120 valid
+sink/EQ timing samples, zero ERR delta, and clean rollback.
+
+After the operator explicitly signaled readiness, the retry captured 11,828
+mixer Master CC arrivals (mirrored on Private) and 568 Arturia notes between
+18:36:49Z and 18:38:50Z. All eight CC40-47 controls reached 0 and 127, with no
+unparsed control payloads. The 120 PipeWire samples join into 122 correlation
+rows including boundary MIDI. Errors form four nominal-second clusters:
+6-15, 34-37, 58-67, and 111-120. Several different controls were active across
+these intervals; no single fader is established as the cause. EQ sampled BUSY
+peaked at 14.5 ms versus 0.1702 ms in the idle baseline, and EQ BUSY retained
+`+++` (started but unfinished) at seconds 62, 64, and 117. These are sampled
+observations, not per-cycle maxima or proof of a particular plugin defect.
+
+This prompted offline isolation of Carla's CC-to-parameter updates
+into the LSP 8-band equalizer under audio load, without changing the protected
+preset or relay rate. Physical-load acceptance remains open. Rollback restored
+legacy 8/8 and the exact pre-probe graph; final live validation and the 30-check
+protected verifier passed. The relay stopped and remote staging was removed.
+Raw evidence remains locally at
+`/tmp/music-rig-controls-timing-retry-airstar-20260905.7rd56G`; the per-control,
+timing, error-cluster, and rollback evidence is
+[recorded here](../../tools/music-rig/benchmarks/smc-mixer-relay-controls-timing-failure-airstar-2026-09-05.json).
+Operator audio assessment remains unreported; no production promotion occurred.
+
+The September 6 device-free EQ isolation on `centralstar` now reproduces the
+parameter-change processing cost using the exact LSP binary loaded on Airstar
+(package 1.2.14-1), with local native Carla 2.5.8. The assertion-free run measured
+30,720 blocks across 15 scenarios and verified 65,536 mapped MIDI events with
+zero mapping errors or nonfinite audio samples. Fixed flat/non-flat audio
+averaged 52/30 microseconds of calling-thread CPU per block. Direct all-band
+gain changes averaged 3.766 ms, with just 2.082 microseconds spent in setters;
+MIDI all-band changes averaged 2.225-2.428 ms and individual-band changes
+1.819-3.105 ms. Silence plus changes was also expensive. The added cost is in
+the subsequent hosted audio-processing block, not primarily the setter call.
+
+This isolates an expensive parameter-change path without the relay, scaling
+intermediaries, audio server, or hardware. It does not establish the exact LSP
+or Carla defect or reproduce Airstar's live scheduling failure. All measured
+blocks stayed below 21.33 ms locally; CPU frequency/order are uncontrolled, and
+the native host differs from the live Flatpak host. Earlier draft runs with a
+standalone-only idle call are explicitly excluded. The corrected native
+dispatcher and assertion-rejecting runner pass 12 contract cases; the full
+local suite passes 75/75. Protected baseline remains 30/30 and Airstar live
+validation passes with all 116 links present.
+
+The subsequent symbol-matched investigation identifies the expensive LSP
+gain-smoothing path. The matching source interpolates every filter slot for
+each audio sample; changed parameters trigger a full-bank rebuild before
+one-sample processing. An independent debugger probe of the copied binary
+confirmed `Filter::rebuild` below `Equalizer::process(samples=1)` inside a
+1,024-frame LV2 call. This explains why even a single moving band can cause
+full-bank work, without claiming the complete cause of live deadline failures.
+
+The optional gprofng runner completed another 15,360 measured blocks and
+32,768 mapped MIDI events with zero mapping errors, invalid samples, or
+assertions. Its timer-period warning invalidates precise CPU percentages;
+only qualitative stacks are accepted, independently supported by the debugger.
+All 16 extraction/log/profile contract cases and the full 75/75 local suite
+pass; protected baseline remains 30/30. No live process was launched or changed
+during this profiling step. The physical mixed-load acceptance gate stays open.
+
+The offline comparison against a locally built upstream LSP Parametric
+Equalizer 1.0.40 passed mapping parity, finite-audio, event-parity, and
+zero-over-quantum checks. Calling-thread CPU fell 13-31x for individual-band
+changes, 17-31x for all-band changes, and output-energy deltas peaked at 1.11%
+under the 2% diagnostic tolerance. This is a promising candidate, not proof of
+identical response or live scheduling behavior. Keep the production preset,
+plugin version, and one-cycle relay unchanged. Reproducible procedure and
+limits are in the [benchmark guide](../../tools/music-rig/benchmarks/README.md#device-free-eq-parameter-isolation).
+The [unprofiled timings](../../tools/music-rig/benchmarks/carla-eq-parameter-isolation-centralstar-2026-09-06.json)
+and [symbol-matched call-path evidence](../../tools/music-rig/benchmarks/carla-eq-smoothing-profile-centralstar-2026-09-06.json)
+retain measurements, provenance, limitations, and hashes. Raw files remain
+under `/tmp/music-rig-eq-isolation-20260906.0uzGPJ` (`run4`, `profile2`, and
+`eq-stack3.txt`).
+
+Next, obtain an operator response assessment and repeat the synchronized
+Airstar mixed-load probe with a separately reviewed candidate package. Require
+zero attributable PipeWire errors, preserved rollback, and unchanged protected
+artifacts before considering any live promotion.
+
+The September 6 protected-plugin relay retry then passed the technical live
+gate. After removing two stale unexpected Pocket/duplicate MIDI links under
+explicit approval, the read-only baseline returned to 118 raw and 68 MIDI
+links. The guarded `pw-jack` relay session exercised all eight CC40-47 faders
+and Arturia audio for 120 observed seconds: 14,748 control arrivals, every
+control reaching 0 and 127, 19,178 relay inputs, 4,089 emitted updates, 15,089
+coalesced updates, and zero adapter failures. PipeWire ERR delta, changed-node
+count, and journal xrun/dropout/deadline matches were all zero. Rollback
+restored legacy 8/8, final protected validation passed 30/30, and temporary
+staging was removed. The operator reported a very subtle audible issue with few
+occurrences, materially less than prior equivalent tests. The strict audible
+stability gate remains open; no production promotion occurred. Evidence is
+[recorded here](../../tools/music-rig/benchmarks/smc-mixer-relay-synchronized-correlation-airstar-2026-09-06.json).
+
 ## Safety Lock
 
 - ✅ Protected single-rig artifacts remain the production authority.
 - ✅ Experimental code has no install or activation target.
 - ✅ Automated tests do not mutate the live audio or MIDI graph.
 - ✅ Restore remains preview-only without the explicit `--apply` option.
-- ✅ Airstar observations create no remote files and control no services.
+- ✅ Airstar correlation observations use cleaned temporary files and control
+  no services.
 - ✅ Production restore rehearsal passed on 2026-08-14. The apply restored the
   protected project, Patchbay snapshot, and services from verified sources with
   Carla closed, kept the pre-restore deployment and service evidence under
@@ -40,7 +172,17 @@ Documents:
 | --- | --- |
 | GCC isolated suite | ✅ 60/60 passed |
 | Complete local schema-enabled suite | ✅ 63/63 passed on 2026-08-29 |
-| Complete local JSON/JACK suite | ✅ 73/73 passed on 2026-08-29 |
+| Complete local JSON/JACK suite | ✅ 75/75 passed on 2026-09-06, including schema validation, correlation regression, and the new EQ isolation contract |
+| Device-free Carla/LSP EQ parameter isolation | 🟡 30,720 blocks across 15 scenarios; fixed non-flat CPU 30 us/block versus 2.225-2.428 ms for all-band MIDI changes and 3.766 ms for direct changes (setters only 2.082 us); 0 mapping errors, invalid samples, or assertions; 12 contract cases pass; expensive path isolated, live acceptance still open; [evidence](../../tools/music-rig/benchmarks/carla-eq-parameter-isolation-centralstar-2026-09-06.json) |
+| Symbol-matched LSP smoothing profile | 🟡 Per-sample processing and full-bank coefficient rebuild confirmed by matching source and independent debugger stack; profile matrix completed 15,360 blocks and 32,768 MIDI events with 0 mapping errors, invalid samples, or assertions; profiler timer warning prohibits precise percentages; 16 contract cases pass; live acceptance remains open; [evidence](../../tools/music-rig/benchmarks/carla-eq-smoothing-profile-centralstar-2026-09-06.json) |
+| Offline upstream LSP EQ comparison | 🟡 Upstream 1.0.40 reduced parameter-change CPU 13-31x for individual bands and 17-31x for all-band changes; mapping/event/finite-audio and zero-over-quantum checks pass; output-energy delta up to 1.11% under a 2% diagnostic tolerance; live response and scheduling acceptance remain open; [evidence](../../tools/music-rig/benchmarks/carla-eq-upstream-comparison-centralstar-2026-09-06.json) |
+| Offline control/xrun correlation | ✅ 15 regression tests pass, including per-source/channel/CC value groups, malformed control payloads, timing-unit normalization, unknown timing markers, and preservation through the joiner |
+| Airstar per-control/timing combined-load retry | 🟡 All eight faders, 11,828 mixer Master CCs and 568 Arturia notes; sink ERR +286, EQ ERR +310, EQ sampled BUSY up to 14.5 ms plus three unfinished markers; 0 relay adapter failures; exact graph restoration, final validation, and remote cleanup passed; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-controls-timing-failure-airstar-2026-09-05.json) |
+| Airstar synchronized protected-plugin relay retry | 🟡 Technical gate passed: 14,748 observed CC arrivals across CC40-47, every control reached 0/127, relay 19,178 inputs with 4,089 emitted and 15,089 coalesced, zero adapter failures, zero PipeWire ERR delta, zero journal matches, exact rollback, and final 30/30 validation; operator heard a very subtle issue with few occurrences, much less than prior tests; audible stability remains open; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-synchronized-correlation-airstar-2026-09-06.json) |
+| Airstar per-control/timing observer idle baseline | 🟡 120 valid sink/EQ timing samples and zero ERR delta, but zero MIDI events after a delayed operator start; idle-only evidence with clean rollback and final validation; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-controls-timing-idle-airstar-2026-09-05.json) |
+| Protected single-rig baseline | ✅ 30/30 checks passed on 2026-09-06 |
+| Airstar synchronized mixer/Arturia correlation | 🟡 120 seconds, 12,064 mixer Master arrivals plus 457 Arturia events, all eight faders evidenced, 121 matched trace rows, and 0 relay adapter failures; speaker sink ERR +57 and EQ ERR +57 across four clusters; rollback, exact graph restoration, final validation, and remote cleanup passed; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-synchronized-correlation-failure-airstar-2026-09-05.json) |
+| Airstar correlation probe preflight | ✅ Live validation passed before/after, all 116 links resolve, and a 20-second unconnected relay startup/trace/shutdown passed; physical input and synchronized audio capture remain pending; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-correlation-preflight-airstar-2026-09-05.json) |
 | Output adoption acknowledgement | ✅ Atomic generation/timestamp and IPC rendering pass |
 | Output-enabled switch benchmark | ✅ Three 1,000-sample scenarios pass commit and adoption gates |
 | Offline SMC-MIX CC coalescing benchmark | ✅ 27,387 mapped inputs across 13,695 cycles; 13,695 emitted, 13,692 coalesced, 0 adapter failures |
@@ -603,6 +745,17 @@ benchmarks.
   supported while final audio attribution and the zero-error gate remain open.
   A two-cycle cross-cycle flush trial was rejected after a +119 ERR result in
   the single-fader/audio probe; the Linux host is restored to one-cycle flushes.
+  The September 1 relay trace and observer joiner now have an offline CTest
+  gate with ten regression tests. The observer accepts real MIDI arrival
+  timestamps, includes the final PipeWire boundary sample, and retains sample
+  positions and last-seen counters across gaps. The joiner rejects malformed,
+  incomplete, or duplicate traces before writing, preserves existing output on
+  parse failure, handles the full 900-second trace without shell argument-size
+  limits, and retains observation status and graph evidence. Missing relay
+  seconds remain explicit nulls with a coverage count. Alignment remains
+  approximate because the observer uses UTC arrival buckets and nominal
+  PipeWire snapshot indices while the relay uses processed JACK frames; live
+  attribution and the zero-error audible gate remain open.
 
 ## Milestone 5: MIDI Management Triggers
 
