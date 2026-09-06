@@ -26,6 +26,9 @@ material when you need an explanation or a repeatable setup procedure.
   slot: [Axial Expansions](../reference/04-axial-expansions.md).
 - You need the rating scale or tags while cataloging a sound:
   [Sound Catalog](../reference/05-sound-catalog.md).
+- You want to understand the history, timbre, and musical role of a sound
+  family: [Keyboard Sound Exploration](../../../music-theory/learning/03-keyboard-sound-exploration.md)
+  and [What A Keyboard Really Is](../../../music-theory/reference/01-what-a-keyboard-really-is.md).
 
 ## Working Records
 

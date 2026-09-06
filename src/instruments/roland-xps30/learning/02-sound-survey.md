@@ -3,6 +3,10 @@
 Use this learning module to discover which factory and expansion sounds are
 useful in the actual worship context. The catalog fields, rating scale, and tag
 definitions are in [Sound Catalog Reference](../reference/05-sound-catalog.md).
+Use [Keyboard Sound Exploration](../../../music-theory/learning/03-keyboard-sound-exploration.md)
+for the family-by-family exercises and
+[What A Keyboard Really Is](../../../music-theory/reference/01-what-a-keyboard-really-is.md)
+for the deeper history, synthesis, timbre, and arrangement explanations.
 
 ## Order Of Work
 

@@ -15,8 +15,14 @@ delivery, deployment, and rollback.
 Progress is maintained in the feature's
 [visual tracker](docs/features/0001.0000.0000.0000-configurable-performance-rig/configurable-performance-rig-tracker.md).
 
+The cross-repository learning and practice work is organized in the
+[Music Studies epic map](docs/music-studies-epics.md).
+
 ## Current Collections
 
+- [Music Theory And Keyboard Study](src/music-theory/README.md) - an ordered
+  written-study plan for theory, keyboard technique, arpeggios, fingering,
+  harmony, ear development, and sound-family exploration.
 - [Roland XPS-30](src/instruments/roland-xps30/README.md) - synthesizer,
   worship setup, sound design, and Linux workflow study.
 - [MIDI Controllers](src/midi-controllers/README.md) - Arturia and M-VAVE controller studies, mappings, DAW-control workflows, and
@@ -37,6 +43,10 @@ Progress is maintained in the feature's
   lookup material.
 - `src/instruments/<instrument>/manual/` - official manual inventory and
   locally retained sources where authorized.
+- `src/music-theory/learning/` - ordered theory, technique, and keyboard study
+  modules.
+- `src/music-theory/reference/` - deeper conceptual material used by the
+  learning modules.
 - `src/midi-controllers/<controller>/learning/` - controller exercises and
   connection checks.
 - `src/midi-controllers/<controller>/reference/` - controller architecture,
