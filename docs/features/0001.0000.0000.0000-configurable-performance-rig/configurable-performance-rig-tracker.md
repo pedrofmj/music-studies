@@ -9,6 +9,7 @@ Documents:
 - [Feature proposal](configurable-performance-rig.md)
 - [Proposta de funcionalidade (pt-BR)](configurable-performance-rig.pt-BR.md)
 - [Implementation plan](configurable-performance-rig-implementation-plan.md)
+- [Epic map](configurable-performance-rig-epics.md)
 - [Architecture decisions](architecture-decisions/README.md)
 
 ## Status Key
