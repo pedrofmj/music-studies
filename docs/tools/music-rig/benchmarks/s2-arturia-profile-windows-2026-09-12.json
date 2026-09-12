@@ -1,0 +1,26 @@
+{
+  "slot": "arturia-main",
+  "default_profile": "full-live-rack",
+  "fallback_profile": "full-live-rack",
+  "candidate_profiles": [
+    "synth-programmer-synthv1",
+    "tonewheel-organ-setbfree"
+  ],
+  "windows": {
+    "synth-programmer-synthv1": {
+      "status": "candidate-profile-pass",
+      "temporary_links": 3,
+      "graph_restored": true
+    },
+    "tonewheel-organ-setbfree": {
+      "status": "candidate-profile-pass",
+      "temporary_links": 3,
+      "graph_restored": true
+    }
+  },
+  "protected_postcheck": "30/30",
+  "production_promotion": false,
+  "persistent_transport": "not-enabled; existing music-rig transport remains fail-closed",
+  "schema": "music-studies/s2-arturia-profile-windows/v1",
+  "status": "candidate-profile-selection-pass"
+}

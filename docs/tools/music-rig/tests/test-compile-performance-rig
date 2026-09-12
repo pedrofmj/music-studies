@@ -178,6 +178,64 @@ def mapping_for(document: Any, key: str) -> Any:
     return mapping
 
 
+def assert_s2_profile(
+    document: Any,
+    profile: str,
+    device_profile: str,
+    engine: str,
+    target_prefix: str,
+    representative_targets: Sequence[str],
+) -> None:
+    if document["active_rig_profile"] != profile:
+        raise AssertionError(f"S2 profile was not selected: {profile}")
+    if set(document["input_bindings"]) != {
+        "arturia-main",
+        "smk25-main",
+        "smc-mixer-main",
+        "smc-pad-main",
+        "smc-pad-pocket",
+    }:
+        raise AssertionError(f"{profile} changed the stable five-slot catalogue")
+    arturia_profiles = [
+        row for row in document["device_profiles"]
+        if row["slot"] == "arturia-main"
+    ]
+    if arturia_profiles != [{
+        "slot": "arturia-main",
+        "profile": device_profile,
+        "hardware_preset": "arturia-current-rack",
+        "readiness": "control-only",
+    }]:
+        raise AssertionError(f"{profile} selected the wrong Arturia profile")
+    if len(document["mappings"]) != 70:
+        raise AssertionError(f"{profile} changed the five-slot mapping count")
+    s2_targets = {
+        row["target"]
+        for row in document["mappings"]
+        if row["target"].startswith(target_prefix)
+    }
+    if len(s2_targets) != 18 or not set(representative_targets) <= s2_targets:
+        raise AssertionError(f"{profile} semantic mapping contract is incomplete")
+    resources = document["requirements"]["resources"]
+    if engine not in resources["engines"]:
+        raise AssertionError(f"{profile} omitted its selected engine resource")
+    if engine not in document["requirements"]["pinned_capabilities"]:
+        raise AssertionError(f"{profile} omitted its pinned engine")
+    if any(target in document["target_bindings"] for target in s2_targets):
+        raise AssertionError(
+            f"{profile} treated unverified semantic targets as Airstar bindings"
+        )
+    graph_delta = document["graph_delta"]
+    if (
+        not graph_delta["empty"]
+        or not graph_delta["control_only_eligible"]
+        or graph_delta["applied"]
+        or any(graph_delta["counts"].values())
+        or any(graph_delta["operations"].values())
+    ):
+        raise AssertionError(f"{profile} changed the empty graph-delta contract")
+
+
 def main() -> int:
     try:
         completed_cases = []
@@ -409,6 +467,48 @@ def main() -> int:
                 raise AssertionError("current control-only graph delta is not empty")
             completed_cases.append("current-empty-graph-delta")
 
+            s2_profiles = (
+                (
+                    "tonewheel-organ",
+                    "tonewheel-organ",
+                    "engine.arturia.hammond-organ-fast",
+                    "organ.",
+                    ("organ.drawbar.16ft", "organ.rotary-speed", "organ.reverb"),
+                ),
+                (
+                    "synth-programmer",
+                    "synth-programmer",
+                    "engine.arturia.optik-synth",
+                    "synth.",
+                    ("synth.oscillator-mix", "synth.filter-cutoff", "synth.reverb"),
+                ),
+            )
+            for (
+                profile,
+                device_profile,
+                engine,
+                target_prefix,
+                representative_targets,
+            ) in s2_profiles:
+                s2_output = temporary_root / f"{profile}.json"
+                s2_result = run_compiler(
+                    RIG_ROOT,
+                    "airstar-current",
+                    other_cwd,
+                    s2_output,
+                    profile,
+                )
+                require_success(s2_result, f"{profile} compilation")
+                assert_s2_profile(
+                    load_json(s2_output),
+                    profile,
+                    device_profile,
+                    engine,
+                    target_prefix,
+                    representative_targets,
+                )
+            completed_cases.append("s2-layout-contracts")
+
             if first_bytes != GOLDEN_PATH.read_bytes():
                 raise AssertionError("compiled output differs from golden fixture")
             completed_cases.append("golden-output")
@@ -577,11 +677,11 @@ def main() -> int:
                 raise AssertionError("relative encoding mismatch compiled")
             completed_cases.append("relative-encoding-rejection")
 
-        if len(completed_cases) != 14:
+        if len(completed_cases) != 15:
             raise AssertionError(
-                f"compiler test accounting expected 14, got {completed_cases}"
+                f"compiler test accounting expected 15, got {completed_cases}"
             )
-        print("Performance Rig compiler tests: PASS (cases=14)")
+        print("Performance Rig compiler tests: PASS (cases=15)")
         return 0
     except (AssertionError, OSError, ValueError, KeyError) as error:
         print(f"FAIL: {error}", file=sys.stderr)

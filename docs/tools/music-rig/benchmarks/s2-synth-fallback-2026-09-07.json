@@ -1,0 +1,29 @@
+{
+  "activation": "disabled",
+  "archive_sha256": "sha256:4cdadbe09bfea5e9f3b8da53ca619a1478bf5467258a742e2fce52f5247a2e1d",
+  "candidate": "synthv1",
+  "control_surface": {
+    "parameter_inputs": 145,
+    "ordinary_lv2_control_ports": true,
+    "representative_controls": {
+      "synth.amp-attack": {"name": "DCA1 Attack", "symbol": "DCA1_ATTACK"},
+      "synth.amp-release": {"name": "DCA1 Release", "symbol": "DCA1_RELEASE"},
+      "synth.filter-cutoff": {"name": "DCF1 Cutoff", "symbol": "DCF1_CUTOFF"},
+      "synth.filter-resonance": {"name": "DCF1 Resonance", "symbol": "DCF1_RESO"},
+      "synth.oscillator-mix": {"name": "DCO1 Balance", "symbol": "DCO1_BALANCE"},
+      "synth.volume": {"name": "OUT1 Volume", "symbol": "OUT1_VOLUME"}
+    }
+  },
+  "lv2_ttl_sha256": "sha256:4292848c744aa2d2234b1794d20c20a5e694b6b0632fe0b73304f5b8c1d7e986",
+  "native_preset_load": {
+    "archive_sha256": "sha256:16391911dbfabbcfde9d4fe1fad0987b4710ede27ffc5f71d3c9e0b05fa5803e",
+    "example_file_sha256": "sha256:63f5aa7c76e7a18a86665748af7f5879c2f87853e7b3afe14ebbbf376a870c5d",
+    "status": "temporary-standalone-startup-load-no-error"
+  },
+  "plugin_uri": "http://synthv1.sourceforge.net/lv2",
+  "protected_graph_touched": false,
+  "schema": "music-studies/s2-synth-fallback/v1",
+  "state_interface": true,
+  "state_restore": "lv2-restore-not-passing",
+  "status": "candidate-control-surface-verified-state-runtime-open"
+}

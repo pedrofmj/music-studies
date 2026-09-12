@@ -1,0 +1,38 @@
+{
+  "candidate": "synth-programmer-synthv1",
+  "engine": "synthv1",
+  "engine_version": "0.9.34-1build3",
+  "package": "synthv1_0.9.34-1build3_amd64.deb",
+  "package_sha256": "sha256:5ee77ba8cb3c0af51e5702eea6d758c52dcf89d5c80b8277d8086d3b5614f56f",
+  "common_package": "synthv1-common_0.9.34-1build3_all.deb",
+  "common_package_sha256": "sha256:1a642155272f8024f2f854246823e3f4a2b36a053dc20e008ae19bceb6a71f9e",
+  "binary": "synthv1_jack",
+  "binary_sha256": "sha256:8968dc938080089d734c98ba169c8dfdc06887065cbbe2b28674089485532785",
+  "preset": "50_SynthRemember-ubuntu.synthv1",
+  "preset_sha256": "sha256:688d4386f19be0081609a3c1975c59625cb7b63adfc9ffa8201ed890e4d5ce1e",
+  "controls_config": "s2-synthv1-keylab-controls.conf",
+  "controls_config_sha256": "sha256:a5128fb12012e1f76aaa7d7277dc980bbdbf9b6bd38ff97095d447ee090bdfe7",
+  "preset_state_strategy": "native-synthv1-preset-file",
+  "required_parameters": [
+    "DCO1_BALANCE",
+    "DCO2_BALANCE",
+    "DCF1_CUTOFF",
+    "DCF1_RESO",
+    "DCA1_ATTACK",
+    "DCA1_RELEASE",
+    "LFO1_BALANCE",
+    "LFO1_RATE",
+    "OUT1_VOLUME"
+  ],
+  "staging": "temporary-airstar-tmp-only",
+  "isolated_boundary": {
+    "block_size": 1024,
+    "finite_audio": true,
+    "midi_events": 1170,
+    "physical_endpoints": false,
+    "pipewire_touched": false,
+    "status": "candidate-only-boundary-pass"
+  },
+  "schema": "music-studies/s2-synthv1-ubuntu-candidate/v1",
+  "status": "temporary-candidate-validated"
+}

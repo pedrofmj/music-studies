@@ -158,6 +158,12 @@ static bool output_adoption_is_valid(
         adapter->rollback != NULL && adapter->adopted != NULL;
 }
 
+static bool prepared_engine_is_enabled(const music_rig_runtime *runtime)
+{
+    return runtime != NULL && runtime->state.output_mode ==
+        MUSIC_RIG_OUTPUT_ENABLED && runtime->prepared_engine_enabled;
+}
+
 static music_rig_result prepare_output_generation(
     music_rig_runtime *runtime,
     const music_rig_generation *generation
@@ -492,7 +498,11 @@ music_rig_result music_rig_runtime_init(
         config->prepared_definition_count >
             MUSIC_RIG_PREPARED_DEFINITION_CAPACITY ||
         (config->prepared_definition_count != 0U &&
-            config->prepared_definitions == NULL)) {
+            config->prepared_definitions == NULL) ||
+        (config->prepared_engine != NULL &&
+            !music_rig_prepared_engine_adapter_is_valid(
+                config->prepared_engine
+            ))) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
     if (config->output_mode != MUSIC_RIG_OUTPUT_SUPPRESSED &&
@@ -510,6 +520,10 @@ music_rig_result music_rig_runtime_init(
     runtime->base_tables = runtime->initial_tables;
     runtime->prepared_definitions = config->prepared_definitions;
     runtime->prepared_definition_count = config->prepared_definition_count;
+    if (config->prepared_engine != NULL) {
+        runtime->prepared_engine = *config->prepared_engine;
+        runtime->prepared_engine_enabled = true;
+    }
     runtime->state.schema_version = MUSIC_RIG_RUNTIME_STATE_VERSION;
     runtime->state.generation_id = config->initial_generation->id;
     memcpy(
@@ -929,6 +943,8 @@ static music_rig_result commit_global_switch(
     music_rig_result result;
     uint64_t published_ns;
     size_t retired_count;
+    music_rig_prepared_engine_transaction prepared_engine_transaction;
+    bool prepared_engine_active = false;
 
     increment(&runtime->metrics.commit_requests);
     if (response->result_code != (uint32_t)MUSIC_RIG_RESULT_OK) {
@@ -977,12 +993,32 @@ static music_rig_result commit_global_switch(
         return MUSIC_RIG_RESULT_OK;
     }
 
+    if (prepared_engine_is_enabled(runtime)) {
+        result = music_rig_prepared_engine_transaction_begin(
+            &prepared_engine_transaction,
+            &runtime->prepared_engine,
+            previous_generation,
+            commit_generation
+        );
+        if (result != MUSIC_RIG_RESULT_OK) {
+            release_commit_generation(runtime, commit_generation);
+            set_commit_failure(response, result);
+            return MUSIC_RIG_RESULT_OK;
+        }
+        prepared_engine_active = true;
+    }
+
     result = music_rig_runtime_publish_generation(
         runtime,
         commit_generation,
         request->expected_generation
     );
     if (result != MUSIC_RIG_RESULT_OK) {
+        if (prepared_engine_active) {
+            (void)music_rig_prepared_engine_transaction_rollback(
+                &prepared_engine_transaction
+            );
+        }
         release_commit_generation(runtime, commit_generation);
         set_commit_failure(response, result);
         return MUSIC_RIG_RESULT_OK;
@@ -994,9 +1030,46 @@ static music_rig_result commit_global_switch(
         ? published_ns - started_ns
         : UINT64_C(0);
 
+    if (prepared_engine_active &&
+        music_rig_prepared_engine_transaction_commit(
+            &prepared_engine_transaction
+        ) != MUSIC_RIG_RESULT_OK) {
+        result = music_rig_prepared_engine_transaction_rollback(
+            &prepared_engine_transaction
+        );
+        if (result == MUSIC_RIG_RESULT_OK) {
+            result = rollback_published_generation(runtime, previous_generation);
+        }
+        if (result == MUSIC_RIG_RESULT_OK &&
+            music_rig_runtime_persist_state(runtime) == MUSIC_RIG_RESULT_OK) {
+            response->resulting_generation = runtime->state.generation_id;
+            response->rollback_status =
+                (uint32_t)MUSIC_RIG_ROLLBACK_SUCCEEDED;
+            increment(&runtime->metrics.commit_rollbacks);
+        } else {
+            response->resulting_generation = runtime->state.generation_id;
+            response->rollback_status = (uint32_t)MUSIC_RIG_ROLLBACK_FAILED;
+            increment(&runtime->metrics.commit_rollback_failures);
+            runtime->state.lifecycle = MUSIC_RIG_RUNTIME_FAILED;
+        }
+        set_commit_failure(response, MUSIC_RIG_RESULT_ADAPTER_FAILURE);
+        return MUSIC_RIG_RESULT_OK;
+    }
+
     if (runtime->state.output_mode == MUSIC_RIG_OUTPUT_ENABLED &&
         confirm_output_generation(runtime, commit_generation) !=
             MUSIC_RIG_RESULT_OK) {
+        if (prepared_engine_active &&
+            music_rig_prepared_engine_transaction_rollback(
+                &prepared_engine_transaction
+            ) != MUSIC_RIG_RESULT_OK) {
+            response->resulting_generation = runtime->state.generation_id;
+            response->rollback_status = (uint32_t)MUSIC_RIG_ROLLBACK_FAILED;
+            increment(&runtime->metrics.commit_rollback_failures);
+            runtime->state.lifecycle = MUSIC_RIG_RUNTIME_FAILED;
+            set_commit_failure(response, MUSIC_RIG_RESULT_ADAPTER_FAILURE);
+            return MUSIC_RIG_RESULT_OK;
+        }
         result = rollback_published_generation(runtime, previous_generation);
         if (result == MUSIC_RIG_RESULT_OK &&
             music_rig_runtime_persist_state(runtime) == MUSIC_RIG_RESULT_OK) {
@@ -1031,6 +1104,17 @@ static music_rig_result commit_global_switch(
         return MUSIC_RIG_RESULT_OK;
     }
 
+    if (prepared_engine_active &&
+        music_rig_prepared_engine_transaction_rollback(
+            &prepared_engine_transaction
+        ) != MUSIC_RIG_RESULT_OK) {
+        response->resulting_generation = runtime->state.generation_id;
+        response->rollback_status = (uint32_t)MUSIC_RIG_ROLLBACK_FAILED;
+        increment(&runtime->metrics.commit_rollback_failures);
+        runtime->state.lifecycle = MUSIC_RIG_RUNTIME_FAILED;
+        set_commit_failure(response, MUSIC_RIG_RESULT_ADAPTER_FAILURE);
+        return MUSIC_RIG_RESULT_OK;
+    }
     result = rollback_published_generation(runtime, previous_generation);
     if (result == MUSIC_RIG_RESULT_OK) {
         copy_profile(runtime->active_rig_profile, previous_profile);
@@ -1111,6 +1195,8 @@ static music_rig_result commit_device_switch(
     int table_index;
     uint32_t previous_count;
     music_rig_result result;
+    music_rig_prepared_engine_transaction prepared_engine_transaction;
+    bool prepared_engine_active = false;
 
     increment(&runtime->metrics.commit_requests);
     if (response->result_code != (uint32_t)MUSIC_RIG_RESULT_OK) {
@@ -1188,6 +1274,21 @@ static music_rig_result commit_device_switch(
         set_commit_failure(response, MUSIC_RIG_RESULT_GENERATION_CONFLICT);
         return MUSIC_RIG_RESULT_OK;
     }
+    if (prepared_engine_is_enabled(runtime)) {
+        result = music_rig_prepared_engine_transaction_begin(
+            &prepared_engine_transaction,
+            &runtime->prepared_engine,
+            previous_generation,
+            generation
+        );
+        if (result != MUSIC_RIG_RESULT_OK) {
+            (void)rollback_published_generation(runtime, previous_generation);
+            runtime->device_override_table_in_use[table_index] = false;
+            set_commit_failure(response, result);
+            return MUSIC_RIG_RESULT_OK;
+        }
+        prepared_engine_active = true;
+    }
     if ((uint32_t)override_index == runtime->device_override_count) {
         runtime->device_override_count += 1U;
     }
@@ -1195,8 +1296,32 @@ static music_rig_result commit_device_switch(
         request->device_slot);
     copy_profile(runtime->device_overrides[override_index].profile,
         request->profile);
+    if (prepared_engine_active &&
+        music_rig_prepared_engine_transaction_commit(
+            &prepared_engine_transaction
+        ) != MUSIC_RIG_RESULT_OK) {
+        if (music_rig_prepared_engine_transaction_rollback(
+                &prepared_engine_transaction
+            ) != MUSIC_RIG_RESULT_OK) {
+            runtime->state.lifecycle = MUSIC_RIG_RUNTIME_FAILED;
+            set_commit_failure(response, MUSIC_RIG_RESULT_ADAPTER_FAILURE);
+            return MUSIC_RIG_RESULT_OK;
+        }
+        restore_device_transaction(runtime, transaction.previous_overrides,
+            transaction.previous_override_count, transaction.previous_generation,
+            response);
+        return MUSIC_RIG_RESULT_OK;
+    }
     if (runtime->state.output_mode == MUSIC_RIG_OUTPUT_ENABLED &&
         confirm_output_generation(runtime, generation) != MUSIC_RIG_RESULT_OK) {
+        if (prepared_engine_active &&
+            music_rig_prepared_engine_transaction_rollback(
+                &prepared_engine_transaction
+            ) != MUSIC_RIG_RESULT_OK) {
+            runtime->state.lifecycle = MUSIC_RIG_RUNTIME_FAILED;
+            set_commit_failure(response, MUSIC_RIG_RESULT_ADAPTER_FAILURE);
+            return MUSIC_RIG_RESULT_OK;
+        }
         (void)rollback_output_generation(runtime, generation);
         restore_device_transaction(runtime, transaction.previous_overrides,
             transaction.previous_override_count, transaction.previous_generation,
@@ -1204,6 +1329,14 @@ static music_rig_result commit_device_switch(
         return MUSIC_RIG_RESULT_OK;
     }
     if (music_rig_runtime_persist_state(runtime) != MUSIC_RIG_RESULT_OK) {
+        if (prepared_engine_active &&
+            music_rig_prepared_engine_transaction_rollback(
+                &prepared_engine_transaction
+            ) != MUSIC_RIG_RESULT_OK) {
+            runtime->state.lifecycle = MUSIC_RIG_RUNTIME_FAILED;
+            set_commit_failure(response, MUSIC_RIG_RESULT_ADAPTER_FAILURE);
+            return MUSIC_RIG_RESULT_OK;
+        }
         restore_device_transaction(
             runtime, previous_overrides, previous_count,
             previous_generation, response

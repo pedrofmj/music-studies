@@ -1,0 +1,9 @@
+{
+  "block_size": 1024,
+  "preset": "/tmp/music-rig-synthv1-presets/50_SynthRemember.synthv1",
+  "protected_graph_touched": false,
+  "sample_rate": 48000,
+  "schema": "music-studies/s2-synthv1-process-runtime/v1",
+  "status": "prepared-transaction-rollback-pass",
+  "synthv1": "/tmp/music-rig-fallbacks/synthv1-standalone/usr/bin/synthv1_jack"
+}

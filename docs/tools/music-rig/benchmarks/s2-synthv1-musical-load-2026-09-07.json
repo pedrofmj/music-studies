@@ -1,0 +1,11 @@
+{
+  "block_size": 1024,
+  "finite_audio": true,
+  "midi_events": 1175,
+  "protected_graph_touched": false,
+  "resource": "synthv1",
+  "resource_measurement": "wrapper-process-not-attributable",
+  "schema": "music-studies/s2-synthv1-musical-load/v1",
+  "status": "isolated-musical-load-pass",
+  "timing": {"rss_kb": 2020, "system_seconds": 0.0, "user_seconds": 0.0}
+}

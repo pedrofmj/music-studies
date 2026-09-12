@@ -1,0 +1,174 @@
+#!/usr/bin/env python3
+"""Exercise the candidate synthv1 definition through the inert runtime."""
+
+from __future__ import annotations
+
+import json
+import os
+import signal
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+
+SCRIPT = Path(__file__).resolve()
+TOOLS_ROOT = SCRIPT.parents[1]
+REPOSITORY_ROOT = SCRIPT.parents[4]
+COMPILER = TOOLS_ROOT / "compile-performance-rig.py"
+RIG_ROOT = REPOSITORY_ROOT / "src" / "performance-rigs" / "pedro-performance-rig"
+
+
+def load(path: Path):
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def write(path: Path, document) -> None:
+    path.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def prepare_candidate_root(root: Path) -> None:
+    rig = load(root / "rig.json")
+    rig["platform_bindings"].append("synthv1-candidate")
+    write(root / "rig.json", rig)
+    binding_path = root / "platform-bindings" / "linux" / "airstar-current.json"
+    binding = load(binding_path)
+    binding["id"] = "synthv1-candidate"
+    binding["display_name"] = "Temporary synthv1 Candidate Fixture"
+    binding["evidence_status"] = "certified"
+    binding["rig_profiles"] = ["synth-programmer-synthv1"]
+    binding["binding_groups"][0]["targets"].update({
+        "engine.synthv1": "candidate:engine.synthv1",
+        "asset.synthv1": "candidate:asset.synthv1",
+    })
+    write(
+        binding_path.with_name("synthv1-candidate.json"),
+        binding,
+    )
+
+
+def wait_for_socket(path: Path, process: subprocess.Popen[str]) -> None:
+    deadline = time.monotonic() + 5.0
+    while time.monotonic() < deadline:
+        if path.exists():
+            return
+        if process.poll() is not None:
+            stderr = process.stderr.read() if process.stderr else ""
+            stdout = process.stdout.read() if process.stdout else ""
+            raise AssertionError(
+                f"music-rigd exited early: {process.returncode}: {stderr}{stdout}"
+            )
+        time.sleep(0.02)
+    raise AssertionError("timed out waiting for music-rigd socket")
+
+
+def request(cli: Path, environment: dict[str, str], *arguments: str) -> dict:
+    result = subprocess.run(
+        [str(cli), *arguments, "--json"],
+        env=environment,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise AssertionError(f"CLI failed: {result.stdout}\n{result.stderr}")
+    return json.loads(result.stdout)
+
+
+def main() -> int:
+    if len(sys.argv) != 7:
+        print(
+            "usage: test-s2-synthv1-runtime-transaction DAEMON CLI CURRENT "
+            "CURRENT_FINGERPRINT COMPILER RIG_ROOT",
+            file=sys.stderr,
+        )
+        return 2
+    daemon, cli, current, current_fingerprint, compiler, source_root = map(
+        Path, sys.argv[1:]
+    )
+    try:
+        with tempfile.TemporaryDirectory(prefix="music-rig-synthv1-runtime-") as temporary:
+            root = Path(temporary)
+            candidate_root = root / "rig"
+            shutil.copytree(source_root, candidate_root)
+            prepare_candidate_root(candidate_root)
+            definition = root / "synthv1-candidate.json"
+            compile_result = subprocess.run(
+                [
+                    sys.executable, str(compiler), "--rig-root", str(candidate_root),
+                    "--platform-binding", "synthv1-candidate",
+                    "--rig-profile", "synth-programmer-synthv1",
+                    "--output", str(definition),
+                ],
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            if compile_result.returncode != 0:
+                raise AssertionError(compile_result.stderr)
+            candidate_fingerprint = compile_result.stdout.split("definition=", 1)[-1].strip().rstrip(")")
+            runtime_home = root / "runtime"
+            state_home = root / "state"
+            config_home = root / "config"
+            runtime_home.mkdir()
+            state_home.mkdir()
+            config_home.mkdir()
+            environment = os.environ.copy()
+            environment.update({
+                "HOME": str(root),
+                "XDG_CONFIG_HOME": str(config_home),
+                "XDG_RUNTIME_DIR": str(runtime_home),
+                "XDG_STATE_HOME": str(state_home),
+            })
+            process = subprocess.Popen(
+                [
+                    str(daemon), "run", "--definition", str(current),
+                    "--expected-fingerprint", str(current_fingerprint),
+                    "--prepared-definition", str(definition),
+                    "--prepared-fingerprint", candidate_fingerprint,
+                ],
+                env=environment,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            try:
+                wait_for_socket(runtime_home / "music-rig" / "control.sock", process)
+                committed = request(cli, environment, "switch", "--global", "synth-programmer-synthv1")
+                if (
+                    committed.get("result") != "ok" or
+                    committed.get("active_rig_profile") != "synth-programmer-synthv1" or
+                    committed.get("dry_run") or
+                    committed.get("graph_delta") != "empty"
+                ):
+                    raise AssertionError(f"candidate commit failed: {committed}")
+                restored = request(cli, environment, "switch", "--global", "full-live-rack")
+                if (
+                    restored.get("result") != "ok" or
+                    restored.get("active_rig_profile") != "full-live-rack" or
+                    restored.get("dry_run") or
+                    restored.get("graph_delta") != "empty"
+                ):
+                    raise AssertionError(f"candidate switch-back failed: {restored}")
+                if not (state_home / "music-rig" / "active.state").exists():
+                    raise AssertionError("candidate transaction did not persist temporary state")
+            finally:
+                process.send_signal(signal.SIGTERM)
+                try:
+                    process.wait(timeout=5.0)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait()
+        print("S2 synthv1 runtime transaction: PASS")
+        return 0
+    except (AssertionError, OSError, ValueError, json.JSONDecodeError) as error:
+        print(f"FAIL: {error}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

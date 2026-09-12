@@ -1,0 +1,19 @@
+{
+  "live_activation": false,
+  "safeguards": {
+    "hardware_touched": false,
+    "pipewire_graph_changed": false,
+    "protected_artifacts_changed": false,
+    "services_changed": false
+  },
+  "schema": "music-studies/s2-operator-rehearsal/v1",
+  "status": "offline-rehearsal-pass",
+  "steps": [
+    "compile-organ",
+    "compile-synth",
+    "candidate-binding",
+    "runtime-dry-run",
+    "commit-switchback",
+    "preset-stage-process"
+  ]
+}

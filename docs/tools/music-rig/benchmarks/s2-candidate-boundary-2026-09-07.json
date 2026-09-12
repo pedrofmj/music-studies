@@ -1,0 +1,8 @@
+{
+  "binding": "synthv1-candidate",
+  "physical_endpoints": false,
+  "pipewire_touched": false,
+  "profile": "synth-programmer-synthv1",
+  "schema": "music-studies/s2-candidate-boundary/v1",
+  "status": "candidate-only-boundary-pass"
+}

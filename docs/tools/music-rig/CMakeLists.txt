@@ -17,6 +17,7 @@ add_library(music_rig_core STATIC
     runtime/core/music_rig_device_ports.c
     runtime/core/music_rig_diagnostics.c
     runtime/core/music_rig_protocol.c
+    runtime/core/music_rig_prepared_engine.c
     runtime/core/music_rig_runtime.c
     runtime/core/music_rig_state.c
 )
@@ -53,6 +54,34 @@ target_link_libraries(music_rig_device_midi_shadow
 )
 target_compile_features(music_rig_device_midi_shadow PUBLIC c_std_17)
 set_target_properties(music_rig_device_midi_shadow PROPERTIES C_EXTENSIONS OFF)
+
+add_library(music_rig_synthv1_preset_adapter STATIC
+    runtime/adapters/music_rig_synthv1_preset_adapter.c
+)
+target_include_directories(music_rig_synthv1_preset_adapter
+    PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}/runtime/adapters/include"
+)
+target_link_libraries(music_rig_synthv1_preset_adapter PUBLIC music_rig_core)
+target_compile_features(music_rig_synthv1_preset_adapter PUBLIC c_std_17)
+set_target_properties(music_rig_synthv1_preset_adapter PROPERTIES
+    C_EXTENSIONS OFF
+)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_library(music_rig_synthv1_process STATIC
+        runtime/adapters/music_rig_synthv1_process.c
+    )
+    target_include_directories(music_rig_synthv1_process
+        PUBLIC
+            "${CMAKE_CURRENT_SOURCE_DIR}/runtime/adapters/include"
+    )
+    target_link_libraries(music_rig_synthv1_process PUBLIC music_rig_core)
+    target_compile_features(music_rig_synthv1_process PUBLIC c_std_17)
+    set_target_properties(music_rig_synthv1_process PROPERTIES
+        C_EXTENSIONS OFF
+    )
+endif()
 
 add_library(music_rig_smc_mixer_relay STATIC
     runtime/adapters/music_rig_smc_mixer_relay.c
@@ -166,6 +195,48 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
             music_rig_jack_smc_mixer_relay PUBLIC c_std_17
         )
         set_target_properties(music_rig_jack_smc_mixer_relay PROPERTIES
+            C_EXTENSIONS OFF
+        )
+        add_executable(music_rig_jack_midi_stimulus
+            benchmarks/jack-midi-stimulus.c
+        )
+        target_link_libraries(music_rig_jack_midi_stimulus
+            PRIVATE "${MUSIC_RIG_JACK_LIBRARY}"
+        )
+        target_compile_features(music_rig_jack_midi_stimulus PRIVATE c_std_17)
+        set_target_properties(music_rig_jack_midi_stimulus PROPERTIES
+            C_EXTENSIONS OFF
+        )
+    endif()
+    find_path(MUSIC_RIG_LILV_INCLUDE_DIR lilv/lilv.h PATH_SUFFIXES lilv-0)
+    find_library(MUSIC_RIG_LILV_LIBRARY NAMES lilv-0)
+    if(MUSIC_RIG_LILV_INCLUDE_DIR AND MUSIC_RIG_LILV_LIBRARY)
+        add_executable(music_rig_lv2_atom_state_probe
+            benchmarks/lv2-atom-state-probe.c
+        )
+        target_include_directories(music_rig_lv2_atom_state_probe PRIVATE
+            "${MUSIC_RIG_LILV_INCLUDE_DIR}"
+        )
+        target_link_libraries(music_rig_lv2_atom_state_probe PRIVATE
+            "${MUSIC_RIG_LILV_LIBRARY}"
+            m
+        )
+        target_compile_features(music_rig_lv2_atom_state_probe PRIVATE c_std_17)
+        set_target_properties(music_rig_lv2_atom_state_probe PROPERTIES
+            C_EXTENSIONS OFF
+        )
+        add_executable(music_rig_lv2_control_state_probe
+            benchmarks/lv2-control-state-probe.c
+        )
+        target_include_directories(music_rig_lv2_control_state_probe PRIVATE
+            "${MUSIC_RIG_LILV_INCLUDE_DIR}"
+        )
+        target_link_libraries(music_rig_lv2_control_state_probe PRIVATE
+            "${MUSIC_RIG_LILV_LIBRARY}"
+            m
+        )
+        target_compile_features(music_rig_lv2_control_state_probe PRIVATE c_std_17)
+        set_target_properties(music_rig_lv2_control_state_probe PROPERTIES
             C_EXTENSIONS OFF
         )
     endif()
@@ -424,6 +495,31 @@ if(BUILD_TESTING)
         tests/runtime-test.c
     )
     target_link_libraries(music_rig_runtime_test PRIVATE music_rig_core)
+    add_executable(music_rig_prepared_engine_test
+        tests/prepared-engine-test.c
+    )
+    target_link_libraries(music_rig_prepared_engine_test PRIVATE music_rig_core)
+    add_executable(music_rig_synthv1_preset_adapter_test
+        tests/synthv1-preset-adapter-test.c
+    )
+    target_link_libraries(music_rig_synthv1_preset_adapter_test
+        PRIVATE music_rig_synthv1_preset_adapter
+    )
+    if(TARGET music_rig_synthv1_process)
+        add_executable(music_rig_synthv1_process_test
+            tests/synthv1-process-test.c
+        )
+        target_link_libraries(music_rig_synthv1_process_test
+            PRIVATE music_rig_synthv1_process
+        )
+        add_executable(music_rig_synthv1_process_runtime_test
+            tests/synthv1-process-runtime-test.c
+        )
+        target_link_libraries(music_rig_synthv1_process_runtime_test
+            PRIVATE music_rig_synthv1_preset_adapter
+                music_rig_synthv1_process
+        )
+    endif()
     add_executable(music_rig_switch_performance_test
         tests/switch-performance-test.c
     )
@@ -715,6 +811,54 @@ if(BUILD_TESTING)
     )
     add_test(NAME music_rig_runtime_test COMMAND music_rig_runtime_test)
     add_test(
+        NAME music_rig_prepared_engine_test
+        COMMAND music_rig_prepared_engine_test
+    )
+    add_test(
+        NAME music_rig_synthv1_preset_adapter_test
+        COMMAND music_rig_synthv1_preset_adapter_test
+    )
+    if(TARGET music_rig_synthv1_process_test)
+        add_test(
+            NAME music_rig_synthv1_process_test
+            COMMAND music_rig_synthv1_process_test
+        )
+        add_test(
+            NAME music_rig_synthv1_process_runtime_test
+            COMMAND music_rig_synthv1_process_runtime_test
+                /definitely/missing/synthv1_jack
+                /tmp/missing-synthv1-preset.synthv1
+                music-rig-s2
+        )
+    add_test(
+        NAME music_rig_synthv1_process_runtime_evidence
+            COMMAND "${Python3_EXECUTABLE}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/run-synthv1-process-runtime.py"
+                --fixture
+                "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-synthv1-process-runtime-2026-09-07.json"
+        )
+        add_test(
+            NAME music_rig_synthv1_musical_load
+            COMMAND "${Python3_EXECUTABLE}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/run-synthv1-musical-load.py"
+                --fixture
+                "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-synthv1-musical-load-2026-09-07.json"
+        )
+        add_test(
+            NAME music_rig_s2_operator_rehearsal
+            COMMAND "${Python3_EXECUTABLE}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/validate-s2-operator-rehearsal.py"
+                "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-operator-rehearsal-2026-09-07.json"
+        )
+        add_test(
+            NAME music_rig_s2_candidate_boundary
+            COMMAND "${Python3_EXECUTABLE}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/run-s2-candidate-boundary.py"
+                --fixture
+                "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-candidate-boundary-2026-09-07.json"
+        )
+    endif()
+    add_test(
         NAME music_rig_switch_performance
         COMMAND music_rig_switch_performance_test
     )
@@ -953,10 +1097,54 @@ if(BUILD_TESTING)
             --platform-binding airstar-current
             --check-only
     )
+    add_test(
+        NAME music_rig_tonewheel_organ_compile_check
+        COMMAND "${Python3_EXECUTABLE}"
+            "${MUSIC_RIG_COMPILER}"
+            --rig-root
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../../src/performance-rigs/pedro-performance-rig"
+            --platform-binding airstar-current
+            --rig-profile tonewheel-organ
+            --check-only
+    )
+    add_test(
+        NAME music_rig_synth_programmer_compile_check
+        COMMAND "${Python3_EXECUTABLE}"
+            "${MUSIC_RIG_COMPILER}"
+            --rig-root
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../../src/performance-rigs/pedro-performance-rig"
+            --platform-binding airstar-current
+            --rig-profile synth-programmer
+            --check-only
+    )
     set_tests_properties(
         music_rig_compiler_self_test
         music_rig_current_compile_check
+        music_rig_tonewheel_organ_compile_check
+        music_rig_synth_programmer_compile_check
         PROPERTIES TIMEOUT 30
+    )
+    add_test(
+        NAME music_rig_synthv1_candidate_compile
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-s2-synthv1-candidate-compile"
+    )
+    set_tests_properties(
+        music_rig_synthv1_candidate_compile PROPERTIES TIMEOUT 30
+    )
+    add_test(
+        NAME music_rig_synthv1_runtime_transaction
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-s2-synthv1-runtime-transaction"
+            $<TARGET_FILE:music-rigd>
+            $<TARGET_FILE:music-rig>
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-current-envelope.json"
+            "sha256:a3a9bfdb60a3409f770063afa18b09e7c3b0c4e269ca0474a976062a8d2906b7"
+            "${MUSIC_RIG_COMPILER}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../../src/performance-rigs/pedro-performance-rig"
+    )
+    set_tests_properties(
+        music_rig_synthv1_runtime_transaction PROPERTIES TIMEOUT 30
     )
 
     add_test(
@@ -1039,13 +1227,148 @@ if(BUILD_TESTING)
         music_rig_m3_shadow_evidence_validator_self_test
         PROPERTIES TIMEOUT 10
     )
+    add_test(
+        NAME music_rig_s2_engine_inventory
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/verify-s2-engine-candidates.py"
+            --fixture
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-engine-inventory-2026-09-06.json"
+    )
+    set_tests_properties(
+        music_rig_s2_engine_inventory PROPERTIES TIMEOUT 10
+    )
+    add_test(
+        NAME music_rig_s2_engine_control_contract
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/validate-s2-engine-control-contracts.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-engine-control-contracts-2026-09-07.json"
+    )
+    set_tests_properties(
+        music_rig_s2_engine_control_contract PROPERTIES TIMEOUT 10
+    )
+    add_test(
+        NAME music_rig_s2_engine_resource_stage
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/stage-s2-engine-resources.py"
+            --fixture
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-engine-resource-stage-2026-09-07.json"
+    )
+    set_tests_properties(
+        music_rig_s2_engine_resource_stage PROPERTIES TIMEOUT 10
+    )
+    add_test(
+        NAME music_rig_s2_jack_isolation
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/run-s2-jack-isolation.py"
+            --fixture
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-jack-isolation-2026-09-07.json"
+    )
+    set_tests_properties(
+        music_rig_s2_jack_isolation PROPERTIES TIMEOUT 10
+    )
+    add_test(
+        NAME music_rig_s2_jack_midi
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/run-s2-jack-midi.py"
+            --fixture
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-jack-midi-2026-09-07.json"
+    )
+    set_tests_properties(
+        music_rig_s2_jack_midi PROPERTIES TIMEOUT 10
+    )
+    add_test(
+        NAME music_rig_s2_state_response
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/validate-s2-state-response.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-state-response-2026-09-07.json"
+    )
+    set_tests_properties(
+        music_rig_s2_state_response PROPERTIES TIMEOUT 10
+    )
+    add_test(
+        NAME music_rig_s2_lv2_atom_probe
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/validate-s2-lv2-atom-probe.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-lv2-atom-probe-2026-09-07.json"
+    )
+    set_tests_properties(
+        music_rig_s2_lv2_atom_probe PROPERTIES TIMEOUT 10
+    )
+    add_test(
+        NAME music_rig_s2_synth_fallback
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/validate-s2-synth-fallback.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-synth-fallback-2026-09-07.json"
+    )
+    set_tests_properties(
+        music_rig_s2_synth_fallback PROPERTIES TIMEOUT 10
+    )
+    add_test(
+        NAME music_rig_s2_synthv1_control_contract
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/validate-s2-synthv1-control-contract.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-synthv1-control-contract-2026-09-07.json"
+    )
+    set_tests_properties(
+        music_rig_s2_synthv1_control_contract PROPERTIES TIMEOUT 10
+    )
+    add_test(
+        NAME music_rig_s2_synthv1_control_probe
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/validate-s2-synthv1-control-probe.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-synthv1-control-probe-2026-09-07.json"
+    )
+    set_tests_properties(
+        music_rig_s2_synthv1_control_probe PROPERTIES TIMEOUT 10
+    )
+    add_test(
+        NAME music_rig_s2_synthv1_preset_stage
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/stage-synthv1-preset.py"
+            --fixture
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-synthv1-preset-stage-2026-09-07.json"
+    )
+    set_tests_properties(
+        music_rig_s2_synthv1_preset_stage PROPERTIES TIMEOUT 10
+    )
+    add_test(
+        NAME music_rig_s2_synthv1_profile_state
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/validate-s2-synthv1-profile-state.py"
+            --contract
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-synthv1-control-contract-2026-09-07.json"
+            --fallback-evidence
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-synthv1-preset-stage-2026-09-07.json"
+    )
+    set_tests_properties(
+        music_rig_s2_synthv1_profile_state PROPERTIES TIMEOUT 10
+    )
+    add_test(
+        NAME music_rig_synthv1_prepared_binding
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/validate-s2-synthv1-prepared-binding.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-synthv1-prepared-binding-2026-09-07.json"
+    )
+    set_tests_properties(
+        music_rig_synthv1_prepared_binding PROPERTIES TIMEOUT 10
+    )
+    add_test(
+        NAME music_rig_synthv1_preset_process
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/run-synthv1-preset-process.py"
+            --fixture
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/s2-synthv1-preset-process-2026-09-07.json"
+    )
+    set_tests_properties(
+        music_rig_synthv1_preset_process PROPERTIES TIMEOUT 10
+    )
 
     if(MUSIC_RIG_ENABLE_JSON_C_SPIKE)
         set(MUSIC_RIG_JSON_DEFINITION_FIXTURE
             "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-current-envelope.json"
         )
         set(MUSIC_RIG_JSON_DEFINITION_FINGERPRINT
-            "sha256:b5988448d8346ffdca61bbcebd3d0b8bd4c62ae214923fe55bf1ffdbffbb22c3"
+            "sha256:a3a9bfdb60a3409f770063afa18b09e7c3b0c4e269ca0474a976062a8d2906b7"
         )
         set(MUSIC_RIG_MIXED_PADS_DEFINITION
             "${CMAKE_CURRENT_BINARY_DIR}/compiled-mixed-pads.json"
@@ -1321,6 +1644,20 @@ if(BUILD_TESTING)
                     "${MUSIC_RIG_JSON_DEFINITION_FINGERPRINT}"
                     "${MUSIC_RIG_MIXED_PADS_DEFINITION}"
                     "${MUSIC_RIG_MIXED_PADS_FINGERPRINT}"
+            )
+            add_test(
+                NAME music_rig_s2_runtime_dry_run
+                COMMAND "${Python3_EXECUTABLE}"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-s2-runtime-dry-run"
+                    $<TARGET_FILE:music-rigd>
+                    $<TARGET_FILE:music-rig>
+                    "${MUSIC_RIG_JSON_DEFINITION_FIXTURE}"
+                    "${MUSIC_RIG_JSON_DEFINITION_FINGERPRINT}"
+                    "${MUSIC_RIG_COMPILER}"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/../../../src/performance-rigs/pedro-performance-rig"
+            )
+            set_tests_properties(
+                music_rig_s2_runtime_dry_run PROPERTIES TIMEOUT 30
             )
             add_test(
                 NAME music_rig_shadow_idle_resource_mechanics

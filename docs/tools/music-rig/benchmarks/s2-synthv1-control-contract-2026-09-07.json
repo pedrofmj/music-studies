@@ -1,0 +1,36 @@
+{
+  "activation_status": "prepared-only-native-preset",
+  "candidate": "synthv1",
+  "control_transport": "lv2-control-port",
+  "state_resource": {
+    "archive_sha256": "sha256:16391911dbfabbcfde9d4fe1fad0987b4710ede27ffc5f71d3c9e0b05fa5803e",
+    "preset": "50_SynthRemember.synthv1",
+    "preset_sha256": "sha256:63f5aa7c76e7a18a86665748af7f5879c2f87853e7b3afe14ebbbf376a870c5d",
+    "strategy": "native-synthv1-preset-file",
+    "accepted_for_prepared_state": true,
+    "lv2_state_restore": "not-accepted"
+  },
+  "targets": {
+    "synth.amp-attack": {"backend_parameter": "DCA1_ATTACK", "status": "verified-metadata"},
+    "synth.amp-release": {"backend_parameter": "DCA1_RELEASE", "status": "verified-metadata"},
+    "synth.delay-feedback": {"backend_parameter": "DEL1_FEEDB", "status": "verified-metadata"},
+    "synth.delay-time": {"backend_parameter": "DEL1_DELAY", "status": "verified-metadata"},
+    "synth.drive": {"reason": "No dedicated drive control was identified.", "status": "unavailable"},
+    "synth.effects-mix": {"backend_parameter": "CHO1_WET", "status": "verified-metadata"},
+    "synth.filter-cutoff": {"backend_parameter": "DCF1_CUTOFF", "status": "verified-metadata"},
+    "synth.filter-resonance": {"backend_parameter": "DCF1_RESO", "status": "verified-metadata"},
+    "synth.modulation-depth": {"backend_parameter": "LFO1_BALANCE", "status": "verified-metadata"},
+    "synth.modulation-rate": {"backend_parameter": "LFO1_RATE", "status": "verified-metadata"},
+    "synth.oscillator-2-level": {"backend_parameter": "DCO2_BALANCE", "status": "verified-metadata"},
+    "synth.oscillator-mix": {"backend_parameter": "DCO1_BALANCE", "status": "verified-metadata"},
+    "synth.pitch-modulation": {"backend_parameter": "LFO1_PITCH", "status": "verified-metadata"},
+    "synth.reverb": {"reason": "Use the explicit reverb mix/room controls instead.", "status": "unavailable"},
+    "synth.reverb-mix": {"backend_parameter": "REV1_WET", "status": "verified-metadata"},
+    "synth.reverb-size": {"backend_parameter": "REV1_ROOM", "status": "verified-metadata"},
+    "synth.unison": {"reason": "No dedicated unison control was identified.", "status": "unavailable"},
+    "synth.volume": {"backend_parameter": "OUT1_VOLUME", "status": "verified-metadata"}
+  },
+  "schema": "music-studies/s2-synth-control-contract/v1",
+  "live_activation": false,
+  "status": "prepared-contract-only"
+}

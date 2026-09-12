@@ -1,0 +1,13 @@
+{
+  "control_count": 145,
+  "finite_audio": true,
+  "parameter": "DCO1_BALANCE",
+  "protected_graph_touched": false,
+  "schema": "music-studies/s2-synthv1-control-probe/v1",
+  "state_properties": 0,
+  "state_restore_status": 1,
+  "state_save_status": 0,
+  "status": "control-response-pass-state-restore-open",
+  "target_after": 0.75,
+  "target_before": 0.0
+}

@@ -1,0 +1,21 @@
+{
+  "protected_graph_touched": false,
+  "results": {
+    "setbfree": {
+      "duration_ms": 5000,
+      "input_feedback_events": 0,
+      "output_midi_events": 1180,
+      "plugin_uri": "http://gareus.org/oss/lv2/b_synth",
+      "status": "midi-stimulus-delivered-plugin-alive"
+    },
+    "surge-xt": {
+      "duration_ms": 5000,
+      "input_feedback_events": 0,
+      "output_midi_events": 1180,
+      "plugin_uri": "https://surge-synthesizer.github.io/lv2/surge-xt",
+      "status": "midi-stimulus-delivered-plugin-alive"
+    }
+  },
+  "schema": "music-studies/s2-jack-midi/v1",
+  "state_restore": "not-runtime-tested"
+}

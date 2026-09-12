@@ -1,0 +1,15 @@
+{
+  "candidate": "synth-programmer-synthv1",
+  "controller": "KL Essential 61 mk3:KL Essential 61 mk3 MIDI",
+  "window_seconds": 30,
+  "live_rack_audio": "muted by temporary SMC-MIX-to-Arturia-input link watchdog",
+  "midi_messages_observed": 236,
+  "note_messages_observed": true,
+  "control_change_messages_observed": false,
+  "before_links_sha256": "sha256:4073683c540974839a1851ffc149bacbb426628aa2bddcae8b8af180310c4e3d",
+  "after_links_sha256": "sha256:4073683c540974839a1851ffc149bacbb426628aa2bddcae8b8af180310c4e3d",
+  "graph_restored": true,
+  "protected_postcheck": "30/30",
+  "schema": "music-studies/s2-live-isolated-control-window/v1",
+  "status": "isolated-note-window-pass-control-assessment-open"
+}

@@ -1,0 +1,14 @@
+{
+  "profile": "tonewheel-organ-setbfree",
+  "controller": "KL Essential 61 mk3",
+  "window_seconds": 120,
+  "live_rack_audio": "muted by temporary upstream link watchdog",
+  "temporary_link_count": 3,
+  "graph_restored": true,
+  "before_links_sha256": "sha256:1bcf1f802e3b0568e9138700c4271030265e3c0f23c05b9e56962631fba763de",
+  "after_links_sha256": "sha256:1bcf1f802e3b0568e9138700c4271030265e3c0f23c05b9e56962631fba763de",
+  "protected_postcheck": "30/30",
+  "operator_audio_assessment": "pass; organ controls audibly responded",
+  "schema": "music-studies/s2-setbfree-two-minute-window/v1",
+  "status": "candidate-organ-window-pass"
+}

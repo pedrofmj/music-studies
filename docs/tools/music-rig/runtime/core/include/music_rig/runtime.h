@@ -5,6 +5,7 @@
 #include "music_rig/definition.h"
 #include "music_rig/device_ports.h"
 #include "music_rig/protocol.h"
+#include "music_rig/prepared_engine.h"
 #include "music_rig/state.h"
 #include "music_rig/storage.h"
 
@@ -129,6 +130,7 @@ typedef struct music_rig_runtime_config {
     const char *active_rig_profile;
     const music_rig_prepared_definition *prepared_definitions;
     size_t prepared_definition_count;
+    const music_rig_prepared_engine_adapter *prepared_engine;
     music_rig_output_mode output_mode;
     const music_rig_output_adoption_adapter *output_adoption;
 } music_rig_runtime_config;
@@ -155,6 +157,8 @@ typedef struct music_rig_runtime {
     const music_rig_compiled_tables *base_tables;
     const music_rig_prepared_definition *prepared_definitions;
     size_t prepared_definition_count;
+    music_rig_prepared_engine_adapter prepared_engine;
+    bool prepared_engine_enabled;
     music_rig_compiled_tables device_override_tables[
         MUSIC_RIG_PERSISTED_DEVICE_OVERRIDE_CAPACITY
     ];

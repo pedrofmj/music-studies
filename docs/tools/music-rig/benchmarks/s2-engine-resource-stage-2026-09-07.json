@@ -1,0 +1,39 @@
+{
+  "activation": "disabled",
+  "resources": {
+    "setbfree": {
+      "archive_sha256": "sha256:6ad090237b6fea0f777db13a52e044d91143df3496e5c7b1b4eccf479c4ba554",
+      "format": "deb-unpacked-temporary",
+      "required_files": [
+        "usr/bin/setBfree",
+        "usr/lib/lv2/b_synth/manifest.ttl",
+        "usr/lib/lv2/b_synth/b_synth.ttl",
+        "usr/share/setBfree/cfg/default.cfg",
+        "usr/share/setBfree/pgm/default.pgm"
+      ],
+      "state_assets": [
+        "usr/share/setBfree/cfg/default.cfg",
+        "usr/share/setBfree/pgm/default.pgm"
+      ]
+    },
+    "surge-xt": {
+      "archive_sha256": "sha256:dd431b75f5fa197c4bffa6ca27ca46970f0a94c834119bb1db7decdeec4c28db",
+      "format": "tar-gz-unpacked-temporary",
+      "required_files": [
+        "Surge XT.lv2/manifest.ttl",
+        "Surge XT.lv2/dsp.ttl",
+        "Surge XT.lv2/libSurge XT.so",
+        "surge-xt-cli"
+      ],
+      "state_assets": ["Surge XT.lv2/manifest.ttl"]
+    }
+  },
+  "runtime_checks": {
+    "audio_cpu": "not-run",
+    "jack_host": null,
+    "reason": "No isolated JACK host is available; PipeWire and protected Carla were not touched.",
+    "state_restore": "assets-staged-not-runtime-tested",
+    "status": "blocked-by-safe-boundary"
+  },
+  "schema": "music-studies/s2-engine-resource-stage/v1"
+}

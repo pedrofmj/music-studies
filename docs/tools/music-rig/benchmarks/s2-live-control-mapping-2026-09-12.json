@@ -1,0 +1,23 @@
+{
+  "candidate": "synth-programmer-synthv1",
+  "controller": "KL Essential 61 mk3",
+  "window_seconds": 30,
+  "live_rack_audio": "muted by temporary upstream link watchdog",
+  "notes_observed": false,
+  "control_changes_observed": 1327,
+  "controls": {
+    "fader-2": {"cc": 75, "messages": 1244, "min": 0, "max": 127},
+    "knob-1": {"cc": 74, "messages": 29, "min": 52, "max": 75},
+    "knob-2": {"cc": 71, "messages": 12, "min": 0, "max": 11},
+    "knob-3": {"cc": 76, "messages": 9, "min": 25, "max": 34},
+    "knob-4": {"cc": 77, "messages": 10, "min": 6, "max": 18},
+    "knob-5": {"cc": 93, "messages": 14, "min": 0, "max": 11},
+    "knob-6": {"cc": 18, "messages": 10, "min": 1, "max": 17}
+  },
+  "before_links_sha256": "sha256:4073683c540974839a1851ffc149bacbb426628aa2bddcae8b8af180310c4e3d",
+  "after_links_sha256": "sha256:4073683c540974839a1851ffc149bacbb426628aa2bddcae8b8af180310c4e3d",
+  "graph_restored": true,
+  "protected_postcheck": "30/30",
+  "schema": "music-studies/s2-live-control-mapping/v1",
+  "status": "control-mapping-pass"
+}

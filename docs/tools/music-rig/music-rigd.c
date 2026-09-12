@@ -302,6 +302,10 @@ static int run_runtime(
         );
         prepared.definition = &prepared_definition;
         prepared.tables = &prepared_tables;
+        if (result != MUSIC_RIG_RESULT_OK) {
+            fprintf(stderr, "prepared definition load failed: result %d\n",
+                (int)result);
+        }
     }
     if (result == MUSIC_RIG_RESULT_OK) {
         result = music_rig_file_storage_init(

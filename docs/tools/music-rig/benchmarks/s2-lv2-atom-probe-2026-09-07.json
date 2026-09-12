@@ -1,0 +1,14 @@
+{
+  "finite_audio": true,
+  "parameter_uri": "https://surge-synthesizer.github.io/lv2/surge-xt:a_filter1_cutoff",
+  "patch_response_events": 0,
+  "parameter_write_sent": 1,
+  "plugin": "Surge XT",
+  "protected_graph_touched": false,
+  "schema": "music-studies/s2-lv2-atom-probe/v1",
+  "state_properties": 0,
+  "state_restore": "restore-rejected-no-properties",
+  "state_restore_status": 5,
+  "state_save_status": 0,
+  "status": "offline-atom-write-finite-audio-response-unobservable"
+}

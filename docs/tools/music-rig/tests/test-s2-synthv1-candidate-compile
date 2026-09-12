@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+"""Compile the synthv1 candidate only inside an isolated temporary catalogue."""
+
+from __future__ import annotations
+
+import json
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+
+SCRIPT = Path(__file__).resolve()
+TOOLS_ROOT = SCRIPT.parents[1]
+REPOSITORY_ROOT = SCRIPT.parents[4]
+COMPILER = TOOLS_ROOT / "compile-performance-rig.py"
+RIG_ROOT = REPOSITORY_ROOT / "src" / "performance-rigs" / "pedro-performance-rig"
+
+
+def load(path: Path):
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def write(path: Path, document) -> None:
+    path.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def main() -> int:
+    try:
+        with tempfile.TemporaryDirectory(prefix="music-rig-synthv1-candidate-") as temporary:
+            root = Path(temporary) / "rig"
+            import shutil
+            shutil.copytree(RIG_ROOT, root)
+            rig = load(root / "rig.json")
+            rig["platform_bindings"].append("synthv1-candidate")
+            write(root / "rig.json", rig)
+
+            binding_path = root / "platform-bindings" / "linux" / "airstar-current.json"
+            binding = load(binding_path)
+            binding["id"] = "synthv1-candidate"
+            binding["display_name"] = "Temporary synthv1 Candidate Fixture"
+            binding["evidence_status"] = "certified"
+            binding["rig_profiles"] = ["synth-programmer-synthv1"]
+            binding["binding_groups"][0]["targets"].update({
+                "engine.synthv1": "candidate:engine.synthv1",
+                "asset.synthv1": "candidate:asset.synthv1",
+            })
+            binding_path = binding_path.with_name("synthv1-candidate.json")
+            write(binding_path, binding)
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(COMPILER),
+                    "--rig-root",
+                    str(root),
+                    "--platform-binding",
+                    "synthv1-candidate",
+                    "--rig-profile",
+                    "synth-programmer-synthv1",
+                    "--check-only",
+                ],
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            if result.returncode != 0:
+                raise AssertionError(result.stderr)
+            if "rig-profile=synth-programmer-synthv1" not in result.stdout:
+                raise AssertionError("candidate profile was not selected")
+            if "graph-delta=empty" not in result.stdout:
+                raise AssertionError("candidate graph delta was not empty")
+        print("S2 synthv1 candidate compile: PASS")
+        return 0
+    except (AssertionError, OSError, ValueError, json.JSONDecodeError) as error:
+        print(f"FAIL: {error}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

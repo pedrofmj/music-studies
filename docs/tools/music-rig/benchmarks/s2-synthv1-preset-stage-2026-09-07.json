@@ -1,0 +1,21 @@
+{
+  "activation": "disabled",
+  "archive_sha256": "sha256:16391911dbfabbcfde9d4fe1fad0987b4710ede27ffc5f71d3c9e0b05fa5803e",
+  "parameter_count": 145,
+  "preset_sha256": "sha256:63f5aa7c76e7a18a86665748af7f5879c2f87853e7b3afe14ebbbf376a870c5d",
+  "required_parameters": [
+    "DCA1_ATTACK",
+    "DCA1_RELEASE",
+    "DCF1_CUTOFF",
+    "DCF1_RESO",
+    "DCO1_BALANCE",
+    "DCO2_BALANCE",
+    "LFO1_BALANCE",
+    "LFO1_RATE",
+    "OUT1_VOLUME"
+  ],
+  "schema": "music-studies/s2-synthv1-preset-stage/v1",
+  "state_strategy": "native-synthv1-preset-file",
+  "prepared_state_acceptance": "accepted-native-preset",
+  "status": "temporary-stage-validated"
+}

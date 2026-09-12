@@ -1,0 +1,24 @@
+{
+  "protected_graph_touched": false,
+  "results": {
+    "setbfree": {
+      "audio": {"block_size": 1024, "sample_rate": 48000},
+      "duration_seconds": 5,
+      "plugin_uri": "http://gareus.org/oss/lv2/b_synth",
+      "resource": "setbfree",
+      "status": "loaded-and-processed-idle-audio",
+      "timing": {"rss_kb": 13392, "system": 0.0, "user": 0.29}
+    },
+    "surge-xt": {
+      "audio": {"block_size": 1024, "sample_rate": 48000},
+      "duration_seconds": 5,
+      "plugin_uri": "https://surge-synthesizer.github.io/lv2/surge-xt",
+      "resource": "surge-xt",
+      "status": "loaded-and-processed-idle-audio",
+      "timing": {"rss_kb": 39384, "system": 0.07, "user": 0.16}
+    }
+  },
+  "schema": "music-studies/s2-jack-isolation/v1",
+  "server": {"backend": "dummy", "block_size": 1024, "sample_rate": 48000},
+  "state_restore": "not-runtime-tested"
+}

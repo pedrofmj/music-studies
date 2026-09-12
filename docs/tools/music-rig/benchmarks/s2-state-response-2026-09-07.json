@@ -1,0 +1,18 @@
+{
+  "candidates": {
+    "setbfree": {
+      "control_response": "MIDI stimulus delivered; no MIDI feedback observed",
+      "preset_path": "MIDI program-change",
+      "state_restore": "not-save-tested",
+      "status": "plugin-alive-under-isolated-MIDI"
+    },
+    "surge-xt": {
+      "control_response": "Jalv cannot set LV2 atom parameters as ordinary control ports",
+      "preset_path": "LV2 preset enumeration and preset command accepted",
+      "state_restore": "preset-load-only-not-save-tested",
+      "status": "plugin-alive-under-isolated-MIDI"
+    }
+  },
+  "protected_graph_touched": false,
+  "schema": "music-studies/s2-state-response/v1"
+}

@@ -8,7 +8,9 @@
   "platform": "linux",
   "rig_profiles": [
     "full-live-rack",
-    "multilevel-volume-mixed-pads"
+    "multilevel-volume-mixed-pads",
+    "tonewheel-organ",
+    "synth-programmer"
   ],
   "evidence_status": "verified-existing-runtime",
   "source_refs": [

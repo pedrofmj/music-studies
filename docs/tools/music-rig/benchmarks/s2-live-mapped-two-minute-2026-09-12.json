@@ -1,0 +1,17 @@
+{
+  "candidate": "synth-programmer-synthv1",
+  "controller": "KL Essential 61 mk3",
+  "window_seconds": 120,
+  "controls_config": "s2-synthv1-keylab-controls.conf",
+  "midi_messages_observed": 2247,
+  "note_messages_observed": 449,
+  "control_change_messages_observed": 1618,
+  "live_rack_audio": "muted by temporary upstream link watchdog",
+  "operator_audio_assessment": "pass; controls audibly affected synth sound",
+  "before_links_sha256": "sha256:4073683c540974839a1851ffc149bacbb426628aa2bddcae8b8af180310c4e3d",
+  "after_links_sha256": "sha256:4073683c540974839a1851ffc149bacbb426628aa2bddcae8b8af180310c4e3d",
+  "graph_restored": true,
+  "protected_postcheck": "30/30",
+  "schema": "music-studies/s2-live-mapped-two-minute/v1",
+  "status": "mapped-live-rehearsal-pass"
+}

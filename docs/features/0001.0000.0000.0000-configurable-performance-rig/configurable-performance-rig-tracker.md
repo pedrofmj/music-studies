@@ -152,6 +152,58 @@ occurrences, materially less than prior equivalent tests. The strict audible
 stability gate remains open; no production promotion occurred. Evidence is
 [recorded here](../../tools/music-rig/benchmarks/smc-mixer-relay-synchronized-correlation-airstar-2026-09-06.json).
 
+## Product Priority Reset
+
+The current implementation has one realized musical layout: the Arturia
+multi-instrument rack, SMC-PAD and Pocket drum roles, SMC-Mixer eight-band EQ,
+and SMK-25 continuous pad system. Performance instrumentation and optimization
+have advanced further than musical layout delivery. The next product sprint is
+therefore layout construction, not another optimization-only sprint.
+
+Priority order:
+
+1. Construct and dry-run the customizable `tonewheel-organ` layout.
+2. Construct and dry-run the customizable `synth-programmer` layout.
+3. Preserve `full-live-rack` and prove layout switch-back and rollback.
+4. Continue performance engineering as a parallel quality track.
+5. Port stable contracts and at least one completed layout to Echora at
+   `/c/development/egt/customers/egt/echora`.
+
+No organ or synth layout has been live-implemented yet; the proposal's layout
+examples are not live acceptance evidence until their profiles, engines,
+mappings, readiness, and operator procedures exist.
+
+The first S2 contract slice is now implemented: additive `tonewheel-organ` and
+`synth-programmer` profiles reuse the existing Hammond and Optik engines,
+preserve all five current slots, compile with empty graph deltas, and pass the
+deterministic compiler contract checks. Both compiled definitions also pass the
+JSON-enabled output-suppressed daemon dry-run: the result is valid, the graph
+delta is empty, the generation and active `full-live-rack` profile remain
+unchanged, and no durable state is written. Their semantic parameter targets
+are still authoring contracts; actual plugin-control binding, live acceptance,
+prepared engine resource rollback, live acceptance, and Echora integration
+remain open. The output-suppressed runtime test now commits each prepared S2
+layout and switches back to `full-live-rack` with durable temporary state.
+
+The protected Carla inspection now confirms why plugin-control binding remains
+open: both existing entries are `SF2` players exposing only generic reverb,
+chorus, polyphony, and interpolation parameters. They do not expose drawbars,
+oscillator mix, filters, envelopes, or modulation controls. The inventory and
+engine-selection decision are [recorded here](../../tools/music-rig/benchmarks/s2-layout-control-inventory.md).
+The selected candidates are setBfree for organ and Surge XT for synth; their
+package, host-format, control-surface, state, and CPU verification is tracked in
+[S2-ENGINE-SELECTION.md](../../tools/music-rig/S2-ENGINE-SELECTION.md).
+The isolated package and Carla discovery inventory now passes for both
+candidates: setBfree exposes MIDI-CC control with inverse nine-position
+drawbars and no host parameters; Surge XT exposes one parameter input and 775
+normalized LV2 parameters. This closes only the discovery/control-surface
+slice; package state restore, CPU, exact control binding, and musical response
+remain open. Evidence is
+[recorded here](../../tools/music-rig/benchmarks/s2-engine-inventory-2026-09-06.json).
+The same evidence records state/audio/CPU checks as blocked by the safe boundary:
+the host has no standalone JACK server, so neither candidate was launched into
+PipeWire or the protected Carla graph.
+
 ## Safety Lock
 
 - ✅ Protected single-rig artifacts remain the production authority.
@@ -177,6 +229,25 @@ stability gate remains open; no production promotion occurred. Evidence is
 | Device-free Carla/LSP EQ parameter isolation | 🟡 30,720 blocks across 15 scenarios; fixed non-flat CPU 30 us/block versus 2.225-2.428 ms for all-band MIDI changes and 3.766 ms for direct changes (setters only 2.082 us); 0 mapping errors, invalid samples, or assertions; 12 contract cases pass; expensive path isolated, live acceptance still open; [evidence](../../tools/music-rig/benchmarks/carla-eq-parameter-isolation-centralstar-2026-09-06.json) |
 | Symbol-matched LSP smoothing profile | 🟡 Per-sample processing and full-bank coefficient rebuild confirmed by matching source and independent debugger stack; profile matrix completed 15,360 blocks and 32,768 MIDI events with 0 mapping errors, invalid samples, or assertions; profiler timer warning prohibits precise percentages; 16 contract cases pass; live acceptance remains open; [evidence](../../tools/music-rig/benchmarks/carla-eq-smoothing-profile-centralstar-2026-09-06.json) |
 | Offline upstream LSP EQ comparison | 🟡 Upstream 1.0.40 reduced parameter-change CPU 13-31x for individual bands and 17-31x for all-band changes; mapping/event/finite-audio and zero-over-quantum checks pass; output-energy delta up to 1.11% under a 2% diagnostic tolerance; live response and scheduling acceptance remain open; [evidence](../../tools/music-rig/benchmarks/carla-eq-upstream-comparison-centralstar-2026-09-06.json) |
+| S2 tonewheel-organ layout contract | 🟡 Additive Arturia profile with nine drawbar mappings, organ controls, existing Hammond engine/assets, five-slot composition, empty graph delta, deterministic compile check, output-suppressed daemon dry-run, and temporary commit/switch-back; plugin-control binding and live activation remain open |
+| S2 synth-programmer layout contract | 🟡 Additive Arturia profile with oscillator, filter, envelope, modulation, unison, drive, and effects mappings, existing Optik engine/assets, five-slot composition, empty graph delta, deterministic compile check, output-suppressed daemon dry-run, and temporary commit/switch-back; plugin-control binding and live activation remain open |
+| S2 candidate engine control inventory | 🟡 Isolated setBfree and Surge XT packages pass Carla discovery and representative control metadata checks; state restore, CPU, exact host binding, and musical response remain open; [evidence](../../tools/music-rig/benchmarks/s2-engine-inventory-2026-09-06.json) |
+| S2 synthv1 fallback candidate | 🟡 Temporary package exposes 145 ordinary LV2 ControlPorts plus a state interface; direct probe changes `DCO1_BALANCE` 0.000→0.750 with finite audio; native preset startup load passes, while LV2 state restore remains open; candidate-only `synth-programmer-synthv1` Device/Rig Profiles record all 18 semantic bindings without entering `airstar-current`; [evidence](../../tools/music-rig/benchmarks/s2-synth-fallback-2026-09-07.json) |
+| S2 synthv1 native preset state resource | 🟡 Temporary preset adapter verifies archive provenance, XML parameter coverage, and all required semantic symbols; native `.synthv1` files are accepted as prepared state, while LV2 save/restore remains unsupported for live promotion; [evidence](../../tools/music-rig/benchmarks/s2-synthv1-preset-stage-2026-09-07.json) |
+| S2 synthv1 preset resource adapter | 🟡 Concrete stage/validate/arm/commit/rollback/discard adapter passes valid and incomplete-preset failure tests; runtime plugin loading/state restore remains open |
+| S2 synthv1 preset process ownership | 🟡 Native preset loads in a temporary standalone synthv1 JACK process at 48 kHz/1024, process ownership and cleanup pass; LV2/runtime state restore remains open; [evidence](../../tools/music-rig/benchmarks/s2-synthv1-preset-process-2026-09-07.json) |
+| S2 synthv1 process adapter | 🟡 POSIX start/health/stop hooks are wired to the preset adapter; real output-enabled temporary-JACK transaction starts synthv1, injects confirmation failure, and rolls back process/generation; live plugin transaction remains candidate-only; [boundary](../../tools/music-rig/PREPARED-ENGINE-TRANSACTION.md) |
+| S2 synthv1 musical load | 🟡 Native preset plus note/CC stimulus passes five-second finite-audio rehearsal at 48 kHz/1024; wrapper CPU timing is not child-attributable and remains diagnostic; protected graph untouched; [evidence](../../tools/music-rig/benchmarks/s2-synthv1-musical-load-2026-09-07.json) |
+| S2 live operator rehearsal | ⬜ Read-only preflight passed 2026-09-12 and candidate-only dummy-JACK boundary is ready; physical execution remains blocked without explicit live routing approval; no graph mutation or production promotion performed; [approval](../../tools/music-rig/S2-LIVE-OPERATOR-APPROVAL.md) |
+| S2 synthv1 candidate profile-state rollback | 🟡 Temporary candidate binding compiles and the real output-suppressed runtime commits `synth-programmer-synthv1`, persists state, and switches back to `full-live-rack`; no Airstar activation; runtime plugin-state restore remains open |
+| S2 prepared engine-control disposition | 🟡 Organ targets have verified MIDI-control or unavailable dispositions; all Surge targets are metadata-only with host binding explicitly unavailable; activation remains disabled; [contract](../../tools/music-rig/benchmarks/s2-engine-control-contracts-2026-09-07.json) |
+| S2 prepared-engine transaction boundary | 🟡 Caller-owned stage/validate/arm/commit/rollback/discard primitive, output-enabled global/device runtime wiring, and failure-injection tests pass; real plugin-resource activation is not implemented; [boundary](../../tools/music-rig/PREPARED-ENGINE-TRANSACTION.md) |
+| S2 isolated engine resource staging | 🟡 setBfree and Surge XT archives pass provenance/hash and required plugin/state-asset checks in temporary extraction; no installation or activation; state/MIDI/realistic audio validation remains open; [evidence](../../tools/music-rig/benchmarks/s2-engine-resource-stage-2026-09-07.json) |
+| S2 isolated JACK idle processing | 🟡 Both staged LV2 candidates load and process five seconds of idle audio at 48 kHz/1024 through a temporary JACK dummy server; protected graph untouched; state restore, MIDI response, and musical-load CPU remain open; [evidence](../../tools/music-rig/benchmarks/s2-jack-isolation-2026-09-07.json) |
+| S2 isolated JACK MIDI stimulus | 🟡 Both candidates remain alive while receiving 5 seconds of note/CC stimulus (1,180 generated MIDI events each); no feedback emitted; semantic response and state restore remain open; [evidence](../../tools/music-rig/benchmarks/s2-jack-midi-2026-09-07.json) |
+| S2 state and semantic response probe | 🟡 Surge preset enumeration/load is available, setBfree remains MIDI-program based, but Jalv cannot directly set Surge LV2 atom parameters; save/restore and semantic response remain open; [evidence](../../tools/music-rig/benchmarks/s2-state-response-2026-09-07.json) |
+| S2 LV2 atom parameter probe | 🟡 Dedicated offline host sends `patch:Set`/`patch:Get` for Surge `a_filter1_cutoff` and produces finite audio, but receives no patch response; LV2 save stores no properties and restore returns `LV2_STATE_ERR_NO_PROPERTY`; semantic acknowledgement and state persistence remain open; [evidence](../../tools/music-rig/benchmarks/s2-lv2-atom-probe-2026-09-07.json) |
+| S2 temporary Carla comparison | 🟡 Carla loads staged Surge on dummy JACK and reports `A Filter 1 Cutoff` as parameter 25 (`0..1`) with read-only hints `4144`; OSC set leaves the value at zero, confirming no ordinary host binding; state save/restore remains open; protected graph untouched; [evidence](../../tools/music-rig/benchmarks/s2-carla-comparison-2026-09-07.json) |
 | Offline control/xrun correlation | ✅ 15 regression tests pass, including per-source/channel/CC value groups, malformed control payloads, timing-unit normalization, unknown timing markers, and preservation through the joiner |
 | Airstar per-control/timing combined-load retry | 🟡 All eight faders, 11,828 mixer Master CCs and 568 Arturia notes; sink ERR +286, EQ ERR +310, EQ sampled BUSY up to 14.5 ms plus three unfinished markers; 0 relay adapter failures; exact graph restoration, final validation, and remote cleanup passed; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-controls-timing-failure-airstar-2026-09-05.json) |
 | Airstar synchronized protected-plugin relay retry | 🟡 Technical gate passed: 14,748 observed CC arrivals across CC40-47, every control reached 0/127, relay 19,178 inputs with 4,089 emitted and 15,089 coalesced, zero adapter failures, zero PipeWire ERR delta, zero journal matches, exact rollback, and final 30/30 validation; operator heard a very subtle issue with few occurrences, much less than prior tests; audible stability remains open; [evidence](../../tools/music-rig/benchmarks/smc-mixer-relay-synchronized-correlation-airstar-2026-09-06.json) |

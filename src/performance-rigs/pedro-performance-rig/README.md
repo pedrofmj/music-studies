@@ -5,8 +5,9 @@ Performance Rig. Schema version `music-studies/performance-rig/v1` uses JSON
 Schema Draft 2020-12.
 
 Current status: schema, stable-slot, Hardware Preset, Device Profile, initial
-Rig Profile, Linux Platform Binding extraction, and deterministic compilation
-envelope. Only authoring validation and compilation tools read this directory;
+Rig Profile, Linux Platform Binding extraction, deterministic compilation
+envelope, and two S2 additive layout candidates. Only authoring validation and
+compilation tools read this directory;
 no installer, service, runtime, or live audio/MIDI tool consumes it. The
 protected `setup.json`, Carla project, services, and graph remain the production
 authority until the later parity and cutover gates pass.
@@ -32,6 +33,17 @@ The five current Device Profiles resolve under `device-profiles/<slot>/<id>`:
 - SMC-PAD `drum-set`; and
 - SMC-PAD Pocket `drum-set`.
 
+S2 also adds two authoring-only Arturia candidates:
+
+- `tonewheel-organ`, with nine drawbar mappings and organ controls;
+- `tonewheel-organ-setbfree`, with the same Arturia layout and a setBfree MIDI backend;
+- `synth-programmer`, with oscillator, filter, envelope, modulation, and effects mappings.
+
+Both candidates reuse the existing Hammond organ and Optik synth engines and
+the verified Arturia hardware preset. Their semantic parameter targets are a
+layout contract for offline dry-runs; they are not claims that the current live
+Carla project exposes those controls or that either layout is production-ready.
+
 They link semantic mappings to controls from the selected Hardware Preset and
 declare capabilities, ownership, dependencies, readiness, state, takeover, and
 switch safety without platform paths or backend identifiers. The two pad
@@ -46,6 +58,13 @@ takeover and rollback policies. It is authored data only; the protected setup
 remains the active default. The resolved
 [`switch-triggers.json`](switch-triggers.json) management catalogue is empty,
 so it enables no MIDI-triggered switching.
+
+[`rig-profiles/tonewheel-organ.json`](rig-profiles/tonewheel-organ.json) and
+[`rig-profiles/synth-programmer.json`](rig-profiles/synth-programmer.json)
+compose the S2 candidates with the unchanged SMK-25, SMC-Mixer, SMC-PAD, and
+Pocket roles. They compile with an empty graph delta and remain offline
+authoring candidates; `full-live-rack` remains the protected default and
+fallback.
 
 The seven schemas are:
 

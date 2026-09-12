@@ -43,6 +43,97 @@ typedef struct mock_adapter {
     music_rig_result output_rollback_result;
 } mock_adapter;
 
+typedef struct prepared_engine_mock {
+    unsigned int stage_calls;
+    unsigned int validate_calls;
+    unsigned int arm_calls;
+    unsigned int commit_calls;
+    unsigned int rollback_calls;
+    unsigned int discard_calls;
+    unsigned int commit_failures;
+} prepared_engine_mock;
+
+static music_rig_result prepared_engine_stage(
+    void *opaque, const music_rig_generation *generation
+)
+{
+    prepared_engine_mock *mock = opaque;
+    (void)generation;
+    mock->stage_calls += 1U;
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result prepared_engine_validate(
+    void *opaque, const music_rig_generation *generation
+)
+{
+    prepared_engine_mock *mock = opaque;
+    (void)generation;
+    mock->validate_calls += 1U;
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result prepared_engine_arm(
+    void *opaque, const music_rig_generation *generation
+)
+{
+    prepared_engine_mock *mock = opaque;
+    (void)generation;
+    mock->arm_calls += 1U;
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result prepared_engine_commit(
+    void *opaque, const music_rig_generation *generation
+)
+{
+    prepared_engine_mock *mock = opaque;
+    (void)generation;
+    mock->commit_calls += 1U;
+    if (mock->commit_failures != 0U) {
+        mock->commit_failures -= 1U;
+        return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    }
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result prepared_engine_rollback(
+    void *opaque, const music_rig_generation *generation
+)
+{
+    prepared_engine_mock *mock = opaque;
+    (void)generation;
+    mock->rollback_calls += 1U;
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result prepared_engine_discard(
+    void *opaque, const music_rig_generation *generation
+)
+{
+    prepared_engine_mock *mock = opaque;
+    (void)generation;
+    mock->discard_calls += 1U;
+    return MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_prepared_engine_adapter prepared_engine_adapter_for(
+    prepared_engine_mock *mock
+)
+{
+    music_rig_prepared_engine_adapter adapter = {0};
+
+    adapter.abi_version = MUSIC_RIG_PREPARED_ENGINE_ADAPTER_ABI_VERSION;
+    adapter.context = mock;
+    adapter.stage = prepared_engine_stage;
+    adapter.validate = prepared_engine_validate;
+    adapter.arm = prepared_engine_arm;
+    adapter.commit = prepared_engine_commit;
+    adapter.rollback = prepared_engine_rollback;
+    adapter.discard = prepared_engine_discard;
+    return adapter;
+}
+
 static music_rig_result mock_output_prepare(
     void *opaque, const music_rig_generation *generation
 )
@@ -1169,6 +1260,83 @@ static int test_output_confirmation_failure_is_fail_closed(void)
     return 0;
 }
 
+static int test_output_enabled_prepared_engine_transaction(void)
+{
+    static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
+        0x55
+    };
+    static music_rig_compiled_tables alternate_tables;
+    static music_rig_compiled_definition alternate_definition;
+    static music_rig_prepared_definition prepared;
+    music_rig_generation initial = {UINT64_C(1), &default_tables};
+    music_rig_runtime runtime;
+    music_rig_runtime_config config;
+    music_rig_platform_interfaces interfaces;
+    music_rig_output_adoption_adapter output;
+    music_rig_prepared_engine_adapter prepared_engine;
+    music_rig_protocol_request value;
+    music_rig_protocol_response response;
+    mock_adapter adapter;
+    prepared_engine_mock engine;
+
+    if (init_alternate_prepared_definition_fixture(
+            &alternate_tables, &alternate_definition, &prepared
+        ) != MUSIC_RIG_RESULT_OK) {
+        return 1;
+    }
+    memset(&engine, 0, sizeof(engine));
+    init_mock(&adapter);
+    interfaces = interfaces_for(&adapter);
+    memset(&output, 0, sizeof(output));
+    output.abi_version = MUSIC_RIG_OUTPUT_ADOPTION_ADAPTER_ABI_VERSION;
+    output.context = &adapter;
+    output.prepare = mock_output_prepare;
+    output.confirm = mock_output_confirm;
+    output.rollback = mock_output_rollback;
+    output.adopted = mock_output_adopted;
+    prepared_engine = prepared_engine_adapter_for(&engine);
+    config = config_for(&initial, fingerprint);
+    config.prepared_definitions = &prepared;
+    config.prepared_definition_count = 1U;
+    config.output_mode = MUSIC_RIG_OUTPUT_ENABLED;
+    config.output_adoption = &output;
+    config.prepared_engine = &prepared_engine;
+    if (music_rig_runtime_init(&runtime, &config, &interfaces) !=
+        MUSIC_RIG_RESULT_OK) {
+        fputs("prepared engine runtime initialization failed\n", stderr);
+        return 1;
+    }
+    value = request(UINT64_C(51), UINT64_C(1),
+        MUSIC_RIG_OPERATION_SWITCH_GLOBAL);
+    fixture_copy(value.profile, "multilevel-volume-mixed-pads");
+    if (music_rig_runtime_dispatch(&runtime, &value, &response) !=
+            MUSIC_RIG_RESULT_OK || response.result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_OK || engine.stage_calls != 1U ||
+        engine.validate_calls != 1U || engine.arm_calls != 1U ||
+        engine.commit_calls != 1U || engine.rollback_calls != 0U ||
+        engine.discard_calls != 0U) {
+        fputs("prepared engine runtime commit failed\n", stderr);
+        return 1;
+    }
+
+    engine.commit_failures = 1U;
+    value.request_id = UINT64_C(52);
+    value.expected_generation = runtime.state.generation_id;
+    fixture_copy(value.profile, "full-live-rack");
+    if (music_rig_runtime_dispatch(&runtime, &value, &response) !=
+            MUSIC_RIG_RESULT_OK || response.result_code !=
+            (uint32_t)MUSIC_RIG_RESULT_ADAPTER_FAILURE ||
+        response.rollback_status != (uint32_t)MUSIC_RIG_ROLLBACK_SUCCEEDED ||
+        response.resulting_generation != UINT64_C(4) ||
+        strcmp(runtime.active_rig_profile, "multilevel-volume-mixed-pads") != 0 ||
+        engine.rollback_calls != 1U || engine.discard_calls != 1U ||
+        adapter.output_rollback_calls != 1U) {
+        fputs("prepared engine runtime rollback failed\n", stderr);
+        return 1;
+    }
+    return 0;
+}
+
 static int test_device_override_transactions(void)
 {
     static const uint8_t fingerprint[MUSIC_RIG_DEFINITION_FINGERPRINT_SIZE] = {
@@ -1492,6 +1660,7 @@ int main(void)
         test_invalid_configuration() != 0 ||
         test_enabled_output_initialization() != 0 ||
         test_output_confirmation_failure_is_fail_closed() != 0 ||
+        test_output_enabled_prepared_engine_transaction() != 0 ||
         test_device_override_transactions() != 0 ||
         test_output_enabled_device_switch() != 0 ||
         test_output_enabled_global_switch() != 0) {

@@ -1,0 +1,22 @@
+{
+  "activation": "not-authorized",
+  "abort_owner": null,
+  "candidate_profile": "synth-programmer-synthv1",
+  "date": "2026-09-07",
+  "operator": null,
+  "preconditions": {
+    "explicit_approval": false,
+    "protected_baseline": false,
+    "staged_hashes_verified": false,
+    "temporary_graph_only": false
+  },
+  "schema": "music-studies/s2-live-operator-rehearsal/v1",
+  "status": "ready-for-review",
+  "steps": {
+    "audio_assessment": "pending",
+    "control_response": "pending",
+    "preset_recall": "pending",
+    "rollback": "pending",
+    "protected_postcheck": "pending"
+  }
+}

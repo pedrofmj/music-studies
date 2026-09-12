@@ -1,0 +1,18 @@
+{
+  "candidate": "synth-programmer-synthv1",
+  "controller": "KL Essential 61 mk3:KL Essential 61 mk3 MIDI",
+  "audio_destination": "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp__sink:playback_FL/FR",
+  "candidate_package_sha256": "sha256:5ee77ba8cb3c0af51e5702eea6d758c52dcf89d5c80b8277d8086d3b5614f56f",
+  "candidate_binary_sha256": "sha256:8968dc938080089d734c98ba169c8dfdc06887065cbbe2b28674089485532785",
+  "candidate_preset_sha256": "sha256:688d4386f19be0081609a3c1975c59625cb7b63adfc9ffa8201ed890e4d5ce1e",
+  "temporary_link_count": 3,
+  "midi_stimulus_events": 420,
+  "before_links_sha256": "sha256:4073683c540974839a1851ffc149bacbb426628aa2bddcae8b8af180310c4e3d",
+  "after_links_sha256": "sha256:4073683c540974839a1851ffc149bacbb426628aa2bddcae8b8af180310c4e3d",
+  "graph_restored": true,
+  "protected_graph_changed": false,
+  "protected_postcheck": "30/30",
+  "operator_control_assessment": "not-performed; synthetic MIDI only",
+  "schema": "music-studies/s2-live-candidate-bridge/v1",
+  "status": "live-routing-transaction-pass"
+}

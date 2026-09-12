@@ -1,0 +1,264 @@
+#!/usr/bin/env python3
+"""Exercise S2 prepared definitions through the output-suppressed daemon."""
+
+from __future__ import annotations
+
+import json
+import os
+import signal
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+from typing import Any, Mapping, Sequence
+
+
+def fail(message: str) -> None:
+    raise AssertionError(message)
+
+
+def run_checked(
+    command: Sequence[str],
+    environment: Mapping[str, str],
+) -> subprocess.CompletedProcess[str]:
+    result = subprocess.run(
+        command,
+        env=dict(environment),
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    if result.returncode != 0:
+        fail(
+            f"command failed ({result.returncode}): {' '.join(command)}\n"
+            f"stdout: {result.stdout}\nstderr: {result.stderr}"
+        )
+    return result
+
+
+def json_response(result: subprocess.CompletedProcess[str]) -> dict[str, Any]:
+    try:
+        response = json.loads(result.stdout)
+    except json.JSONDecodeError as error:
+        fail(f"CLI did not return JSON: {error}: {result.stdout!r}")
+    if not isinstance(response, dict):
+        fail("CLI JSON response is not an object")
+    return response
+
+
+def wait_for_socket(path: Path, process: subprocess.Popen[str]) -> None:
+    deadline = time.monotonic() + 5.0
+    while time.monotonic() < deadline:
+        if path.exists():
+            return
+        if process.poll() is not None:
+            stderr = process.stderr.read() if process.stderr else ""
+            fail(
+                f"music-rigd exited before opening its socket: "
+                f"{process.returncode}: {stderr}"
+            )
+        time.sleep(0.01)
+    fail(f"timed out waiting for daemon socket: {path}")
+
+
+def assert_dry_run_response(response: Mapping[str, Any], profile: str) -> None:
+    expected = {
+        "result": "ok",
+        "active_rig_profile": "full-live-rack",
+        "output_mode": "suppressed",
+        "dry_run": True,
+        "valid": True,
+        "graph_delta": "empty",
+    }
+    for field, value in expected.items():
+        if response.get(field) != value:
+            fail(f"{profile} dry-run returned {field}={response.get(field)!r}")
+    if response.get("previous_generation") != response.get("resulting_generation"):
+        fail(f"{profile} dry-run published a generation")
+
+
+def assert_commit_response(
+    response: Mapping[str, Any],
+    profile: str,
+    previous_generation: int,
+) -> int:
+    expected = {
+        "result": "ok",
+        "active_rig_profile": profile,
+        "output_mode": "suppressed",
+        "dry_run": False,
+        "valid": True,
+        "graph_delta": "empty",
+        "previous_generation": previous_generation,
+    }
+    for field, value in expected.items():
+        if response.get(field) != value:
+            fail(f"{profile} commit returned {field}={response.get(field)!r}")
+    resulting_generation = response.get("resulting_generation")
+    if not isinstance(resulting_generation, int) or resulting_generation <= previous_generation:
+        fail(f"{profile} commit did not publish a new generation")
+    return resulting_generation
+
+
+def exercise_profile(
+    daemon: Path,
+    cli: Path,
+    current_definition: Path,
+    current_fingerprint: str,
+    prepared_definition: Path,
+    prepared_fingerprint: str,
+    profile: str,
+) -> None:
+    with tempfile.TemporaryDirectory(prefix="music-rig-s2-runtime-") as root:
+        root_path = Path(root)
+        runtime_home = root_path / "runtime"
+        state_home = root_path / "state"
+        runtime_home.mkdir()
+        state_home.mkdir()
+        environment = os.environ.copy()
+        environment.update({
+            "HOME": str(root_path),
+            "XDG_CONFIG_HOME": str(root_path / "config"),
+            "XDG_RUNTIME_DIR": str(runtime_home),
+            "XDG_STATE_HOME": str(state_home),
+        })
+        daemon_process = subprocess.Popen(
+            [
+                str(daemon),
+                "run",
+                "--definition",
+                str(current_definition),
+                "--expected-fingerprint",
+                current_fingerprint,
+                "--prepared-definition",
+                str(prepared_definition),
+                "--prepared-fingerprint",
+                prepared_fingerprint,
+            ],
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        try:
+            socket_path = runtime_home / "music-rig" / "control.sock"
+            wait_for_socket(socket_path, daemon_process)
+            state_path = state_home / "music-rig" / "active.state"
+            before = state_path.read_bytes() if state_path.exists() else None
+            result = run_checked(
+                [
+                    str(cli),
+                    "switch",
+                    "--global",
+                    profile,
+                    "--dry-run",
+                    "--json",
+                ],
+                environment,
+            )
+            dry_run_response = json_response(result)
+            assert_dry_run_response(dry_run_response, profile)
+            dry_run_generation = int(dry_run_response["resulting_generation"])
+            after = state_path.read_bytes() if state_path.exists() else None
+            if before != after:
+                fail(f"{profile} dry-run changed durable state")
+            committed = json_response(
+                run_checked(
+                    [str(cli), "switch", "--global", profile, "--json"],
+                    environment,
+                )
+            )
+            committed_generation = assert_commit_response(
+                committed,
+                profile,
+                dry_run_generation,
+            )
+            if not state_path.exists():
+                fail(f"{profile} commit did not persist prepared active state")
+            status = json_response(
+                run_checked([str(cli), "status", "--json"], environment)
+            )
+            if status.get("active_rig_profile") != profile:
+                fail(f"{profile} commit did not change the active profile")
+            rollback = json_response(
+                run_checked(
+                    [str(cli), "switch", "--global", "full-live-rack", "--json"],
+                    environment,
+                )
+            )
+            assert_commit_response(rollback, "full-live-rack", committed_generation)
+            status = json_response(
+                run_checked([str(cli), "status", "--json"], environment)
+            )
+            if status.get("active_rig_profile") != "full-live-rack":
+                fail(f"{profile} switch-back did not restore full-live-rack")
+        finally:
+            daemon_process.send_signal(signal.SIGTERM)
+            try:
+                daemon_process.wait(timeout=5.0)
+            except subprocess.TimeoutExpired:
+                daemon_process.kill()
+                daemon_process.wait()
+            if daemon_process.returncode != 0 and sys.exc_info()[0] is None:
+                stderr = daemon_process.stderr.read() if daemon_process.stderr else ""
+                fail(f"daemon did not stop cleanly: {daemon_process.returncode}: {stderr}")
+
+
+def main() -> int:
+    if len(sys.argv) != 7:
+        print(
+            "usage: test-s2-runtime-dry-run DAEMON CLI CURRENT CURRENT_FINGERPRINT "
+            "COMPILER RIG_ROOT",
+            file=sys.stderr,
+        )
+        return 2
+    daemon, cli, current, current_fingerprint, compiler, rig_root = map(
+        Path, sys.argv[1:]
+    )
+    try:
+        with tempfile.TemporaryDirectory(prefix="music-rig-s2-compile-") as root:
+            root_path = Path(root)
+            for profile in ("tonewheel-organ", "synth-programmer"):
+                output = root_path / f"{profile}.json"
+                compile_result = run_checked(
+                    [
+                        sys.executable,
+                        str(compiler),
+                        "--rig-root",
+                        str(rig_root),
+                        "--platform-binding",
+                        "airstar-current",
+                        "--rig-profile",
+                        profile,
+                        "--output",
+                        str(output),
+                    ],
+                    os.environ,
+                )
+                fingerprint = (
+                    compile_result.stdout.split("definition=", 1)[-1]
+                    .strip()
+                    .rstrip(")")
+                )
+                if not fingerprint.startswith("sha256:"):
+                    fail(f"{profile} compiler did not report a definition fingerprint")
+                exercise_profile(
+                    daemon,
+                    cli,
+                    current,
+                    current_fingerprint,
+                    output,
+                    fingerprint,
+                    profile,
+                )
+        print("S2 output-suppressed runtime dry-runs: PASS (profiles=2)")
+        return 0
+    except (AssertionError, OSError, ValueError) as error:
+        print(f"FAIL: {error}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

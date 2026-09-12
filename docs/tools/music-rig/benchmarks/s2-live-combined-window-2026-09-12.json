@@ -1,0 +1,28 @@
+{
+  "candidate": "synth-programmer-synthv1",
+  "controller": "KL Essential 61 mk3",
+  "window_seconds": 30,
+  "live_rack_audio": "muted by temporary upstream link watchdog",
+  "midi_messages_observed": 953,
+  "note_messages_observed": 299,
+  "control_change_messages_observed": 654,
+  "control_change_ranges": {
+    "71": {"messages": 58, "min": 1, "max": 113},
+    "72": {"messages": 35, "min": 0, "max": 80},
+    "73": {"messages": 15, "min": 1, "max": 14},
+    "74": {"messages": 16, "min": 25, "max": 55},
+    "75": {"messages": 332, "min": 0, "max": 127},
+    "76": {"messages": 10, "min": 26, "max": 44},
+    "79": {"messages": 47, "min": 0, "max": 90},
+    "80": {"messages": 42, "min": 0, "max": 71},
+    "81": {"messages": 27, "min": 0, "max": 48},
+    "82": {"messages": 28, "min": 0, "max": 65},
+    "83": {"messages": 44, "min": 0, "max": 80}
+  },
+  "before_links_sha256": "sha256:4073683c540974839a1851ffc149bacbb426628aa2bddcae8b8af180310c4e3d",
+  "after_links_sha256": "sha256:4073683c540974839a1851ffc149bacbb426628aa2bddcae8b8af180310c4e3d",
+  "graph_restored": true,
+  "protected_postcheck": "30/30",
+  "schema": "music-studies/s2-live-combined-window/v1",
+  "status": "combined-note-control-window-pass"
+}

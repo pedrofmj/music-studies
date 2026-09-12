@@ -1,0 +1,14 @@
+{
+  "activation": "disabled",
+  "binding": "synthv1-candidate",
+  "live_platform_binding": false,
+  "profile": "synth-programmer-synthv1",
+  "schema": "music-studies/s2-synthv1-prepared-binding/v1",
+  "state_strategy": "native-synthv1-preset-file",
+  "status": "prepared-only",
+  "transaction": {
+    "commit": true,
+    "rollback_to": "full-live-rack",
+    "rollback": true
+  }
+}

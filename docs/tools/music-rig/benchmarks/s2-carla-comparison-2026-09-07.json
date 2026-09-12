@@ -1,0 +1,14 @@
+{
+  "carla_loaded": true,
+  "carla_parameter": {
+    "hints": 4144,
+    "id": 25,
+    "name": "A Filter 1 Cutoff",
+    "range": [0.0, 1.0]
+  },
+  "protected_graph_touched": false,
+  "schema": "music-studies/s2-carla-comparison/v1",
+  "set_parameter_response": "read-only-hint-value-remained-zero",
+  "state_save_restore": "not-tested",
+  "status": "temporary-carla-project-dummy-jack-only"
+}

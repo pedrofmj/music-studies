@@ -1,0 +1,7 @@
+{
+  "preset": "/tmp/music-rig-synthv1-presets/50_SynthRemember.synthv1",
+  "protected_graph_touched": false,
+  "schema": "music-studies/s2-synthv1-preset-process/v1",
+  "status": "preset-loaded-process-owned-cleaned",
+  "temporary_jack": {"block_size": 1024, "sample_rate": 48000}
+}

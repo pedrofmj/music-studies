@@ -1,0 +1,174 @@
+{
+  "activation_eligible": false,
+  "candidates": {
+    "setbfree": {
+      "control_transport": "midi-cc",
+      "targets": {
+        "organ.chorus-vibrato": {
+          "backend_control": "vibrato.knob",
+          "status": "verified-control-surface"
+        },
+        "organ.drive": {
+          "backend_control": "overdrive.enable",
+          "status": "verified-control-surface"
+        },
+        "organ.drawbar.16ft": {
+          "backend_control": "upper.drawbar16",
+          "status": "verified-control-surface",
+          "transform": "inverse-0..127-to-8..0"
+        },
+        "organ.drawbar.1-1-3ft": {
+          "backend_control": "upper.drawbar113",
+          "status": "verified-control-surface",
+          "transform": "inverse-0..127-to-8..0"
+        },
+        "organ.drawbar.1-3-5ft": {
+          "backend_control": "upper.drawbar135",
+          "status": "verified-control-surface",
+          "transform": "inverse-0..127-to-8..0"
+        },
+        "organ.drawbar.1ft": {
+          "backend_control": "upper.drawbar1",
+          "status": "verified-control-surface",
+          "transform": "inverse-0..127-to-8..0"
+        },
+        "organ.drawbar.2-2-3ft": {
+          "backend_control": "upper.drawbar223",
+          "status": "verified-control-surface",
+          "transform": "inverse-0..127-to-8..0"
+        },
+        "organ.drawbar.2ft": {
+          "backend_control": "upper.drawbar2",
+          "status": "verified-control-surface",
+          "transform": "inverse-0..127-to-8..0"
+        },
+        "organ.drawbar.4ft": {
+          "backend_control": "upper.drawbar4",
+          "status": "verified-control-surface",
+          "transform": "inverse-0..127-to-8..0"
+        },
+        "organ.drawbar.5-1-3ft": {
+          "backend_control": "upper.drawbar513",
+          "status": "verified-control-surface",
+          "transform": "inverse-0..127-to-8..0"
+        },
+        "organ.drawbar.8ft": {
+          "backend_control": "upper.drawbar8",
+          "status": "verified-control-surface",
+          "transform": "inverse-0..127-to-8..0"
+        },
+        "organ.key-click": {
+          "reason": "No MIDI-CC function verified in the package control surface.",
+          "status": "unavailable"
+        },
+        "organ.leakage": {
+          "reason": "No MIDI-CC function verified in the package control surface.",
+          "status": "unavailable"
+        },
+        "organ.microphone-balance": {
+          "reason": "No MIDI-CC function verified in the package control surface.",
+          "status": "unavailable"
+        },
+        "organ.percussion": {
+          "backend_control": "percussion.enable",
+          "status": "verified-control-surface",
+          "transform": "discrete-threshold"
+        },
+        "organ.reverb": {
+          "backend_control": "reverb.mix",
+          "status": "verified-control-surface"
+        },
+        "organ.rotary-speed": {
+          "backend_control": "rotary.speed-preset",
+          "status": "verified-control-surface",
+          "transform": "discrete-stop-slow-fast"
+        },
+        "organ.volume": {
+          "backend_control": "swellpedal1",
+          "status": "verified-control-surface"
+        }
+      }
+    },
+    "surge-xt": {
+      "activation_status": "unavailable-host-binding",
+      "control_transport": "lv2-parameter",
+      "reason": "Carla reports the LV2 atom parameters as read-only and the dedicated LV2 host receives no patch response.",
+      "targets": {
+        "synth.amp-attack": {
+          "backend_parameter": "a_env1_attack",
+          "status": "metadata-only"
+        },
+        "synth.amp-release": {
+          "backend_parameter": "a_env1_release",
+          "status": "metadata-only"
+        },
+        "synth.delay-feedback": {
+          "reason": "FX parameter identity depends on the selected effect type.",
+          "status": "unavailable"
+        },
+        "synth.delay-time": {
+          "reason": "FX parameter identity depends on the selected effect type.",
+          "status": "unavailable"
+        },
+        "synth.drive": {
+          "backend_parameter": "a_ws_drive",
+          "status": "metadata-only"
+        },
+        "synth.effects-mix": {
+          "reason": "FX parameter identity depends on the selected effect type.",
+          "status": "unavailable"
+        },
+        "synth.filter-cutoff": {
+          "backend_parameter": "a_filter1_cutoff",
+          "status": "metadata-only"
+        },
+        "synth.filter-resonance": {
+          "backend_parameter": "a_filter1_resonance",
+          "status": "metadata-only"
+        },
+        "synth.modulation-depth": {
+          "backend_parameter": "a_lfo0_magnitude",
+          "status": "metadata-only-routing-open"
+        },
+        "synth.modulation-rate": {
+          "backend_parameter": "a_lfo0_rate",
+          "status": "metadata-only-routing-open"
+        },
+        "synth.oscillator-2-level": {
+          "backend_parameter": "a_level_o2",
+          "status": "metadata-only"
+        },
+        "synth.oscillator-mix": {
+          "backend_parameter": "a_osc1_param3",
+          "status": "metadata-only"
+        },
+        "synth.pitch-modulation": {
+          "reason": "Pitch routing and modulation assignment are not yet verified.",
+          "status": "unavailable"
+        },
+        "synth.reverb": {
+          "reason": "FX parameter identity depends on the selected effect type.",
+          "status": "unavailable"
+        },
+        "synth.reverb-mix": {
+          "reason": "FX parameter identity depends on the selected effect type.",
+          "status": "unavailable"
+        },
+        "synth.reverb-size": {
+          "reason": "FX parameter identity depends on the selected effect type.",
+          "status": "unavailable"
+        },
+        "synth.unison": {
+          "backend_parameter": "a_osc1_param6",
+          "status": "metadata-only"
+        },
+        "synth.volume": {
+          "backend_parameter": "volume",
+          "status": "metadata-only"
+        }
+      }
+    }
+  },
+  "schema": "music-studies/s2-engine-control-contract/v1",
+  "status": "prepared-contract-only"
+}

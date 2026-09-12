@@ -1,0 +1,69 @@
+{
+  "candidates": {
+    "setbfree": {
+      "control_surface": "midi-cc",
+      "discovery": {
+        "audio_inputs": 0,
+        "audio_outputs": 2,
+        "category": "synth",
+        "label": "b_synth/http://gareus.org/oss/lv2/b_synth",
+        "maker": "Robin Gareus",
+        "midi_inputs": 1,
+        "midi_outputs": 1,
+        "name": "setBfree DSP Tonewheel Organ",
+        "parameter_inputs": 0,
+        "parameter_outputs": 0
+      },
+      "drawbar_function_numbers": [16, 513, 8, 4, 223, 2, 135, 113, 1],
+      "drawbar_inverted": true,
+      "drawbar_positions": 9,
+      "drawbar_range": [0, 127],
+      "host_parameter_binding": "unavailable",
+      "lv2_ttl": "sha256:d3c8bc68c7966c88d772dea34ef1bfaadbe7b343cd0a4a1789f553f460195c87",
+      "package_sha256": "sha256:6ad090237b6fea0f777db13a52e044d91143df3496e5c7b1b4eccf479c4ba554",
+      "plugin_uri": "http://gareus.org/oss/lv2/b_synth",
+      "state_restore": "documented-not-runtime-tested"
+    },
+    "surge-xt": {
+      "discovery": {
+        "audio_inputs": 2,
+        "audio_outputs": 6,
+        "category": "synth",
+        "label": "Surge XT.lv2/https://surge-synthesizer.github.io/lv2/surge-xt",
+        "maker": "Surge Synth Team",
+        "midi_inputs": 1,
+        "midi_outputs": 0,
+        "name": "Surge XT",
+        "parameter_inputs": 1,
+        "parameter_outputs": 0
+      },
+      "midi_control": "MIDI-input-present-host-automation-present",
+      "parameter_count": 775,
+      "parameter_range": [0.0, 1.0],
+      "lv2_dsp_ttl": "sha256:5dfc3efd1eb7baca95e9c1b779b5832800543484b0dc6a6f97015ba6608f6523",
+      "package_sha256": "sha256:dd431b75f5fa197c4bffa6ca27ca46970f0a94c834119bb1db7decdeec4c28db",
+      "plugin_uri": "https://surge-synthesizer.github.io/lv2/surge-xt",
+      "representative_parameters": {
+        "a_env1_attack": "A Amp EG Attack",
+        "a_env1_release": "A Amp EG Release",
+        "a_filter1_cutoff": "A Filter 1 Cutoff",
+        "a_filter1_resonance": "A Filter 1 Resonance",
+        "a_level_o1": "A Osc 1 Volume",
+        "a_lfo0_rate": "A LFO 1 Rate",
+        "a_osc1_param3": "A Osc 1 Sub Mix",
+        "a_osc1_param6": "A Osc 1 Unison Voices",
+        "a_ws_drive": "A Waveshaper Drive",
+        "volume": "Global Volume"
+      },
+      "state_restore": "LV2-preset-metadata-present-runtime-not-tested"
+    }
+  },
+  "runtime_checks": {
+    "audio_cpu": "not-run",
+    "reason": "No isolated JACK host is available; PipeWire and the protected Carla graph were not touched.",
+    "state_restore": "not-run",
+    "status": "blocked-by-safe-boundary"
+  },
+  "schema": "music-studies/s2-engine-inventory/v1",
+  "status": "isolated discovery; no live rig activation"
+}

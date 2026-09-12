@@ -23,12 +23,14 @@ evidence and acceptance status.
 | E2. Portable Rig Definition | The complete rig, profiles, hardware presets, bindings, ownership, and readiness are authored and validated portably. | ✅ | 1 |
 | E3. Deterministic Materialization | Authored definitions compile into reproducible runtime tables and temporary parity materializations. | ✅ | 2 |
 | E4. Shadow Runtime And Platform Boundary | Linux and Windows can load, inspect, dispatch, and resource-test the output-suppressed runtime without production activation. | ✅ | 3 |
-| E5. Control-Only Relay And Switching | SMC-Mixer control routing and control-only profile adoption work transactionally with rollback and bounded fan-out. | 🟡 | 4 |
-| E6. EQ Performance And Audible Stability | Parameter-change cost is understood and reduced while live audio remains clean and musically acceptable. | 🟡 | 4, acceptance follow-up |
-| E7. MIDI Management Triggers | MIDI management events invoke the same validated switching operations without disturbing musical mappings. | ⬜ | 5 |
-| E8. Prepared Engines And Graph Deltas | Prepared plugin engines and graph changes can be committed atomically without blocking audio or MIDI. | ⬜ | 6 |
-| E9. Windows Certification | The selected Windows adapters pass runtime, MIDI, plugin-host, lifecycle, performance, and cleanup campaigns. | ⬜ | 7 |
-| E10. Deployment Promotion And Cleanup | The experimental runtime has a reviewed cutover, rollback, promotion, and legacy cleanup path. | ⬜ | 8 |
+| E5. Musical Layout Construction | The rig gains usable musical layouts beyond the current full-live-rack baseline, beginning with customizable tonewheel organ and synthesizer layouts. | 🟡 | 1, 4, 6 |
+| E6. Control-Only Relay And Switching | SMC-Mixer control routing and control-only profile adoption work transactionally with rollback and bounded fan-out. | 🟡 | 4 |
+| E7. Performance Engineering And Audible Stability | Parameter-change cost, control fan-out, scheduling, and live audio behavior are measured and improved without hiding residual faults. | 🟡 | 0, 4, acceptance follow-up |
+| E8. MIDI Management Triggers | MIDI management events invoke the same validated switching operations without disturbing musical mappings. | ⬜ | 5 |
+| E9. Prepared Engines And Graph Deltas | Prepared plugin engines and graph changes can be committed atomically without blocking audio or MIDI. | ⬜ | 6 |
+| E10. Echora Portability | The portable rig model, layouts, runtime contracts, and evidence can be integrated into `/c/development/egt/customers/egt/echora`. | ⬜ | cross-project follow-up |
+| E11. Windows Certification | The selected Windows adapters pass runtime, MIDI, plugin-host, lifecycle, performance, and cleanup campaigns. | ⬜ | 7 |
+| E12. Deployment Promotion And Cleanup | The experimental runtime has a reviewed cutover, rollback, promotion, and legacy cleanup path. | ⬜ | 8 |
 
 ## Sprint Boundary
 
@@ -55,18 +57,44 @@ Accepted with follow-up:
 Sprint close: no production promotion, preset replacement, plugin replacement,
 service enablement, or permanent graph change.
 
-### Sprint S2: Residual Audible-Fault Attribution
+### Sprint S2: First Musical Layouts
 
-This sprint is planned, not started. It should begin with a short planning review
-and must not assume that the relay technical pass proves audio acceptance.
+This is now the active product sprint. Its first contract slice is complete and
+the engine-parameter binding and live activation slices remain open. It restores
+the original product balance: layouts are deliverables, not only future schema
+examples.
+
+Completed first slice:
+
+- Added additive `tonewheel-organ` and `synth-programmer` Arturia Device Profiles.
+- Reused the existing Hammond organ and Optik synth engines and verified Arturia hardware preset.
+- Added five-slot Rig Profiles that preserve SMK-25, SMC-Mixer, SMC-PAD, and Pocket roles.
+- Added deterministic compile checks for both layouts with empty graph deltas.
+- Preserved `full-live-rack` as default and fallback; no live graph or plugin was changed.
 
 Candidate backlog:
 
+- Define the `tonewheel-organ` Device Profile and Arturia drawbar layout.
+- Define the `synth-programmer` Device Profile and Arturia/keyboard control layout.
+- Select and document the initial organ and synthesizer plugin engines using prepared-resource contracts.
+- Add deterministic compiler fixtures, ownership rules, mappings, readiness checks, and output-suppressed dry-runs for both layouts.
+- Keep the current full-live-rack layout unchanged and prove switch-back behavior in offline tests.
+- Specify the first operator acceptance session for organ registration, synth patch shaping, and rollback.
+
+Remaining S2 slices:
+
+- Select genuinely controllable organ and synth engines; the current protected SF2 players expose only generic reverb, chorus, polyphony, and interpolation controls.
+- Engine candidates are selected in [S2-ENGINE-SELECTION.md](../../tools/music-rig/S2-ENGINE-SELECTION.md): setBfree for organ and Surge XT for synth.
+- Bind semantic organ and synth parameters to verified plugin controls or explicitly mark them unavailable.
+- Confirm actual engine control ranges, drawbar inversion, pickup behavior, and state persistence.
+- Add output-suppressed runtime dry-runs for both layouts and prove temporary commit/switch-back leaves `full-live-rack` recoverable; prepared engine resource rollback remains open.
+- Defer live audio acceptance and Echora integration until these contracts are reviewed.
+
+Parked but not forgotten:
+
 - Compare a protected-plugin legacy route and relay route under an explicitly matched operator workload.
 - Attribute the remaining audible occurrences to mixer control, plugin processing, host scheduling, or another graph participant.
-- Define a repeatable operator audio-assessment form and capture its result beside the machine evidence.
-- Review the upstream EQ candidate as a separately staged experiment only if its response and packaging boundaries are accepted.
-- Close the audible gate only when the agreed zero-error and audible criteria pass; otherwise retain the epic as active.
+- Close the audible gate only when the agreed zero-error and audible criteria pass.
 
 ## Epic Exit Rules
 
@@ -78,8 +106,10 @@ Candidate backlog:
 
 ## Planning Order
 
-1. Close or explicitly defer E6's audible-stability gate.
-2. Start E7 only after the control-only switching contract remains stable.
-3. Enter E8 only after prepared-resource budgets, graph-delta semantics, and rollback ownership are reviewed.
-4. Run E9 after the portable and Linux boundaries stop changing.
-5. Perform E10 only after all prior epic exit gates and legacy restoration evidence pass.
+1. Build the first organ and synthesizer layouts in E5 while preserving full-live-rack.
+2. Continue E7 performance work as a quality track without making it the only product output.
+3. Start E8 only after the control-only switching contract remains stable.
+4. Enter E9 only after prepared-resource budgets, graph-delta semantics, and rollback ownership are reviewed.
+5. Port stable contracts and at least one layout through E10 in Echora.
+6. Run E11 after the portable and Linux boundaries stop changing.
+7. Perform E12 only after all prior epic exit gates and legacy restoration evidence pass.

@@ -44,7 +44,11 @@
         }
       ],
       "available_device_profiles": [
-        "multi-instrument-rack"
+           "multi-instrument-rack",
+           "tonewheel-organ",
+           "tonewheel-organ-setbfree",
+           "synth-programmer",
+          "synth-programmer-synthv1"
       ],
       "required": true
     },
@@ -223,7 +227,11 @@
   ],
   "rig_profiles": [
     "full-live-rack",
-    "multilevel-volume-mixed-pads"
+    "multilevel-volume-mixed-pads",
+      "tonewheel-organ",
+      "tonewheel-organ-setbfree",
+      "synth-programmer",
+    "synth-programmer-synthv1"
   ],
   "hardware_presets": [
     "arturia-current-rack",

@@ -1,0 +1,18 @@
+{
+  "candidate": "tonewheel-organ-setbfree",
+  "engine": "setBfree",
+  "engine_version": "0.8.12+ds-2build2",
+  "package_sha256": "sha256:6ad090237b6fea0f777db13a52e044d91143df3496e5c7b1b4eccf479c4ba554",
+  "controls_config": "s2-setbfree-keylab-controls.cfg",
+  "controls_config_sha256": "sha256:d17147feb0e85403eed818415e73fb7b4900e810b26fa9fe7512f78be75bdd66",
+  "drawbar_transform": "setBfree inverse 0..127 to 8..0",
+  "isolated_ports": {
+    "midi_input": "setBfree:midi_in",
+    "audio_outputs": ["setBfree:out_left", "setBfree:out_right"]
+  },
+  "isolated_midi_events": 423,
+  "protected_graph_touched": false,
+  "system_install": false,
+  "schema": "music-studies/s2-setbfree-keylab-candidate/v1",
+  "status": "isolated-midi-candidate-pass"
+}
