@@ -4,13 +4,12 @@ This directory contains the portable authored definition of the first
 Performance Rig. Schema version `music-studies/performance-rig/v1` uses JSON
 Schema Draft 2020-12.
 
-Current status: schema, stable-slot, Hardware Preset, Device Profile, initial
-Rig Profile, Linux Platform Binding extraction, deterministic compilation
-envelope, and two S2 additive layout candidates. Only authoring validation and
-compilation tools read this directory;
-no installer, service, runtime, or live audio/MIDI tool consumes it. The
+Current status: schema, stable-slot, Hardware Preset, Device Profile, Rig Profile,
+Linux Platform Binding extraction, deterministic compilation envelope, pad
+triggers, mapped synthv1/setBfree candidates, and materialized genre projects.
+The authored files remain the source of truth for candidate selection; the
 protected `setup.json`, Carla project, services, and graph remain the production
-authority until the later parity and cutover gates pass.
+authority and default recovery state.
 
 `rig.json` records the five stable controller slots from the protected rack.
 Each slot orders selectors from model, semantic alias, and endpoint purpose to
@@ -19,13 +18,13 @@ share USB ID `4353:4b4d`, so that ID is supporting evidence and cannot
 distinguish them by itself. Platform bindings resolve these portable selectors
 to operating-system device identities.
 
-All five Hardware Preset IDs resolve to verified files in `hardware-presets`.
+All six Hardware Preset IDs resolve to verified files in `hardware-presets`.
 The SMC-PAD and SMC-PAD Pocket assignments are checked against the
 [2026-08-11 live capture](../../../docs/tools/music-rig/benchmarks/hardware-preset-airstar-2026-08-11.json),
 including exact per-pad channel/note assignments and the Pocket's eight
 hardware-internal control pads.
 
-The five current Device Profiles resolve under `device-profiles/<slot>/<id>`:
+The current Device Profiles resolve under `device-profiles/<slot>/<id>`:
 
 - Arturia `multi-instrument-rack`;
 - SMK-25 `ambient-pad-layers`;
@@ -33,16 +32,19 @@ The five current Device Profiles resolve under `device-profiles/<slot>/<id>`:
 - SMC-PAD `drum-set`; and
 - SMC-PAD Pocket `drum-set`.
 
-S2 also adds two authoring-only Arturia candidates:
+S2 adds Arturia candidate profiles:
 
 - `tonewheel-organ`, with nine drawbar mappings and organ controls;
 - `tonewheel-organ-setbfree`, with the same Arturia layout and a setBfree MIDI backend;
-- `synth-programmer`, with oscillator, filter, envelope, modulation, and effects mappings.
+- `synth-programmer`, with oscillator, filter, envelope, modulation, and effects mappings;
+- `synth-programmer-synthv1`, with a native synthv1 controller map; and
+- thirteen genre profiles using materialized SoundFont/DecentSampler patch sets.
 
-Both candidates reuse the existing Hammond organ and Optik synth engines and
-the verified Arturia hardware preset. Their semantic parameter targets are a
-layout contract for offline dry-runs; they are not claims that the current live
-Carla project exposes those controls or that either layout is production-ready.
+The setBfree and synthv1 candidates use their own headless engines and the
+verified Arturia hardware control surface. Genre profiles use separate candidate
+Carla projects generated from `docs/tools/music-rig/benchmarks/arturia-genre-patches.json`.
+All candidates remain explicit, reversible sessions; the protected live Carla
+project is not replaced.
 
 They link semantic mappings to controls from the selected Hardware Preset and
 declare capabilities, ownership, dependencies, readiness, state, takeover, and
@@ -56,15 +58,14 @@ aggregate endpoint and musical capabilities, pins the eighteen current sound
 engines, identifies the shared drum engine and effects, and retains the safe
 takeover and rollback policies. It is authored data only; the protected setup
 remains the active default. The resolved
-[`switch-triggers.json`](switch-triggers.json) management catalogue is empty,
-so it enables no MIDI-triggered switching.
+[`switch-triggers.json`](switch-triggers.json) management catalogue maps the
+16 Arturia pads to the organ, synth, live, and genre profiles.
 
-[`rig-profiles/tonewheel-organ.json`](rig-profiles/tonewheel-organ.json) and
-[`rig-profiles/synth-programmer.json`](rig-profiles/synth-programmer.json)
-compose the S2 candidates with the unchanged SMK-25, SMC-Mixer, SMC-PAD, and
-Pocket roles. They compile with an empty graph delta and remain offline
-authoring candidates; `full-live-rack` remains the protected default and
-fallback.
+[`rig-profiles/tonewheel-organ.json`](rig-profiles/tonewheel-organ.json),
+[`rig-profiles/tonewheel-organ-setbfree.json`](rig-profiles/tonewheel-organ-setbfree.json),
+and the synth/genre profiles compose Arturia alternatives with the unchanged
+SMK-25, SMC-Mixer, SMC-PAD, and Pocket roles. `full-live-rack` remains the
+protected default and fallback.
 
 The seven schemas are:
 
