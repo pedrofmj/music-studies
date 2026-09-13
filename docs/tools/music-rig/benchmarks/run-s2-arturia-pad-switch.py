@@ -59,19 +59,21 @@ PAD_PROFILES = {
     16: "acoustic-worship",
 }
 GENRE_ACTIVE_LAYERS = {
-    "worship-piano": (1, 2, 3, 4, 5, 6),
-    "gospel-keys": (1, 2, 3, 4, 5, 8),
-    "ambient-worship": (1, 2, 3, 5, 6),
-    "jazz-keys": (1, 2, 3, 4, 5),
-    "soul-rnb": (1, 2, 3, 4, 5, 6),
-    "cinematic-strings": (1, 2, 3, 5, 6, 7),
-    "orchestral": (1, 2, 3, 4, 5, 6, 8),
-    "brass-winds": (1, 2, 3, 4, 5, 6),
-    "synthwave": (1, 2, 3, 5, 6, 7),
-    "retro-keys": (1, 2, 3, 5, 6, 7),
-    "intimate-pads": (1, 2, 3, 5),
-    "praise-leads": (1, 2, 4, 6, 7, 8),
-    "acoustic-worship": (1, 2, 3, 4, 5, 6),
+    # These are fixed protected Carla engine channels, not logical profile
+    # layer numbers. The genre declarations choose the same engine identities.
+    "worship-piano": (1, 2, 3, 6, 8, 9),
+    "gospel-keys": (1, 2, 3, 5, 6, 7),
+    "ambient-worship": (3, 7, 8, 9),
+    "jazz-keys": (1, 2, 3, 4, 5, 6),
+    "soul-rnb": (1, 2, 3, 5, 6, 7),
+    "cinematic-strings": (2, 3, 7, 8, 9),
+    "orchestral": (1, 2, 3, 4, 5, 9),
+    "brass-winds": (1, 3, 4, 5, 6, 7),
+    "synthwave": (1, 2, 3, 7, 8, 9),
+    "retro-keys": (1, 2, 6, 7, 8, 9),
+    "intimate-pads": (1, 2, 3, 8, 9),
+    "praise-leads": (1, 6, 7, 8, 9),
+    "acoustic-worship": (1, 2, 3, 4, 6, 9),
 }
 
 
@@ -167,6 +169,7 @@ def main() -> int:
     profiles_seen: list[str] = []
     current = "full-live-rack"
     audio_touched = False
+    active_arturia_layers = set(range(1, 10))
     error: str | None = None
     try:
         before = links(environment)
@@ -198,23 +201,25 @@ def main() -> int:
             candidate = None
 
         def restore_live() -> None:
-            nonlocal current, audio_touched
+            nonlocal current, audio_touched, active_arturia_layers
             stop_candidate()
             if audio_touched:
                 for source, target in ARTURIA_AUDIO:
                     connect(source, target, environment)
                 audio_touched = False
+            active_arturia_layers = set(range(1, 10))
             for target in MIDI_TARGETS:
                 disconnect("s2-arturia-profile-router:out", target, environment)
                 connect("s2-arturia-profile-router:out", target, environment)
             current = "full-live-rack"
 
         def start_candidate(profile: str) -> None:
-            nonlocal candidate, current, audio_touched
+            nonlocal candidate, current, audio_touched, active_arturia_layers
             stop_candidate()
             for source, target in ARTURIA_AUDIO:
                 disconnect(source, target, environment)
             audio_touched = True
+            active_arturia_layers = set()
             for target in MIDI_TARGETS:
                 disconnect("s2-arturia-profile-router:out", target, environment)
             if profile == "synth-programmer-synthv1":
@@ -251,6 +256,7 @@ def main() -> int:
                 for index, (source, target) in enumerate(ARTURIA_AUDIO):
                     if index // 2 + 1 in active:
                         connect(source, target, environment)
+                active_arturia_layers = set(active)
                 current = profile
                 profiles_seen.append(profile)
                 return
@@ -272,8 +278,9 @@ def main() -> int:
             for target in MIDI_TARGETS:
                 disconnect(keylab, target, environment)
             if audio_touched:
-                for source, target in ARTURIA_AUDIO:
-                    disconnect(source, target, environment)
+                for index, (source, target) in enumerate(ARTURIA_AUDIO):
+                    if index // 2 + 1 not in active_arturia_layers:
+                        disconnect(source, target, environment)
             try:
                 profile_code = os.read(fifo_fd, 1)
             except BlockingIOError:

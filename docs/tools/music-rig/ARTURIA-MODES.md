@@ -143,6 +143,309 @@ Genre modes are currently represented as Arturia layer compositions. The live
 session runner swaps only Arturia layer audio links; it does not mute the shared
 master output.
 
+In the tables below, `inactive` means that the corresponding existing Arturia
+instrument is not connected to the genre mix. The central encoder remains Master
+volume and its click remains Master mute in every mode.
+
+### Worship Piano
+
+| Control | Function |
+| --- | --- |
+| Fader 1 | Basic Piano volume |
+| Fader 2 | Nord White Grand volume |
+| Fader 3 | Alt Strings volume |
+| Fader 4 | inactive |
+| Fader 5 | inactive |
+| Fader 6 | Hammond Organ Fast volume |
+| Fader 7 | inactive |
+| Fader 8 | PAD EFEITOS volume |
+| Fader 9 | AtmosferaPAD volume |
+| Knob 1 | Basic Piano reverb |
+| Knob 2 | Nord White Grand reverb |
+| Knob 3 | Alt Strings reverb |
+| Knob 4 | inactive |
+| Knob 5 | inactive |
+| Knob 6 | Hammond Organ Fast reverb |
+| Knob 7 | inactive |
+| Knob 8 | PAD EFEITOS reverb |
+| Knob 9 | AtmosferaPAD reverb |
+
+### Gospel Keys
+
+| Control | Function |
+| --- | --- |
+| Fader 1 | Basic Piano volume |
+| Fader 2 | Nord White Grand volume |
+| Fader 3 | Alt Strings volume |
+| Fader 4 | inactive |
+| Fader 5 | SAX Lirakeys volume |
+| Fader 6 | Hammond Organ Fast volume |
+| Fader 7 | Optik Synth volume |
+| Fader 8 | inactive |
+| Fader 9 | inactive |
+| Knob 1 | Basic Piano reverb |
+| Knob 2 | Nord White Grand reverb |
+| Knob 3 | Alt Strings reverb |
+| Knob 4 | inactive |
+| Knob 5 | SAX Lirakeys reverb |
+| Knob 6 | Hammond Organ Fast reverb |
+| Knob 7 | Optik Synth reverb |
+| Knob 8 | inactive |
+| Knob 9 | inactive |
+
+### Ambient Worship
+
+| Control | Function |
+| --- | --- |
+| Fader 1 | inactive |
+| Fader 2 | inactive |
+| Fader 3 | Alt Strings volume |
+| Fader 4 | inactive |
+| Fader 5 | inactive |
+| Fader 6 | inactive |
+| Fader 7 | Optik Synth volume |
+| Fader 8 | PAD EFEITOS volume |
+| Fader 9 | AtmosferaPAD volume |
+| Knob 1 | inactive |
+| Knob 2 | inactive |
+| Knob 3 | Alt Strings reverb |
+| Knob 4 | inactive |
+| Knob 5 | inactive |
+| Knob 6 | inactive |
+| Knob 7 | Optik Synth reverb |
+| Knob 8 | PAD EFEITOS reverb |
+| Knob 9 | AtmosferaPAD reverb |
+
+### Jazz Keys
+
+| Control | Function |
+| --- | --- |
+| Fader 1 | Basic Piano volume |
+| Fader 2 | Nord White Grand volume |
+| Fader 3 | Alt Strings volume |
+| Fader 4 | Good Flute volume |
+| Fader 5 | SAX Lirakeys volume |
+| Fader 6 | Hammond Organ Fast volume |
+| Fader 7 | inactive |
+| Fader 8 | inactive |
+| Fader 9 | inactive |
+| Knob 1 | Basic Piano reverb |
+| Knob 2 | Nord White Grand reverb |
+| Knob 3 | Alt Strings reverb |
+| Knob 4 | Good Flute reverb |
+| Knob 5 | SAX Lirakeys reverb |
+| Knob 6 | Hammond Organ Fast reverb |
+| Knob 7 | inactive |
+| Knob 8 | inactive |
+| Knob 9 | inactive |
+
+### Soul And R&B
+
+| Control | Function |
+| --- | --- |
+| Fader 1 | Basic Piano volume |
+| Fader 2 | Nord White Grand volume |
+| Fader 3 | Alt Strings volume |
+| Fader 4 | inactive |
+| Fader 5 | SAX Lirakeys volume |
+| Fader 6 | Hammond Organ Fast volume |
+| Fader 7 | Optik Synth volume |
+| Fader 8 | inactive |
+| Fader 9 | inactive |
+| Knob 1 | Basic Piano reverb |
+| Knob 2 | Nord White Grand reverb |
+| Knob 3 | Alt Strings reverb |
+| Knob 4 | inactive |
+| Knob 5 | SAX Lirakeys reverb |
+| Knob 6 | Hammond Organ Fast reverb |
+| Knob 7 | Optik Synth reverb |
+| Knob 8 | inactive |
+| Knob 9 | inactive |
+
+### Cinematic Strings
+
+| Control | Function |
+| --- | --- |
+| Fader 1 | inactive |
+| Fader 2 | Nord White Grand volume |
+| Fader 3 | Alt Strings volume |
+| Fader 4 | inactive |
+| Fader 5 | inactive |
+| Fader 6 | inactive |
+| Fader 7 | Optik Synth volume |
+| Fader 8 | PAD EFEITOS volume |
+| Fader 9 | AtmosferaPAD volume |
+| Knob 1 | inactive |
+| Knob 2 | Nord White Grand reverb |
+| Knob 3 | Alt Strings reverb |
+| Knob 4 | inactive |
+| Knob 5 | inactive |
+| Knob 6 | inactive |
+| Knob 7 | Optik Synth reverb |
+| Knob 8 | PAD EFEITOS reverb |
+| Knob 9 | AtmosferaPAD reverb |
+
+### Orchestral
+
+| Control | Function |
+| --- | --- |
+| Fader 1 | Basic Piano volume |
+| Fader 2 | Nord White Grand volume |
+| Fader 3 | Alt Strings volume |
+| Fader 4 | Good Flute volume |
+| Fader 5 | SAX Lirakeys volume |
+| Fader 6 | inactive |
+| Fader 7 | inactive |
+| Fader 8 | inactive |
+| Fader 9 | AtmosferaPAD volume |
+| Knob 1 | Basic Piano reverb |
+| Knob 2 | Nord White Grand reverb |
+| Knob 3 | Alt Strings reverb |
+| Knob 4 | Good Flute reverb |
+| Knob 5 | SAX Lirakeys reverb |
+| Knob 6 | inactive |
+| Knob 7 | inactive |
+| Knob 8 | inactive |
+| Knob 9 | AtmosferaPAD reverb |
+
+### Brass And Winds
+
+| Control | Function |
+| --- | --- |
+| Fader 1 | Basic Piano volume |
+| Fader 2 | inactive |
+| Fader 3 | Alt Strings volume |
+| Fader 4 | Good Flute volume |
+| Fader 5 | SAX Lirakeys volume |
+| Fader 6 | Hammond Organ Fast volume |
+| Fader 7 | Optik Synth volume |
+| Fader 8 | inactive |
+| Fader 9 | inactive |
+| Knob 1 | Basic Piano reverb |
+| Knob 2 | inactive |
+| Knob 3 | Alt Strings reverb |
+| Knob 4 | Good Flute reverb |
+| Knob 5 | SAX Lirakeys reverb |
+| Knob 6 | Hammond Organ Fast reverb |
+| Knob 7 | Optik Synth reverb |
+| Knob 8 | inactive |
+| Knob 9 | inactive |
+
+### Synthwave
+
+| Control | Function |
+| --- | --- |
+| Fader 1 | Basic Piano volume |
+| Fader 2 | Nord White Grand volume |
+| Fader 3 | Alt Strings volume |
+| Fader 4 | inactive |
+| Fader 5 | inactive |
+| Fader 6 | inactive |
+| Fader 7 | Optik Synth volume |
+| Fader 8 | PAD EFEITOS volume |
+| Fader 9 | AtmosferaPAD volume |
+| Knob 1 | Basic Piano reverb |
+| Knob 2 | Nord White Grand reverb |
+| Knob 3 | Alt Strings reverb |
+| Knob 4 | inactive |
+| Knob 5 | inactive |
+| Knob 6 | inactive |
+| Knob 7 | Optik Synth reverb |
+| Knob 8 | PAD EFEITOS reverb |
+| Knob 9 | AtmosferaPAD reverb |
+
+### Retro Keys
+
+| Control | Function |
+| --- | --- |
+| Fader 1 | Basic Piano volume |
+| Fader 2 | Nord White Grand volume |
+| Fader 3 | inactive |
+| Fader 4 | inactive |
+| Fader 5 | inactive |
+| Fader 6 | Hammond Organ Fast volume |
+| Fader 7 | Optik Synth volume |
+| Fader 8 | PAD EFEITOS volume |
+| Fader 9 | AtmosferaPAD volume |
+| Knob 1 | Basic Piano reverb |
+| Knob 2 | Nord White Grand reverb |
+| Knob 3 | inactive |
+| Knob 4 | inactive |
+| Knob 5 | inactive |
+| Knob 6 | Hammond Organ Fast reverb |
+| Knob 7 | Optik Synth reverb |
+| Knob 8 | PAD EFEITOS reverb |
+| Knob 9 | AtmosferaPAD reverb |
+
+### Intimate Pads
+
+| Control | Function |
+| --- | --- |
+| Fader 1 | Basic Piano volume |
+| Fader 2 | Nord White Grand volume |
+| Fader 3 | Alt Strings volume |
+| Fader 4 | inactive |
+| Fader 5 | inactive |
+| Fader 6 | inactive |
+| Fader 7 | inactive |
+| Fader 8 | PAD EFEITOS volume |
+| Fader 9 | AtmosferaPAD volume |
+| Knob 1 | Basic Piano reverb |
+| Knob 2 | Nord White Grand reverb |
+| Knob 3 | Alt Strings reverb |
+| Knob 4 | inactive |
+| Knob 5 | inactive |
+| Knob 6 | inactive |
+| Knob 7 | inactive |
+| Knob 8 | PAD EFEITOS reverb |
+| Knob 9 | AtmosferaPAD reverb |
+
+### Praise Leads
+
+| Control | Function |
+| --- | --- |
+| Fader 1 | Basic Piano volume |
+| Fader 2 | inactive |
+| Fader 3 | inactive |
+| Fader 4 | inactive |
+| Fader 5 | inactive |
+| Fader 6 | Hammond Organ Fast volume |
+| Fader 7 | Optik Synth volume |
+| Fader 8 | PAD EFEITOS volume |
+| Fader 9 | AtmosferaPAD volume |
+| Knob 1 | Basic Piano reverb |
+| Knob 2 | inactive |
+| Knob 3 | inactive |
+| Knob 4 | inactive |
+| Knob 5 | inactive |
+| Knob 6 | Hammond Organ Fast reverb |
+| Knob 7 | Optik Synth reverb |
+| Knob 8 | PAD EFEITOS reverb |
+| Knob 9 | AtmosferaPAD reverb |
+
+### Acoustic Worship
+
+| Control | Function |
+| --- | --- |
+| Fader 1 | Basic Piano volume |
+| Fader 2 | Nord White Grand volume |
+| Fader 3 | Alt Strings volume |
+| Fader 4 | Good Flute volume |
+| Fader 5 | inactive |
+| Fader 6 | Hammond Organ Fast volume |
+| Fader 7 | inactive |
+| Fader 8 | inactive |
+| Fader 9 | AtmosferaPAD volume |
+| Knob 1 | Basic Piano reverb |
+| Knob 2 | Nord White Grand reverb |
+| Knob 3 | Alt Strings reverb |
+| Knob 4 | Good Flute reverb |
+| Knob 5 | inactive |
+| Knob 6 | Hammond Organ Fast reverb |
+| Knob 7 | inactive |
+| Knob 8 | inactive |
+| Knob 9 | AtmosferaPAD reverb |
+
 ## Safety
 
 - `full-live-rack` remains the default and rollback mode.
