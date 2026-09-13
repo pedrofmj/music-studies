@@ -60,6 +60,13 @@ def main() -> int:
             and "Volume Map" not in (plugin.findtext("Info/Name") or "")
             and "Reverb Map" not in (plugin.findtext("Info/Name") or "")
         ]
+        map_plugins = {
+            plugin.findtext("Info/Name"): plugin
+            for plugin in root.findall("Plugin")
+            if (plugin.findtext("Info/Name") or "").startswith("AR-CH-")
+            and ("Volume Map" in (plugin.findtext("Info/Name") or "")
+                 or "Reverb Map" in (plugin.findtext("Info/Name") or ""))
+        }
         if len(arturia_plugins) != 9:
             raise ValueError(f"expected nine Arturia instrument plugins, found {len(arturia_plugins)}")
         vst2_template = next(
@@ -73,11 +80,25 @@ def main() -> int:
         if vst2_template is None or sf2_template is None:
             raise ValueError("source project must contain both VST2 and SF2 Arturia templates")
 
+        retained_maps = []
+        for channel in (2, 4, 5, 6, 7, 8, 9):
+            for kind in ("Volume Map", "Reverb Map"):
+                source_name = f"AR-CH-{channel} {kind}"
+                source = map_plugins.get(source_name)
+                if source is None:
+                    raise ValueError(f"required map plugin is missing: {source_name}")
+                retained = copy.deepcopy(source)
+                retained.find("Info/Name").text = f"GENRE-CH-{channel} {kind}"
+                retained_maps.append(retained)
+
         for child in list(root):
-            if child.tag == "Plugin" and child not in arturia_plugins:
+            if child.tag == "Plugin" and child not in arturia_plugins and child not in map_plugins.values():
                 root.remove(child)
             elif child.tag == "ExternalPatchbay":
                 root.remove(child)
+
+        for retained in retained_maps:
+            root.append(retained)
 
         for index, (plugin, patch_id) in enumerate(zip(arturia_plugins, selected), 1):
             patch = patches.get(patch_id)

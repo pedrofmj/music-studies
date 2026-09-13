@@ -63,6 +63,15 @@ static int process(jack_nframes_t frames, void *opaque)
             event.buffer[2] != 0U
             ? profile_for_pad(event.buffer[1]) : 0;
         if (profile != 0) {
+            static const unsigned char all_sound_off[] = {0xb0U, 120U, 0U};
+            static const unsigned char all_notes_off[] = {0xb0U, 123U, 0U};
+
+            (void)jack_midi_event_write(
+                output, event.time, all_sound_off, sizeof(all_sound_off)
+            );
+            (void)jack_midi_event_write(
+                output, event.time, all_notes_off, sizeof(all_notes_off)
+            );
             unsigned char value_byte = (unsigned char)profile;
             (void)write(value->trigger_fd, &value_byte, 1U);
             continue;

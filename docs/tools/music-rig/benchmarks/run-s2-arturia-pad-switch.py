@@ -21,6 +21,7 @@ MIDI_TARGETS = (
 )
 LSP_LEFT = "LSP Mixer x8 Stereo:Input L"
 LSP_RIGHT = "LSP Mixer x8 Stereo:Input R"
+MIDI_GUARD_INTERVAL_SECONDS = 0.5
 ARTURIA_AUDIO = (
     ("AR-CH-1 - Basic Piano:output_1", LSP_LEFT),
     ("AR-CH-1 - Basic Piano:output_2", LSP_RIGHT),
@@ -79,8 +80,14 @@ GENRE_ACTIVE_LAYERS = {
 
 
 def run(command: list[str], environment: dict[str, str]) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(command, env=environment, check=False, stdout=subprocess.PIPE,
-                          stderr=subprocess.STDOUT, text=True)
+    try:
+        return subprocess.run(command, env=environment, check=False, stdout=subprocess.PIPE,
+                              stderr=subprocess.STDOUT, text=True, timeout=2.0)
+    except subprocess.TimeoutExpired as failure:
+        output = failure.stdout or ""
+        if isinstance(output, bytes):
+            output = output.decode(errors="replace")
+        return subprocess.CompletedProcess(command, 124, output, output)
 
 
 def links(environment: dict[str, str]) -> str:
@@ -169,6 +176,7 @@ def main() -> int:
     keylab = ""
     router: subprocess.Popen[str] | None = None
     candidate: subprocess.Popen[str] | None = None
+    candidate_instance_id: str | None = None
     config_temporary = tempfile.TemporaryDirectory(prefix="music-rig-arturia-pad-config-")
     profiles_seen: list[str] = []
     current = "full-live-rack"
@@ -176,6 +184,7 @@ def main() -> int:
     active_arturia_layers = set(range(1, 10))
     stop_requested = False
     error: str | None = None
+    last_midi_guard = 0.0
 
     def request_stop(signal_number: int, frame: object) -> None:
         nonlocal stop_requested
@@ -203,7 +212,10 @@ def main() -> int:
         connect("s2-arturia-profile-router:out", MIDI_TARGETS[1], environment)
 
         def stop_candidate() -> None:
-            nonlocal candidate
+            nonlocal candidate, candidate_instance_id
+            if candidate_instance_id is not None:
+                run(["flatpak", "kill", candidate_instance_id], environment)
+                candidate_instance_id = None
             if candidate is not None and candidate.poll() is None:
                 candidate.send_signal(signal.SIGTERM)
                 try:
@@ -211,8 +223,8 @@ def main() -> int:
                 except subprocess.TimeoutExpired:
                     try:
                         os.killpg(candidate.pid, signal.SIGKILL)
-                    except ProcessLookupError:
-                        pass
+                    except (PermissionError, ProcessLookupError):
+                        candidate.kill()
                     candidate.wait()
             candidate = None
 
@@ -230,7 +242,7 @@ def main() -> int:
             current = "full-live-rack"
 
         def start_candidate(profile: str) -> None:
-            nonlocal candidate, current, audio_touched, active_arturia_layers
+            nonlocal candidate, candidate_instance_id, current, audio_touched, active_arturia_layers
             stop_candidate()
             for source, target in ARTURIA_AUDIO:
                 disconnect(source, target, environment)
@@ -249,7 +261,7 @@ def main() -> int:
                            "--client-name", "s2-synthv1-live", str(arguments.synthv1_preset)]
                 candidate = subprocess.Popen(command, env=candidate_environment,
                                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                                              text=True)
+                                              text=True, start_new_session=True)
                 input_port = "s2-synthv1-live:in"
                 left_port = "s2-synthv1-live:out_1"
                 right_port = "s2-synthv1-live:out_2"
@@ -260,7 +272,7 @@ def main() -> int:
                     ["/usr/bin/pw-jack", str(arguments.setbfree), "-C", "-c",
                      str(arguments.setbfree_config), "jack.connect="],
                     env=candidate_environment, stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL, text=True,
+                    stderr=subprocess.DEVNULL, text=True, start_new_session=True,
                 )
                 input_port = "setBfree:midi_in"
                 left_port = "setBfree:out_left"
@@ -271,27 +283,47 @@ def main() -> int:
                 project = arguments.genre_project_root / f"{profile}.uproject"
                 if not project.is_file():
                     raise RuntimeError(f"genre project is missing: {project}")
-                candidate = subprocess.Popen(
-                    ["/usr/bin/flatpak", "run", f"--cwd={arguments.soundfont_workdir}",
-                     "--file-forwarding", "studio.kx.carla", "--no-gui",
-                     "@@", str(project), "@@"],
-                    env=environment, stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL, text=True, start_new_session=True,
-                )
+                instance_read, instance_write = os.pipe()
+                try:
+                    candidate = subprocess.Popen(
+                        ["/usr/bin/flatpak", "run", f"--cwd={arguments.soundfont_workdir}",
+                         "--file-forwarding", f"--instance-id-fd={instance_write}",
+                         "studio.kx.carla", "--no-gui", "@@", str(project), "@@"],
+                        env=environment, stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL, text=True, start_new_session=True,
+                        pass_fds=(instance_write,),
+                    )
+                finally:
+                    os.close(instance_write)
+                try:
+                    candidate_instance_id = os.read(instance_read, 256).decode().strip()
+                finally:
+                    os.close(instance_read)
                 deadline = time.monotonic() + 20.0
                 midi_inputs: list[str] = []
+                midi_control_inputs: list[str] = []
+                midi_control_outputs: list[str] = []
                 audio_outputs: list[str] = []
                 while time.monotonic() < deadline:
                     outputs = run(["pw-link", "-o"], environment).stdout.splitlines()
                     inputs = run(["pw-link", "-i"], environment).stdout.splitlines()
                     midi_inputs = [line.strip() for line in inputs
-                                   if "GENRE-CH-" in line and ":events-in" in line]
+                                   if "GENRE-CH-" in line and ":events-in" in line
+                                   and "Volume Map" not in line and "Reverb Map" not in line]
+                    midi_control_inputs = [line.strip() for line in inputs
+                                           if "GENRE-CH-" in line and ":events-in" in line
+                                           and ("Volume Map" in line or "Reverb Map" in line)]
+                    midi_control_outputs = [line.strip() for line in outputs
+                                            if "GENRE-CH-" in line and ":events-out" in line
+                                            and ("Volume Map" in line or "Reverb Map" in line)]
                     audio_outputs = [line.strip() for line in outputs
                                      if "GENRE-CH-" in line and re.search(
                                          r":(?:output_[12]|out-(?:left|right))$",
                                          line.strip(),
                                      )]
-                    if len(midi_inputs) == 9 and len(audio_outputs) == 18:
+                    if (len(midi_inputs) == 9 and len(midi_control_inputs) == 14
+                            and len(midi_control_outputs) == 14
+                            and len(audio_outputs) == 18):
                         break
                     if candidate.poll() is not None:
                         raise RuntimeError("genre Carla process exited before port registration")
@@ -302,6 +334,15 @@ def main() -> int:
                     connect("s2-arturia-profile-router:out", target, environment)
                 for target in sorted(midi_inputs):
                     connect("s2-arturia-profile-router:out", target, environment)
+                for target in sorted(midi_control_inputs):
+                    connect("s2-arturia-profile-router:out", target, environment)
+                for output in sorted(midi_control_outputs):
+                    channel = output.split(" ", 1)[0]
+                    target = next(
+                        target for target in midi_inputs
+                        if target.startswith(f"{channel} - ")
+                    )
+                    connect(output, target, environment)
                 for output in sorted(audio_outputs):
                     target = LSP_LEFT if any(token in output for token in
                                              (":output_1", ":out-left")) else LSP_RIGHT
@@ -325,8 +366,11 @@ def main() -> int:
         while not stop_requested and (arguments.duration_ms == 0 or time.monotonic() < deadline):
             # Keep the management input exclusive while the watcher observes
             # graph events. Normal keyboard/CC data still flows via the router.
-            for target in MIDI_TARGETS:
-                disconnect(keylab, target, environment)
+            now = time.monotonic()
+            if now - last_midi_guard >= MIDI_GUARD_INTERVAL_SECONDS:
+                for target in MIDI_TARGETS:
+                    disconnect(keylab, target, environment)
+                last_midi_guard = now
             if audio_touched:
                 for index, (source, target) in enumerate(ARTURIA_AUDIO):
                     if index // 2 + 1 not in active_arturia_layers:
@@ -348,6 +392,9 @@ def main() -> int:
     except (OSError, RuntimeError) as failure:
         error = str(failure)
     finally:
+        if candidate_instance_id is not None:
+            run(["flatpak", "kill", candidate_instance_id], environment)
+            candidate_instance_id = None
         if candidate is not None and candidate.poll() is None:
             candidate.kill()
         if router is not None and router.poll() is None:

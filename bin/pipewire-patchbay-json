@@ -19,7 +19,7 @@ Usage:
   $PROGRAM_NAME export [--midi-only] [FILE]
   $PROGRAM_NAME import [--names] [--midi-component] [--dry-run] FILE
   $PROGRAM_NAME --take-snapshot [FILE]
-  $PROGRAM_NAME --check-and-restore [--dry-run] [FILE]
+  $PROGRAM_NAME --check-and-restore [--dry-run] [--selector-aware] [FILE]
   $PROGRAM_NAME --watch-and-restore [--interval SECONDS] [FILE]
   $PROGRAM_NAME --watch-events-and-restore [--settle SECONDS] [FILE]
 
@@ -298,6 +298,7 @@ import_patchbay() {
     local use_names=false
     local midi_component=false
     local dry_run=false
+    local selector_aware=false
     local document=
     local dump_file current_document
     local total=0 restored=0 existing=0 unresolved=0 failed=0 would_restore=0
@@ -314,6 +315,9 @@ import_patchbay() {
                 ;;
             --dry-run)
                 dry_run=true
+                ;;
+            --selector-aware)
+                selector_aware=true
                 ;;
             --help|-h)
                 usage
@@ -380,7 +384,7 @@ import_patchbay() {
             ((failed += 1))
         fi
     done < <(
-        jq -r --argjson midi_component "$midi_component" '
+        jq -r --argjson midi_component "$midi_component" --argjson selector_aware "$selector_aware" '
             def midi_component_node_ids:
                 ([.ports[] | select(.midi) | .node_id] | unique) as $roots
                 | def expand($node_ids):
@@ -398,8 +402,27 @@ import_patchbay() {
                       end;
                 expand($roots);
             (if $midi_component then midi_component_node_ids else null end) as $node_ids
-            | .links[]
-            | select(
+             | .links[]
+             | select(
+                 ($selector_aware | not)
+                 or (
+                     (
+                         ((.output.node_name // "") | startswith("AR-CH-"))
+                         or ((.input.node_name // "") | startswith("AR-CH-"))
+                         or (.output.node_name == "AR Controls - Sustain Scale")
+                         or (.input.node_name == "AR Controls - Sustain Scale")
+                         or (
+                             .output.node_name == "Midi-Bridge"
+                             and ((.output.name // "") | contains("KL Essential 61 mk3"))
+                         )
+                         or (
+                             .input.node_name == "Midi-Bridge"
+                             and ((.input.name // "") | contains("KL Essential 61 mk3"))
+                         )
+                     ) | not
+                 )
+               )
+             | select(
                 $node_ids == null
                 or (
                     (.output.node_id as $id | $node_ids | index($id))
@@ -535,8 +558,13 @@ watch_and_restore() {
 event_restore_check() {
     local document=$1
     local result
+    local -a import_options=(--names --midi-component)
 
-    if result=$(import_patchbay --names --midi-component "$document" 2>&1); then
+    if systemctl --user is-active --quiet music-rig-arturia-profile-session.service; then
+        import_options+=(--selector-aware)
+    fi
+
+    if result=$(import_patchbay "${import_options[@]}" "$document" 2>&1); then
         printf 'Patchbay event check: %s\n' "$result" >&2
     else
         printf 'Patchbay waiting for MIDI endpoints: %s\n' "$result" >&2
