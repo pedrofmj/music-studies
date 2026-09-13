@@ -4,7 +4,7 @@
     "id": "music-rig-authoring-compiler",
     "version": "0.2.0"
   },
-  "definition_fingerprint": "sha256:a3a9bfdb60a3409f770063afa18b09e7c3b0c4e269ca0474a976062a8d2906b7",
+  "definition_fingerprint": "sha256:379c0b7b08fc91d96897f5ae7e32438a2c1d5c0a3a3a386f4cd3e86d0515d89e",
   "device_profiles": [
     {
       "hardware_preset": "arturia-current-rack",
@@ -40,8 +40,8 @@
   "fingerprints": {
     "algorithm": "sha256",
     "platform_binding": "sha256:93fbc7e1a0a6238a91ef3888c63967d2c1ce2d787fd1d140d0fe6905cf4b90a3",
-    "portable_source": "sha256:d1fa4e19445eb314e25bd8a8363262298c69b0e1a09e0fa84deda571fa855423",
-    "schema_set": "sha256:2c1de2ba9a3a7b519eb758b688d874cdd1060b94d83a2ba469cf7fda65f63e06"
+    "portable_source": "sha256:91a2bc47eb06c26b7fd941310a4b96ab1ab6364dabd94af2fc599972ff8d492f",
+    "schema_set": "sha256:0f042fcbebbfba1734ec9b7a47be699075cb1c904a08a05bfa7376c481778ef6"
   },
   "generation": 1,
   "graph_delta": {
@@ -2748,6 +2748,10 @@
         "path": "hardware-presets/arturia-current-rack.json"
       },
       {
+        "fingerprint": "sha256:b13e87903c87e842cdcf18d2e18acacd659fddcaca4f4c1add342d8231378069",
+        "path": "hardware-presets/arturia-pad-switches.json"
+      },
+      {
         "fingerprint": "sha256:14a37fd0ddc4cb2b9c583bb5588671ec19517aa3bca2c317985d2f9c78c1ad0d",
         "path": "hardware-presets/smc-mixer-current-cc.json"
       },
@@ -2764,12 +2768,56 @@
         "path": "hardware-presets/smk25-current-pad-layers.json"
       },
       {
+        "fingerprint": "sha256:5de33515b8eb56e639d10feeae02ceaaae08a763961ab10864af37b65af41b62",
+        "path": "rig-profiles/acoustic-worship.json"
+      },
+      {
+        "fingerprint": "sha256:1f369088ec9f86b75d22d96b0ac6d1127a39d12a4fd164c0336cd3d88bb556de",
+        "path": "rig-profiles/ambient-worship.json"
+      },
+      {
+        "fingerprint": "sha256:b0412ef9c1f1cd9b0ee9e7b64f05ccec733b39822906aa9037fedbcc650c85c7",
+        "path": "rig-profiles/brass-winds.json"
+      },
+      {
+        "fingerprint": "sha256:6e9f134f6d55e519024d19800515296268f5f38f4b09328d91dca9727cd0ee57",
+        "path": "rig-profiles/cinematic-strings.json"
+      },
+      {
         "fingerprint": "sha256:c113392d40603cdae209934095febf2bed9a6530d7064db7238772f7473010ee",
         "path": "rig-profiles/full-live-rack.json"
       },
       {
+        "fingerprint": "sha256:99896fc17263eb39cb47a7e0d66985965b9c70d4ddc2ef99fc41e91be6e8d42e",
+        "path": "rig-profiles/gospel-keys.json"
+      },
+      {
+        "fingerprint": "sha256:d53e8d802d2d5ea0ba78518ba72a8e8131863bfc9b01fb4839e3eb8043eb79a0",
+        "path": "rig-profiles/intimate-pads.json"
+      },
+      {
+        "fingerprint": "sha256:d20c79eb453dd41e6775ec5ea3db7bf5de62a896d763d3ddda7467264e9e7fbd",
+        "path": "rig-profiles/jazz-keys.json"
+      },
+      {
         "fingerprint": "sha256:38d93bdf71cf741a0694961acf08abffdf3a4984e8810d76588201c1824c6cb5",
         "path": "rig-profiles/multilevel-volume-mixed-pads.json"
+      },
+      {
+        "fingerprint": "sha256:ae810fd44759895f546a18150176fcb7918afc78376b4e89d7320c6c77e17739",
+        "path": "rig-profiles/orchestral.json"
+      },
+      {
+        "fingerprint": "sha256:24fe0beb5cfa896fdae4befa9718fd2eb747d5b2880d2552534f051b45f5b63b",
+        "path": "rig-profiles/praise-leads.json"
+      },
+      {
+        "fingerprint": "sha256:a1b5a054cdda7c820d367dd9e03b4cdb049f07a63e20d2c40ed1cdaa66ff23b0",
+        "path": "rig-profiles/retro-keys.json"
+      },
+      {
+        "fingerprint": "sha256:bf3335eb7794a8bf6b810ede1643cd116334d6df77592b3afc4fc4c998c7be97",
+        "path": "rig-profiles/soul-rnb.json"
       },
       {
         "fingerprint": "sha256:70600d06dd9b2baf78bf1011513f9a78b42197391570ed3a3b776198d8587023",
@@ -2780,6 +2828,10 @@
         "path": "rig-profiles/synth-programmer.json"
       },
       {
+        "fingerprint": "sha256:613837d843b8ac80d18de96544f142222cc772622ff4f0b15ebd25c7e9c2a5b4",
+        "path": "rig-profiles/synthwave.json"
+      },
+      {
         "fingerprint": "sha256:a0c3c85ce84125f7108231bce1bca280d2c16e3dd84e438f2096ecda33f74397",
         "path": "rig-profiles/tonewheel-organ-setbfree.json"
       },
@@ -2788,11 +2840,15 @@
         "path": "rig-profiles/tonewheel-organ.json"
       },
       {
-        "fingerprint": "sha256:fa1af9126bcd857010cd6a8b26c23a9eb4d14074e9a485b519710e52bba9b7c0",
+        "fingerprint": "sha256:09a4bde87c4561f7149867825ec3f383955d2e322cc9cd668ea3ef4f506ea4a7",
+        "path": "rig-profiles/worship-piano.json"
+      },
+      {
+        "fingerprint": "sha256:d8e1f03937401f2d55d5728d064df1ac836e979705a66d7826dd5f5778169658",
         "path": "rig.json"
       },
       {
-        "fingerprint": "sha256:e4c0ec9bed7bed5edb6b9ab010eee073a41c227d9e338cc01e3f1dc06be0232b",
+        "fingerprint": "sha256:35ed5ee17b096240274a31eb285fe1c7f40a9c1777d134c4b5896a78fd2ed80d",
         "path": "switch-triggers.json"
       }
     ],
@@ -2814,7 +2870,7 @@
         "path": "schemas/platform-binding.schema.json"
       },
       {
-        "fingerprint": "sha256:dfa5e9a5433c7cf1bc8e4c4a802abe841d62e8db2b943a2a8dd9af6b6fa6d5ac",
+        "fingerprint": "sha256:d54ac5018e2c29aefb8e73bf52d2222a1d4f87b9b6bd1433a896b02852617a38",
         "path": "schemas/rig-profile.schema.json"
       },
       {
@@ -2822,7 +2878,7 @@
         "path": "schemas/rig.schema.json"
       },
       {
-        "fingerprint": "sha256:981adb638f470b102252a13b4b5045c9abcefbaea26557ee2f61118e7c5878b7",
+        "fingerprint": "sha256:a125899f0f169cfac70b1826efa2e5197af2dd0efc093859103832d2460e12ac",
         "path": "schemas/switch-triggers.schema.json"
       }
     ]

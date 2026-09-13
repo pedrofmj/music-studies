@@ -73,10 +73,20 @@ the default is the cleanup/rollback state. The ordinary `music-rig` production
 transport remains fail-closed until a separately approved persistent engine
 ownership transaction is implemented.
 
+For a bounded performance session, omit `--duration-ms` or pass `--duration-ms
+0`; the pad selector then runs until interrupted and restores `full-live-rack`
+during cleanup. It remains an explicit candidate session, not a system service
+or default startup path.
+
 The first two-minute `tonewheel-organ-setbfree` window passed its reversible
 candidate transaction and protected post-check. The operator confirmed that
 organ controls audibly responded. Assessment is recorded separately in
 `benchmarks/s2-setbfree-two-minute-window-2026-09-12.json`.
+
+The first live pad trigger test also passed: Bank A Pad 1 selected
+`tonewheel-organ-setbfree`, preserved the SMK/SMC paths, restored the graph, and
+passed the protected `30/30` post-check. See
+`benchmarks/s2-arturia-pad-switch-2026-09-12.json`.
 
 This session is separate from production. It must use one staged candidate
 engine and its temporary JACK/PipeWire ports. It must not open or mutate the

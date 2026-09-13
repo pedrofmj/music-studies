@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../../../../.." && pwd)"
+readonly SERVICE_NAME="music-rig-arturia-profile-session.service"
+readonly INSTALL_ROOT="${HOME}/.local/share/music-rig/arturia-profile-session"
+readonly SERVICE_ROOT="${HOME}/.config/systemd/user"
+readonly SERVICE_SOURCE="${SCRIPT_DIR}/${SERVICE_NAME}"
+
+candidate_root=""
+router_binary=""
+uninstall=false
+
+usage() {
+    printf '%s\n' \
+        "Usage: $(basename "$0") --candidate-root PATH" \
+        "       $(basename "$0") --uninstall" \
+        "" \
+        "Install the explicit Arturia profile session as a systemd user unit." \
+        "The installer does not enable or start the service." \
+        "The candidate root must contain the staged synthv1 and setBfree files." \
+        "  --router-binary PATH    Use a precompiled JACK router binary" \
+        ""
+}
+
+while (($#)); do
+    case $1 in
+        --candidate-root)
+            [[ -n ${2-} ]] || { printf '%s\n' "--candidate-root requires a path" >&2; exit 2; }
+            candidate_root=$2
+            shift
+            ;;
+        --router-binary)
+            [[ -n ${2-} ]] || { printf '%s\n' "--router-binary requires a path" >&2; exit 2; }
+            router_binary=$2
+            shift
+            ;;
+        --uninstall)
+            uninstall=true
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            printf 'Unknown option: %s\n' "$1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
+
+if [[ $uninstall == true ]]; then
+    systemctl --user disable --now "$SERVICE_NAME" >/dev/null 2>&1 || true
+    rm -f "${SERVICE_ROOT}/${SERVICE_NAME}"
+    systemctl --user daemon-reload
+    printf 'Removed %s; no candidate process is running.\n' "$SERVICE_NAME"
+    exit 0
+fi
+
+[[ -n $candidate_root ]] || { usage >&2; exit 2; }
+[[ -d $candidate_root ]] || { printf 'Candidate root does not exist: %s\n' "$candidate_root" >&2; exit 1; }
+
+readonly SYNTHV1_SOURCE="${candidate_root}/root/usr/bin/synthv1_jack"
+readonly SYNTHV1_PRESET="${candidate_root}/50_SynthRemember-ubuntu.synthv1"
+readonly SYNTHV1_CONTROLS="${REPO_ROOT}/docs/tools/music-rig/benchmarks/s2-synthv1-keylab-controls.conf"
+readonly SETBFREE_SOURCE="${candidate_root}/setbfree-root/usr/bin/setBfree"
+readonly SETBFREE_CONFIG="${REPO_ROOT}/docs/tools/music-rig/benchmarks/s2-setbfree-keylab-controls.cfg"
+readonly SETBFREE_LIB="${candidate_root}/setbfree-root/usr/lib"
+readonly ROUTER_SOURCE="${REPO_ROOT}/docs/tools/music-rig/benchmarks/arturia-pad-router.c"
+
+for required in "$SYNTHV1_SOURCE" "$SYNTHV1_PRESET" "$SYNTHV1_CONTROLS" \
+    "$SETBFREE_SOURCE" "$SETBFREE_CONFIG" "$SETBFREE_LIB"; do
+    [[ -e $required ]] || { printf 'Required candidate resource is missing: %s\n' "$required" >&2; exit 1; }
+done
+if [[ -n $router_binary ]]; then
+    [[ -f $router_binary ]] || { printf 'Router binary is missing: %s\n' "$router_binary" >&2; exit 1; }
+else
+    [[ -f $ROUTER_SOURCE ]] || { printf 'Router source is missing: %s\n' "$ROUTER_SOURCE" >&2; exit 1; }
+fi
+
+mkdir -p "$INSTALL_ROOT" "$SERVICE_ROOT"
+install -m 0755 "${REPO_ROOT}/docs/tools/music-rig/benchmarks/run-s2-arturia-pad-switch.py" \
+    "${INSTALL_ROOT}/run-s2-arturia-pad-switch.py"
+install -m 0644 "$SYNTHV1_PRESET" "${INSTALL_ROOT}/50_SynthRemember.synthv1"
+install -m 0644 "$SYNTHV1_CONTROLS" "${INSTALL_ROOT}/synthv1-keylab-controls.conf"
+install -m 0644 "$SETBFREE_CONFIG" "${INSTALL_ROOT}/setbfree-keylab-controls.cfg"
+install -m 0755 "$SYNTHV1_SOURCE" "${INSTALL_ROOT}/synthv1_jack"
+install -m 0755 "$SETBFREE_SOURCE" "${INSTALL_ROOT}/setBfree"
+rm -rf "${INSTALL_ROOT}/setbfree-lib"
+cp -a "$SETBFREE_LIB" "${INSTALL_ROOT}/setbfree-lib"
+
+if [[ -n $router_binary ]]; then
+    install -m 0755 "$router_binary" "${INSTALL_ROOT}/arturia-pad-router"
+else
+    cc "$ROUTER_SOURCE" -o "${INSTALL_ROOT}/arturia-pad-router" -ljack
+fi
+install -m 0644 "$SERVICE_SOURCE" "${SERVICE_ROOT}/${SERVICE_NAME}"
+systemctl --user daemon-reload
+
+printf '%s\n' \
+    "Installed ${SERVICE_NAME}." \
+    "It is intentionally disabled and stopped." \
+    "Start:   systemctl --user start ${SERVICE_NAME}" \
+    "Status:  systemctl --user status ${SERVICE_NAME}" \
+    "Stop:    systemctl --user stop ${SERVICE_NAME}" \
+    "Remove:  $0 --uninstall"

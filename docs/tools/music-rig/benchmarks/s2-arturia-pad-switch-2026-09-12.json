@@ -1,0 +1,13 @@
+{
+  "controller": "KL Essential 61 mk3",
+  "pad": "Bank A Pad 1",
+  "selected_profile": "tonewheel-organ-setbfree",
+  "profiles_seen": ["tonewheel-organ-setbfree"],
+  "window_seconds": 30,
+  "graph_restored": true,
+  "protected_graph_changed": false,
+  "protected_postcheck": "30/30",
+  "smk_smc_paths": "preserved by Arturia-layer-only routing",
+  "schema": "music-studies/s2-arturia-pad-switch/v1",
+  "status": "pad-trigger-pass"
+}

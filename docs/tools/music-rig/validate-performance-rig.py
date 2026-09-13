@@ -996,23 +996,22 @@ def validate_switch_trigger_catalogue_document(
                 if slot_id == source_slot
             ]
 
-        source_presets = {
-            profile["hardware_preset"]
-            for _, profile in source_profiles
-        }
-        for preset_id in sorted(source_presets):
-            preset = presets_by_id.get(preset_id)
-            if preset is None:
-                continue
-            if not any(
-                midi_events_overlap(trigger["event"], control["message"])
-                for control in preset["controls"]
-            ):
-                errors.append(
-                    f"{item_path}.event: management MIDI event "
-                    f"{midi_event_signature(trigger['event'])!r} is not "
-                    f"defined by hardware preset {preset_id!r}"
-                )
+        management_preset_id = trigger["hardware_preset"]
+        management_preset = presets_by_id.get(management_preset_id)
+        if management_preset is None:
+            errors.append(
+                f"{item_path}.hardware_preset: unresolved Hardware Preset "
+                f"{management_preset_id!r}"
+            )
+        elif not any(
+            midi_events_overlap(trigger["event"], control["message"])
+            for control in management_preset["controls"]
+        ):
+            errors.append(
+                f"{item_path}.event: management MIDI event "
+                f"{midi_event_signature(trigger['event'])!r} is not defined by "
+                f"hardware preset {management_preset_id!r}"
+            )
 
         operation = trigger["operation"]
         operation_type = operation["type"]

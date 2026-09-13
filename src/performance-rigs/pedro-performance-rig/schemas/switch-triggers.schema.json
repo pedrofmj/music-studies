@@ -43,6 +43,7 @@
       "required": [
         "id",
         "source_slot",
+        "hardware_preset",
         "event",
         "operation",
         "consume",
@@ -54,6 +55,9 @@
           "$ref": "common.schema.json#/$defs/identifier"
         },
         "source_slot": {
+          "$ref": "common.schema.json#/$defs/identifier"
+        },
+        "hardware_preset": {
           "$ref": "common.schema.json#/$defs/identifier"
         },
         "event": {

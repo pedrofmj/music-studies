@@ -8,6 +8,7 @@
     {
       "id": "unsafe-cold-switch",
       "source_slot": "fixture-controller",
+      "hardware_preset": "fixture-preset",
       "event": {
         "type": "note",
         "channel": 16,

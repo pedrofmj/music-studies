@@ -8,6 +8,7 @@
     {
       "id": "select-fixture-live",
       "source_slot": "fixture-controller",
+      "hardware_preset": "fixture-preset",
       "event": {
         "type": "note",
         "channel": 16,
@@ -26,6 +27,7 @@
     {
       "id": "select-fixture-live-again",
       "source_slot": "fixture-controller",
+      "hardware_preset": "fixture-preset",
       "event": {
         "type": "note",
         "channel": 16,

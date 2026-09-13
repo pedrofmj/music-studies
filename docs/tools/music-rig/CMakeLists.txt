@@ -1139,7 +1139,7 @@ if(BUILD_TESTING)
             $<TARGET_FILE:music-rigd>
             $<TARGET_FILE:music-rig>
             "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-current-envelope.json"
-            "sha256:a3a9bfdb60a3409f770063afa18b09e7c3b0c4e269ca0474a976062a8d2906b7"
+            "sha256:379c0b7b08fc91d96897f5ae7e32438a2c1d5c0a3a3a386f4cd3e86d0515d89e"
             "${MUSIC_RIG_COMPILER}"
             "${CMAKE_CURRENT_SOURCE_DIR}/../../../src/performance-rigs/pedro-performance-rig"
     )
@@ -1368,7 +1368,7 @@ if(BUILD_TESTING)
             "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/compiled-current-envelope.json"
         )
         set(MUSIC_RIG_JSON_DEFINITION_FINGERPRINT
-            "sha256:a3a9bfdb60a3409f770063afa18b09e7c3b0c4e269ca0474a976062a8d2906b7"
+            "sha256:379c0b7b08fc91d96897f5ae7e32438a2c1d5c0a3a3a386f4cd3e86d0515d89e"
         )
         set(MUSIC_RIG_MIXED_PADS_DEFINITION
             "${CMAKE_CURRENT_BINARY_DIR}/compiled-mixed-pads.json"

@@ -1,0 +1,8 @@
+[Unit]
+Description=Music Rig Arturia pad profile session
+After=pipewire.service wireplumber.service pipewire-patchbay-watch.service
+Requires=pipewire.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 %h/.local/share/music-rig/arturia-profile-session/run-s2-arturia-pad-switch.py --acknowledge-live-routing --router %h/.local/share/music-rig/arturia-profile-session/arturia-pad-router --synthv1 %h/.local/share/music-rig/arturia-profile-session/synthv1_jack --synthv1-preset %h/.local/share/music-rig/arturia-profile-session/50_SynthRemember.synthv1 --synthv1-controls %h/.local/share/music-rig/arturia-profile-session/synthv1-keylab-controls.conf --setbfree %h/.local/share/music-rig/arturia-profile-session/setBfree --setbfree-config %h/.local/share/music-rig/arturia-profile-session/setbfree-keylab-controls.cfg --setbfree-library %h/.local/share/music-rig/arturia-profile-session/setbfree-lib --duration-ms 0 --output %h/.local/share/music-rig/arturia-profile-session/last-session.json

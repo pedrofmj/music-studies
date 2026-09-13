@@ -44,6 +44,28 @@
         "$ref": "common.schema.json#/$defs/identifier"
       }
     },
+    "arturia_layer_engines": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^layer-[1-9]$"
+      },
+      "minProperties": 9,
+      "maxProperties": 9,
+      "additionalProperties": {
+        "$ref": "common.schema.json#/$defs/semantic_identifier"
+      }
+    },
+    "active_arturia_layers": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 9,
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 9
+      }
+    },
     "readiness": {
       "$ref": "common.schema.json#/$defs/readiness_class"
     },

@@ -46,9 +46,9 @@
       "available_device_profiles": [
            "multi-instrument-rack",
            "tonewheel-organ",
-           "tonewheel-organ-setbfree",
-           "synth-programmer",
-          "synth-programmer-synthv1"
+    "tonewheel-organ-setbfree",
+    "synth-programmer",
+    "synth-programmer-synthv1"
       ],
       "required": true
     },
@@ -228,13 +228,27 @@
   "rig_profiles": [
     "full-live-rack",
     "multilevel-volume-mixed-pads",
-      "tonewheel-organ",
-      "tonewheel-organ-setbfree",
-      "synth-programmer",
-    "synth-programmer-synthv1"
+    "tonewheel-organ",
+    "tonewheel-organ-setbfree",
+    "synth-programmer",
+    "synth-programmer-synthv1",
+    "worship-piano",
+    "gospel-keys",
+    "ambient-worship",
+    "jazz-keys",
+    "soul-rnb",
+    "cinematic-strings",
+    "orchestral",
+    "brass-winds",
+    "synthwave",
+    "retro-keys",
+    "intimate-pads",
+    "praise-leads",
+    "acoustic-worship"
   ],
   "hardware_presets": [
     "arturia-current-rack",
+    "arturia-pad-switches",
     "smk25-current-pad-layers",
     "smc-mixer-current-cc",
     "smc-pad-current-notes",

@@ -1,0 +1,17 @@
+{
+  "controller": "Arturia KeyLab Essential 61 mk3",
+  "source": "PipeWire MIDI performance input",
+  "keyboard_channel": 1,
+  "pad_channel": 10,
+  "bank_select_cc": 89,
+  "banks": {
+    "A": [40, 41, 42, 43, 36, 37, 38, 39],
+    "B": [48, 49, 50, 51, 44, 45, 46, 47]
+  },
+  "pad_order": "physical pads 1 through 8",
+  "event_contract": "note-on/note-off on channel 10; management matching must include source slot and channel",
+  "keyboard_collision": "safe; keyboard channel 1 is distinct from pad channel 10",
+  "protected_graph_touched": false,
+  "schema": "music-studies/arturia-pad-capture/v1",
+  "status": "read-only-capture-pass"
+}
