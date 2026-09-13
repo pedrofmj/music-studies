@@ -259,6 +259,7 @@ def main() -> int:
                 return
             time.sleep(2.0)
             connect("s2-arturia-profile-router:out", input_port, environment)
+            connect("s2-arturia-profile-router:out", MIDI_TARGETS[0], environment)
             connect(left_port, LSP_LEFT, environment)
             connect(right_port, LSP_RIGHT, environment)
             current = profile

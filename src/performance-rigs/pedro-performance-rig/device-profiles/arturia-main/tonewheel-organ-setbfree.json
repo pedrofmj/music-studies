@@ -36,7 +36,9 @@
     {"id": "drive", "source_control": "knob-6", "target": "organ.drive", "transform": {"type": "direct"}},
     {"id": "microphone-balance", "source_control": "knob-7", "target": "organ.microphone-balance", "transform": {"type": "direct"}},
     {"id": "organ-volume", "source_control": "knob-8", "target": "organ.volume", "transform": {"type": "direct"}},
-    {"id": "organ-reverb", "source_control": "knob-9", "target": "organ.reverb", "transform": {"type": "direct"}}
+    {"id": "organ-reverb", "source_control": "knob-9", "target": "organ.reverb", "transform": {"type": "direct"}},
+    {"id": "master-volume", "source_control": "central-encoder", "target": "master.volume", "transform": {"type": "relative", "relative_encoding": "binary-offset"}},
+    {"id": "master-mute", "source_control": "central-click", "target": "master.mute", "transform": {"type": "toggle"}}
   ],
   "ownership": [
     {"kind": "parameter", "target": "organ.drawbar.16ft", "mode": "exclusive"},
@@ -56,7 +58,9 @@
     {"kind": "parameter", "target": "organ.drive", "mode": "exclusive"},
     {"kind": "parameter", "target": "organ.microphone-balance", "mode": "exclusive"},
     {"kind": "parameter", "target": "organ.volume", "mode": "exclusive"},
-    {"kind": "parameter", "target": "organ.reverb", "mode": "exclusive"}
+    {"kind": "parameter", "target": "organ.reverb", "mode": "exclusive"},
+    {"kind": "parameter", "target": "master.volume", "mode": "exclusive"},
+    {"kind": "parameter", "target": "master.mute", "mode": "exclusive"}
   ],
   "dependencies": {
     "engines": ["engine.setbfree"],

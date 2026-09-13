@@ -165,6 +165,7 @@ def main() -> int:
 
         for source, target in (
             (midi_source, input_port),
+            (midi_source, "Arturia Main Volume Encoder:relative-in"),
             (left_port, AUDIO_LEFT),
             (right_port, AUDIO_RIGHT),
         ):

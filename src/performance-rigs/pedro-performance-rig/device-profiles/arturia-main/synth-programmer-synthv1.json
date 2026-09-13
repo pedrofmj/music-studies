@@ -36,7 +36,9 @@
     {"id": "reverb-mix", "source_control": "knob-6", "target": "synth.reverb-mix", "transform": {"type": "direct"}},
     {"id": "pitch-modulation", "source_control": "knob-7", "target": "synth.pitch-modulation", "transform": {"type": "direct"}},
     {"id": "synth-volume", "source_control": "knob-8", "target": "synth.volume", "transform": {"type": "direct"}},
-    {"id": "synth-reverb", "source_control": "knob-9", "target": "synth.reverb", "transform": {"type": "direct"}}
+    {"id": "synth-reverb", "source_control": "knob-9", "target": "synth.reverb", "transform": {"type": "direct"}},
+    {"id": "master-volume", "source_control": "central-encoder", "target": "master.volume", "transform": {"type": "relative", "relative_encoding": "binary-offset"}},
+    {"id": "master-mute", "source_control": "central-click", "target": "master.mute", "transform": {"type": "toggle"}}
   ],
   "ownership": [
     {"kind": "parameter", "target": "synth.oscillator-mix", "mode": "exclusive"},
@@ -56,7 +58,9 @@
     {"kind": "parameter", "target": "synth.reverb-mix", "mode": "exclusive"},
     {"kind": "parameter", "target": "synth.pitch-modulation", "mode": "exclusive"},
     {"kind": "parameter", "target": "synth.volume", "mode": "exclusive"},
-    {"kind": "parameter", "target": "synth.reverb", "mode": "exclusive"}
+    {"kind": "parameter", "target": "synth.reverb", "mode": "exclusive"},
+    {"kind": "parameter", "target": "master.volume", "mode": "exclusive"},
+    {"kind": "parameter", "target": "master.mute", "mode": "exclusive"}
   ],
   "dependencies": {
     "engines": ["engine.synthv1"],
