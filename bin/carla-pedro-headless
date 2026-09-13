@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly CONFIG_FILE="${CARLA_PEDRO_CONFIG:-${HOME}/.config/pedro-live-rack.conf}"
+if [[ -r $CONFIG_FILE ]]; then
+    # shellcheck disable=SC1090
+    source "$CONFIG_FILE"
+fi
+
+readonly PROJECT="${CARLA_PEDRO_PROJECT:-/c/music/carla/pedro.uproject}"
+readonly SOUNDFONT_WORKDIR="${CARLA_PEDRO_SOUNDFONT_WORKDIR:-${HOME}/.local/share/carla/pedro-soundfonts}"
+readonly APP_ID="studio.kx.carla"
+readonly OSC_PORT="${CARLA_OSC_UDP_PORT:-21337}"
+
+if [[ ! -r $PROJECT ]]; then
+    printf 'Carla project is not readable: %s\n' "$PROJECT" >&2
+    exit 1
+fi
+if [[ ! -d $SOUNDFONT_WORKDIR ]]; then
+    printf 'Carla SoundFont directory is missing: %s\n' "$SOUNDFONT_WORKDIR" >&2
+    exit 1
+fi
+if pgrep -af '/app/share/carla/carla' >/dev/null 2>&1; then
+    printf '%s\n' 'A Carla process is already running; stop the GUI rack before starting headless Carla.' >&2
+    exit 1
+fi
+
+exec flatpak run --cwd="$SOUNDFONT_WORKDIR" --file-forwarding "$APP_ID" \
+    --no-gui "--osc-gui=${OSC_PORT}" @@ "$PROJECT" @@

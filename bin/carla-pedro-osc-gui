@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly OSC_PORT="${CARLA_OSC_UDP_PORT:-21337}"
+if ! pgrep -af '/app/share/carla/carla.*--no-gui' >/dev/null 2>&1; then
+    printf '%s\n' 'No headless Carla backend is running.' >&2
+    printf '%s\n' 'Start music-rig-pedro-carla-headless.service first.' >&2
+    exit 1
+fi
+
+exec flatpak run --command=python3 studio.kx.carla \
+    /app/share/carla/carla-control \
+    --with-appname=/app/bin/carla-control \
+    --with-libprefix=/app \
+    "osc.tcp://127.0.0.1:${OSC_PORT}/Carla"

@@ -10,7 +10,8 @@ repository:
 
 ```bash
 docs/tools/music-rig/packaging/linux/install-arturia-profile-session \
-  --candidate-root /tmp/music-rig-synthv1-ubuntu-20260912
+  --candidate-root /tmp/music-rig-synthv1-ubuntu-20260912 \
+  --genre-project-root /path/to/materialized/genre-projects
 ```
 
 The installer copies the router, mapped synthv1 preset/config, setBfree binary,
@@ -19,6 +20,11 @@ setBfree config, and libraries below
 `music-rig-arturia-profile-session.service` under
 `~/.config/systemd/user`, reloads the user manager, and does not enable or start
 the unit.
+
+Materialize genre projects first with
+`benchmarks/materialize-arturia-genre-project.py` using
+`benchmarks/arturia-genre-patches.json`. The materializer reads the protected
+project as a template and writes only candidate `.uproject` files.
 
 ## Operate
 
@@ -42,3 +48,23 @@ docs/tools/music-rig/packaging/linux/install-arturia-profile-session \
 
 The service is deliberately not a production default until an interactive
 performance rehearsal confirms startup, pad switching, and shutdown recovery.
+
+## Optional Headless Full Rack
+
+Install the separate headless Carla launcher and user unit:
+
+```bash
+docs/tools/music-rig/packaging/linux/install-pedro-carla-headless
+```
+
+It is installed disabled and stopped. Close the normal GUI Carla rack before
+starting it:
+
+```bash
+systemctl --user start music-rig-pedro-carla-headless.service
+~/.local/bin/carla-pedro-osc-gui
+```
+
+`carla-pedro-osc-gui` uses Carla's bundled OSC control frontend to attach to the
+headless backend. It does not launch a second Carla engine. Stop the backend
+before reopening the normal GUI rack.

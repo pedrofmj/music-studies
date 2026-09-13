@@ -1,0 +1,19 @@
+[Unit]
+Description=Pedro full live rack headless Carla backend
+After=pipewire.service wireplumber.service pipewire-patchbay-watch.service
+Requires=pipewire.service
+Conflicts=music-rig-arturia-profile-session.service
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/carla-pedro-headless
+Restart=on-failure
+RestartSec=2s
+KillMode=mixed
+TimeoutStopSec=15s
+NoNewPrivileges=true
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

@@ -9,6 +9,7 @@ readonly SERVICE_ROOT="${HOME}/.config/systemd/user"
 readonly SERVICE_SOURCE="${SCRIPT_DIR}/${SERVICE_NAME}"
 
 candidate_root=""
+genre_project_root=""
 router_binary=""
 uninstall=false
 
@@ -21,6 +22,7 @@ usage() {
         "The installer does not enable or start the service." \
         "The candidate root must contain the staged synthv1 and setBfree files." \
         "  --router-binary PATH    Use a precompiled JACK router binary" \
+        "  --genre-project-root PATH  Materialized genre Carla projects" \
         ""
 }
 
@@ -34,6 +36,11 @@ while (($#)); do
         --router-binary)
             [[ -n ${2-} ]] || { printf '%s\n' "--router-binary requires a path" >&2; exit 2; }
             router_binary=$2
+            shift
+            ;;
+        --genre-project-root)
+            [[ -n ${2-} ]] || { printf '%s\n' "--genre-project-root requires a path" >&2; exit 2; }
+            genre_project_root=$2
             shift
             ;;
         --uninstall)
@@ -62,6 +69,8 @@ fi
 
 [[ -n $candidate_root ]] || { usage >&2; exit 2; }
 [[ -d $candidate_root ]] || { printf 'Candidate root does not exist: %s\n' "$candidate_root" >&2; exit 1; }
+[[ -n $genre_project_root ]] || genre_project_root="${candidate_root}/genre-projects"
+[[ -d $genre_project_root ]] || { printf 'Genre project root does not exist: %s\n' "$genre_project_root" >&2; exit 1; }
 
 readonly SYNTHV1_SOURCE="${candidate_root}/root/usr/bin/synthv1_jack"
 readonly SYNTHV1_PRESET="${candidate_root}/50_SynthRemember-ubuntu.synthv1"
@@ -91,6 +100,9 @@ install -m 0755 "$SYNTHV1_SOURCE" "${INSTALL_ROOT}/synthv1_jack"
 install -m 0755 "$SETBFREE_SOURCE" "${INSTALL_ROOT}/setBfree"
 rm -rf "${INSTALL_ROOT}/setbfree-lib"
 cp -a "$SETBFREE_LIB" "${INSTALL_ROOT}/setbfree-lib"
+rm -rf "${INSTALL_ROOT}/genre-projects"
+mkdir -p "${INSTALL_ROOT}/genre-projects"
+cp -a "${genre_project_root}/." "${INSTALL_ROOT}/genre-projects/"
 
 if [[ -n $router_binary ]]; then
     install -m 0755 "$router_binary" "${INSTALL_ROOT}/arturia-pad-router"

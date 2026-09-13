@@ -25,6 +25,40 @@ systemctl --user stop music-rig-arturia-profile-session.service
 Stopping the service restores `full-live-rack` and removes temporary candidate
 connections.
 
+## Headless Carla
+
+The protected full rack can also be launched as an opt-in headless Carla user
+service. This is separate from the Arturia pad selector and must not run beside
+the normal GUI Carla rack.
+
+Install the optional launcher:
+
+```bash
+docs/tools/music-rig/packaging/linux/install-pedro-carla-headless
+```
+
+With the normal Carla GUI rack closed, start the headless backend:
+
+```bash
+systemctl --user start music-rig-pedro-carla-headless.service
+```
+
+The optional Carla control GUI can then attach to the running OSC backend:
+
+```bash
+~/.local/bin/carla-pedro-osc-gui
+```
+
+Stop the backend before returning to the normal GUI rack:
+
+```bash
+systemctl --user stop music-rig-pedro-carla-headless.service
+```
+
+The headless service is not enabled automatically. Opening the project with a
+second normal Carla GUI would create a second engine instead of attaching to the
+headless backend.
+
 ## Pad Modes
 
 Use Bank A or Bank B on the Arturia pads. Pad switching matches MIDI channel 10
@@ -135,17 +169,22 @@ is off.
 
 ## Genre Modes
 
-Pads 4 through 16 select layer masks built from the existing Arturia instrument
-set. They do not replace the SMK-25, SMC-Mixer, SMC-PAD, or SMC-PAD Pocket
-profiles. Those controllers remain active with their existing behavior.
+Pads 4 through 16 load separate materialized Carla projects. Each project has
+nine concrete SoundFont or DecentSampler patches selected from the larger
+library, rather than reusing the nine live-rack patches. The exact source paths
+are recorded in `benchmarks/arturia-genre-patches.json`.
 
-Genre modes are currently represented as Arturia layer compositions. The live
-session runner swaps only Arturia layer audio links; it does not mute the shared
-master output.
+They do not replace the SMK-25, SMC-Mixer, SMC-PAD, or SMC-PAD Pocket profiles.
+Those controllers remain active with their existing behavior.
 
-In the tables below, `inactive` means that the corresponding existing Arturia
-instrument is not connected to the genre mix. The central encoder remains Master
-volume and its click remains Master mute in every mode.
+The live session runner swaps only Arturia layer audio links; it does not mute
+the shared master output. The complete musician-facing patch table is also
+included in the Performance Rig README at `src/performance-rigs/pedro-performance-rig/README.md`.
+
+The central encoder remains Master volume and its click remains Master mute in
+every mode. The older control-slot tables below describe the original live-rack
+layer controls; for the actual materialized genre patch names, use the table in
+the Performance Rig README.
 
 ### Worship Piano
 

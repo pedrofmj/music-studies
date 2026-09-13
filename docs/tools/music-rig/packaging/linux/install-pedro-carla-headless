@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../../../../.." && pwd)"
+readonly SERVICE_NAME="music-rig-pedro-carla-headless.service"
+readonly USER_BIN="${HOME}/.local/bin"
+readonly USER_UNIT="${HOME}/.config/systemd/user/${SERVICE_NAME}"
+
+uninstall=false
+
+usage() {
+    printf '%s\n' \
+        "Usage: $(basename "$0")" \
+        "       $(basename "$0") --uninstall" \
+        "" \
+        "Install the opt-in headless full-live-rack Carla user service." \
+        "The installer never enables or starts the service."
+}
+
+while (($#)); do
+    case $1 in
+        --uninstall)
+            uninstall=true
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            printf 'Unknown option: %s\n' "$1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
+
+if [[ $uninstall == true ]]; then
+    systemctl --user disable --now "$SERVICE_NAME" >/dev/null 2>&1 || true
+    rm -f "$USER_UNIT" "$USER_BIN/carla-pedro-headless" "$USER_BIN/carla-pedro-osc-gui"
+    systemctl --user daemon-reload
+    printf 'Removed %s.\n' "$SERVICE_NAME"
+    exit 0
+fi
+
+mkdir -p "$USER_BIN" "$(dirname -- "$USER_UNIT")"
+install -m 0755 "$REPO_ROOT/bin/carla-pedro-headless" "$USER_BIN/carla-pedro-headless"
+install -m 0755 "$REPO_ROOT/bin/carla-pedro-osc-gui" "$USER_BIN/carla-pedro-osc-gui"
+install -m 0644 "${SCRIPT_DIR}/music-rig-pedro-carla-headless.service" "$USER_UNIT"
+systemctl --user daemon-reload
+
+printf '%s\n' \
+    "Installed ${SERVICE_NAME}; it remains disabled and stopped." \
+    "Start: systemctl --user start ${SERVICE_NAME}" \
+    "GUI attach: ${USER_BIN}/carla-pedro-osc-gui" \
+    "Stop: systemctl --user stop ${SERVICE_NAME}" \
+    "Uninstall: $0 --uninstall"
