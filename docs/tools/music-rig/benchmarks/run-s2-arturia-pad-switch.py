@@ -160,6 +160,11 @@ def main() -> int:
     parser.add_argument("--setbfree-config", type=Path, required=True)
     parser.add_argument("--setbfree-library", type=Path, required=True)
     parser.add_argument("--genre-project-root", type=Path)
+    parser.add_argument(
+        "--control-fifo",
+        type=Path,
+        default=Path.home() / ".local/state/music-rig/arturia-profile-session/profile.fifo",
+    )
     parser.add_argument("--soundfont-workdir", type=Path,
                         default=Path.home() / ".local/share/carla/pedro-soundfonts")
     parser.add_argument("--duration-ms", type=int, default=0,
@@ -178,6 +183,8 @@ def main() -> int:
     candidate: subprocess.Popen[str] | None = None
     candidate_instance_id: str | None = None
     config_temporary = tempfile.TemporaryDirectory(prefix="music-rig-arturia-pad-config-")
+    fifo = arguments.control_fifo.expanduser()
+    fifo_fd = -1
     profiles_seen: list[str] = []
     current = "full-live-rack"
     audio_touched = False
@@ -196,7 +203,11 @@ def main() -> int:
     try:
         before = links(environment)
         keylab = find_keylab(environment)
-        fifo = Path(config_temporary.name) / "profile.fifo"
+        fifo.parent.mkdir(parents=True, exist_ok=True)
+        if fifo.exists():
+            if not fifo.is_fifo():
+                raise RuntimeError(f"control FIFO is not a FIFO: {fifo}")
+            fifo.unlink()
         os.mkfifo(fifo)
         fifo_fd = os.open(fifo, os.O_RDWR | os.O_NONBLOCK)
 
@@ -386,12 +397,14 @@ def main() -> int:
                     start_candidate(profile)
             time.sleep(0.02)
         restore_live()
-        os.close(fifo_fd)
     except KeyboardInterrupt:
         error = None
     except (OSError, RuntimeError) as failure:
         error = str(failure)
     finally:
+        if fifo_fd >= 0:
+            os.close(fifo_fd)
+        fifo.unlink(missing_ok=True)
         if candidate_instance_id is not None:
             run(["flatpak", "kill", candidate_instance_id], environment)
             candidate_instance_id = None
