@@ -34,6 +34,11 @@ docs/tools/airstar-live-setup/restore-protected-baseline
 Both commands above are read-only. Restoration requires an explicit
 `restore-protected-baseline --apply`.
 
+The installed Arturia selector has a live transition certification test. See
+[`packaging/linux/README.md`](packaging/linux/README.md#transition-certification)
+and run `benchmarks/certify-pad-transitions.py` on the target station before a
+performance rehearsal or after changing Carla, PipeWire, or genre projects.
+
 ## Build And Test
 
 Install the pinned authoring-only schema validator and build outside the

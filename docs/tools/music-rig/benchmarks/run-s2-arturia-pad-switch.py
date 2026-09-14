@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import datetime
 import hashlib
 import json
 import os
@@ -19,9 +20,16 @@ MIDI_TARGETS = (
     "Arturia Main Volume Encoder:relative-in",
     "AR Controls - Sustain Scale:events-in",
 )
+ROUTER_INPUT = "s2-arturia-profile-router:in"
 LSP_LEFT = "LSP Mixer x8 Stereo:Input L"
 LSP_RIGHT = "LSP Mixer x8 Stereo:Input R"
 MIDI_GUARD_INTERVAL_SECONDS = 0.5
+GENRE_PORT_REGISTRATION_TIMEOUT_SECONDS = 60.0
+DEFAULT_PIPEWIRE_QUANTUM = "1024"
+GENRE_PIPEWIRE_QUANTUM = "2048"
+FULL_CARLA_SERVICE = "music-rig-pedro-carla-headless.service"
+CARLA_PROCESS_PATTERN = "^/usr/bin/python3 /app/share/carla/carla "
+DEFAULT_DIAGNOSTIC_LOG = Path.home() / ".local/state/music-rig/arturia-profile-session/transition-events.jsonl"
 ARTURIA_AUDIO = (
     ("AR-CH-1 - Basic Piano:output_1", LSP_LEFT),
     ("AR-CH-1 - Basic Piano:output_2", LSP_RIGHT),
@@ -41,6 +49,17 @@ ARTURIA_AUDIO = (
     ("AR-CH-8 - PAD EFEITOS:out-right", LSP_RIGHT),
     ("AR-CH-9 - AtmosferaPAD:out-left", LSP_LEFT),
     ("AR-CH-9 - AtmosferaPAD:out-right", LSP_RIGHT),
+)
+MASTER_AUDIO = (
+    ("SMC-MIX - 8-Band EQ:Output L", "Arturia Main Volume Encoder:audio-in-l"),
+    ("SMC-MIX - 8-Band EQ:Output R", "Arturia Main Volume Encoder:audio-in-r"),
+)
+MASTER_CONTROL = (
+    ("Arturia Main Volume Encoder:absolute-out", "LSP Mixer x8 Stereo:events-in"),
+)
+SHARED_AUDIO = (
+    ("LSP Mixer x8 Stereo:Output L", "SMC-MIX - 8-Band EQ:Input L"),
+    ("LSP Mixer x8 Stereo:Output R", "SMC-MIX - 8-Band EQ:Input R"),
 )
 PAD_PROFILES = {
     1: "tonewheel-organ-setbfree",
@@ -90,11 +109,78 @@ def run(command: list[str], environment: dict[str, str]) -> subprocess.Completed
         return subprocess.CompletedProcess(command, 124, output, output)
 
 
+def diagnostic_event(path: Path, event: str, **fields: object) -> None:
+    payload = {
+        "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "event": event,
+        "pid": os.getpid(),
+        **fields,
+    }
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(payload, sort_keys=True) + "\n")
+    except OSError:
+        pass
+
+
 def links(environment: dict[str, str]) -> str:
     result = run(["pw-link", "-l"], environment)
     if result.returncode != 0:
         raise RuntimeError(result.stdout)
     return result.stdout
+
+
+def set_pipewire_quantum(value: str, environment: dict[str, str]) -> None:
+    run(["pw-metadata", "-n", "settings", "0", "clock.force-quantum", value], environment)
+
+
+def systemd_user(action: str, unit: str, environment: dict[str, str]) -> None:
+    result = run(["systemctl", "--user", action, unit], environment)
+    if result.returncode != 0:
+        raise RuntimeError(result.stdout)
+
+
+def stop_systemd_user(unit: str, environment: dict[str, str]) -> None:
+    run(["systemctl", "--user", "stop", unit], environment)
+
+
+def wait_for_carla(present: bool, environment: dict[str, str], timeout: float = 30.0) -> None:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        running = run(["pgrep", "-f", CARLA_PROCESS_PATTERN], environment).returncode == 0
+        if running == present:
+            return
+        time.sleep(0.25)
+    state = "register" if present else "exit"
+    raise RuntimeError(f"Carla did not {state} within {timeout:g} seconds")
+
+
+def terminate_carla_processes(environment: dict[str, str]) -> None:
+    for signal_number in (signal.SIGTERM, signal.SIGKILL):
+        result = run(["pgrep", "-f", CARLA_PROCESS_PATTERN], environment)
+        for value in result.stdout.split():
+            try:
+                os.kill(int(value), signal_number)
+            except (ProcessLookupError, PermissionError, ValueError):
+                pass
+        try:
+            wait_for_carla(False, environment, timeout=8.0)
+            return
+        except RuntimeError:
+            continue
+    raise RuntimeError("Carla backend could not be terminated")
+
+
+def wait_for_ports(tokens: tuple[str, ...], environment: dict[str, str], timeout: float = 45.0) -> None:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        outputs = run(["pw-link", "-o"], environment).stdout
+        inputs = run(["pw-link", "-i"], environment).stdout
+        if all(token in outputs or token in inputs for token in tokens):
+            return
+        time.sleep(0.25)
+    raise RuntimeError(f"audio base ports did not register: {tokens}")
 
 
 def normalized_links(snapshot: str) -> str:
@@ -127,11 +213,17 @@ def link_present(snapshot: str, source: str, target: str) -> bool:
 
 
 def connect(source: str, target: str, environment: dict[str, str]) -> None:
-    if link_present(links(environment), source, target):
-        return
-    result = run(["pw-link", source, target], environment)
-    if result.returncode != 0 and "Arquivo existe" not in result.stdout and "File exists" not in result.stdout:
-        raise RuntimeError(result.stdout)
+    deadline = time.monotonic() + 15.0
+    last_error = ""
+    while time.monotonic() < deadline:
+        if link_present(links(environment), source, target):
+            return
+        result = run(["pw-link", source, target], environment)
+        if result.returncode == 0 or "Arquivo existe" in result.stdout or "File exists" in result.stdout:
+            return
+        last_error = result.stdout
+        time.sleep(0.25)
+    raise RuntimeError(f"failed to link {source} -> {target}: {last_error}")
 
 
 def disconnect(source: str, target: str, environment: dict[str, str]) -> None:
@@ -165,6 +257,7 @@ def main() -> int:
         type=Path,
         default=Path.home() / ".local/state/music-rig/arturia-profile-session/profile.fifo",
     )
+    parser.add_argument("--diagnostic-log", type=Path, default=DEFAULT_DIAGNOSTIC_LOG)
     parser.add_argument("--soundfont-workdir", type=Path,
                         default=Path.home() / ".local/share/carla/pedro-soundfonts")
     parser.add_argument("--duration-ms", type=int, default=0,
@@ -177,6 +270,8 @@ def main() -> int:
     environment = os.environ.copy()
     environment.setdefault("XDG_RUNTIME_DIR", "/run/user/50001")
     environment.setdefault("DBUS_SESSION_BUS_ADDRESS", "unix:path=/run/user/50001/bus")
+    diagnostic_log = arguments.diagnostic_log.expanduser()
+    diagnostic_event(diagnostic_log, "session-start", output=str(arguments.output))
     before = ""
     keylab = ""
     router: subprocess.Popen[str] | None = None
@@ -186,12 +281,14 @@ def main() -> int:
     fifo = arguments.control_fifo.expanduser()
     fifo_fd = -1
     profiles_seen: list[str] = []
+    transition_failures: list[dict[str, str]] = []
     current = "full-live-rack"
     audio_touched = False
     active_arturia_layers = set(range(1, 10))
     stop_requested = False
     error: str | None = None
     last_midi_guard = 0.0
+    genre_quantum_changed = False
 
     def request_stop(signal_number: int, frame: object) -> None:
         nonlocal stop_requested
@@ -218,14 +315,20 @@ def main() -> int:
         time.sleep(2.0)
         for target in MIDI_TARGETS:
             disconnect(keylab, target, environment)
-        connect(keylab, "s2-arturia-profile-router:in", environment)
+        connect(keylab, ROUTER_INPUT, environment)
         connect("s2-arturia-profile-router:out", MIDI_TARGETS[0], environment)
         connect("s2-arturia-profile-router:out", MIDI_TARGETS[1], environment)
 
         def stop_candidate() -> None:
-            nonlocal candidate, candidate_instance_id
+            nonlocal candidate, candidate_instance_id, current
+            was_genre_candidate = current in GENRE_ACTIVE_LAYERS or candidate_instance_id is not None
+            if candidate is not None:
+                was_genre_candidate = was_genre_candidate or any(
+                    "genre-projects" in str(argument) for argument in candidate.args
+                )
             if candidate_instance_id is not None:
                 run(["flatpak", "kill", candidate_instance_id], environment)
+                run(["flatpak", "kill", "studio.kx.carla"], environment)
                 candidate_instance_id = None
             if candidate is not None and candidate.poll() is None:
                 candidate.send_signal(signal.SIGTERM)
@@ -238,10 +341,30 @@ def main() -> int:
                         candidate.kill()
                     candidate.wait()
             candidate = None
+            if was_genre_candidate:
+                terminate_carla_processes(environment)
+
+        def ensure_full_audio() -> None:
+            systemd_user("start", FULL_CARLA_SERVICE, environment)
+            wait_for_carla(True, environment)
+            wait_for_ports(("AR-CH-1 - Basic Piano:output_1", "SMC-MIX - 8-Band EQ:Output L"), environment)
+            for source, target in MASTER_AUDIO:
+                connect(source, target, environment)
+            for source, target in MASTER_CONTROL:
+                connect(source, target, environment)
+            for source, target in SHARED_AUDIO:
+                connect(source, target, environment)
 
         def restore_live() -> None:
-            nonlocal current, audio_touched, active_arturia_layers
+            nonlocal current, audio_touched, active_arturia_layers, genre_quantum_changed
+            was_genre = current in GENRE_ACTIVE_LAYERS
             stop_candidate()
+            if was_genre:
+                wait_for_carla(False, environment)
+            ensure_full_audio()
+            if genre_quantum_changed:
+                set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
+                genre_quantum_changed = False
             if audio_touched:
                 for source, target in ARTURIA_AUDIO:
                     connect(source, target, environment)
@@ -250,17 +373,36 @@ def main() -> int:
             for target in MIDI_TARGETS:
                 disconnect("s2-arturia-profile-router:out", target, environment)
                 connect("s2-arturia-profile-router:out", target, environment)
+            for source, target in MASTER_CONTROL:
+                connect(source, target, environment)
             current = "full-live-rack"
 
         def start_candidate(profile: str) -> None:
-            nonlocal candidate, candidate_instance_id, current, audio_touched, active_arturia_layers
+            nonlocal candidate, candidate_instance_id, current, audio_touched
+            nonlocal active_arturia_layers, genre_quantum_changed
+            was_genre = current in GENRE_ACTIVE_LAYERS
             stop_candidate()
+            if was_genre:
+                wait_for_carla(False, environment)
+            if profile in GENRE_ACTIVE_LAYERS:
+                stop_systemd_user(FULL_CARLA_SERVICE, environment)
+                wait_for_carla(False, environment)
+            else:
+                ensure_full_audio()
+            if profile in GENRE_ACTIVE_LAYERS:
+                set_pipewire_quantum(GENRE_PIPEWIRE_QUANTUM, environment)
+                genre_quantum_changed = True
+            elif genre_quantum_changed:
+                set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
+                genre_quantum_changed = False
             for source, target in ARTURIA_AUDIO:
                 disconnect(source, target, environment)
             audio_touched = True
             active_arturia_layers = set()
             for target in MIDI_TARGETS:
                 disconnect("s2-arturia-profile-router:out", target, environment)
+            if profile in GENRE_ACTIVE_LAYERS:
+                connect("s2-arturia-profile-router:out", MIDI_TARGETS[0], environment)
             if profile == "synth-programmer-synthv1":
                 config_home = Path(config_temporary.name) / "synth-config"
                 config_file = config_home / "rncbc.org" / "synthv1.conf"
@@ -306,11 +448,24 @@ def main() -> int:
                     )
                 finally:
                     os.close(instance_write)
+                os.set_blocking(instance_read, False)
                 try:
-                    candidate_instance_id = os.read(instance_read, 256).decode().strip()
+                    instance_deadline = time.monotonic() + GENRE_PORT_REGISTRATION_TIMEOUT_SECONDS
+                    while time.monotonic() < instance_deadline:
+                        try:
+                            candidate_instance_id = os.read(instance_read, 256).decode().strip()
+                        except BlockingIOError:
+                            if candidate.poll() is not None:
+                                raise RuntimeError("genre Carla exited before registering")
+                            time.sleep(0.2)
+                            continue
+                        if candidate_instance_id:
+                            break
+                    else:
+                        raise RuntimeError("genre Carla instance did not register")
                 finally:
                     os.close(instance_read)
-                deadline = time.monotonic() + 20.0
+                deadline = time.monotonic() + GENRE_PORT_REGISTRATION_TIMEOUT_SECONDS
                 midi_inputs: list[str] = []
                 midi_control_inputs: list[str] = []
                 midi_control_outputs: list[str] = []
@@ -341,8 +496,6 @@ def main() -> int:
                     time.sleep(0.2)
                 else:
                     raise RuntimeError("genre Carla ports did not register")
-                for target in MIDI_TARGETS:
-                    connect("s2-arturia-profile-router:out", target, environment)
                 for target in sorted(midi_inputs):
                     connect("s2-arturia-profile-router:out", target, environment)
                 for target in sorted(midi_control_inputs):
@@ -358,6 +511,10 @@ def main() -> int:
                     target = LSP_LEFT if any(token in output for token in
                                              (":output_1", ":out-left")) else LSP_RIGHT
                     connect(output, target, environment)
+                for source, target in SHARED_AUDIO:
+                    connect(source, target, environment)
+                for source, target in MASTER_AUDIO:
+                    connect(source, target, environment)
                 active_arturia_layers = set()
                 current = profile
                 profiles_seen.append(profile)
@@ -373,14 +530,21 @@ def main() -> int:
             current = profile
             profiles_seen.append(profile)
 
+        ensure_full_audio()
         deadline = time.monotonic() + arguments.duration_ms / 1000.0
         while not stop_requested and (arguments.duration_ms == 0 or time.monotonic() < deadline):
             # Keep the management input exclusive while the watcher observes
             # graph events. Normal keyboard/CC data still flows via the router.
             now = time.monotonic()
             if now - last_midi_guard >= MIDI_GUARD_INTERVAL_SECONDS:
+                try:
+                    keylab = find_keylab(environment)
+                except RuntimeError:
+                    pass
                 for target in MIDI_TARGETS:
                     disconnect(keylab, target, environment)
+                if not link_present(links(environment), keylab, ROUTER_INPUT):
+                    run(["pw-link", keylab, ROUTER_INPUT], environment)
                 last_midi_guard = now
             if audio_touched:
                 for index, (source, target) in enumerate(ARTURIA_AUDIO):
@@ -394,14 +558,78 @@ def main() -> int:
                 code = profile_code[0]
                 profile = PAD_PROFILES.get(code)
                 if profile is not None and profile != current:
-                    start_candidate(profile)
+                    diagnostic_event(
+                        diagnostic_log,
+                        "transition-start",
+                        from_profile=current,
+                        requested_profile=profile,
+                    )
+                    try:
+                        start_candidate(profile)
+                        diagnostic_event(
+                            diagnostic_log,
+                            "transition-pass",
+                            profile=profile,
+                        )
+                    except (OSError, RuntimeError) as failure:
+                        transition_failures.append({
+                            "requested_profile": profile,
+                            "error": str(failure),
+                        })
+                        print(json.dumps({
+                            "requested_profile": profile,
+                            "error": str(failure),
+                            "status": "transition-fail-recovering",
+                        }), flush=True)
+                        diagnostic_event(
+                            diagnostic_log,
+                            "transition-fail",
+                            requested_profile=profile,
+                            error=str(failure),
+                            recovery="started",
+                        )
+                        try:
+                            restore_live()
+                            diagnostic_event(
+                                diagnostic_log,
+                                "transition-recovered",
+                                requested_profile=profile,
+                                final_profile=current,
+                            )
+                        except (OSError, RuntimeError) as recovery_failure:
+                            transition_failures.append({
+                                "requested_profile": "full-live-rack",
+                                "error": str(recovery_failure),
+                            })
+                            diagnostic_event(
+                                diagnostic_log,
+                                "recovery-fail",
+                                requested_profile=profile,
+                                error=str(recovery_failure),
+                            )
+                            stop_requested = True
             time.sleep(0.02)
         restore_live()
     except KeyboardInterrupt:
         error = None
     except (OSError, RuntimeError) as failure:
         error = str(failure)
+        diagnostic_event(diagnostic_log, "session-error", error=error, profile=current)
     finally:
+        full_active = run(
+            ["systemctl", "--user", "is-active", FULL_CARLA_SERVICE], environment
+        ).returncode == 0
+        if audio_touched and not full_active:
+            try:
+                stop_candidate()
+                wait_for_carla(False, environment)
+                ensure_full_audio()
+            except (OSError, RuntimeError) as failure:
+                if error is None:
+                    error = str(failure)
+        if genre_quantum_changed:
+            set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
+            genre_quantum_changed = False
         if fifo_fd >= 0:
             os.close(fifo_fd)
         fifo.unlink(missing_ok=True)
@@ -420,18 +648,27 @@ def main() -> int:
         if keylab:
             disconnect(keylab, "s2-arturia-profile-router:in", environment)
             for target in MIDI_TARGETS:
-                connect(keylab, target, environment)
+                try:
+                    connect(keylab, target, environment)
+                except RuntimeError as failure:
+                    if error is None:
+                        error = str(failure)
         for target in MIDI_TARGETS:
             disconnect("s2-arturia-profile-router:out", target, environment)
         if audio_touched:
             for source, target in ARTURIA_AUDIO:
-                connect(source, target, environment)
+                try:
+                    connect(source, target, environment)
+                except RuntimeError as failure:
+                    if error is None:
+                        error = str(failure)
 
     after = links(environment) if before else ""
     normalized_before = normalized_links(before)
     normalized_after = normalized_links(after)
     result = {
         "profiles_seen": profiles_seen,
+        "transition_failures": transition_failures,
         "final_profile": current,
         "duration_ms": arguments.duration_ms,
         "error": error,
@@ -440,8 +677,16 @@ def main() -> int:
         "before_links_sha256": hashlib.sha256(normalized_before.encode()).hexdigest() if before else None,
         "after_links_sha256": hashlib.sha256(normalized_after.encode()).hexdigest() if after else None,
         "schema": "music-studies/s2-arturia-pad-switch/v1",
-        "status": "pad-switch-window-pass" if error is None and normalized_before == normalized_after else "pad-switch-window-fail",
+        "status": "pad-switch-window-pass" if error is None and not transition_failures and normalized_before == normalized_after else "pad-switch-window-fail",
     }
+    diagnostic_event(
+        diagnostic_log,
+        "session-end",
+        status=result["status"],
+        error=error,
+        final_profile=current,
+        transition_failures=transition_failures,
+    )
     arguments.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0 if result["status"] == "pad-switch-window-pass" else 1

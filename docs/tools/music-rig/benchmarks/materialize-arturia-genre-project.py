@@ -16,6 +16,14 @@ AR_PREFIX = "AR-CH-"
 CHUNK_PREFIX = b"VC2!\x10\r\x00\x00"
 
 
+def excluded_name(name: str) -> bool:
+    return (
+        name.startswith(AR_PREFIX)
+        or name.startswith("AR Controls")
+        or name.startswith("Arturia Main Volume Encoder")
+    )
+
+
 def load(path: Path):
     with path.open("r", encoding="utf-8") as source:
         return json.load(source)
@@ -53,6 +61,16 @@ def main() -> int:
 
         project = ET.parse(source)
         root = project.getroot()
+        engine_settings = root.find("EngineSettings")
+        if engine_settings is not None:
+            engine_settings.find("PreferUiBridges").text = "false"
+            engine_settings.find("UIBridgesTimeout").text = "1000"
+        for plugin in root.findall("Plugin"):
+            if plugin.findtext("Info/Name") != "LSP Mixer x8 Stereo":
+                continue
+            for parameter in plugin.findall("Data/Parameter"):
+                if parameter.findtext("Symbol") == "g_out":
+                    parameter.find("Value").text = "1"
         arturia_plugins = [
             plugin for plugin in root.findall("Plugin")
             if (plugin.findtext("Info/Name") or "").startswith(AR_PREFIX)
@@ -92,10 +110,15 @@ def main() -> int:
                 retained_maps.append(retained)
 
         for child in list(root):
-            if child.tag == "Plugin" and child not in arturia_plugins and child not in map_plugins.values():
+            if (child.tag == "Plugin" and child not in arturia_plugins
+                    and excluded_name(child.findtext("Info/Name") or "")):
                 root.remove(child)
             elif child.tag == "ExternalPatchbay":
-                root.remove(child)
+                for connection in list(child):
+                    source_name = connection.findtext("Source") or ""
+                    target_name = connection.findtext("Target") or ""
+                    if excluded_name(source_name) or excluded_name(target_name):
+                        child.remove(connection)
 
         for retained in retained_maps:
             root.append(retained)

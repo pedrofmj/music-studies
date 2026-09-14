@@ -7,6 +7,8 @@ readonly SERVICE_NAME="music-rig-arturia-profile-session.service"
 readonly INSTALL_ROOT="${HOME}/.local/share/music-rig/arturia-profile-session"
 readonly SERVICE_ROOT="${HOME}/.config/systemd/user"
 readonly SERVICE_SOURCE="${SCRIPT_DIR}/${SERVICE_NAME}"
+readonly CRASH_REPORT_SOURCE="${SCRIPT_DIR}/music-rig-arturia-profile-crash-report"
+readonly USER_BIN_ROOT="${HOME}/.local/bin"
 
 candidate_root=""
 genre_project_root=""
@@ -62,6 +64,7 @@ done
 if [[ $uninstall == true ]]; then
     systemctl --user disable --now "$SERVICE_NAME" >/dev/null 2>&1 || true
     rm -f "${SERVICE_ROOT}/${SERVICE_NAME}"
+    rm -f "${USER_BIN_ROOT}/music-rig-arturia-profile-crash-report"
     systemctl --user daemon-reload
     printf 'Removed %s; no candidate process is running.\n' "$SERVICE_NAME"
     exit 0
@@ -90,7 +93,7 @@ else
     [[ -f $ROUTER_SOURCE ]] || { printf 'Router source is missing: %s\n' "$ROUTER_SOURCE" >&2; exit 1; }
 fi
 
-mkdir -p "$INSTALL_ROOT" "$SERVICE_ROOT"
+mkdir -p "$INSTALL_ROOT" "$SERVICE_ROOT" "$USER_BIN_ROOT"
 install -m 0755 "${REPO_ROOT}/docs/tools/music-rig/benchmarks/run-s2-arturia-pad-switch.py" \
     "${INSTALL_ROOT}/run-s2-arturia-pad-switch.py"
 install -m 0644 "$SYNTHV1_PRESET" "${INSTALL_ROOT}/50_SynthRemember.synthv1"
@@ -98,6 +101,8 @@ install -m 0644 "$SYNTHV1_CONTROLS" "${INSTALL_ROOT}/synthv1-keylab-controls.con
 install -m 0644 "$SETBFREE_CONFIG" "${INSTALL_ROOT}/setbfree-keylab-controls.cfg"
 install -m 0755 "$SYNTHV1_SOURCE" "${INSTALL_ROOT}/synthv1_jack"
 install -m 0755 "$SETBFREE_SOURCE" "${INSTALL_ROOT}/setBfree"
+install -m 0755 "$CRASH_REPORT_SOURCE" \
+    "${USER_BIN_ROOT}/music-rig-arturia-profile-crash-report"
 rm -rf "${INSTALL_ROOT}/setbfree-lib"
 cp -a "$SETBFREE_LIB" "${INSTALL_ROOT}/setbfree-lib"
 rm -rf "${INSTALL_ROOT}/genre-projects"

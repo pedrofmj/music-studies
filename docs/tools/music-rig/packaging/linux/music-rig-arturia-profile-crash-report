@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -u
+
+readonly REPORT_ROOT="${HOME}/.local/state/music-rig/arturia-profile-session/reports"
+readonly STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+readonly REPORT="${REPORT_ROOT}/session-${STAMP}.log"
+
+mkdir -p "$REPORT_ROOT"
+{
+    printf 'timestamp_utc=%s\n' "$STAMP"
+    printf 'service_result=%s\n' "${SERVICE_RESULT:-unknown}"
+    printf 'exit_code=%s\n' "${EXIT_CODE:-unknown}"
+    printf 'exit_status=%s\n' "${EXIT_STATUS:-unknown}"
+    printf '\n[systemd]\n'
+    systemctl --user show music-rig-arturia-profile-session.service \
+        -p ActiveState -p SubState -p Result -p ExecMainCode -p ExecMainStatus \
+        -p MainPID -p NRestarts --no-pager || true
+    printf '\n[journal]\n'
+    journalctl --user -u music-rig-arturia-profile-session.service -n 200 --no-pager || true
+    printf '\n[pipewire]\n'
+    wpctl status -n || true
+    printf '\n[pipewire-metadata]\n'
+    pw-metadata -n settings 0 || true
+    printf '\n[links]\n'
+    pw-link -l || true
+} >"$REPORT" 2>&1
+
+printf '%s\n' "$REPORT"
