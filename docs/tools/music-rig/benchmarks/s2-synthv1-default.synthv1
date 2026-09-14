@@ -1,0 +1,12 @@
+<!DOCTYPE synthv1>
+<preset><params>
+<param index="0" name="DCO1_BALANCE">0.5</param>
+<param index="1" name="DCO2_BALANCE">0.5</param>
+<param index="2" name="DCF1_CUTOFF">0.5</param>
+<param index="3" name="DCF1_RESO">0.25</param>
+<param index="4" name="DCA1_ATTACK">0.1</param>
+<param index="5" name="DCA1_RELEASE">0.5</param>
+<param index="6" name="LFO1_BALANCE">0.5</param>
+<param index="7" name="LFO1_RATE">0.25</param>
+<param index="8" name="OUT1_VOLUME">1.0</param>
+</params></preset>
