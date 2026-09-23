@@ -96,6 +96,18 @@ GENRE_ACTIVE_LAYERS = {
     "praise-leads": (1, 6, 7, 8, 9),
     "acoustic-worship": (1, 2, 3, 4, 6, 9),
 }
+FAST_ENGINE_PROFILES = {
+    "synth-programmer-synthv1": (
+        "s2-synthv1-live:in",
+        "s2-synthv1-live:out_1",
+        "s2-synthv1-live:out_2",
+    ),
+    "tonewheel-organ-setbfree": (
+        "setBfree:midi_in",
+        "setBfree:out_left",
+        "setBfree:out_right",
+    ),
+}
 
 
 def run(command: list[str], environment: dict[str, str]) -> subprocess.CompletedProcess[str]:
@@ -244,6 +256,12 @@ def find_keylab(environment: dict[str, str]) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--acknowledge-live-routing", action="store_true")
+    parser.add_argument(
+        "--transition-mode",
+        choices=("safe", "fast"),
+        default=os.environ.get("MUSIC_RIG_TRANSITION_MODE", "safe"),
+        help="safe rebuilds engines per transition; fast keeps SynthV1 and setBfree warm",
+    )
     parser.add_argument("--router", type=Path, required=True)
     parser.add_argument("--synthv1", type=Path, required=True)
     parser.add_argument("--synthv1-preset", type=Path, required=True)
@@ -285,6 +303,8 @@ def main() -> int:
     current = "full-live-rack"
     audio_touched = False
     active_arturia_layers = set(range(1, 10))
+    fast_mode_enabled = arguments.transition_mode == "fast"
+    warm_candidates: dict[str, subprocess.Popen[str]] = {}
     stop_requested = False
     error: str | None = None
     last_midi_guard = 0.0
@@ -344,6 +364,117 @@ def main() -> int:
             if was_genre_candidate:
                 terminate_carla_processes(environment)
 
+        def start_synth_engine() -> subprocess.Popen[str]:
+            config_home = Path(config_temporary.name) / "synth-config"
+            config_file = config_home / "rncbc.org" / "synthv1.conf"
+            config_file.parent.mkdir(parents=True, exist_ok=True)
+            config_file.write_bytes(arguments.synthv1_controls.read_bytes())
+            candidate_environment = dict(environment)
+            candidate_environment["XDG_CONFIG_HOME"] = str(config_home)
+            process = subprocess.Popen(
+                ["/usr/bin/pw-jack", str(arguments.synthv1), "--no-gui",
+                 "--client-name", "s2-synthv1-live", str(arguments.synthv1_preset)],
+                env=candidate_environment, stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL, text=True, start_new_session=True,
+            )
+            wait_for_ports(FAST_ENGINE_PROFILES["synth-programmer-synthv1"], environment)
+            return process
+
+        def start_setbfree_engine() -> subprocess.Popen[str]:
+            candidate_environment = dict(environment)
+            candidate_environment["LD_LIBRARY_PATH"] = str(arguments.setbfree_library)
+            process = subprocess.Popen(
+                ["/usr/bin/pw-jack", str(arguments.setbfree), "-C", "-c",
+                 str(arguments.setbfree_config), "jack.connect="],
+                env=candidate_environment, stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL, text=True, start_new_session=True,
+            )
+            wait_for_ports(FAST_ENGINE_PROFILES["tonewheel-organ-setbfree"], environment)
+            return process
+
+        def stop_warm_engines() -> None:
+            for process in list(warm_candidates.values()):
+                if process.poll() is not None:
+                    continue
+                process.send_signal(signal.SIGTERM)
+                try:
+                    process.wait(timeout=3.0)
+                except subprocess.TimeoutExpired:
+                    try:
+                        os.killpg(process.pid, signal.SIGKILL)
+                    except (PermissionError, ProcessLookupError):
+                        process.kill()
+                    process.wait()
+            warm_candidates.clear()
+
+        def start_warm_engines() -> None:
+            try:
+                warm_candidates["synth-programmer-synthv1"] = start_synth_engine()
+                warm_candidates["tonewheel-organ-setbfree"] = start_setbfree_engine()
+            except (OSError, RuntimeError):
+                stop_warm_engines()
+                raise
+
+        def fast_switch_engine(profile: str) -> None:
+            nonlocal current, audio_touched, active_arturia_layers
+            if profile not in FAST_ENGINE_PROFILES:
+                raise RuntimeError(f"Fast mode does not support profile: {profile}")
+            if profile not in warm_candidates or warm_candidates[profile].poll() is not None:
+                raise RuntimeError(f"Warm engine is not running: {profile}")
+            if current == "full-live-rack" and not audio_touched:
+                for source, target in ARTURIA_AUDIO:
+                    disconnect(source, target, environment)
+                audio_touched = True
+            for engine_input, left_output, right_output in FAST_ENGINE_PROFILES.values():
+                disconnect("s2-arturia-profile-router:out", engine_input, environment)
+                disconnect(left_output, LSP_LEFT, environment)
+                disconnect(right_output, LSP_RIGHT, environment)
+            for target in MIDI_TARGETS:
+                disconnect("s2-arturia-profile-router:out", target, environment)
+            engine_input, left_output, right_output = FAST_ENGINE_PROFILES[profile]
+            connect("s2-arturia-profile-router:out", engine_input, environment)
+            connect("s2-arturia-profile-router:out", MIDI_TARGETS[0], environment)
+            connect(left_output, LSP_LEFT, environment)
+            connect(right_output, LSP_RIGHT, environment)
+            active_arturia_layers = set()
+            current = profile
+            profiles_seen.append(profile)
+
+        def fast_restore_full() -> None:
+            nonlocal current, audio_touched, active_arturia_layers
+            for engine_input, left_output, right_output in FAST_ENGINE_PROFILES.values():
+                disconnect("s2-arturia-profile-router:out", engine_input, environment)
+                disconnect(left_output, LSP_LEFT, environment)
+                disconnect(right_output, LSP_RIGHT, environment)
+            ensure_full_audio()
+            if audio_touched:
+                for source, target in ARTURIA_AUDIO:
+                    connect(source, target, environment)
+                audio_touched = False
+            active_arturia_layers = set(range(1, 10))
+            for target in MIDI_TARGETS:
+                disconnect("s2-arturia-profile-router:out", target, environment)
+                connect("s2-arturia-profile-router:out", target, environment)
+            for source, target in MASTER_CONTROL:
+                connect(source, target, environment)
+            current = "full-live-rack"
+
+        def restore_independent_device_routes() -> None:
+            tool = Path.home() / "bin/pipewire-patchbay-json"
+            if tool.is_file():
+                try:
+                    subprocess.run(
+                        [str(tool), "--check-and-restore"],
+                        env=environment,
+                        check=False,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        text=True,
+                        timeout=20.0,
+                    )
+                except subprocess.TimeoutExpired:
+                    diagnostic_event(diagnostic_log, "independent-route-restore-timeout")
+
         def ensure_full_audio() -> None:
             systemd_user("start", FULL_CARLA_SERVICE, environment)
             wait_for_carla(True, environment)
@@ -354,6 +485,7 @@ def main() -> int:
                 connect(source, target, environment)
             for source, target in SHARED_AUDIO:
                 connect(source, target, environment)
+            restore_independent_device_routes()
 
         def restore_live() -> None:
             nonlocal current, audio_touched, active_arturia_layers, genre_quantum_changed
@@ -380,6 +512,13 @@ def main() -> int:
         def start_candidate(profile: str) -> None:
             nonlocal candidate, candidate_instance_id, current, audio_touched
             nonlocal active_arturia_layers, genre_quantum_changed
+            if fast_mode_enabled and profile in FAST_ENGINE_PROFILES:
+                if current == "full-live-rack" or current in FAST_ENGINE_PROFILES:
+                    fast_switch_engine(profile)
+                    return
+            if fast_mode_enabled and profile == "full-live-rack" and current in FAST_ENGINE_PROFILES:
+                fast_restore_full()
+                return
             was_genre = current in GENRE_ACTIVE_LAYERS
             stop_candidate()
             if was_genre:
@@ -515,6 +654,7 @@ def main() -> int:
                     connect(source, target, environment)
                 for source, target in MASTER_AUDIO:
                     connect(source, target, environment)
+                restore_independent_device_routes()
                 active_arturia_layers = set()
                 current = profile
                 profiles_seen.append(profile)
@@ -531,6 +671,13 @@ def main() -> int:
             profiles_seen.append(profile)
 
         ensure_full_audio()
+        if fast_mode_enabled:
+            try:
+                start_warm_engines()
+                diagnostic_event(diagnostic_log, "fast-mode-enabled", warm_profiles=sorted(warm_candidates))
+            except (OSError, RuntimeError) as failure:
+                fast_mode_enabled = False
+                diagnostic_event(diagnostic_log, "fast-mode-fallback", error=str(failure))
         deadline = time.monotonic() + arguments.duration_ms / 1000.0
         while not stop_requested and (arguments.duration_ms == 0 or time.monotonic() < deadline):
             # Keep the management input exclusive while the watcher observes
@@ -572,6 +719,10 @@ def main() -> int:
                             profile=profile,
                         )
                     except (OSError, RuntimeError) as failure:
+                        if fast_mode_enabled:
+                            fast_mode_enabled = False
+                            stop_warm_engines()
+                            diagnostic_event(diagnostic_log, "fast-mode-fallback", error=str(failure))
                         transition_failures.append({
                             "requested_profile": profile,
                             "error": str(failure),
@@ -616,6 +767,7 @@ def main() -> int:
         error = str(failure)
         diagnostic_event(diagnostic_log, "session-error", error=error, profile=current)
     finally:
+        stop_warm_engines()
         full_active = run(
             ["systemctl", "--user", "is-active", FULL_CARLA_SERVICE], environment
         ).returncode == 0
