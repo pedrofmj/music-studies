@@ -315,6 +315,15 @@ def port_ids(direction: str, environment: dict[str, str]) -> dict[str, int]:
 def connect_by_current_ids(source: str, target: str, environment: dict[str, str]) -> None:
     output_ids = port_ids("-o", environment)
     input_ids = port_ids("-i", environment)
+    output_id = output_ids.get(source)
+    input_id = input_ids.get(target)
+    if output_id is not None and input_id is not None:
+        result = run(["pw-link", str(output_id), str(input_id)], environment)
+        if result.returncode == 0 or "File exists" in result.stdout or "Arquivo existe" in result.stdout:
+            return
+        raise RuntimeError(
+            f"PipeWire ID link failed {output_id}->{input_id} for {source} -> {target}: {result.stdout}"
+        )
     if connect_with_ids(source, target, output_ids, input_ids, environment):
         return
     connect(source, target, environment)
