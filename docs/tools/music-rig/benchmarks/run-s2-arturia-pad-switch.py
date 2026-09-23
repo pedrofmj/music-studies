@@ -263,6 +263,17 @@ def link_present(snapshot: str, source: str, target: str) -> bool:
     return False
 
 
+def wait_for_links_absent(connections: tuple[tuple[str, str], ...],
+                          environment: dict[str, str], timeout: float = 5.0) -> None:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        snapshot = links(environment)
+        if all(not link_present(snapshot, source, target) for source, target in connections):
+            return
+        time.sleep(0.05)
+    raise RuntimeError("PipeWire links did not disconnect before the next route was connected")
+
+
 def connect(source: str, target: str, environment: dict[str, str]) -> None:
     deadline = time.monotonic() + 15.0
     last_error = ""
@@ -733,6 +744,7 @@ def main() -> int:
             if current == "full-live-rack" and not audio_touched:
                 for source, target in ARTURIA_AUDIO:
                     disconnect(source, target, environment)
+                wait_for_links_absent(ARTURIA_AUDIO, environment)
                 audio_touched = True
             for engine_input, left_output, right_output in FAST_ENGINE_PROFILES.values():
                 disconnect("s2-arturia-profile-router:out", engine_input, environment)
@@ -765,6 +777,7 @@ def main() -> int:
             if current == "full-live-rack" and not audio_touched:
                 for source, target in ARTURIA_AUDIO:
                     disconnect(source, target, environment)
+                wait_for_links_absent(ARTURIA_AUDIO, environment)
                 audio_touched = True
             for engine_input, left_output, right_output in FAST_ENGINE_PROFILES.values():
                 disconnect("s2-arturia-profile-router:out", engine_input, environment)
