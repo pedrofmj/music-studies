@@ -571,7 +571,6 @@ def main() -> int:
             connect_many(genre_route_connections(warm), environment)
             connect_many(SHARED_AUDIO, environment)
             connect_many(MASTER_AUDIO, environment)
-            restore_independent_device_routes()
 
         def disconnect_warmed_genre(warm: WarmedGenre) -> None:
             for source, target in genre_route_connections(warm):
@@ -654,7 +653,6 @@ def main() -> int:
             if was_warmed_genre:
                 connect_many(SHARED_AUDIO, environment)
                 connect_many(MASTER_AUDIO, environment)
-                restore_independent_device_routes()
                 if genre_quantum_changed:
                     set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
                     genre_quantum_changed = False
@@ -696,7 +694,6 @@ def main() -> int:
             if current in warmed_genres:
                 disconnect_warmed_genre(warmed_genres[current])
             ensure_full_audio(restore_independent=False)
-            restore_independent_device_routes()
             if genre_quantum_changed:
                 set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
                 genre_quantum_changed = False
