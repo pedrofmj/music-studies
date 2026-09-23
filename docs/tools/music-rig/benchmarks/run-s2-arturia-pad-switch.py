@@ -319,7 +319,19 @@ def connect_by_current_ids(source: str, target: str, environment: dict[str, str]
         result = run(["pw-link", str(output_id), str(input_id)], environment)
         if result.returncode == 0 or "File exists" in result.stdout or "Arquivo existe" in result.stdout:
             return
+        raise RuntimeError(
+            f"failed to link PipeWire ports {source_id_text(output_id, source)} -> "
+            f"{target_id_text(input_id, target)}: {result.stdout}"
+        )
     connect(source, target, environment)
+
+
+def source_id_text(port_id: int, name: str) -> str:
+    return f"{port_id} ({name})"
+
+
+def target_id_text(port_id: int, name: str) -> str:
+    return f"{port_id} ({name})"
 
 
 def disconnect(source: str, target: str, environment: dict[str, str]) -> None:
