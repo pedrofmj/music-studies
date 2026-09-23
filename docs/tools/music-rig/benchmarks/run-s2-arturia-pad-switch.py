@@ -312,6 +312,16 @@ def port_ids(direction: str, environment: dict[str, str]) -> dict[str, int]:
     return ports
 
 
+def connect_by_current_ids(source: str, target: str, environment: dict[str, str]) -> None:
+    output_id = port_ids("-o", environment).get(source)
+    input_id = port_ids("-i", environment).get(target)
+    if output_id is not None and input_id is not None:
+        result = run(["pw-link", str(output_id), str(input_id)], environment)
+        if result.returncode == 0 or "File exists" in result.stdout or "Arquivo existe" in result.stdout:
+            return
+    connect(source, target, environment)
+
+
 def disconnect(source: str, target: str, environment: dict[str, str]) -> None:
     run(["pw-link", "-d", source, target], environment)
 
@@ -599,7 +609,7 @@ def main() -> int:
             connect("s2-arturia-profile-router:out", MIDI_TARGETS[0], environment)
             connect_many(genre_midi_connections(warm), environment)
             for source, target in genre_audio_connections(warm):
-                connect(source, target, environment)
+                connect_by_current_ids(source, target, environment)
             connect_many(SHARED_AUDIO, environment)
             connect_many(MASTER_AUDIO, environment)
 
