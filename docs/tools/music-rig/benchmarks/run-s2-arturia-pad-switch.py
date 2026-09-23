@@ -724,6 +724,31 @@ def main() -> int:
                     process.wait()
             warm_candidates.clear()
 
+        def ensure_router() -> None:
+            nonlocal router, keylab
+            outputs = run(["pw-link", "-o"], environment).stdout
+            inputs = run(["pw-link", "-i"], environment).stdout
+            if (router is not None and router.poll() is None
+                    and "s2-arturia-profile-router:out" in outputs
+                    and "s2-arturia-profile-router:in" in inputs):
+                return
+            if router is not None and router.poll() is None:
+                router.send_signal(signal.SIGTERM)
+                try:
+                    router.wait(timeout=3.0)
+                except subprocess.TimeoutExpired:
+                    router.kill()
+                    router.wait()
+            router = subprocess.Popen(
+                ["/usr/bin/pw-jack", str(arguments.router), "s2-arturia-profile-router", str(fifo)],
+                env=environment, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, text=True,
+            )
+            wait_for_ports(("s2-arturia-profile-router:in", "s2-arturia-profile-router:out"), environment)
+            keylab = find_keylab(environment)
+            for target in MIDI_TARGETS:
+                disconnect(keylab, target, environment)
+            connect(keylab, ROUTER_INPUT, environment)
+
         def start_warm_engines() -> None:
             try:
                 warm_candidates["synth-programmer-synthv1"] = start_synth_engine()
@@ -795,6 +820,7 @@ def main() -> int:
 
         def fast_restore_full() -> None:
             nonlocal current, audio_touched, active_arturia_layers, genre_quantum_changed
+            ensure_router()
             for engine_input, left_output, right_output in FAST_ENGINE_PROFILES.values():
                 disconnect("s2-arturia-profile-router:out", engine_input, environment)
                 disconnect(left_output, LSP_LEFT, environment)
@@ -845,6 +871,7 @@ def main() -> int:
         def restore_live() -> None:
             nonlocal current, audio_touched, active_arturia_layers, genre_quantum_changed
             stop_candidate()
+            ensure_router()
             ensure_full_audio()
             if genre_quantum_changed:
                 set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
