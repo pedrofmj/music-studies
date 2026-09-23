@@ -672,6 +672,25 @@ def main() -> int:
             connect_many(SHARED_AUDIO, environment)
             connect_many(MASTER_AUDIO, environment)
 
+        def validate_warmed_genre(warm: WarmedGenre) -> None:
+            refresh_warmed_genre_ports(warm)
+            connections = (
+                ("s2-arturia-profile-router:out", MIDI_TARGETS[0]),
+                *genre_midi_connections(warm),
+                *genre_audio_connections(warm),
+                *SHARED_AUDIO,
+                *MASTER_AUDIO,
+            )
+            outputs = port_ids("-o", environment)
+            inputs = port_ids("-i", environment)
+            missing = [
+                f"{source} -> {target}"
+                for source, target in connections
+                if source not in outputs or target not in inputs
+            ]
+            if missing:
+                raise RuntimeError(f"warmed genre endpoints missing before switch: {missing[0]}")
+
         def refresh_warmed_genre_ports(warm: WarmedGenre) -> None:
             if warm.process.poll() is not None:
                 raise RuntimeError(f"warmed genre process exited: {warm.profile}")
@@ -797,6 +816,7 @@ def main() -> int:
             warm = warmed_genres.get(profile)
             if warm is None or warm.process.poll() is not None:
                 raise RuntimeError(f"Warmed genre is not running: {profile}")
+            validate_warmed_genre(warm)
             if current in GENRE_ACTIVE_LAYERS:
                 stop_candidate()
             if current == "full-live-rack" and not audio_touched:
