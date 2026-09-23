@@ -848,6 +848,7 @@ def main() -> int:
             if current in warmed_genres:
                 disconnect_warmed_genre(warmed_genres[current])
             ensure_full_audio(restore_independent=False)
+            restore_independent_device_routes()
             if genre_quantum_changed:
                 set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
                 genre_quantum_changed = False
