@@ -313,16 +313,13 @@ def port_ids(direction: str, environment: dict[str, str]) -> dict[str, int]:
 
 
 def connect_by_current_ids(source: str, target: str, environment: dict[str, str]) -> None:
-    output_ids = port_ids("-o", environment)
-    input_ids = port_ids("-i", environment)
-    output_id = output_ids.get(source)
-    input_id = input_ids.get(target)
-    if output_id is not None and input_id is not None:
-        result = run(["pw-link", str(output_id), str(input_id)], environment)
-        if result.returncode == 0 or "File exists" in result.stdout or "Arquivo existe" in result.stdout:
+    for attempt in range(4):
+        output_ids = port_ids("-o", environment)
+        input_ids = port_ids("-i", environment)
+        if connect_with_ids(source, target, output_ids, input_ids, environment):
             return
-    if connect_with_ids(source, target, output_ids, input_ids, environment):
-        return
+        if attempt < 3:
+            time.sleep(0.25)
     connect(source, target, environment)
 
 
@@ -588,6 +585,7 @@ def main() -> int:
                 finally:
                     os.close(instance_read)
                 ports = discover_warmed_genre_ports(prefix, process)
+                time.sleep(1.0)
                 return WarmedGenre(profile, prefix, process, instance_id, *ports)
             except (OSError, RuntimeError):
                 run(["flatpak", "kill", instance_id], environment)
@@ -642,6 +640,12 @@ def main() -> int:
                 connect_cached(source, target)
             for source, target in genre_audio_connections(warm):
                 connect_cached(source, target)
+            expected = (*genre_midi_connections(warm), *genre_audio_connections(warm))
+            current_links = links(environment)
+            missing = [(source, target) for source, target in expected
+                       if not link_present(current_links, source, target)]
+            if missing:
+                raise RuntimeError(f"warmed genre route validation failed: {missing[0][0]} -> {missing[0][1]}")
             connect_many(SHARED_AUDIO, environment)
             connect_many(MASTER_AUDIO, environment)
 
