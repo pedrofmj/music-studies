@@ -445,7 +445,8 @@ def main() -> int:
             ["/usr/bin/pw-jack", str(arguments.router), "s2-arturia-profile-router", str(fifo)],
             env=environment, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, text=True,
         )
-        time.sleep(2.0)
+        wait_for_ports(("s2-arturia-profile-router:in", "s2-arturia-profile-router:out",
+                        *MIDI_TARGETS), environment)
         for target in MIDI_TARGETS:
             disconnect(keylab, target, environment)
         connect(keylab, ROUTER_INPUT, environment)
