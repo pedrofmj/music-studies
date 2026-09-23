@@ -1,5 +1,14 @@
 # Music Rig Benchmarks
 
+## Fast Arturia Genre Transitions
+
+`run-s2-arturia-pad-switch.py` remains safe-mode by default. With
+`MUSIC_RIG_TRANSITION_MODE=fast`, `MUSIC_RIG_FAST_GENRES` can opt into
+prewarming genre projects using a comma-separated list of genre ids, or `all`.
+Each warmed project uses a distinct Carla client prefix and is discarded on
+selector shutdown. A failed prewarm or cached switch records
+`fast-mode-fallback` and returns to the existing safe genre transition path.
+
 The [2026-08-11 Airstar Hardware Preset capture](hardware-preset-airstar-2026-08-11.json)
 records the exact current SMC-PAD and SMC-PAD Pocket pad assignments, the
 Pocket's non-MIDI hardware controls, and matching pre/post subscription

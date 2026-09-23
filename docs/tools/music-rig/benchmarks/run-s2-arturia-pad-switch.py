@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 import datetime
 import hashlib
 import json
@@ -111,6 +112,34 @@ FAST_ENGINE_PROFILES = {
 }
 
 
+@dataclass
+class WarmedGenre:
+    """A prefixed Carla genre instance and the ports discovered on that instance."""
+
+    profile: str
+    prefix: str
+    process: subprocess.Popen[str]
+    instance_id: str
+    midi_inputs: tuple[str, ...]
+    midi_control_inputs: tuple[str, ...]
+    midi_control_outputs: tuple[str, ...]
+    audio_outputs: tuple[str, ...]
+
+
+def parse_fast_genres(value: str) -> tuple[str, ...]:
+    requested = tuple(item.strip() for item in value.split(",") if item.strip())
+    if not requested:
+        return ()
+    if "all" in requested:
+        if len(requested) != 1:
+            raise ValueError("MUSIC_RIG_FAST_GENRES=all cannot be combined with genre ids")
+        return tuple(sorted(GENRE_ACTIVE_LAYERS))
+    unknown = sorted(set(requested) - set(GENRE_ACTIVE_LAYERS))
+    if unknown:
+        raise ValueError(f"unknown fast genre id(s): {', '.join(unknown)}")
+    return tuple(dict.fromkeys(requested))
+
+
 def run(command: list[str], environment: dict[str, str]) -> subprocess.CompletedProcess[str]:
     try:
         return subprocess.run(command, env=environment, check=False, stdout=subprocess.PIPE,
@@ -167,6 +196,15 @@ def wait_for_carla(present: bool, environment: dict[str, str], timeout: float = 
         time.sleep(0.25)
     state = "register" if present else "exit"
     raise RuntimeError(f"Carla did not {state} within {timeout:g} seconds")
+
+
+def wait_for_service_stopped(environment: dict[str, str], timeout: float = 30.0) -> None:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if run(["systemctl", "--user", "is-active", FULL_CARLA_SERVICE], environment).returncode != 0:
+            return
+        time.sleep(0.25)
+    raise RuntimeError(f"Carla service did not stop within {timeout:g} seconds")
 
 
 def terminate_carla_processes(environment: dict[str, str]) -> None:
@@ -271,6 +309,11 @@ def main() -> int:
         default=os.environ.get("MUSIC_RIG_TRANSITION_MODE", "safe"),
         help="safe rebuilds engines per transition; fast keeps SynthV1 and setBfree warm",
     )
+    parser.epilog = (
+        "Fast genre prewarming is opt-in: set MUSIC_RIG_FAST_GENRES to a comma-separated "
+        "list of genre ids (for example worship-piano,jazz-keys) or all. It is used only "
+        "with --transition-mode fast; the default is no genre prewarming."
+    )
     parser.add_argument("--router", type=Path, required=True)
     parser.add_argument("--synthv1", type=Path, required=True)
     parser.add_argument("--synthv1-preset", type=Path, required=True)
@@ -314,6 +357,9 @@ def main() -> int:
     active_arturia_layers = set(range(1, 10))
     fast_mode_enabled = arguments.transition_mode == "fast"
     warm_candidates: dict[str, subprocess.Popen[str]] = {}
+    warmed_genres: dict[str, WarmedGenre] = {}
+    fast_genre_enabled = False
+    configured_fast_genres: tuple[str, ...] = ()
     stop_requested = False
     error: str | None = None
     last_midi_guard = 0.0
@@ -351,13 +397,17 @@ def main() -> int:
         def stop_candidate() -> None:
             nonlocal candidate, candidate_instance_id, current
             was_genre_candidate = current in GENRE_ACTIVE_LAYERS or candidate_instance_id is not None
+            preserve_warm_genres = bool(warmed_genres)
+            if current in warmed_genres:
+                disconnect_warmed_genre(warmed_genres[current])
             if candidate is not None:
                 was_genre_candidate = was_genre_candidate or any(
                     "genre-projects" in str(argument) for argument in candidate.args
                 )
             if candidate_instance_id is not None:
                 run(["flatpak", "kill", candidate_instance_id], environment)
-                run(["flatpak", "kill", "studio.kx.carla"], environment)
+                if not preserve_warm_genres:
+                    run(["flatpak", "kill", "studio.kx.carla"], environment)
                 candidate_instance_id = None
             if candidate is not None and candidate.poll() is None:
                 candidate.send_signal(signal.SIGTERM)
@@ -370,7 +420,7 @@ def main() -> int:
                         candidate.kill()
                     candidate.wait()
             candidate = None
-            if was_genre_candidate:
+            if was_genre_candidate and not preserve_warm_genres:
                 terminate_carla_processes(environment)
 
         def start_synth_engine() -> subprocess.Popen[str]:
@@ -401,6 +451,160 @@ def main() -> int:
             wait_for_ports(FAST_ENGINE_PROFILES["tonewheel-organ-setbfree"], environment)
             return process
 
+        def discover_warmed_genre_ports(
+            prefix: str, process: subprocess.Popen[str]
+        ) -> tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...], tuple[str, ...]]:
+            deadline = time.monotonic() + GENRE_PORT_REGISTRATION_TIMEOUT_SECONDS
+            port_prefix = f"{prefix}GENRE-CH-"
+            while time.monotonic() < deadline:
+                outputs = run(["pw-link", "-o"], environment).stdout.splitlines()
+                inputs = run(["pw-link", "-i"], environment).stdout.splitlines()
+                midi_inputs = tuple(sorted(
+                    line.strip() for line in inputs
+                    if line.strip().startswith(port_prefix)
+                    and ":events-in" in line
+                    and "Volume Map" not in line
+                    and "Reverb Map" not in line
+                ))
+                midi_control_inputs = tuple(sorted(
+                    line.strip() for line in inputs
+                    if line.strip().startswith(port_prefix)
+                    and ":events-in" in line
+                    and ("Volume Map" in line or "Reverb Map" in line)
+                ))
+                midi_control_outputs = tuple(sorted(
+                    line.strip() for line in outputs
+                    if line.strip().startswith(port_prefix)
+                    and ":events-out" in line
+                    and ("Volume Map" in line or "Reverb Map" in line)
+                ))
+                audio_outputs = tuple(sorted(
+                    line.strip() for line in outputs
+                    if line.strip().startswith(port_prefix)
+                    and re.search(r":(?:output_[12]|out-(?:left|right))$", line.strip())
+                ))
+                if (len(midi_inputs) == 9 and len(midi_control_inputs) == 14
+                        and len(midi_control_outputs) == 14 and len(audio_outputs) == 18):
+                    return (
+                        midi_inputs,
+                        midi_control_inputs,
+                        midi_control_outputs,
+                        audio_outputs,
+                    )
+                if process.poll() is not None:
+                    raise RuntimeError("warmed genre Carla exited before port registration")
+                time.sleep(0.2)
+            raise RuntimeError(f"warmed genre ports did not register for {prefix}")
+
+        def start_warm_genre(profile: str) -> WarmedGenre:
+            if arguments.genre_project_root is None:
+                raise RuntimeError("genre project root is required for fast genre prewarming")
+            project = arguments.genre_project_root / f"{profile}.uproject"
+            if not project.is_file():
+                raise RuntimeError(f"genre project is missing: {project}")
+            prefix = f"FAST-GENRE-{profile}-"
+            instance_read, instance_write = os.pipe()
+            process: subprocess.Popen[str] | None = None
+            instance_id = ""
+            try:
+                process = subprocess.Popen(
+                    ["/usr/bin/flatpak", "run", f"--cwd={arguments.soundfont_workdir}",
+                     "--file-forwarding", f"--instance-id-fd={instance_write}",
+                     "studio.kx.carla", "--no-gui", f"--cnprefix={prefix}",
+                     "@@", str(project), "@@"],
+                    env=environment, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                    text=True, start_new_session=True, pass_fds=(instance_write,),
+                )
+            finally:
+                os.close(instance_write)
+            os.set_blocking(instance_read, False)
+            try:
+                try:
+                    instance_deadline = time.monotonic() + GENRE_PORT_REGISTRATION_TIMEOUT_SECONDS
+                    while time.monotonic() < instance_deadline:
+                        try:
+                            instance_id = os.read(instance_read, 256).decode().strip()
+                        except BlockingIOError:
+                            if process.poll() is not None:
+                                raise RuntimeError("warmed genre Carla exited before registering")
+                            time.sleep(0.2)
+                            continue
+                        if instance_id:
+                            break
+                    else:
+                        raise RuntimeError("warmed genre Carla instance did not register")
+                finally:
+                    os.close(instance_read)
+                ports = discover_warmed_genre_ports(prefix, process)
+                return WarmedGenre(profile, prefix, process, instance_id, *ports)
+            except (OSError, RuntimeError):
+                run(["flatpak", "kill", instance_id], environment)
+                if process.poll() is None:
+                    process.send_signal(signal.SIGTERM)
+                raise
+
+        def genre_route_connections(warm: WarmedGenre) -> tuple[tuple[str, str], ...]:
+            connections: list[tuple[str, str]] = [
+                ("s2-arturia-profile-router:out", target)
+                for target in (*warm.midi_inputs, *warm.midi_control_inputs)
+            ]
+            for output in warm.midi_control_outputs:
+                channel = output.split(" ", 1)[0]
+                target = next(
+                    (target for target in warm.midi_inputs
+                     if target.startswith(f"{channel} - ")),
+                    None,
+                )
+                if target is None:
+                    raise RuntimeError(f"no MIDI input for warmed genre control port: {output}")
+                connections.append((output, target))
+            connections.extend(
+                (output, LSP_LEFT if any(token in output for token in (":output_1", ":out-left"))
+                 else LSP_RIGHT)
+                for output in warm.audio_outputs
+            )
+            return tuple(connections)
+
+        def connect_warmed_genre(warm: WarmedGenre) -> None:
+            for target in MIDI_TARGETS:
+                disconnect("s2-arturia-profile-router:out", target, environment)
+            connect("s2-arturia-profile-router:out", MIDI_TARGETS[0], environment)
+            connect_many(genre_route_connections(warm), environment)
+            connect_many(SHARED_AUDIO, environment)
+            connect_many(MASTER_AUDIO, environment)
+            restore_independent_device_routes()
+
+        def disconnect_warmed_genre(warm: WarmedGenre) -> None:
+            for source, target in genre_route_connections(warm):
+                disconnect(source, target, environment)
+            for source, target in (*SHARED_AUDIO, *MASTER_AUDIO):
+                disconnect(source, target, environment)
+            for target in MIDI_TARGETS:
+                disconnect("s2-arturia-profile-router:out", target, environment)
+
+        def stop_warm_genres() -> None:
+            for warm in list(warmed_genres.values()):
+                run(["flatpak", "kill", warm.instance_id], environment)
+                if warm.process.poll() is None:
+                    warm.process.send_signal(signal.SIGTERM)
+                    try:
+                        warm.process.wait(timeout=3.0)
+                    except subprocess.TimeoutExpired:
+                        try:
+                            os.killpg(warm.process.pid, signal.SIGKILL)
+                        except (PermissionError, ProcessLookupError):
+                            warm.process.kill()
+                        warm.process.wait()
+            warmed_genres.clear()
+
+        def start_warm_genres() -> None:
+            try:
+                for profile in configured_fast_genres:
+                    warmed_genres[profile] = start_warm_genre(profile)
+            except (OSError, RuntimeError):
+                stop_warm_genres()
+                raise
+
         def stop_warm_engines() -> None:
             for process in list(warm_candidates.values()):
                 if process.poll() is not None:
@@ -425,11 +629,14 @@ def main() -> int:
                 raise
 
         def fast_switch_engine(profile: str) -> None:
-            nonlocal current, audio_touched, active_arturia_layers
+            nonlocal current, audio_touched, active_arturia_layers, genre_quantum_changed
             if profile not in FAST_ENGINE_PROFILES:
                 raise RuntimeError(f"Fast mode does not support profile: {profile}")
             if profile not in warm_candidates or warm_candidates[profile].poll() is not None:
                 raise RuntimeError(f"Warm engine is not running: {profile}")
+            was_warmed_genre = current in warmed_genres
+            if was_warmed_genre:
+                stop_candidate()
             if current == "full-live-rack" and not audio_touched:
                 for source, target in ARTURIA_AUDIO:
                     disconnect(source, target, environment)
@@ -445,17 +652,58 @@ def main() -> int:
             connect("s2-arturia-profile-router:out", MIDI_TARGETS[0], environment)
             connect(left_output, LSP_LEFT, environment)
             connect(right_output, LSP_RIGHT, environment)
+            if was_warmed_genre:
+                connect_many(SHARED_AUDIO, environment)
+                connect_many(MASTER_AUDIO, environment)
+                restore_independent_device_routes()
+                if genre_quantum_changed:
+                    set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
+                    genre_quantum_changed = False
+            active_arturia_layers = set()
+            current = profile
+            profiles_seen.append(profile)
+
+        def fast_switch_genre(profile: str) -> None:
+            nonlocal current, audio_touched, active_arturia_layers, genre_quantum_changed
+            warm = warmed_genres.get(profile)
+            if warm is None or warm.process.poll() is not None:
+                raise RuntimeError(f"Warmed genre is not running: {profile}")
+            if current in GENRE_ACTIVE_LAYERS:
+                stop_candidate()
+            if current == "full-live-rack" and not audio_touched:
+                for source, target in ARTURIA_AUDIO:
+                    disconnect(source, target, environment)
+                audio_touched = True
+            for engine_input, left_output, right_output in FAST_ENGINE_PROFILES.values():
+                disconnect("s2-arturia-profile-router:out", engine_input, environment)
+                disconnect(left_output, LSP_LEFT, environment)
+                disconnect(right_output, LSP_RIGHT, environment)
+            if current in warmed_genres:
+                disconnect_warmed_genre(warmed_genres[current])
+            if run(["systemctl", "--user", "is-active", FULL_CARLA_SERVICE], environment).returncode == 0:
+                stop_systemd_user(FULL_CARLA_SERVICE, environment)
+                wait_for_service_stopped(environment)
+            if not genre_quantum_changed:
+                set_pipewire_quantum(GENRE_PIPEWIRE_QUANTUM, environment)
+                genre_quantum_changed = True
+            connect_warmed_genre(warm)
             active_arturia_layers = set()
             current = profile
             profiles_seen.append(profile)
 
         def fast_restore_full() -> None:
-            nonlocal current, audio_touched, active_arturia_layers
+            nonlocal current, audio_touched, active_arturia_layers, genre_quantum_changed
             for engine_input, left_output, right_output in FAST_ENGINE_PROFILES.values():
                 disconnect("s2-arturia-profile-router:out", engine_input, environment)
                 disconnect(left_output, LSP_LEFT, environment)
                 disconnect(right_output, LSP_RIGHT, environment)
+            if current in warmed_genres:
+                disconnect_warmed_genre(warmed_genres[current])
             ensure_full_audio(restore_independent=False)
+            restore_independent_device_routes()
+            if genre_quantum_changed:
+                set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
+                genre_quantum_changed = False
             if audio_touched:
                 connect_many(ARTURIA_AUDIO, environment)
                 audio_touched = False
@@ -497,7 +745,7 @@ def main() -> int:
             nonlocal current, audio_touched, active_arturia_layers, genre_quantum_changed
             was_genre = current in GENRE_ACTIVE_LAYERS
             stop_candidate()
-            if was_genre:
+            if was_genre and not warmed_genres:
                 wait_for_carla(False, environment)
             ensure_full_audio()
             if genre_quantum_changed:
@@ -518,19 +766,26 @@ def main() -> int:
             nonlocal candidate, candidate_instance_id, current, audio_touched
             nonlocal active_arturia_layers, genre_quantum_changed
             if fast_mode_enabled and profile in FAST_ENGINE_PROFILES:
-                if current == "full-live-rack" or current in FAST_ENGINE_PROFILES:
+                if current == "full-live-rack" or current in FAST_ENGINE_PROFILES or current in warmed_genres:
                     fast_switch_engine(profile)
                     return
-            if fast_mode_enabled and profile == "full-live-rack" and current in FAST_ENGINE_PROFILES:
+            if fast_genre_enabled and profile in warmed_genres:
+                fast_switch_genre(profile)
+                return
+            if fast_mode_enabled and profile == "full-live-rack" and (
+                    current in FAST_ENGINE_PROFILES or current in warmed_genres):
                 fast_restore_full()
                 return
             was_genre = current in GENRE_ACTIVE_LAYERS
             stop_candidate()
-            if was_genre:
+            if was_genre and not warmed_genres:
                 wait_for_carla(False, environment)
             if profile in GENRE_ACTIVE_LAYERS:
                 stop_systemd_user(FULL_CARLA_SERVICE, environment)
-                wait_for_carla(False, environment)
+                if warmed_genres:
+                    wait_for_service_stopped(environment)
+                else:
+                    wait_for_carla(False, environment)
             else:
                 ensure_full_audio()
             if profile in GENRE_ACTIVE_LAYERS:
@@ -617,20 +872,26 @@ def main() -> int:
                 while time.monotonic() < deadline:
                     outputs = run(["pw-link", "-o"], environment).stdout.splitlines()
                     inputs = run(["pw-link", "-i"], environment).stdout.splitlines()
+                    warm_prefixes = tuple(warm.prefix for warm in warmed_genres.values())
                     midi_inputs = [line.strip() for line in inputs
                                    if "GENRE-CH-" in line and ":events-in" in line
+                                   and not line.strip().startswith(warm_prefixes)
                                    and "Volume Map" not in line and "Reverb Map" not in line]
                     midi_control_inputs = [line.strip() for line in inputs
                                            if "GENRE-CH-" in line and ":events-in" in line
+                                           and not line.strip().startswith(warm_prefixes)
                                            and ("Volume Map" in line or "Reverb Map" in line)]
                     midi_control_outputs = [line.strip() for line in outputs
                                             if "GENRE-CH-" in line and ":events-out" in line
+                                            and not line.strip().startswith(warm_prefixes)
                                             and ("Volume Map" in line or "Reverb Map" in line)]
                     audio_outputs = [line.strip() for line in outputs
                                      if "GENRE-CH-" in line and re.search(
                                          r":(?:output_[12]|out-(?:left|right))$",
                                          line.strip(),
                                      )]
+                    audio_outputs = [line for line in audio_outputs
+                                     if not line.startswith(warm_prefixes)]
                     if (len(midi_inputs) == 9 and len(midi_control_inputs) == 14
                             and len(midi_control_outputs) == 14
                             and len(audio_outputs) == 18):
@@ -683,6 +944,23 @@ def main() -> int:
             except (OSError, RuntimeError) as failure:
                 fast_mode_enabled = False
                 diagnostic_event(diagnostic_log, "fast-mode-fallback", error=str(failure))
+            if fast_mode_enabled and os.environ.get("MUSIC_RIG_FAST_GENRES", "").strip():
+                try:
+                    configured_fast_genres = parse_fast_genres(
+                        os.environ["MUSIC_RIG_FAST_GENRES"]
+                    )
+                    if configured_fast_genres:
+                        start_warm_genres()
+                        fast_genre_enabled = True
+                        diagnostic_event(
+                            diagnostic_log,
+                            "fast-mode-enabled",
+                            warm_genres=list(configured_fast_genres),
+                        )
+                except (OSError, RuntimeError, ValueError) as failure:
+                    fast_genre_enabled = False
+                    stop_warm_genres()
+                    diagnostic_event(diagnostic_log, "fast-mode-fallback", error=str(failure))
         deadline = time.monotonic() + arguments.duration_ms / 1000.0
         while not stop_requested and (arguments.duration_ms == 0 or time.monotonic() < deadline):
             # Keep the management input exclusive while the watcher observes
@@ -724,7 +1002,19 @@ def main() -> int:
                             profile=profile,
                         )
                     except (OSError, RuntimeError) as failure:
-                        if fast_mode_enabled:
+                        warm_genre_transition = fast_genre_enabled and (
+                            profile in warmed_genres or current in warmed_genres
+                        )
+                        if warm_genre_transition:
+                            fast_genre_enabled = False
+                            stop_warm_genres()
+                            diagnostic_event(
+                                diagnostic_log,
+                                "fast-mode-fallback",
+                                error=str(failure),
+                                feature="genre-prewarming",
+                            )
+                        elif fast_mode_enabled:
                             fast_mode_enabled = False
                             stop_warm_engines()
                             diagnostic_event(diagnostic_log, "fast-mode-fallback", error=str(failure))
@@ -773,6 +1063,7 @@ def main() -> int:
         diagnostic_event(diagnostic_log, "session-error", error=error, profile=current)
     finally:
         stop_warm_engines()
+        stop_warm_genres()
         full_active = run(
             ["systemctl", "--user", "is-active", FULL_CARLA_SERVICE], environment
         ).returncode == 0
