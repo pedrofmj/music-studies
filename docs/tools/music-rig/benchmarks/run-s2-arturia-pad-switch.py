@@ -278,11 +278,34 @@ def connect(source: str, target: str, environment: dict[str, str]) -> None:
 
 
 def connect_many(connections: tuple[tuple[str, str], ...], environment: dict[str, str]) -> None:
+    output_ids = port_ids("-o", environment)
+    input_ids = port_ids("-i", environment)
+
+    def connect_pair(source: str, target: str) -> None:
+        source_id = output_ids.get(source)
+        target_id = input_ids.get(target)
+        if source_id is not None and target_id is not None:
+            result = run(["pw-link", str(source_id), str(target_id)], environment)
+            if result.returncode == 0 or "File exists" in result.stdout or "Arquivo existe" in result.stdout:
+                return
+        connect(source, target, environment)
+
     with ThreadPoolExecutor(max_workers=min(8, len(connections))) as executor:
-        futures = [executor.submit(connect, source, target, environment)
+        futures = [executor.submit(connect_pair, source, target)
                    for source, target in connections]
         for future in futures:
             future.result()
+
+
+def port_ids(direction: str, environment: dict[str, str]) -> dict[str, int]:
+    result = run(["pw-link", "-I", direction], environment)
+    ports: dict[str, int] = {}
+    for line in result.stdout.splitlines():
+        parts = line.strip().split(None, 1)
+        if len(parts) != 2 or not parts[0].isdigit():
+            continue
+        ports[parts[1]] = int(parts[0])
+    return ports
 
 
 def disconnect(source: str, target: str, environment: dict[str, str]) -> None:
