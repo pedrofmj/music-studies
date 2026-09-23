@@ -455,32 +455,31 @@ def main() -> int:
             prefix: str, process: subprocess.Popen[str]
         ) -> tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...], tuple[str, ...]]:
             deadline = time.monotonic() + GENRE_PORT_REGISTRATION_TIMEOUT_SECONDS
-            port_prefix = f"{prefix}GENRE-CH-"
             while time.monotonic() < deadline:
                 outputs = run(["pw-link", "-o"], environment).stdout.splitlines()
                 inputs = run(["pw-link", "-i"], environment).stdout.splitlines()
                 midi_inputs = tuple(sorted(
                     line.strip() for line in inputs
-                    if line.strip().startswith(port_prefix)
+                    if line.strip().startswith(prefix) and "/GENRE-CH-" in line
                     and ":events-in" in line
                     and "Volume Map" not in line
                     and "Reverb Map" not in line
                 ))
                 midi_control_inputs = tuple(sorted(
                     line.strip() for line in inputs
-                    if line.strip().startswith(port_prefix)
+                    if line.strip().startswith(prefix) and "/GENRE-CH-" in line
                     and ":events-in" in line
                     and ("Volume Map" in line or "Reverb Map" in line)
                 ))
                 midi_control_outputs = tuple(sorted(
                     line.strip() for line in outputs
-                    if line.strip().startswith(port_prefix)
+                    if line.strip().startswith(prefix) and "/GENRE-CH-" in line
                     and ":events-out" in line
                     and ("Volume Map" in line or "Reverb Map" in line)
                 ))
                 audio_outputs = tuple(sorted(
                     line.strip() for line in outputs
-                    if line.strip().startswith(port_prefix)
+                    if line.strip().startswith(prefix) and "/GENRE-CH-" in line
                     and re.search(r":(?:output_[12]|out-(?:left|right))$", line.strip())
                 ))
                 if (len(midi_inputs) == 9 and len(midi_control_inputs) == 14
@@ -680,9 +679,6 @@ def main() -> int:
                 disconnect(right_output, LSP_RIGHT, environment)
             if current in warmed_genres:
                 disconnect_warmed_genre(warmed_genres[current])
-            if run(["systemctl", "--user", "is-active", FULL_CARLA_SERVICE], environment).returncode == 0:
-                stop_systemd_user(FULL_CARLA_SERVICE, environment)
-                wait_for_service_stopped(environment)
             if not genre_quantum_changed:
                 set_pipewire_quantum(GENRE_PIPEWIRE_QUANTUM, environment)
                 genre_quantum_changed = True
