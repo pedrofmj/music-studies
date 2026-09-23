@@ -470,7 +470,10 @@ def main() -> int:
                         candidate.kill()
                     candidate.wait()
             candidate = None
-            if was_genre_candidate and not preserve_warm_genres:
+            full_audio_active = run(
+                ["systemctl", "--user", "is-active", FULL_CARLA_SERVICE], environment
+            ).returncode == 0
+            if was_genre_candidate and not preserve_warm_genres and not full_audio_active:
                 terminate_carla_processes(environment)
 
         def start_synth_engine() -> subprocess.Popen[str]:
@@ -806,10 +809,7 @@ def main() -> int:
 
         def restore_live() -> None:
             nonlocal current, audio_touched, active_arturia_layers, genre_quantum_changed
-            was_genre = current in GENRE_ACTIVE_LAYERS
             stop_candidate()
-            if was_genre and not warmed_genres:
-                wait_for_carla(False, environment)
             ensure_full_audio()
             if genre_quantum_changed:
                 set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
@@ -841,14 +841,12 @@ def main() -> int:
                 return
             was_genre = current in GENRE_ACTIVE_LAYERS
             stop_candidate()
-            if was_genre and not warmed_genres:
-                wait_for_carla(False, environment)
             if profile in GENRE_ACTIVE_LAYERS:
-                stop_systemd_user(FULL_CARLA_SERVICE, environment)
-                if warmed_genres:
-                    wait_for_service_stopped(environment)
-                else:
-                    wait_for_carla(False, environment)
+                # Headless Carla owns the shared LSP/SMC mixer and output path.
+                # Genre Carla supplies only the temporary instrument layer.
+                if run(["systemctl", "--user", "is-active", FULL_CARLA_SERVICE],
+                       environment).returncode != 0:
+                    ensure_full_audio()
             else:
                 ensure_full_audio()
             if profile in GENRE_ACTIVE_LAYERS:
