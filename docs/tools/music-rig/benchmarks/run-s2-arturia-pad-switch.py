@@ -455,7 +455,7 @@ def main() -> int:
                 disconnect("s2-arturia-profile-router:out", engine_input, environment)
                 disconnect(left_output, LSP_LEFT, environment)
                 disconnect(right_output, LSP_RIGHT, environment)
-            ensure_full_audio()
+            ensure_full_audio(restore_independent=False)
             if audio_touched:
                 connect_many(ARTURIA_AUDIO, environment)
                 audio_touched = False
@@ -483,14 +483,15 @@ def main() -> int:
                 except subprocess.TimeoutExpired:
                     diagnostic_event(diagnostic_log, "independent-route-restore-timeout")
 
-        def ensure_full_audio() -> None:
+        def ensure_full_audio(restore_independent: bool = True) -> None:
             systemd_user("start", FULL_CARLA_SERVICE, environment)
             wait_for_carla(True, environment)
             wait_for_ports(("AR-CH-1 - Basic Piano:output_1", "SMC-MIX - 8-Band EQ:Output L"), environment)
             connect_many(MASTER_AUDIO, environment)
             connect_many(MASTER_CONTROL, environment)
             connect_many(SHARED_AUDIO, environment)
-            restore_independent_device_routes()
+            if restore_independent:
+                restore_independent_device_routes()
 
         def restore_live() -> None:
             nonlocal current, audio_touched, active_arturia_layers, genre_quantum_changed
