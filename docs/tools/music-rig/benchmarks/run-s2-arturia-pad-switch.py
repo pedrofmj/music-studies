@@ -223,6 +223,31 @@ def terminate_carla_processes(environment: dict[str, str]) -> None:
     raise RuntimeError("Carla backend could not be terminated")
 
 
+def cleanup_orphaned_warm_genres(environment: dict[str, str]) -> None:
+    """Remove only prefixed warm genre Carla processes left by an old session."""
+    result = run(["ps", "-eo", "pid=,args="], environment)
+    pids = []
+    for line in result.stdout.splitlines():
+        parts = line.strip().split(None, 1)
+        if len(parts) == 2 and "FAST-GENRE-" in parts[1]:
+            try:
+                pids.append(int(parts[0]))
+            except ValueError:
+                continue
+    for pid in pids:
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except (ProcessLookupError, PermissionError):
+            pass
+    if pids:
+        time.sleep(1.0)
+    for pid in pids:
+        try:
+            os.kill(pid, signal.SIGKILL)
+        except (ProcessLookupError, PermissionError):
+            pass
+
+
 def wait_for_ports(tokens: tuple[str, ...], environment: dict[str, str], timeout: float = 45.0) -> None:
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
@@ -1083,6 +1108,7 @@ def main() -> int:
 
         ensure_full_audio()
         if fast_mode_enabled:
+            cleanup_orphaned_warm_genres(environment)
             try:
                 start_warm_engines()
                 diagnostic_event(diagnostic_log, "fast-mode-enabled", warm_profiles=sorted(warm_candidates))
