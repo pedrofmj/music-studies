@@ -282,12 +282,16 @@ def connect_many(connections: tuple[tuple[str, str], ...], environment: dict[str
     input_ids = port_ids("-i", environment)
 
     def connect_pair(source: str, target: str) -> None:
-        source_id = output_ids.get(source)
-        target_id = input_ids.get(target)
-        if source_id is not None and target_id is not None:
-            result = run(["pw-link", str(source_id), str(target_id)], environment)
-            if result.returncode == 0 or "File exists" in result.stdout or "Arquivo existe" in result.stdout:
-                return
+        for attempt in range(2):
+            source_id = output_ids.get(source)
+            target_id = input_ids.get(target)
+            if source_id is not None and target_id is not None:
+                result = run(["pw-link", str(source_id), str(target_id)], environment)
+                if result.returncode == 0 or "File exists" in result.stdout or "Arquivo existe" in result.stdout:
+                    return
+            if attempt == 0:
+                output_ids.update(port_ids("-o", environment))
+                input_ids.update(port_ids("-i", environment))
         connect(source, target, environment)
 
     with ThreadPoolExecutor(max_workers=min(8, len(connections))) as executor:
