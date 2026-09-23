@@ -321,9 +321,6 @@ def connect_by_current_ids(source: str, target: str, environment: dict[str, str]
         result = run(["pw-link", str(output_id), str(input_id)], environment)
         if result.returncode == 0 or "File exists" in result.stdout or "Arquivo existe" in result.stdout:
             return
-        raise RuntimeError(
-            f"PipeWire ID link failed {output_id}->{input_id} for {source} -> {target}: {result.stdout}"
-        )
     if connect_with_ids(source, target, output_ids, input_ids, environment):
         return
     connect(source, target, environment)
