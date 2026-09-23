@@ -569,7 +569,7 @@ def main() -> int:
                     process.send_signal(signal.SIGTERM)
                 raise
 
-        def genre_route_connections(warm: WarmedGenre) -> tuple[tuple[str, str], ...]:
+        def genre_midi_connections(warm: WarmedGenre) -> tuple[tuple[str, str], ...]:
             connections: list[tuple[str, str]] = [
                 ("s2-arturia-profile-router:out", target)
                 for target in (*warm.midi_inputs, *warm.midi_control_inputs)
@@ -584,23 +584,27 @@ def main() -> int:
                 if target is None:
                     raise RuntimeError(f"no MIDI input for warmed genre control port: {output}")
                 connections.append((output, target))
-            connections.extend(
+            return tuple(connections)
+
+        def genre_audio_connections(warm: WarmedGenre) -> tuple[tuple[str, str], ...]:
+            return tuple(
                 (output, LSP_LEFT if any(token in output for token in (":output_1", ":out-left"))
                  else LSP_RIGHT)
                 for output in warm.audio_outputs
             )
-            return tuple(connections)
 
         def connect_warmed_genre(warm: WarmedGenre) -> None:
             for target in MIDI_TARGETS:
                 disconnect("s2-arturia-profile-router:out", target, environment)
             connect("s2-arturia-profile-router:out", MIDI_TARGETS[0], environment)
-            connect_many(genre_route_connections(warm), environment)
+            connect_many(genre_midi_connections(warm), environment)
+            for source, target in genre_audio_connections(warm):
+                connect(source, target, environment)
             connect_many(SHARED_AUDIO, environment)
             connect_many(MASTER_AUDIO, environment)
 
         def disconnect_warmed_genre(warm: WarmedGenre) -> None:
-            for source, target in genre_route_connections(warm):
+            for source, target in (*genre_midi_connections(warm), *genre_audio_connections(warm)):
                 disconnect(source, target, environment)
             for source, target in (*SHARED_AUDIO, *MASTER_AUDIO):
                 disconnect(source, target, environment)
