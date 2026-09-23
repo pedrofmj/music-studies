@@ -619,7 +619,15 @@ def main() -> int:
             for target in MIDI_TARGETS:
                 disconnect("s2-arturia-profile-router:out", target, environment)
             connect("s2-arturia-profile-router:out", MIDI_TARGETS[0], environment)
-            for source, target in (*genre_midi_connections(warm), *genre_audio_connections(warm)):
+            midi_connections = genre_midi_connections(warm)
+            router_connections = [connection for connection in midi_connections
+                                  if connection[0] == "s2-arturia-profile-router:out"]
+            other_midi_connections = [connection for connection in midi_connections
+                                      if connection[0] != "s2-arturia-profile-router:out"]
+            for source, target in router_connections:
+                connect_by_current_ids(source, target, environment)
+            connect_many(tuple(other_midi_connections), environment)
+            for source, target in genre_audio_connections(warm):
                 connect_by_current_ids(source, target, environment)
             connect_many(SHARED_AUDIO, environment)
             connect_many(MASTER_AUDIO, environment)
