@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import datetime
 import hashlib
 import json
@@ -238,6 +239,14 @@ def connect(source: str, target: str, environment: dict[str, str]) -> None:
     raise RuntimeError(f"failed to link {source} -> {target}: {last_error}")
 
 
+def connect_many(connections: tuple[tuple[str, str], ...], environment: dict[str, str]) -> None:
+    with ThreadPoolExecutor(max_workers=min(8, len(connections))) as executor:
+        futures = [executor.submit(connect, source, target, environment)
+                   for source, target in connections]
+        for future in futures:
+            future.result()
+
+
 def disconnect(source: str, target: str, environment: dict[str, str]) -> None:
     run(["pw-link", "-d", source, target], environment)
 
@@ -448,8 +457,7 @@ def main() -> int:
                 disconnect(right_output, LSP_RIGHT, environment)
             ensure_full_audio()
             if audio_touched:
-                for source, target in ARTURIA_AUDIO:
-                    connect(source, target, environment)
+                connect_many(ARTURIA_AUDIO, environment)
                 audio_touched = False
             active_arturia_layers = set(range(1, 10))
             for target in MIDI_TARGETS:
@@ -479,12 +487,9 @@ def main() -> int:
             systemd_user("start", FULL_CARLA_SERVICE, environment)
             wait_for_carla(True, environment)
             wait_for_ports(("AR-CH-1 - Basic Piano:output_1", "SMC-MIX - 8-Band EQ:Output L"), environment)
-            for source, target in MASTER_AUDIO:
-                connect(source, target, environment)
-            for source, target in MASTER_CONTROL:
-                connect(source, target, environment)
-            for source, target in SHARED_AUDIO:
-                connect(source, target, environment)
+            connect_many(MASTER_AUDIO, environment)
+            connect_many(MASTER_CONTROL, environment)
+            connect_many(SHARED_AUDIO, environment)
             restore_independent_device_routes()
 
         def restore_live() -> None:
@@ -498,8 +503,7 @@ def main() -> int:
                 set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
                 genre_quantum_changed = False
             if audio_touched:
-                for source, target in ARTURIA_AUDIO:
-                    connect(source, target, environment)
+                connect_many(ARTURIA_AUDIO, environment)
                 audio_touched = False
             active_arturia_layers = set(range(1, 10))
             for target in MIDI_TARGETS:
