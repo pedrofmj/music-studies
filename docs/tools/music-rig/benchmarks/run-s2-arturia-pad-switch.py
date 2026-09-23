@@ -313,27 +313,22 @@ def port_ids(direction: str, environment: dict[str, str]) -> dict[str, int]:
 
 
 def connect_by_current_ids(source: str, target: str, environment: dict[str, str]) -> None:
-    output_id = port_ids("-o", environment).get(source)
-    input_id = port_ids("-i", environment).get(target)
-    if output_id is not None and input_id is not None:
-        result = run(["pw-link", str(output_id), str(input_id)], environment)
-        if result.returncode == 0 or "File exists" in result.stdout or "Arquivo existe" in result.stdout:
-            return
-        raise RuntimeError(
-            f"failed to link PipeWire ports {source_id_text(output_id, source)} -> "
-            f"{target_id_text(input_id, target)}: {result.stdout}"
-        )
+    output_ids = port_ids("-o", environment)
+    input_ids = port_ids("-i", environment)
+    if connect_with_ids(source, target, output_ids, input_ids, environment):
+        return
     connect(source, target, environment)
 
 
-def source_id_text(port_id: int, name: str) -> str:
-    return f"{port_id} ({name})"
-
-
-def target_id_text(port_id: int, name: str) -> str:
-    return f"{port_id} ({name})"
-
-
+def connect_with_ids(source: str, target: str, output_ids: dict[str, int],
+                     input_ids: dict[str, int], environment: dict[str, str]) -> bool:
+    output_id = output_ids.get(source)
+    input_id = input_ids.get(target)
+    if output_id is not None and input_id is not None:
+        result = run(["pw-link", str(output_id), str(input_id)], environment)
+        if result.returncode == 0 or "File exists" in result.stdout or "Arquivo existe" in result.stdout:
+            return True
+    return False
 def disconnect(source: str, target: str, environment: dict[str, str]) -> None:
     run(["pw-link", "-d", source, target], environment)
 
@@ -624,11 +619,20 @@ def main() -> int:
                                   if connection[0] == "s2-arturia-profile-router:out"]
             other_midi_connections = [connection for connection in midi_connections
                                       if connection[0] != "s2-arturia-profile-router:out"]
+            output_ids = port_ids("-o", environment)
+            input_ids = port_ids("-i", environment)
+
+            def connect_cached(source: str, target: str) -> None:
+                if connect_with_ids(source, target, output_ids, input_ids, environment):
+                    return
+                connect_by_current_ids(source, target, environment)
+
             for source, target in router_connections:
-                connect_by_current_ids(source, target, environment)
-            connect_many(tuple(other_midi_connections), environment)
+                connect_cached(source, target)
+            for source, target in other_midi_connections:
+                connect_cached(source, target)
             for source, target in genre_audio_connections(warm):
-                connect_by_current_ids(source, target, environment)
+                connect_cached(source, target)
             connect_many(SHARED_AUDIO, environment)
             connect_many(MASTER_AUDIO, environment)
 
