@@ -594,11 +594,20 @@ def main() -> int:
                 raise
 
         def genre_midi_connections(warm: WarmedGenre) -> tuple[tuple[str, str], ...]:
+            active_layers = GENRE_ACTIVE_LAYERS[warm.profile]
+            active_marker = tuple(f"/GENRE-CH-{layer} " for layer in active_layers)
+
+            def active(port: str) -> bool:
+                return any(marker in port for marker in active_marker)
+
             connections: list[tuple[str, str]] = [
                 ("s2-arturia-profile-router:out", target)
                 for target in (*warm.midi_inputs, *warm.midi_control_inputs)
+                if active(target)
             ]
             for output in warm.midi_control_outputs:
+                if not active(output):
+                    continue
                 channel = output.split(" ", 1)[0]
                 target = next(
                     (target for target in warm.midi_inputs
@@ -611,10 +620,12 @@ def main() -> int:
             return tuple(connections)
 
         def genre_audio_connections(warm: WarmedGenre) -> tuple[tuple[str, str], ...]:
+            active_layers = GENRE_ACTIVE_LAYERS[warm.profile]
             return tuple(
                 (output, LSP_LEFT if any(token in output for token in (":output_1", ":out-left"))
                  else LSP_RIGHT)
                 for output in warm.audio_outputs
+                if any(f"/GENRE-CH-{layer} " in output for layer in active_layers)
             )
 
         def connect_warmed_genre(warm: WarmedGenre) -> None:
