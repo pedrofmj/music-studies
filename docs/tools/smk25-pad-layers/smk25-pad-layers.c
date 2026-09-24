@@ -79,6 +79,7 @@ typedef struct {
     int channel;
     control_type_t pad_type;
     pad_behavior_t pad_behavior;
+    int pad_toggle_layer;
     int pad_on_minimum;
     int pads[LAYER_COUNT];
     int pad_channels[LAYER_COUNT];
@@ -211,6 +212,7 @@ static void initialize_configuration(void)
     configuration.channel = 0;
     configuration.pad_type = CONTROL_NONE;
     configuration.pad_behavior = PAD_VALUE;
+    configuration.pad_toggle_layer = -1;
     configuration.pad_on_minimum = 64;
     configuration.play.type = CONTROL_NONE;
     configuration.play.number = -1;
@@ -319,6 +321,10 @@ static int load_configuration(const char *path)
                 configuration.pad_behavior = PAD_TOGGLE;
             else
                 goto invalid;
+        } else if (strcmp(key, "pad_toggle_layer") == 0) {
+            if (parse_number(value, 1, LAYER_COUNT, &configuration.pad_toggle_layer) != 0)
+                goto invalid;
+            --configuration.pad_toggle_layer;
         } else if (strcmp(key, "pad_on_minimum") == 0) {
             if (parse_number(value, 1, 127, &configuration.pad_on_minimum) != 0)
                 goto invalid;
@@ -635,7 +641,8 @@ static bool handle_pad(
     pressed = (message[0] & 0xf0) == 0x90
         ? message[2] > 0
         : message[2] >= configuration.pad_on_minimum;
-    if (configuration.pad_behavior == PAD_VALUE) {
+    if (configuration.pad_behavior == PAD_VALUE
+        && layer != configuration.pad_toggle_layer) {
         set_layer_enabled(layer, pressed, frame, emit, context);
     } else {
         const bool was_down = layers[layer].pad_down;
