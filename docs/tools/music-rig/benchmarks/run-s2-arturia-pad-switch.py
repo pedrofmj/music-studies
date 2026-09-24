@@ -861,6 +861,9 @@ def main() -> int:
             warm = warmed_genres.get(profile)
             if warm is None or warm.process.poll() is not None:
                 raise RuntimeError(f"Warmed genre is not running: {profile}")
+            if not genre_quantum_changed:
+                set_pipewire_quantum(GENRE_PIPEWIRE_QUANTUM, environment)
+                genre_quantum_changed = True
             validate_warmed_genre(warm)
             if current in GENRE_ACTIVE_LAYERS:
                 stop_candidate()
@@ -875,9 +878,6 @@ def main() -> int:
                 disconnect(right_output, LSP_RIGHT, environment)
             if current in warmed_genres:
                 disconnect_warmed_genre(warmed_genres[current])
-            if not genre_quantum_changed:
-                set_pipewire_quantum(GENRE_PIPEWIRE_QUANTUM, environment)
-                genre_quantum_changed = True
             connect_warmed_genre(warm)
             active_arturia_layers = set()
             current = profile
