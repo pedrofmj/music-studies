@@ -348,21 +348,40 @@ def port_ids(direction: str, environment: dict[str, str]) -> dict[str, int]:
     return ports
 
 
+def wait_for_endpoint_ids(connections: tuple[tuple[str, str], ...],
+                          environment: dict[str, str], timeout: float = 15.0) -> None:
+    deadline = time.monotonic() + timeout
+    missing: list[str] = []
+    while time.monotonic() < deadline:
+        outputs = port_ids("-o", environment)
+        inputs = port_ids("-i", environment)
+        missing = [
+            f"{source} -> {target}"
+            for source, target in connections
+            if source not in outputs or target not in inputs
+        ]
+        if not missing:
+            return
+        time.sleep(0.25)
+    raise RuntimeError(f"warmed genre endpoints did not register: {missing[0]}")
+
+
 def connect_by_current_ids(source: str, target: str, environment: dict[str, str]) -> None:
+    deadline = time.monotonic() + 15.0
     last_output_id = None
     last_input_id = None
-    for attempt in range(4):
+    last_error = ""
+    while time.monotonic() < deadline:
         output_ids = port_ids("-o", environment)
         input_ids = port_ids("-i", environment)
         last_output_id = output_ids.get(source)
         last_input_id = input_ids.get(target)
         if connect_with_ids(source, target, output_ids, input_ids, environment):
             return
-        if attempt < 3:
-            time.sleep(0.25)
+        last_error = f"resolved ids output={last_output_id} input={last_input_id}"
+        time.sleep(0.25)
     raise RuntimeError(
-        f"warm port link failed for {source} -> {target}; "
-        f"resolved ids output={last_output_id} input={last_input_id}"
+        f"warm port link failed for {source} -> {target}; {last_error}"
     )
 
 
@@ -690,6 +709,8 @@ def main() -> int:
 
         def connect_warmed_genre(warm: WarmedGenre) -> None:
             refresh_warmed_genre_ports(warm)
+            expected = (*genre_midi_connections(warm), *genre_audio_connections(warm))
+            wait_for_endpoint_ids(expected, environment)
             for target in MIDI_TARGETS:
                 disconnect("s2-arturia-profile-router:out", target, environment)
             midi_connections = genre_midi_connections(warm)
@@ -697,12 +718,7 @@ def main() -> int:
                                   if connection[0] == "s2-arturia-profile-router:out"]
             other_midi_connections = [connection for connection in midi_connections
                                       if connection[0] != "s2-arturia-profile-router:out"]
-            output_ids = port_ids("-o", environment)
-            input_ids = port_ids("-i", environment)
-
             def connect_cached(source: str, target: str) -> None:
-                if connect_with_ids(source, target, output_ids, input_ids, environment):
-                    return
                 connect_by_current_ids(source, target, environment)
 
             for source, target in genre_audio_connections(warm):
@@ -728,15 +744,7 @@ def main() -> int:
                 *SHARED_AUDIO,
                 *MASTER_AUDIO,
             )
-            outputs = port_ids("-o", environment)
-            inputs = port_ids("-i", environment)
-            missing = [
-                f"{source} -> {target}"
-                for source, target in connections
-                if source not in outputs or target not in inputs
-            ]
-            if missing:
-                raise RuntimeError(f"warmed genre endpoints missing before switch: {missing[0]}")
+            wait_for_endpoint_ids(connections, environment)
 
         def refresh_warmed_genre_ports(warm: WarmedGenre) -> None:
             if warm.process.poll() is not None:
