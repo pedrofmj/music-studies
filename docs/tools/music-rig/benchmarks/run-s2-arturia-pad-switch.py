@@ -894,6 +894,8 @@ def main() -> int:
                 disconnect_warmed_genre(warmed_genres[current])
             ensure_full_audio(restore_independent=False)
             restore_fast_independent_device_routes()
+            if not independent_routes_present():
+                restore_independent_device_routes()
             if genre_quantum_changed:
                 set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
                 genre_quantum_changed = False
@@ -948,6 +950,11 @@ def main() -> int:
                 for destination in destinations:
                     if destination in inputs:
                         connect(source, destination, environment)
+
+        def independent_routes_present() -> bool:
+            snapshot = links(environment)
+            return all(alias in snapshot for alias in (
+                "SMK25-Master", "SMC-PAD-Master", "SMC-Mixer-Master"))
 
         def ensure_full_audio(restore_independent: bool = True) -> None:
             systemd_user("start", FULL_CARLA_SERVICE, environment)
