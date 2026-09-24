@@ -82,6 +82,8 @@ typedef struct {
     int pad_on_minimum;
     int pads[LAYER_COUNT];
     int pad_channels[LAYER_COUNT];
+    int alternate_pads[LAYER_COUNT];
+    int alternate_pad_channels[LAYER_COUNT];
     int knobs[LAYER_COUNT];
     int knob_channels[LAYER_COUNT];
     control_spec_t play;
@@ -219,6 +221,8 @@ static void initialize_configuration(void)
     for (index = 0; index < LAYER_COUNT; ++index) {
         configuration.pads[index] = -1;
         configuration.pad_channels[index] = -1;
+        configuration.alternate_pads[index] = -1;
+        configuration.alternate_pad_channels[index] = -1;
         configuration.knobs[index] = -1;
         configuration.knob_channels[index] = -1;
     }
@@ -248,6 +252,8 @@ static int validate_configuration(void)
     for (pad = 0; pad < LAYER_COUNT; ++pad) {
         if (configuration.pad_channels[pad] < 0)
             configuration.pad_channels[pad] = configuration.channel;
+        if (configuration.alternate_pad_channels[pad] < 0)
+            configuration.alternate_pad_channels[pad] = configuration.channel;
         if (configuration.knob_channels[pad] < 0)
             configuration.knob_channels[pad] = configuration.channel;
     }
@@ -333,6 +339,17 @@ static int load_configuration(const char *path)
                 goto invalid;
             for (index = 0; index < LAYER_COUNT; ++index)
                 --configuration.pad_channels[index];
+        } else if (strcmp(key, "alternate_pads") == 0) {
+            if (parse_csv(value, configuration.alternate_pads, LAYER_COUNT, 0, 127) != 0)
+                goto invalid;
+        } else if (strcmp(key, "alternate_pad_channels") == 0) {
+            int index;
+            if (parse_csv(
+                    value, configuration.alternate_pad_channels, LAYER_COUNT, 1, 16
+                ) != 0)
+                goto invalid;
+            for (index = 0; index < LAYER_COUNT; ++index)
+                --configuration.alternate_pad_channels[index];
         } else if (strcmp(key, "knobs") == 0) {
             if (parse_csv(value, configuration.knobs, LAYER_COUNT, 0, 127) != 0)
                 goto invalid;
@@ -618,6 +635,10 @@ static int matching_pad(const unsigned char *message, size_t size)
     for (index = 0; index < LAYER_COUNT; ++index)
         if (message[1] == configuration.pads[index]
             && channel == configuration.pad_channels[index])
+            return index;
+    for (index = 0; index < LAYER_COUNT; ++index)
+        if (message[1] == configuration.alternate_pads[index]
+            && channel == configuration.alternate_pad_channels[index])
             return index;
     return -1;
 }

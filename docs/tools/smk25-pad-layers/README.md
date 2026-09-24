@@ -28,17 +28,19 @@ two-value CC state (pad_behavior=value) or press-to-toggle Note/CC messages
 (pad_behavior=toggle). Do not deploy guessed mappings: capture them with
 `jack_midi_dump` first.
 
-Side-A controls must be distinguishable from keyboard notes. CC-toggle pads
-are preferred. If the pads send Note messages on the keyboard's channel, use
-the M-VAVE editor to assign them unique CCs or a separate MIDI channel.
+The current factory mapping uses CC-toggle pads on MIDI channel 10: CC21-28
+for Pads 1-8 and CC111-118 for the Pad-B bank. Both banks address the same eight
+layer outputs. Side-A controls must be distinguishable from keyboard notes. If
+the pads send Note messages on the keyboard's channel, use the M-VAVE editor to
+assign them unique CCs or a separate MIDI channel.
 
 ### Observed Controls
 
 | Control | Message | Endpoint |
 | --- | --- | --- |
-| Side-A Pads 1-4 | CC40-43 on channels 1-4, values 127/0 | SMK25-Master |
-| Side-A Pads 5-8 | CC36-39 on channels 5-8, values 127/0 | SMK25-Master |
-| Knobs 1-8 | CC20-27 on channel 1 | SMK25-Master |
+| Pads 1-8 | CC21-28 on channel 10, values 127/0 | SMK25-Master |
+| Pad-B 1-8 | CC111-118 on channel 10, values 127/0 | SMK25-Master |
+| Knobs 1-8 | CC30-37 on channel 1 | SMK25-Master |
 | Stop | Note 93 on channel 1 | AUX `capture_2` |
 | Play | Note 94 on channel 1 | AUX `capture_2` |
 | Side-B Pad 1 | CC96 on channel 9, values 127/0 | Separate from Side-A; ignored |
