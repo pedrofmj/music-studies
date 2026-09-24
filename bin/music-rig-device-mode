@@ -1,0 +1,170 @@
+#!/usr/bin/env python3
+"""Select or restore one independent Music Rig device mode."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+
+ARTURIA_CODES = {
+    "tonewheel-organ-setbfree": 1,
+    "synth-programmer-synthv1": 2,
+    "full-live-rack": 3,
+    "worship-piano": 4,
+    "gospel-keys": 5,
+    "ambient-worship": 6,
+    "jazz-keys": 7,
+    "soul-rnb": 8,
+    "cinematic-strings": 9,
+    "orchestral": 10,
+    "brass-winds": 11,
+    "synthwave": 12,
+    "retro-keys": 13,
+    "intimate-pads": 14,
+    "praise-leads": 15,
+    "acoustic-worship": 16,
+}
+DEVICE_MODES = {
+    "smk25-main": {
+        "ambient-pad-layers": (
+            ("SMK25-Master", "SMK25 Pad Layers:midi-in"),
+        ),
+    },
+    "smc-mixer-main": {
+        "eight-band-eq": tuple(
+            ("SMC-Mixer-Master", f"SMC-EQ-{index} CC Scale:events-in")
+            for index in range(1, 9)
+        ),
+    },
+    "smc-pad-main": {
+        "drum-set": (
+            ("SMC-PAD-Master", "PD-CH-1 - Drum Set:events-in"),
+            ("SMC-PAD-Master", "PD Controls - Sustain Scale:events-in"),
+            ("SMC-PAD-Master", "PD-CH-1 Gain Map:events-in"),
+        ),
+    },
+    "smc-pad-pocket": {
+        "drum-set": (
+            ("SMC-PAD Pocket-Master", "PD-CH-1 - Drum Set:events-in"),
+            ("SMC-PAD Pocket-Master", "PD Controls - Sustain Scale:events-in"),
+            ("SMC-PAD Pocket-Master", "PD-CH-1 Gain Map:events-in"),
+        ),
+    },
+}
+
+
+def command(args: list[str]) -> str:
+    result = subprocess.run(args, check=False, text=True, stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT, timeout=5.0)
+    return result.stdout
+
+
+def snapshot_links() -> str:
+    return command(["pw-link", "-l"])
+
+
+def find_source(links: str, alias: str) -> str | None:
+    for line in links.splitlines():
+        source = line.strip()
+        if source.startswith("Midi-Bridge:") and alias in source and "capture_1" in source:
+            return source
+    return None
+
+
+def has_link(links: str, source: str, target: str) -> bool:
+    header = ""
+    for line in links.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("|->"):
+            if header == source and stripped[3:].strip() == target:
+                return True
+        elif stripped.startswith("|<-"):
+            if header == target and stripped[3:].strip() == source:
+                return True
+        elif stripped:
+            header = stripped
+    return False
+
+
+def restore_patchbay() -> None:
+    tool = Path.home() / "bin/pipewire-patchbay-json"
+    if tool.is_file():
+        subprocess.run([str(tool), "--check-and-restore"], check=False,
+                       stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                       text=True, timeout=20.0)
+
+
+def connect_link(source: str, target: str) -> None:
+    result = subprocess.run(["pw-link", source, target], check=False,
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                            text=True, timeout=5.0)
+    if result.returncode != 0 and "Arquivo existe" not in result.stdout and "File exists" not in result.stdout:
+        raise RuntimeError(result.stdout.strip() or f"could not link {source} -> {target}")
+
+
+def select_arturia(mode: str) -> dict[str, object]:
+    fifo = Path.home() / ".local/state/music-rig/arturia-profile-session/profile.fifo"
+    if not fifo.is_fifo():
+        raise RuntimeError(f"Arturia selector FIFO is unavailable: {fifo}")
+    descriptor = os.open(fifo, os.O_WRONLY | os.O_NONBLOCK)
+    try:
+        os.write(descriptor, bytes((ARTURIA_CODES[mode],)))
+    finally:
+        os.close(descriptor)
+    return {"device": "arturia-main", "mode": mode, "status": "requested"}
+
+
+def select_independent(device: str, mode: str) -> dict[str, object]:
+    targets = DEVICE_MODES[device].get(mode)
+    if targets is None:
+        available = ", ".join(sorted(DEVICE_MODES[device]))
+        raise RuntimeError(f"unsupported mode {mode!r} for {device}; available: {available}")
+    restore_patchbay()
+    deadline = time.monotonic() + 15.0
+    while time.monotonic() < deadline:
+        links = snapshot_links()
+        resolved = []
+        complete = True
+        for alias, target in targets:
+            source = find_source(links, alias)
+            if source is None:
+                complete = False
+                break
+            if not has_link(links, source, target):
+                connect_link(source, target)
+                links = snapshot_links()
+            if not has_link(links, source, target):
+                complete = False
+                break
+            resolved.append({"source": source, "target": target})
+        if complete:
+            return {"device": device, "mode": mode, "links": resolved, "status": "active"}
+        restore_patchbay()
+        time.sleep(1.0)
+    raise RuntimeError(f"mode {mode!r} for {device} did not become active")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--device", required=True, choices=["arturia-main", *DEVICE_MODES])
+    parser.add_argument("--mode", required=True)
+    arguments = parser.parse_args()
+    try:
+        result = (select_arturia(arguments.mode) if arguments.device == "arturia-main"
+                  else select_independent(arguments.device, arguments.mode))
+    except (OSError, RuntimeError, subprocess.SubprocessError) as failure:
+        print(json.dumps({"device": arguments.device, "mode": arguments.mode,
+                          "status": "fail", "error": str(failure)}, indent=2))
+        return 1
+    print(json.dumps(result, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

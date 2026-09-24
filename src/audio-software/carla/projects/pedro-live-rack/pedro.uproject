@@ -105,10 +105,10 @@ bmNlcy8+PC9EZWNlbnRTYW1wbGVyPgA=
    <Volume>1</Volume>
    <ControlChannel>1</ControlChannel>
    <Options>0x1f4</Options>
-   <Parameter>
-    <Index>0</Index>
-    <Name>Reverb On/Off</Name>
-    <Value>1</Value>
+    <Parameter>
+     <Index>0</Index>
+     <Name>Reverb On/Off</Name>
+     <Value>0</Value>
    </Parameter>
    <Parameter>
     <Index>1</Index>
@@ -130,10 +130,10 @@ bmNlcy8+PC9EZWNlbnRTYW1wbGVyPgA=
     <Name>Reverb Width</Name>
     <Value>0.8</Value>
    </Parameter>
-   <Parameter>
-    <Index>5</Index>
-    <Name>Chorus On/Off</Name>
-    <Value>1</Value>
+    <Parameter>
+     <Index>5</Index>
+     <Name>Chorus On/Off</Name>
+     <Value>0</Value>
    </Parameter>
    <Parameter>
     <Index>6</Index>
@@ -3860,7 +3860,7 @@ YXg9IjEiLz48L2NjPjwvbWlkaT48bW9kdWxhdG9ycy8+PHRhZ3MvPjxidXNlcy8+PG5vdGVTZXF1ZW5j
     <Index>5</Index>
     <Name>Output gain</Name>
     <Symbol>g_out</Symbol>
-    <Value>2</Value>
+    <Value>4</Value>
     <MidiChannel>1</MidiChannel>
     <MappedControlIndex>110</MappedControlIndex>
     <MappedMinimum>1</MappedMinimum>

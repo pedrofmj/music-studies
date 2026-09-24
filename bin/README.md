@@ -4,6 +4,28 @@
 JSON document, then recreates those links later. It does not create hardware
 devices, plugin instances, or applications; start those first.
 
+## Independent Device Modes
+
+`music-rig-device-mode` selects a device mode without changing another device.
+The currently supported non-Arturia modes are the existing runtime modes:
+
+```bash
+music-rig-device-mode --device smk25-main --mode ambient-pad-layers
+music-rig-device-mode --device smc-mixer-main --mode eight-band-eq
+music-rig-device-mode --device smc-pad-main --mode drum-set
+music-rig-device-mode --device smc-pad-pocket --mode drum-set
+```
+
+Arturia requests use the existing selector FIFO:
+
+```bash
+music-rig-device-mode --device arturia-main --mode gospel-keys
+```
+
+The command restores and verifies the independent MIDI routes. It does not
+start or stop Carla and does not change another device's active mode. Additional
+device modes can be added later without changing the Arturia selector.
+
 ## Run on airstar
 
 Copy the script to the host and make it executable:
