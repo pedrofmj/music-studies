@@ -373,10 +373,7 @@ def connect_with_ids(source: str, target: str, output_ids: dict[str, int],
     if output_id is not None and input_id is not None:
         result = run(["pw-link", str(output_id), str(input_id)], environment)
         if result.returncode == 0 or "File exists" in result.stdout or "Arquivo existe" in result.stdout:
-            for _ in range(4):
-                if link_present(links(environment), source, target):
-                    return True
-                time.sleep(0.1)
+            return True
     return False
 def disconnect(source: str, target: str, environment: dict[str, str]) -> None:
     run(["pw-link", "-d", source, target], environment)
