@@ -885,7 +885,7 @@ def main() -> int:
             if current in warmed_genres:
                 disconnect_warmed_genre(warmed_genres[current])
             ensure_full_audio(restore_independent=False)
-            restore_independent_device_routes()
+            restore_fast_independent_device_routes()
             if genre_quantum_changed:
                 set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
                 genre_quantum_changed = False
@@ -915,6 +915,31 @@ def main() -> int:
                     )
                 except subprocess.TimeoutExpired:
                     diagnostic_event(diagnostic_log, "independent-route-restore-timeout")
+
+        def restore_fast_independent_device_routes() -> None:
+            outputs = run(["pw-link", "-o"], environment).stdout.splitlines()
+            inputs = run(["pw-link", "-i"], environment).stdout
+            targets = {
+                "SMC-Mixer-Master": tuple(
+                    f"SMC-EQ-{channel} CC Scale:events-in" for channel in range(1, 9)
+                ),
+                "SMC-PAD-Master": (
+                    "PD Controls - Sustain Scale:events-in",
+                    "PD-CH-1 - Drum Set:events-in",
+                    "PD-CH-1 Volume Map:events-in",
+                    "PD-CH-1 Gain Map:events-in",
+                ),
+                "SMC-PAD Pocket-Master": ("PD-CH-1 - Drum Set:events-in",),
+                "SMK25-Master": ("SMK25 Pad Layers:midi-in",),
+            }
+            for alias, destinations in targets.items():
+                source = next((line.strip() for line in outputs
+                               if alias in line and "capture_1" in line), None)
+                if source is None:
+                    continue
+                for destination in destinations:
+                    if destination in inputs:
+                        connect(source, destination, environment)
 
         def ensure_full_audio(restore_independent: bool = True) -> None:
             systemd_user("start", FULL_CARLA_SERVICE, environment)
