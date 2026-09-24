@@ -473,6 +473,9 @@ def main() -> int:
     error: str | None = None
     last_midi_guard = 0.0
     genre_quantum_changed = False
+    # Early port preflight failures must still run the normal cleanup path.
+    stop_warm_engines = lambda: None
+    stop_warm_genres = lambda: None
 
     def request_stop(signal_number: int, frame: object) -> None:
         nonlocal stop_requested
