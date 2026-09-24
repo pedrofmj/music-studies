@@ -754,8 +754,8 @@ def main() -> int:
         def disconnect_warmed_genre(warm: WarmedGenre) -> None:
             for source, target in (*genre_midi_connections(warm), *genre_audio_connections(warm)):
                 disconnect(source, target, environment)
-            for source, target in (*SHARED_AUDIO, *MASTER_AUDIO):
-                disconnect(source, target, environment)
+            # Keep the shared LSP/SMC and master-output path live so independent
+            # devices such as SMK-25 do not pause during a genre switch.
             for target in MIDI_TARGETS:
                 disconnect("s2-arturia-profile-router:out", target, environment)
 
