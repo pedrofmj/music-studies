@@ -28,6 +28,9 @@ two-value CC state (pad_behavior=value) or press-to-toggle Note/CC messages
 (pad_behavior=toggle). Do not deploy guessed mappings: capture them with
 `jack_midi_dump` first.
 
+`pad_toggle_layer` can override one pad when it emits press/release values but
+must behave as a latch. The current mapping uses this override for layer 8.
+
 Side-A controls must be distinguishable from keyboard notes. CC-toggle pads
 are preferred. If the pads send Note messages on the keyboard's channel, use
 the M-VAVE editor to assign them unique CCs or a separate MIDI channel.
