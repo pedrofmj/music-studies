@@ -872,9 +872,8 @@ def main() -> int:
                 raise RuntimeError(f"Warmed genre is not running: {profile}")
             ensure_router()
             wait_for_ports(MIDI_TARGETS, environment)
-            if not genre_quantum_changed:
-                set_pipewire_quantum(GENRE_PIPEWIRE_QUANTUM, environment)
-                genre_quantum_changed = True
+            # Warmed genres share the live graph's quantum. Changing the global
+            # quantum here can unregister their ports during the switch.
             validate_warmed_genre(warm)
             if current in GENRE_ACTIVE_LAYERS:
                 stop_candidate()
