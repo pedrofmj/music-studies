@@ -86,6 +86,8 @@ typedef struct {
     int alternate_pad_channels[LAYER_COUNT];
     int knobs[LAYER_COUNT];
     int knob_channels[LAYER_COUNT];
+    int alternate_knobs[LAYER_COUNT];
+    int alternate_knob_channels[LAYER_COUNT];
     control_spec_t play;
     control_spec_t stop;
     int default_chord[MAX_CHORD_NOTES];
@@ -225,6 +227,8 @@ static void initialize_configuration(void)
         configuration.alternate_pad_channels[index] = -1;
         configuration.knobs[index] = -1;
         configuration.knob_channels[index] = -1;
+        configuration.alternate_knobs[index] = -1;
+        configuration.alternate_knob_channels[index] = -1;
     }
     configuration.default_chord[0] = 48;
     configuration.default_chord[1] = 52;
@@ -256,6 +260,8 @@ static int validate_configuration(void)
             configuration.alternate_pad_channels[pad] = configuration.channel;
         if (configuration.knob_channels[pad] < 0)
             configuration.knob_channels[pad] = configuration.channel;
+        if (configuration.alternate_knob_channels[pad] < 0)
+            configuration.alternate_knob_channels[pad] = configuration.channel;
     }
 
     if (configuration.pad_type == CONTROL_NONE
@@ -361,6 +367,17 @@ static int load_configuration(const char *path)
                 goto invalid;
             for (index = 0; index < LAYER_COUNT; ++index)
                 --configuration.knob_channels[index];
+        } else if (strcmp(key, "alternate_knobs") == 0) {
+            if (parse_csv(value, configuration.alternate_knobs, LAYER_COUNT, 0, 127) != 0)
+                goto invalid;
+        } else if (strcmp(key, "alternate_knob_channels") == 0) {
+            int index;
+            if (parse_csv(
+                    value, configuration.alternate_knob_channels, LAYER_COUNT, 1, 16
+                ) != 0)
+                goto invalid;
+            for (index = 0; index < LAYER_COUNT; ++index)
+                --configuration.alternate_knob_channels[index];
         } else if (strcmp(key, "play") == 0) {
             if (parse_control(value, &configuration.play) != 0)
                 goto invalid;
@@ -679,6 +696,10 @@ static int matching_knob(const unsigned char *message, size_t size)
     for (index = 0; index < LAYER_COUNT; ++index)
         if (message[1] == configuration.knobs[index]
             && (message[0] & 0x0f) == configuration.knob_channels[index])
+            return index;
+    for (index = 0; index < LAYER_COUNT; ++index)
+        if (message[1] == configuration.alternate_knobs[index]
+            && (message[0] & 0x0f) == configuration.alternate_knob_channels[index])
             return index;
     return -1;
 }

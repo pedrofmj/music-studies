@@ -41,6 +41,7 @@ assign them unique CCs or a separate MIDI channel.
 | Pads 1-8 | CC21-28 on channel 10, values 127/0 | SMK25-Master |
 | Pad-B 1-8 | CC111-118 on channel 10, values 127/0 | SMK25-Master |
 | Knobs 1-8 | CC30-37 on channel 1 | SMK25-Master |
+| Knob-B 1-8 | CC38-45 on channel 1 | SMK25-Master |
 | Stop | Note 93 on channel 1 | AUX `capture_2` |
 | Play | Note 94 on channel 1 | AUX `capture_2` |
 | Side-B Pad 1 | CC96 on channel 9, values 127/0 | Separate from Side-A; ignored |
