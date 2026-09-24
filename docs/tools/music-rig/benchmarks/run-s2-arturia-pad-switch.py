@@ -904,8 +904,6 @@ def main() -> int:
                 disconnect_warmed_genre(warmed_genres[current])
             ensure_full_audio(restore_independent=False)
             restore_fast_independent_device_routes()
-            if not independent_routes_present():
-                restore_independent_device_routes()
             if genre_quantum_changed:
                 set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
                 genre_quantum_changed = False
@@ -919,22 +917,6 @@ def main() -> int:
             for source, target in MASTER_CONTROL:
                 connect(source, target, environment)
             current = "full-live-rack"
-
-        def restore_independent_device_routes() -> None:
-            tool = Path.home() / "bin/pipewire-patchbay-json"
-            if tool.is_file():
-                try:
-                    subprocess.run(
-                        [str(tool), "--check-and-restore"],
-                        env=environment,
-                        check=False,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.STDOUT,
-                        text=True,
-                        timeout=20.0,
-                    )
-                except subprocess.TimeoutExpired:
-                    diagnostic_event(diagnostic_log, "independent-route-restore-timeout")
 
         def restore_fast_independent_device_routes() -> None:
             outputs = run(["pw-link", "-o"], environment).stdout.splitlines()
@@ -961,11 +943,6 @@ def main() -> int:
                     if destination in inputs:
                         connect(source, destination, environment)
 
-        def independent_routes_present() -> bool:
-            snapshot = links(environment)
-            return all(alias in snapshot for alias in (
-                "SMK25-Master", "SMC-PAD-Master", "SMC-Mixer-Master"))
-
         def ensure_full_audio(restore_independent: bool = True) -> None:
             systemd_user("start", FULL_CARLA_SERVICE, environment)
             wait_for_carla(True, environment)
@@ -974,13 +951,25 @@ def main() -> int:
             connect_many(MASTER_CONTROL, environment)
             connect_many(SHARED_AUDIO, environment)
             if restore_independent:
-                restore_independent_device_routes()
+                restore_fast_independent_device_routes()
+
+        def restart_full_audio() -> None:
+            # A safe genre can leave the protected rack graph linked but silent.
+            # Recreate only the protected Carla process before restoring routes.
+            stop_systemd_user(FULL_CARLA_SERVICE, environment)
+            wait_for_service_stopped(environment)
+            wait_for_carla(False, environment)
+            ensure_full_audio()
 
         def restore_live() -> None:
             nonlocal current, audio_touched, active_arturia_layers, genre_quantum_changed
+            was_genre = current in GENRE_ACTIVE_LAYERS
             stop_candidate()
             ensure_router()
-            ensure_full_audio()
+            if was_genre:
+                restart_full_audio()
+            else:
+                ensure_full_audio()
             if genre_quantum_changed:
                 set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
                 genre_quantum_changed = False
@@ -1009,6 +998,9 @@ def main() -> int:
                     current in FAST_ENGINE_PROFILES or current in warmed_genres):
                 fast_restore_full()
                 return
+            if profile == "full-live-rack" and current in GENRE_ACTIVE_LAYERS:
+                restore_live()
+                return
             was_genre = current in GENRE_ACTIVE_LAYERS
             stop_candidate()
             if profile in GENRE_ACTIVE_LAYERS:
@@ -1019,12 +1011,6 @@ def main() -> int:
                     ensure_full_audio()
             else:
                 ensure_full_audio()
-            if profile in GENRE_ACTIVE_LAYERS:
-                set_pipewire_quantum(GENRE_PIPEWIRE_QUANTUM, environment)
-                genre_quantum_changed = True
-            elif genre_quantum_changed:
-                set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
-                genre_quantum_changed = False
             for source, target in ARTURIA_AUDIO:
                 disconnect(source, target, environment)
             audio_touched = True
@@ -1066,12 +1052,14 @@ def main() -> int:
                 project = arguments.genre_project_root / f"{profile}.uproject"
                 if not project.is_file():
                     raise RuntimeError(f"genre project is missing: {project}")
+                candidate_prefix = f"SAFE-GENRE-{profile}-"
                 instance_read, instance_write = os.pipe()
                 try:
                     candidate = subprocess.Popen(
                         ["/usr/bin/flatpak", "run", f"--cwd={arguments.soundfont_workdir}",
                          "--file-forwarding", f"--instance-id-fd={instance_write}",
-                         "studio.kx.carla", "--no-gui", "@@", str(project), "@@"],
+                         "studio.kx.carla", "--no-gui", f"--cnprefix={candidate_prefix}",
+                         "@@", str(project), "@@"],
                         env=environment, stdout=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL, text=True, start_new_session=True,
                         pass_fds=(instance_write,),
@@ -1103,26 +1091,25 @@ def main() -> int:
                 while time.monotonic() < deadline:
                     outputs = run(["pw-link", "-o"], environment).stdout.splitlines()
                     inputs = run(["pw-link", "-i"], environment).stdout.splitlines()
-                    warm_prefixes = tuple(warm.prefix for warm in warmed_genres.values())
                     midi_inputs = [line.strip() for line in inputs
                                    if "GENRE-CH-" in line and ":events-in" in line
-                                   and not line.strip().startswith(warm_prefixes)
+                                   and line.strip().startswith(candidate_prefix)
                                    and "Volume Map" not in line and "Reverb Map" not in line]
                     midi_control_inputs = [line.strip() for line in inputs
                                            if "GENRE-CH-" in line and ":events-in" in line
-                                           and not line.strip().startswith(warm_prefixes)
+                                           and line.strip().startswith(candidate_prefix)
                                            and ("Volume Map" in line or "Reverb Map" in line)]
                     midi_control_outputs = [line.strip() for line in outputs
                                             if "GENRE-CH-" in line and ":events-out" in line
-                                            and not line.strip().startswith(warm_prefixes)
+                                            and line.strip().startswith(candidate_prefix)
                                             and ("Volume Map" in line or "Reverb Map" in line)]
                     audio_outputs = [line.strip() for line in outputs
                                      if "GENRE-CH-" in line and re.search(
-                                         r":(?:output_[12]|out-(?:left|right))$",
-                                         line.strip(),
-                                     )]
+                                          r":(?:output_[12]|out-(?:left|right))$",
+                                          line.strip(),
+                                      )]
                     audio_outputs = [line for line in audio_outputs
-                                     if not line.startswith(warm_prefixes)]
+                                     if line.startswith(candidate_prefix)]
                     if (len(midi_inputs) == 9 and len(midi_control_inputs) == 14
                             and len(midi_control_outputs) == 14
                             and len(audio_outputs) == 18):
@@ -1151,7 +1138,7 @@ def main() -> int:
                     connect(source, target, environment)
                 for source, target in MASTER_AUDIO:
                     connect(source, target, environment)
-                restore_independent_device_routes()
+                restore_fast_independent_device_routes()
                 active_arturia_layers = set()
                 current = profile
                 profiles_seen.append(profile)
