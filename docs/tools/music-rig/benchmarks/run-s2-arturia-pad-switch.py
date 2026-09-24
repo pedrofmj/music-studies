@@ -659,11 +659,22 @@ def main() -> int:
         def genre_audio_connections(warm: WarmedGenre) -> tuple[tuple[str, str], ...]:
             active_layers = GENRE_ACTIVE_LAYERS[warm.profile]
             return tuple(
-                (output, LSP_LEFT if any(token in output for token in (":output_1", ":out-left"))
-                 else LSP_RIGHT)
+                (output, genre_audio_target(output, warm.profile))
                 for output in warm.audio_outputs
                 if any(f"/GENRE-CH-{layer} " in output for layer in active_layers)
             )
+
+        def genre_audio_target(output: str, profile: str) -> str:
+            match = re.search(r"(?:^|/)GENRE-CH-(\d+) ", output)
+            if match is None:
+                raise RuntimeError(f"could not identify warmed genre audio channel: {output}")
+            channel = int(match.group(1))
+            active_layers = GENRE_ACTIVE_LAYERS[profile]
+            if channel not in active_layers:
+                raise RuntimeError(f"inactive genre channel was routed: {output}")
+            slot = active_layers.index(channel) + 1
+            side = "left" if any(token in output for token in (":output_1", ":out-left")) else "right"
+            return f"LSP Mixer x8 Stereo:Audio input {side} {slot}"
 
         def connect_warmed_genre(warm: WarmedGenre) -> None:
             refresh_warmed_genre_ports(warm)
@@ -1082,10 +1093,10 @@ def main() -> int:
                         if target.startswith(f"{channel} - ")
                     )
                     connect(output, target, environment)
+                active_layers = GENRE_ACTIVE_LAYERS[profile]
                 for output in sorted(audio_outputs):
-                    target = LSP_LEFT if any(token in output for token in
-                                             (":output_1", ":out-left")) else LSP_RIGHT
-                    connect(output, target, environment)
+                    if any(f"GENRE-CH-{layer} " in output for layer in active_layers):
+                        connect(output, genre_audio_target(output, profile), environment)
                 for source, target in SHARED_AUDIO:
                     connect(source, target, environment)
                 for source, target in MASTER_AUDIO:
