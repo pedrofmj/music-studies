@@ -476,6 +476,11 @@ def main() -> int:
         os.mkfifo(fifo)
         fifo_fd = os.open(fifo, os.O_RDWR | os.O_NONBLOCK)
 
+        systemd_user("start", FULL_CARLA_SERVICE, environment)
+        wait_for_carla(True, environment)
+        wait_for_ports(("AR-CH-1 - Basic Piano:output_1", "SMC-MIX - 8-Band EQ:Output L",
+                        "Arturia Main Volume Encoder:relative-in",
+                        "AR Controls - Sustain Scale:events-in"), environment)
         router = subprocess.Popen(
             ["/usr/bin/pw-jack", str(arguments.router), "s2-arturia-profile-router", str(fifo)],
             env=environment, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, text=True,
