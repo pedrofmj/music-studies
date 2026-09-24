@@ -349,14 +349,21 @@ def port_ids(direction: str, environment: dict[str, str]) -> dict[str, int]:
 
 
 def connect_by_current_ids(source: str, target: str, environment: dict[str, str]) -> None:
+    last_output_id = None
+    last_input_id = None
     for attempt in range(4):
         output_ids = port_ids("-o", environment)
         input_ids = port_ids("-i", environment)
+        last_output_id = output_ids.get(source)
+        last_input_id = input_ids.get(target)
         if connect_with_ids(source, target, output_ids, input_ids, environment):
             return
         if attempt < 3:
             time.sleep(0.25)
-    connect(source, target, environment)
+    raise RuntimeError(
+        f"warm port link failed for {source} -> {target}; "
+        f"resolved ids output={last_output_id} input={last_input_id}"
+    )
 
 
 def connect_with_ids(source: str, target: str, output_ids: dict[str, int],
