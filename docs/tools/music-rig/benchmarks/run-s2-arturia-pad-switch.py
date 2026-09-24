@@ -738,7 +738,6 @@ def main() -> int:
         def validate_warmed_genre(warm: WarmedGenre) -> None:
             refresh_warmed_genre_ports(warm)
             connections = (
-                ("s2-arturia-profile-router:out", MIDI_TARGETS[0]),
                 *genre_midi_connections(warm),
                 *genre_audio_connections(warm),
                 *SHARED_AUDIO,
@@ -871,6 +870,8 @@ def main() -> int:
             warm = warmed_genres.get(profile)
             if warm is None or warm.process.poll() is not None:
                 raise RuntimeError(f"Warmed genre is not running: {profile}")
+            ensure_router()
+            wait_for_ports(MIDI_TARGETS, environment)
             if not genre_quantum_changed:
                 set_pipewire_quantum(GENRE_PIPEWIRE_QUANTUM, environment)
                 genre_quantum_changed = True
