@@ -680,7 +680,6 @@ def main() -> int:
             refresh_warmed_genre_ports(warm)
             for target in MIDI_TARGETS:
                 disconnect("s2-arturia-profile-router:out", target, environment)
-            connect("s2-arturia-profile-router:out", MIDI_TARGETS[0], environment)
             midi_connections = genre_midi_connections(warm)
             router_connections = [connection for connection in midi_connections
                                   if connection[0] == "s2-arturia-profile-router:out"]
@@ -694,11 +693,14 @@ def main() -> int:
                     return
                 connect_by_current_ids(source, target, environment)
 
+            for source, target in genre_audio_connections(warm):
+                connect_cached(source, target)
+            connect_many(SHARED_AUDIO, environment)
+            connect_many(MASTER_AUDIO, environment)
+            connect("s2-arturia-profile-router:out", MIDI_TARGETS[0], environment)
             for source, target in router_connections:
                 connect_cached(source, target)
             for source, target in other_midi_connections:
-                connect_cached(source, target)
-            for source, target in genre_audio_connections(warm):
                 connect_cached(source, target)
             expected = (*genre_midi_connections(warm), *genre_audio_connections(warm))
             current_links = links(environment)
@@ -706,8 +708,6 @@ def main() -> int:
                        if not link_present(current_links, source, target)]
             if missing:
                 raise RuntimeError(f"warmed genre route validation failed: {missing[0][0]} -> {missing[0][1]}")
-            connect_many(SHARED_AUDIO, environment)
-            connect_many(MASTER_AUDIO, environment)
 
         def validate_warmed_genre(warm: WarmedGenre) -> None:
             refresh_warmed_genre_ports(warm)
