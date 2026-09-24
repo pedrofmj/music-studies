@@ -4,7 +4,7 @@
  <EngineSettings>
   <ForceStereo>false</ForceStereo>
   <PreferPluginBridges>false</PreferPluginBridges>
-  <PreferUiBridges>true</PreferUiBridges>
+   <PreferUiBridges>false</PreferUiBridges>
   <UIsAlwaysOnTop>false</UIsAlwaysOnTop>
   <MaxParameters>200</MaxParameters>
   <UIBridgesTimeout>4000</UIBridgesTimeout>
