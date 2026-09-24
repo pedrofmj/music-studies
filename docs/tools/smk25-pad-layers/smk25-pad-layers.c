@@ -784,7 +784,7 @@ static void process_event(
     if (knob >= 0) {
         const unsigned char volume[] = {
             (unsigned char)(0xb0 | configuration.knob_channels[knob]),
-            (unsigned char)configuration.knobs[knob],
+            (unsigned char)(20 + knob),
             message[2],
         };
         atomic_store(&knob_values[knob], message[2]);
