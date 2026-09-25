@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import signal
 import shutil
 import subprocess
 import sys
@@ -137,31 +138,94 @@ def rollback() -> None:
     restart_selector()
 
 
-def reset(kind: str) -> None:
+def wait_for_ports(names: list[str], timeout: float = 90) -> None:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        outputs = run(["pw-link", "-o"]).stdout.splitlines()
+        if all(name in outputs for name in names):
+            return
+        time.sleep(1)
+    raise RuntimeError(f"required Carla ports did not register: {', '.join(names)}")
+
+
+def kill_orphan_genres() -> None:
+    result = run(["ps", "-eo", "pid=,args="])
+    pids: list[int] = []
+    for line in result.stdout.splitlines():
+        parts = line.strip().split(None, 1)
+        if len(parts) != 2 or not any(prefix in parts[1]
+                                      for prefix in ("FAST-GENRE-", "SAFE-GENRE-")):
+            continue
+        try:
+            pids.append(int(parts[0]))
+        except ValueError:
+            pass
+    for pid in pids:
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except (ProcessLookupError, PermissionError):
+            pass
+    if pids:
+        time.sleep(3)
+    for pid in pids:
+        try:
+            os.kill(pid, signal.SIGKILL)
+        except (ProcessLookupError, PermissionError):
+            pass
+    run(["flatpak", "kill", "studio.kx.carla"])
+
+
+def emergency_reset() -> Path:
+    timestamp = time.strftime("%Y%m%dT%H%M%S")
+    backup = HOME / ".local/state/music-rig/emergency-resets" / timestamp
+    backup.mkdir(parents=True, exist_ok=True)
+    for source in (ENV_FILE, PREVIOUS_ENV_FILE,
+                   HOME / ".local/state/smk25-pad-layers/state",
+                   HOME / ".local/share/music-rig/arturia-profile-session/last-session.json"):
+        if source.exists():
+            shutil.copy2(source, backup / source.name)
+    write_env("MUSIC_RIG_TRANSITION_MODE=fast\n")
+    for unit in (SELECTOR, ENCODER, SMK, HEADLESS):
+        run(["systemctl", "--user", "stop", unit])
+    kill_orphan_genres()
+    state = HOME / ".local/state/smk25-pad-layers/state"
+    if state.exists():
+        state.unlink()
+    run(["systemctl", "--user", "start", HEADLESS], check=True)
+    wait_for_ports(["AR-CH-1 - Basic Piano:output_1", "SMC-MIX - 8-Band EQ:Output L"])
+    run(["systemctl", "--user", "start", ENCODER], check=True)
+    run(["systemctl", "--user", "start", SMK], check=True)
+    run(["systemctl", "--user", "start", SELECTOR], check=True)
+    return backup
+
+
+def reset(kind: str) -> str | None:
     if kind == "genres":
         write_env("MUSIC_RIG_TRANSITION_MODE=fast\n")
         restart_selector()
-        return
+        return None
     if kind == "arturia":
         restart_selector()
-        return
+        return None
     if kind == "smk25":
         run(["systemctl", "--user", "stop", SMK], check=True)
         state = HOME / ".local/state/smk25-pad-layers/state"
         if state.exists():
             state.replace(state.with_name("state.reset-backup"))
         run(["systemctl", "--user", "start", SMK], check=True)
-        return
+        return None
     if kind == "output":
         run(["systemctl", "--user", "restart", ENCODER], check=True)
-        return
+        return None
     if kind == "full":
         write_env("MUSIC_RIG_TRANSITION_MODE=fast\n")
         run(["systemctl", "--user", "stop", SELECTOR], check=True)
         run(["systemctl", "--user", "restart", HEADLESS], check=True)
         run(["systemctl", "--user", "restart", ENCODER], check=True)
         run(["systemctl", "--user", "start", SELECTOR], check=True)
-        return
+        return None
+    if kind == "emergency":
+        return str(emergency_reset())
     raise RuntimeError(f"unknown reset type: {kind}")
 
 
@@ -176,7 +240,8 @@ def main() -> int:
     events_parser = subparsers.add_parser("events")
     events_parser.add_argument("--limit", type=int, default=20)
     reset_parser = subparsers.add_parser("reset")
-    reset_parser.add_argument("kind", choices=("full", "arturia", "smk25", "output", "genres"))
+    reset_parser.add_argument("kind", choices=(
+        "full", "emergency", "arturia", "smk25", "output", "genres"))
     arguments = parser.parse_args()
     try:
         if arguments.operation == "status":
@@ -192,8 +257,11 @@ def main() -> int:
         elif arguments.operation == "events":
             print(json.dumps(latest_events(arguments.limit), indent=2, sort_keys=True))
         elif arguments.operation == "reset":
-            reset(arguments.kind)
-            print(json.dumps(status(), indent=2, sort_keys=True))
+            backup = reset(arguments.kind)
+            payload = status()
+            if backup:
+                payload["emergency_backup"] = backup
+            print(json.dumps(payload, indent=2, sort_keys=True))
         return 0
     except (OSError, RuntimeError, subprocess.CalledProcessError) as error:
         print(json.dumps({"error": str(error)}), file=sys.stderr)

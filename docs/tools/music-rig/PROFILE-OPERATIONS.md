@@ -30,15 +30,18 @@ fails.
 
 ```bash
 music-rig-profile reset full
+music-rig-profile reset emergency
 music-rig-profile reset arturia
 music-rig-profile reset smk25
 music-rig-profile reset output
 music-rig-profile reset genres
 ```
 
-`full` restarts the protected Carla rack, encoder, and selector. `smk25` clears
-the persisted layer state and restarts only the SMK router. `genres` returns to
-engine-only Fast Mode.
+`full` restarts the protected Carla rack, encoder, and selector. `emergency`
+backs up runtime state, stops all Music Rig services, removes orphan genre
+Carla processes, clears SMK state, rebuilds services in dependency order, and
+returns to engine-only Fast Mode. `smk25` clears the persisted layer state and
+restarts only the SMK router. `genres` returns to engine-only Fast Mode.
 
 All reset operations should be performed while no live notes or sustained pads
 are active.
