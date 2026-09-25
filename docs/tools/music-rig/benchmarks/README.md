@@ -9,6 +9,9 @@ Each warmed project uses a distinct Carla client prefix and is discarded on
 selector shutdown. A failed prewarm or cached switch records
 `fast-mode-fallback` and returns to the existing safe genre transition path.
 
+For profile selection, reset operations, rollback, and event inspection, use
+[`PROFILE-OPERATIONS.md`](../PROFILE-OPERATIONS.md) and `bin/music-rig-profile`.
+
 ### Genre rollout rules
 
 Enable only one genre while validating the fast genre path. The current

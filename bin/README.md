@@ -26,6 +26,20 @@ The command restores and verifies the independent MIDI routes. It does not
 start or stop Carla and does not change another device's active mode. Additional
 device modes can be added later without changing the Arturia selector.
 
+## Runtime Profiles
+
+`music-rig-profile` is the single entry point for versioned runtime profiles,
+rollback, events, and reset scopes. Install profiles under
+`~/.config/music-rig/profiles` before using it from Echora:
+
+```bash
+music-rig-profile list
+music-rig-profile status
+music-rig-profile apply validated-4-5
+music-rig-profile rollback
+music-rig-profile reset smk25
+```
+
 ## Run on airstar
 
 Copy the script to the host and make it executable:

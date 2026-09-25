@@ -1,0 +1,204 @@
+#!/usr/bin/env python3
+"""Apply and inspect versioned Music Rig runtime profiles."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+
+HOME = Path.home()
+ENV_FILE = HOME / ".config/music-rig/arturia-profile-session.env"
+PREVIOUS_ENV_FILE = ENV_FILE.with_suffix(".env.previous")
+EVENT_LOG = HOME / ".local/state/music-rig/arturia-profile-session/transition-events.jsonl"
+SELECTOR = "music-rig-arturia-profile-session.service"
+HEADLESS = "music-rig-pedro-carla-headless.service"
+ENCODER = "arturia-main-volume-encoder.service"
+SMK = "smk25-pad-layers.service"
+
+
+def run(command: list[str], check: bool = False) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(command, check=check, text=True, capture_output=True)
+
+
+def profile_dir() -> Path:
+    configured = os.environ.get("MUSIC_RIG_PROFILE_DIR")
+    if configured:
+        return Path(configured).expanduser()
+    local = HOME / ".config/music-rig/profiles"
+    if local.is_dir():
+        return local
+    return Path(__file__).resolve().parent.parent / "docs/tools/music-rig/runtime-profiles"
+
+
+def profiles() -> dict[str, Path]:
+    return {path.stem: path for path in sorted(profile_dir().glob("*.env"))}
+
+
+def read_env(path: Path = ENV_FILE) -> str:
+    return path.read_text(encoding="utf-8") if path.exists() else ""
+
+
+def write_env(contents: str) -> None:
+    ENV_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=ENV_FILE.parent,
+                                    prefix="arturia-profile-session.", delete=False) as stream:
+        stream.write(contents)
+        temporary = Path(stream.name)
+    temporary.replace(ENV_FILE)
+
+
+def service_state(unit: str) -> str:
+    result = run(["systemctl", "--user", "is-active", unit])
+    return result.stdout.strip() or "inactive"
+
+
+def latest_events(limit: int = 12) -> list[dict[str, object]]:
+    if not EVENT_LOG.exists():
+        return []
+    entries: list[dict[str, object]] = []
+    for line in EVENT_LOG.read_text(encoding="utf-8").splitlines()[-limit:]:
+        try:
+            entries.append(json.loads(line))
+        except json.JSONDecodeError:
+            entries.append({"raw": line})
+    return entries
+
+
+def status() -> dict[str, object]:
+    return {
+        "profile_dir": str(profile_dir()),
+        "environment_file": str(ENV_FILE),
+        "environment": read_env().splitlines(),
+        "services": {
+            "headless": service_state(HEADLESS),
+            "encoder": service_state(ENCODER),
+            "selector": service_state(SELECTOR),
+            "smk25": service_state(SMK),
+        },
+        "events": latest_events(),
+    }
+
+
+def restart_selector() -> None:
+    result = run(["systemctl", "--user", "restart", SELECTOR])
+    if result.returncode:
+        raise RuntimeError(result.stdout or result.stderr or "selector restart failed")
+
+
+def apply_profile(name: str) -> None:
+    available = profiles()
+    if name not in available:
+        raise RuntimeError(f"unknown profile {name!r}; available: {', '.join(sorted(available))}")
+    previous = read_env()
+    if previous:
+        PREVIOUS_ENV_FILE.write_text(previous, encoding="utf-8")
+    contents = available[name].read_text(encoding="utf-8")
+    expected_genres = next(
+        (line.split("=", 1)[1].strip().split(",")
+         for line in contents.splitlines()
+         if line.startswith("MUSIC_RIG_FAST_GENRES=")),
+        [],
+    )
+    write_env(contents)
+    restart_selector()
+    deadline = time.monotonic() + 90
+    while time.monotonic() < deadline:
+        if service_state(SELECTOR) == "active":
+            events = latest_events(3)
+            warm_events = [event for event in events
+                           if event.get("event") == "fast-mode-enabled"]
+            if expected_genres:
+                if any(set(event.get("warm_genres", [])) == set(expected_genres)
+                       for event in warm_events):
+                    return
+            elif warm_events:
+                return
+        time.sleep(1)
+    if previous:
+        write_env(previous)
+        restart_selector()
+    raise RuntimeError(f"profile {name!r} did not become ready; previous profile restored")
+
+
+def rollback() -> None:
+    if not PREVIOUS_ENV_FILE.exists():
+        raise RuntimeError("no previous profile is available")
+    current = read_env()
+    ENV_FILE.write_text(PREVIOUS_ENV_FILE.read_text(encoding="utf-8"), encoding="utf-8")
+    PREVIOUS_ENV_FILE.write_text(current, encoding="utf-8")
+    restart_selector()
+
+
+def reset(kind: str) -> None:
+    if kind == "genres":
+        write_env("MUSIC_RIG_TRANSITION_MODE=fast\n")
+        restart_selector()
+        return
+    if kind == "arturia":
+        restart_selector()
+        return
+    if kind == "smk25":
+        run(["systemctl", "--user", "stop", SMK], check=True)
+        state = HOME / ".local/state/smk25-pad-layers/state"
+        if state.exists():
+            state.replace(state.with_name("state.reset-backup"))
+        run(["systemctl", "--user", "start", SMK], check=True)
+        return
+    if kind == "output":
+        run(["systemctl", "--user", "restart", ENCODER], check=True)
+        return
+    if kind == "full":
+        write_env("MUSIC_RIG_TRANSITION_MODE=fast\n")
+        run(["systemctl", "--user", "stop", SELECTOR], check=True)
+        run(["systemctl", "--user", "restart", HEADLESS], check=True)
+        run(["systemctl", "--user", "restart", ENCODER], check=True)
+        run(["systemctl", "--user", "start", SELECTOR], check=True)
+        return
+    raise RuntimeError(f"unknown reset type: {kind}")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    subparsers = parser.add_subparsers(dest="operation", required=True)
+    subparsers.add_parser("status")
+    subparsers.add_parser("list")
+    apply_parser = subparsers.add_parser("apply")
+    apply_parser.add_argument("profile")
+    subparsers.add_parser("rollback")
+    events_parser = subparsers.add_parser("events")
+    events_parser.add_argument("--limit", type=int, default=20)
+    reset_parser = subparsers.add_parser("reset")
+    reset_parser.add_argument("kind", choices=("full", "arturia", "smk25", "output", "genres"))
+    arguments = parser.parse_args()
+    try:
+        if arguments.operation == "status":
+            print(json.dumps(status(), indent=2, sort_keys=True))
+        elif arguments.operation == "list":
+            print("\n".join(sorted(profiles())))
+        elif arguments.operation == "apply":
+            apply_profile(arguments.profile)
+            print(json.dumps(status(), indent=2, sort_keys=True))
+        elif arguments.operation == "rollback":
+            rollback()
+            print(json.dumps(status(), indent=2, sort_keys=True))
+        elif arguments.operation == "events":
+            print(json.dumps(latest_events(arguments.limit), indent=2, sort_keys=True))
+        elif arguments.operation == "reset":
+            reset(arguments.kind)
+            print(json.dumps(status(), indent=2, sort_keys=True))
+        return 0
+    except (OSError, RuntimeError, subprocess.CalledProcessError) as error:
+        print(json.dumps({"error": str(error)}), file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
