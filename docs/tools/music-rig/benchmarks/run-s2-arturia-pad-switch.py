@@ -229,7 +229,9 @@ def cleanup_orphaned_warm_genres(environment: dict[str, str]) -> None:
     pids = []
     for line in result.stdout.splitlines():
         parts = line.strip().split(None, 1)
-        if len(parts) == 2 and "FAST-GENRE-" in parts[1]:
+        if len(parts) == 2 and any(
+            prefix in parts[1] for prefix in ("FAST-GENRE-", "SAFE-GENRE-")
+        ):
             try:
                 pids.append(int(parts[0]))
             except ValueError:
