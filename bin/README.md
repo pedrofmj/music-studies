@@ -40,6 +40,22 @@ music-rig-profile rollback
 music-rig-profile reset smk25
 ```
 
+`music-rig-setup` is the package-level setup boundary used by Echora's
+Performance Rig Setup dialog:
+
+```bash
+music-rig-setup status
+music-rig-setup validate
+music-rig-setup install
+music-rig-setup reinstall
+music-rig-setup uninstall
+music-rig-setup repair
+```
+
+The package payload is staged under
+`~/.local/share/echora/performance-rig-package`. Large user assets remain
+external and are validated before install/reinstall succeeds.
+
 ## Run on airstar
 
 Copy the script to the host and make it executable:

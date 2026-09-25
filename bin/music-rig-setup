@@ -1,0 +1,149 @@
+#!/usr/bin/env python3
+"""Inspect and operate the offline Music Rig package installation."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import platform
+import subprocess
+import sys
+from pathlib import Path
+
+
+HOME = Path.home()
+PACKAGE_ROOT = Path(os.environ.get(
+    "MUSIC_RIG_PACKAGE_ROOT",
+    str(HOME / ".local/share/echora/performance-rig-package"),
+)).expanduser()
+MANIFEST = PACKAGE_ROOT / "package-manifest.json"
+PROFILE_COMMAND = HOME / "bin/music-rig-profile"
+STATE_FILE = PACKAGE_ROOT / "installation-state.json"
+
+
+def run(command: list[str]) -> tuple[int, str]:
+    result = subprocess.run(command, check=False, text=True,
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    return result.returncode, result.stdout.strip()
+
+
+def load_manifest() -> dict[str, object]:
+    if not MANIFEST.is_file():
+        raise RuntimeError(f"offline package payload is not staged: {MANIFEST}")
+    return json.loads(MANIFEST.read_text(encoding="utf-8"))
+
+
+def expand(path: str) -> Path:
+    return Path(path.replace("~/", f"{HOME}/", 1)).expanduser()
+
+
+def asset_status(manifest: dict[str, object]) -> list[dict[str, object]]:
+    result = []
+    for asset in manifest.get("requiredAssets", []):
+        paths = asset.get("paths", [])
+        resolved = [expand(path) for path in paths]
+        result.append({
+            "id": asset.get("id"),
+            "paths": [str(path) for path in resolved],
+            "present": any(path.exists() for path in resolved),
+        })
+    return result
+
+
+def service_status() -> dict[str, str]:
+    units = {
+        "headless": "music-rig-pedro-carla-headless.service",
+        "encoder": "arturia-main-volume-encoder.service",
+        "selector": "music-rig-arturia-profile-session.service",
+        "smk25": "smk25-pad-layers.service",
+    }
+    return {name: run(["systemctl", "--user", "is-active", unit])[1] or "inactive"
+            for name, unit in units.items()}
+
+
+def distro() -> str:
+    values: dict[str, str] = {}
+    try:
+        for line in Path("/etc/os-release").read_text(encoding="utf-8").splitlines():
+            if "=" in line:
+                key, value = line.split("=", 1)
+                values[key] = value.strip('"')
+    except OSError:
+        return "unknown"
+    return values.get("ID", "unknown")
+
+
+def dependency_plan() -> dict[str, object]:
+    packages = ["carla", "pipewire", "pipewire-jack", "wireplumber", "lv2-plugins", "jack-tools"]
+    current = distro()
+    if current in {"debian", "ubuntu", "linuxmint", "pop"}:
+        command = ["sudo", "apt-get", "install", *packages]
+    elif current in {"fedora", "rhel", "centos"}:
+        command = ["sudo", "dnf", "install", *packages]
+    elif current in {"arch", "manjaro"}:
+        command = ["sudo", "pacman", "-S", *packages]
+    else:
+        command = []
+    return {"distribution": current, "packages": packages, "command": command}
+
+
+def status() -> dict[str, object]:
+    manifest = load_manifest()
+    return {
+        "package_root": str(PACKAGE_ROOT),
+        "manifest": str(MANIFEST),
+        "manifest_version": manifest.get("packageVersion"),
+        "assets": asset_status(manifest),
+        "services": service_status(),
+        "dependencies": dependency_plan(),
+        "installed": STATE_FILE.is_file(),
+    }
+
+
+def operation(name: str) -> dict[str, object]:
+    manifest = load_manifest()
+    if name in {"install", "reinstall"}:
+        missing = [asset["id"] for asset in asset_status(manifest) if not asset["present"]]
+        if missing:
+            raise RuntimeError("missing external assets: " + ", ".join(missing))
+        if not PROFILE_COMMAND.is_file():
+            raise RuntimeError(f"runtime profile CLI is missing: {PROFILE_COMMAND}")
+        STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        STATE_FILE.write_text(json.dumps({
+            "packageVersion": manifest.get("packageVersion"),
+            "operation": name,
+            "platform": platform.system().lower(),
+        }, indent=2) + "\n", encoding="utf-8")
+        return {"status": "installed", "operation": name, "package_root": str(PACKAGE_ROOT)}
+    if name == "uninstall":
+        if STATE_FILE.exists():
+            STATE_FILE.unlink()
+        return {"status": "uninstalled", "package_root": str(PACKAGE_ROOT)}
+    if name == "validate":
+        return status()
+    if name == "repair":
+        if not PROFILE_COMMAND.is_file():
+            raise RuntimeError(f"runtime profile CLI is missing: {PROFILE_COMMAND}")
+        result = run([str(PROFILE_COMMAND), "reset", "emergency"])
+        if result[0] != 0:
+            raise RuntimeError(result[1] or "emergency repair failed")
+        return {"status": "repaired", "output": result[1]}
+    raise RuntimeError(f"unknown operation: {name}")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("operation", choices=("status", "install", "reinstall", "uninstall", "validate", "repair"))
+    arguments = parser.parse_args()
+    try:
+        print(json.dumps(status() if arguments.operation == "status"
+                         else operation(arguments.operation), indent=2, sort_keys=True))
+        return 0
+    except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as error:
+        print(json.dumps({"error": str(error)}), file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
