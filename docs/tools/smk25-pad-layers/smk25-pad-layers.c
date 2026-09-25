@@ -675,6 +675,11 @@ static bool handle_pad(
         : message[2] >= configuration.pad_on_minimum;
     if (configuration.pad_behavior == PAD_VALUE) {
         set_layer_enabled(layer, pressed, frame, emit, context);
+    } else if (configuration.pad_type == CONTROL_CC) {
+        if (pressed)
+            set_layer_enabled(
+                layer, !atomic_load(&layers[layer].enabled), frame, emit, context
+            );
     } else {
         const bool was_down = layers[layer].pad_down;
         layers[layer].pad_down = pressed;
