@@ -37,8 +37,16 @@ music-rig-profile list
 music-rig-profile status
 music-rig-profile apply validated-4-5
 music-rig-profile rollback
+music-rig-profile repair-routes
+music-rig-profile repair-audio
+music-rig-profile recover
 music-rig-profile reset smk25
 ```
+
+Post-reboot Arturia recovery is deterministic: run `music-rig-profile recover`
+first. If the rig is green but Arturia remains silent after the KeyLab USB cable
+is replugged, run `music-rig-profile repair-routes` to bind the newly enumerated
+`KL Essential 61 mk3 MIDI` capture port back into `s2-arturia-profile-router`.
 
 `music-rig-setup` is the package-level setup boundary used by Echora's
 Performance Rig Setup dialog:

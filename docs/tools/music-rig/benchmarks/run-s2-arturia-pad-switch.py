@@ -23,6 +23,9 @@ MIDI_TARGETS = (
     "AR Controls - Sustain Scale:events-in",
 )
 ROUTER_INPUT = "s2-arturia-profile-router:in"
+KEYLAB_OUTPUT_TOKEN = "KL Essential 61 mk3"
+KEYLAB_OUTPUT_SUFFIX = ":(capture_0) KL Essential 61 mk3 MIDI"
+KEYLAB_DISCOVERY_TIMEOUT_SECONDS = 60.0
 LSP_LEFT = "LSP Mixer x8 Stereo:Input L"
 LSP_RIGHT = "LSP Mixer x8 Stereo:Input R"
 MIDI_GUARD_INTERVAL_SECONDS = 0.5
@@ -401,14 +404,28 @@ def disconnect(source: str, target: str, environment: dict[str, str]) -> None:
 
 
 def find_keylab(environment: dict[str, str]) -> str:
-    result = run(["pw-link", "-o"], environment)
-    candidates = [
-        line.strip() for line in result.stdout.splitlines()
-        if "KL Essential 61 mk3" in line and "capture_0" in line and "MIDI" in line
-    ]
-    if len(candidates) != 1:
-        raise RuntimeError(f"expected one KeyLab MIDI source, found {candidates}")
-    return candidates[0]
+    deadline = time.monotonic() + KEYLAB_DISCOVERY_TIMEOUT_SECONDS
+    candidates: list[str] = []
+    last_error = ""
+    while True:
+        result = run(["pw-link", "-o"], environment)
+        if result.returncode == 0:
+            candidates = [
+                line.strip() for line in result.stdout.splitlines()
+                if KEYLAB_OUTPUT_TOKEN in line.strip()
+                and line.strip().endswith(KEYLAB_OUTPUT_SUFFIX)
+            ]
+            if len(candidates) == 1:
+                return candidates[0]
+            last_error = ""
+        else:
+            last_error = result.stdout.strip()
+        if time.monotonic() >= deadline:
+            detail = f"; last pw-link error: {last_error}" if last_error else ""
+            raise RuntimeError(
+                f"expected one KeyLab MIDI source, found {candidates}{detail}"
+            )
+        time.sleep(0.5)
 
 
 def main() -> int:
