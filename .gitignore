@@ -4,3 +4,7 @@ vtcode.toml
 
 # Local build outputs
 build/
+
+# Python-generated files
+__pycache__/
+*.py[cod]

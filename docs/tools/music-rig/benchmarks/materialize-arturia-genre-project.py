@@ -66,7 +66,12 @@ def main() -> int:
             engine_settings.find("PreferUiBridges").text = "false"
             engine_settings.find("UIBridgesTimeout").text = "1000"
         for plugin in root.findall("Plugin"):
-            if plugin.findtext("Info/Name") != "LSP Mixer x8 Stereo":
+            name = plugin.findtext("Info/Name") or ""
+            if name == "PD-CH-1 Output Gain 0 to +12 dB":
+                for parameter in plugin.findall("Data/Parameter"):
+                    if parameter.findtext("Symbol") == "g_out":
+                        parameter.find("Value").text = "4"
+            if name != "LSP Mixer x8 Stereo":
                 continue
             for parameter in plugin.findall("Data/Parameter"):
                 if parameter.findtext("Symbol") == "g_out":

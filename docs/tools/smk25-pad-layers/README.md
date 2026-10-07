@@ -28,20 +28,23 @@ two-value CC state (pad_behavior=value) or press-to-toggle Note/CC messages
 (pad_behavior=toggle). Do not deploy guessed mappings: capture them with
 `jack_midi_dump` first.
 
-Side-A controls must be distinguishable from keyboard notes. CC-toggle pads
-are preferred. If the pads send Note messages on the keyboard's channel, use
-the M-VAVE editor to assign them unique CCs or a separate MIDI channel.
+The current factory mapping uses CC-toggle pads on MIDI channel 10: CC21-28
+for Pads 1-8 and CC111-118 for the Pad-B bank. Both banks address the same eight
+layer outputs. Side-A controls must be distinguishable from keyboard notes. If
+the pads send Note messages on the keyboard's channel, use the M-VAVE editor to
+assign them unique CCs or a separate MIDI channel.
 
 ### Observed Controls
 
 | Control | Message | Endpoint |
 | --- | --- | --- |
-| Side-A Pads 1-4 | CC40-43 on channels 1-4, values 127/0 | SMK25-Master |
-| Side-A Pads 5-8 | CC36-39 on channels 5-8, values 127/0 | SMK25-Master |
-| Knobs 1-8 | CC20-27 on channel 1 | SMK25-Master |
-| Stop | Note 93 on channel 1 | AUX `capture_2` |
-| Play | Note 94 on channel 1 | AUX `capture_2` |
-| Side-B Pad 1 | CC96 on channel 9, values 127/0 | Separate from Side-A; ignored |
+| Pads 1-8 | CC21-28 on channel 10, values 127/127 | SMK25-Master |
+| Pad-B 1-8 | CC111-118 on channel 10, values 127/127 | SMK25-Master |
+| Knobs 1-8 | CC30-37 on channel 1 | SMK25-Master |
+| Knob-B 1-8 | CC38-45 on channel 1 | SMK25-Master |
+
+The router normalizes both knob banks to CC20-27 on its layer outputs because
+the protected SMK layer mixer uses those legacy CC mappings.
 
 Captured on `airstar` on 2026-08-08. The remaining Side-B pads are reserved and
 are not consumed by this service.
@@ -49,6 +52,52 @@ are not consumed by this service.
 The controller's local two-color toggle can display latch state. The retained
 manual does not document inbound RGB feedback, so automatic LED resynchronizing
 after a controller or service restart remains a separate hardware test.
+
+## Factory CubeSuite Setup
+
+The tested factory profile uses these assignments. Save the profile to the
+controller after changing it; the application display alone is not sufficient.
+
+| Control bank | MIDI message | Router behavior |
+| --- | --- | --- |
+| Pads 1-8 | CC21-28, channel 10, values 127/127 | Toggle layers 1-8 |
+| Pad-B 1-8 | CC111-118, channel 10, values 127/127 | Toggle layers 1-8 |
+| Knobs 1-8 | CC30-37, channel 1 | Layer volumes 1-8 |
+| Knob-B 1-8 | CC38-45, channel 1 | Layer volumes 1-8 |
+| Stop | CC93, channel 1, CC Push | Pause sustained layers |
+| Play | CC94, channel 1, CC Push | Resume sustained layers |
+
+The third knob in each bank did not emit a MIDI message during capture. CC32
+and CC40 remain reserved for those controls. The router normalizes both knob
+banks to the protected layer mixer's legacy CC20-27 outputs.
+
+The corresponding deployed configuration is
+`docs/tools/smk25-pad-layers/smk25-pad-layers.conf`. Install it and rebuild the
+service with:
+
+```bash
+docs/tools/smk25-pad-layers/install-smk25-pad-layers
+```
+
+After a controller power cycle, verify the current source and restore the
+semantic routes if necessary:
+
+```bash
+pw-link -o | grep 'SMK25-Master'
+pw-link 'Midi-Bridge:<current SMK25-Master source>' 'SMK25 Pad Layers:midi-in'
+```
+
+To reset all latched layers without changing the CubeSuite profile:
+
+```bash
+systemctl --user stop smk25-pad-layers.service
+mv ~/.local/state/smk25-pad-layers/state \
+   ~/.local/state/smk25-pad-layers/state.backup
+systemctl --user start smk25-pad-layers.service
+```
+
+The reset clears software layer state; controller LED state is local to the
+hardware and is not currently synchronized by the router.
 
 ## Data Flow
 
