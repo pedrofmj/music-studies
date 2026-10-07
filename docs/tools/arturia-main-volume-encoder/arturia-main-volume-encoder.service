@@ -1,12 +1,13 @@
 [Unit]
 Description=Map Arturia central control to Carla master volume and mute
-After=pipewire.service
+After=pipewire.service music-rig-pedro-carla-headless.service
+Requires=music-rig-pedro-carla-headless.service
 Wants=pipewire.service
 
 [Service]
 Type=simple
 ExecStart=/usr/bin/pw-jack %h/.local/bin/arturia-main-volume-encoder %h/.local/state/arturia-main-volume-encoder/value 3
-Restart=on-failure
+Restart=always
 RestartSec=2
 
 [Install]

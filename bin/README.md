@@ -4,6 +4,66 @@
 JSON document, then recreates those links later. It does not create hardware
 devices, plugin instances, or applications; start those first.
 
+## Independent Device Modes
+
+`music-rig-device-mode` selects a device mode without changing another device.
+The currently supported non-Arturia modes are the existing runtime modes:
+
+```bash
+music-rig-device-mode --device smk25-main --mode ambient-pad-layers
+music-rig-device-mode --device smc-mixer-main --mode eight-band-eq
+music-rig-device-mode --device smc-pad-main --mode drum-set
+music-rig-device-mode --device smc-pad-pocket --mode drum-set
+```
+
+Arturia requests use the existing selector FIFO:
+
+```bash
+music-rig-device-mode --device arturia-main --mode gospel-keys
+```
+
+The command restores and verifies the independent MIDI routes. It does not
+start or stop Carla and does not change another device's active mode. Additional
+device modes can be added later without changing the Arturia selector.
+
+## Runtime Profiles
+
+`music-rig-profile` is the single entry point for versioned runtime profiles,
+rollback, events, and reset scopes. Install profiles under
+`~/.config/music-rig/profiles` before using it from Echora:
+
+```bash
+music-rig-profile list
+music-rig-profile status
+music-rig-profile apply validated-4-5
+music-rig-profile rollback
+music-rig-profile repair-routes
+music-rig-profile repair-audio
+music-rig-profile recover
+music-rig-profile reset smk25
+```
+
+Post-reboot Arturia recovery is deterministic: run `music-rig-profile recover`
+first. If the rig is green but Arturia remains silent after the KeyLab USB cable
+is replugged, run `music-rig-profile repair-routes` to bind the newly enumerated
+`KL Essential 61 mk3 MIDI` capture port back into `s2-arturia-profile-router`.
+
+`music-rig-setup` is the package-level setup boundary used by Echora's
+Performance Rig Setup dialog:
+
+```bash
+music-rig-setup status
+music-rig-setup validate
+music-rig-setup install
+music-rig-setup reinstall
+music-rig-setup uninstall
+music-rig-setup repair
+```
+
+The package payload is staged under
+`~/.local/share/echora/performance-rig-package`. Large user assets remain
+external and are validated before install/reinstall succeeds.
+
 ## Run on airstar
 
 Copy the script to the host and make it executable:

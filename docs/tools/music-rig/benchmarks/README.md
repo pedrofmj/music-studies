@@ -1,5 +1,44 @@
 # Music Rig Benchmarks
 
+## Fast Arturia Genre Transitions
+
+`run-s2-arturia-pad-switch.py` remains safe-mode by default. With
+`MUSIC_RIG_TRANSITION_MODE=fast`, `MUSIC_RIG_FAST_GENRES` can opt into
+prewarming genre projects using a comma-separated list of genre ids, or `all`.
+Each warmed project uses a distinct Carla client prefix and is discarded on
+selector shutdown. A failed prewarm or cached switch records
+`fast-mode-fallback` and returns to the existing safe genre transition path.
+
+For profile selection, reset operations, rollback, and event inspection, use
+[`PROFILE-OPERATIONS.md`](../PROFILE-OPERATIONS.md) and `bin/music-rig-profile`.
+
+### Genre rollout rules
+
+Enable only one genre while validating the fast genre path. The current
+validated landstar configuration is:
+
+```ini
+MUSIC_RIG_TRANSITION_MODE=fast
+MUSIC_RIG_FAST_GENRES=worship-piano
+```
+
+Fast genre projects share the Full Live Rack's PipeWire quantum. The selector
+waits for the complete genre endpoint set and refreshes PipeWire port IDs before
+connecting each route. Do not change the global quantum during a warm genre
+switch; doing so can unregister the prefixed Carla ports while the transition is
+in progress.
+
+The genre endpoint graph is separate from the shared router and LSP/SMC graph.
+The selector validates both parts independently, then falls back to Full Live
+if either part fails. A successful automated route check is not sufficient for
+acceptance: validate the continuous SMK-25 pad, SMC-Mixer, SMC-PAD, SMC-PAD
+Pocket, Arturia modes 1 through 4, and audible recovery to Full Live.
+
+After a genre failure, inspect
+`~/.local/state/music-rig/arturia-profile-session/transition-events.jsonl`,
+remove the genre from `MUSIC_RIG_FAST_GENRES`, and restart the selector before
+testing another genre. Do not enable `all` during rollout.
+
 The [2026-08-11 Airstar Hardware Preset capture](hardware-preset-airstar-2026-08-11.json)
 records the exact current SMC-PAD and SMC-PAD Pocket pad assignments, the
 Pocket's non-MIDI hardware controls, and matching pre/post subscription

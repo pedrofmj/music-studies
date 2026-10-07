@@ -1,0 +1,545 @@
+#!/usr/bin/env python3
+"""Apply and inspect versioned Music Rig runtime profiles."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import signal
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+
+HOME = Path.home()
+ENV_FILE = HOME / ".config/music-rig/arturia-profile-session.env"
+PREVIOUS_ENV_FILE = ENV_FILE.with_suffix(".env.previous")
+EVENT_LOG = HOME / ".local/state/music-rig/arturia-profile-session/transition-events.jsonl"
+SELECTOR = "music-rig-arturia-profile-session.service"
+HEADLESS = "music-rig-pedro-carla-headless.service"
+ENCODER = "arturia-main-volume-encoder.service"
+SMK = "smk25-pad-layers.service"
+AUDIO_OUTPUT_CONFIG = HOME / ".config/echora/performance-rig-audio-output.properties"
+AUDIO_OUTPUT_LEFT = "Arturia Main Volume Encoder:audio-out-l"
+AUDIO_OUTPUT_RIGHT = "Arturia Main Volume Encoder:audio-out-r"
+ARTURIA_KEYLAB_OUTPUT_TOKEN = "KL Essential 61 mk3"
+ARTURIA_KEYLAB_OUTPUT_SUFFIX = ":(capture_0) KL Essential 61 mk3 MIDI"
+ROUTE_REPAIR_WAIT_SECONDS = 30
+ROUTER_START_WAIT_SECONDS = 90
+ARTURIA_ROUTER_INPUT = "s2-arturia-profile-router:in"
+ARTURIA_ROUTER_OUTPUT = "s2-arturia-profile-router:out"
+ARTURIA_MASTER_INPUT = "Arturia Main Volume Encoder:relative-in"
+ARTURIA_FULL_RACK_INPUT = "AR Controls - Sustain Scale:events-in"
+ARTURIA_NOTE_TARGETS = (
+    ARTURIA_FULL_RACK_INPUT,
+    "s2-synthv1-live:in",
+    "setBfree:midi_in",
+)
+LIVE_RACK_REQUIRED_PORTS = (
+    "AR-CH-1 - Basic Piano:output_1",
+    "SMC-MIX - 8-Band EQ:Output L",
+    "Arturia Main Volume Encoder:relative-in",
+    "Arturia Main Volume Encoder:audio-out-l",
+    "Arturia Main Volume Encoder:audio-out-r",
+    "AR Controls - Sustain Scale:events-in",
+)
+
+
+def run(command: list[str], check: bool = False) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(command, check=check, text=True, capture_output=True)
+
+
+def profile_dir() -> Path:
+    configured = os.environ.get("MUSIC_RIG_PROFILE_DIR")
+    if configured:
+        return Path(configured).expanduser()
+    local = HOME / ".config/music-rig/profiles"
+    if local.is_dir():
+        return local
+    return Path(__file__).resolve().parent.parent / "docs/tools/music-rig/runtime-profiles"
+
+
+def profiles() -> dict[str, Path]:
+    return {path.stem: path for path in sorted(profile_dir().glob("*.env"))}
+
+
+def read_env(path: Path = ENV_FILE) -> str:
+    return path.read_text(encoding="utf-8") if path.exists() else ""
+
+
+def write_env(contents: str) -> None:
+    ENV_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=ENV_FILE.parent,
+                                    prefix="arturia-profile-session.", delete=False) as stream:
+        stream.write(contents)
+        temporary = Path(stream.name)
+    temporary.replace(ENV_FILE)
+
+
+def service_state(unit: str) -> str:
+    result = run(["systemctl", "--user", "is-active", unit])
+    return result.stdout.strip() or "inactive"
+
+
+def pipewire_links() -> str:
+    return run(["pw-link", "-l"]).stdout
+
+
+def pipewire_output_ports() -> str:
+    return run(["pw-link", "-o"]).stdout
+
+
+def pipewire_input_ports() -> str:
+    return run(["pw-link", "-i"]).stdout
+
+
+def port_present(ports: str, port: str) -> bool:
+    return any(line.strip() == port for line in ports.splitlines())
+
+
+def sleep_for_route_retry(deadline: float) -> None:
+    remaining = deadline - time.monotonic()
+    if remaining > 0:
+        time.sleep(min(1.0, remaining))
+
+
+def arturia_keylab_output(deadline: float) -> str:
+    while True:
+        matches = [
+            line.strip()
+            for line in pipewire_output_ports().splitlines()
+            if ARTURIA_KEYLAB_OUTPUT_TOKEN in line.strip()
+            and line.strip().endswith(ARTURIA_KEYLAB_OUTPUT_SUFFIX)
+        ]
+        if matches:
+            return matches[0]
+        if time.monotonic() >= deadline:
+            raise RuntimeError(
+                "Arturia KeyLab MIDI output port is not visible; "
+                "power on or reconnect the keyboard and wait for PipeWire to expose it."
+            )
+        sleep_for_route_retry(deadline)
+
+
+def arturia_note_target(deadline: float) -> str:
+    fallback = ""
+    while True:
+        ports = pipewire_input_ports()
+        for target in ARTURIA_NOTE_TARGETS:
+            if port_present(ports, target):
+                if target == ARTURIA_FULL_RACK_INPUT:
+                    return target
+                if not fallback:
+                    fallback = target
+        if time.monotonic() >= deadline:
+            if fallback:
+                return fallback
+            raise RuntimeError(
+                "No Arturia router note target is visible; wait for the Performance Rig "
+                "to finish starting, or restart the Arturia selector/full rack."
+            )
+        sleep_for_route_retry(deadline)
+
+
+def link_present(graph: str, source: str, target: str) -> bool:
+    header = ""
+    for line in graph.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("|->"):
+            if header == source and stripped[3:].strip() == target:
+                return True
+        elif stripped.startswith("|<-"):
+            if header == target and stripped[3:].strip() == source:
+                return True
+        elif stripped:
+            header = stripped
+    return False
+
+
+def ensure_link(source: str, target: str, deadline: float) -> str:
+    last_error = ""
+    while True:
+        graph = pipewire_links()
+        if link_present(graph, source, target):
+            return "present"
+        result = run(["pw-link", source, target])
+        combined = (result.stdout + result.stderr).strip()
+        if result.returncode == 0 or "File exists" in combined:
+            return "restored"
+        last_error = combined
+        if time.monotonic() >= deadline:
+            raise RuntimeError(f"could not connect {source} -> {target}: {last_error}")
+        sleep_for_route_retry(deadline)
+
+
+def arturia_router_ports_visible() -> bool:
+    return (
+        port_present(pipewire_input_ports(), ARTURIA_ROUTER_INPUT)
+        and port_present(pipewire_output_ports(), ARTURIA_ROUTER_OUTPUT)
+    )
+
+
+def restart_selector() -> None:
+    result = run(["systemctl", "--user", "restart", SELECTOR])
+    if result.returncode:
+        raise RuntimeError(result.stdout or result.stderr or "selector restart failed")
+
+
+def ensure_arturia_router(deadline: float) -> dict[str, str]:
+    keylab = arturia_keylab_output(deadline)
+    restarted = False
+    last_state = service_state(SELECTOR)
+    while True:
+        if arturia_router_ports_visible():
+            return {"keylab": keylab, "selector": service_state(SELECTOR)}
+        last_state = service_state(SELECTOR)
+        if last_state in {"failed", "inactive"} and not restarted:
+            restart_selector()
+            restarted = True
+            last_state = service_state(SELECTOR)
+        if time.monotonic() >= deadline:
+            raise RuntimeError(
+                "Arturia profile router ports are not visible; "
+                f"selector={last_state}. Try Recover Rig after the KeyLab is visible."
+            )
+        sleep_for_route_retry(deadline)
+
+
+def repair_routes() -> dict[str, object]:
+    router = ensure_arturia_router(time.monotonic() + ROUTER_START_WAIT_SECONDS)
+    deadline = time.monotonic() + ROUTE_REPAIR_WAIT_SECONDS
+    operations = {
+        "router_to_master": ensure_link(ARTURIA_ROUTER_OUTPUT, ARTURIA_MASTER_INPUT, deadline),
+    }
+    graph = pipewire_links()
+    has_note_target = any(
+        link_present(graph, ARTURIA_ROUTER_OUTPUT, target)
+        for target in ARTURIA_NOTE_TARGETS
+    )
+    if has_note_target:
+        operations["router_to_note_target"] = "present"
+    else:
+        target = arturia_note_target(deadline)
+        operations["router_to_note_target"] = ensure_link(ARTURIA_ROUTER_OUTPUT, target, deadline)
+    operations["keylab_to_router"] = ensure_link(
+        arturia_keylab_output(deadline), ARTURIA_ROUTER_INPUT, deadline
+    )
+    return {"status": "routes-repaired", "router": router, "links": operations}
+
+
+def read_properties(path: Path) -> dict[str, str]:
+    values: dict[str, str] = {}
+    if not path.exists():
+        return values
+    for line in path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key, value = stripped.split("=", 1)
+        values[key.strip()] = value.strip()
+    return values
+
+
+def discover_audio_sinks() -> dict[str, tuple[str, str]]:
+    left: dict[str, str] = {}
+    right: dict[str, str] = {}
+    for line in pipewire_input_ports().splitlines():
+        port = line.strip()
+        if port.endswith(":playback_FL"):
+            left[port.rsplit(":", 1)[0]] = port
+        elif port.endswith(":playback_FR"):
+            right[port.rsplit(":", 1)[0]] = port
+    return {sink: (left[sink], right[sink]) for sink in left if sink in right}
+
+
+def audio_repair_targets(sinks: dict[str, tuple[str, str]]) -> list[str]:
+    properties = read_properties(AUDIO_OUTPUT_CONFIG)
+    mode = properties.get("mode", "DEFAULT")
+    if mode == "SINGLE_CUSTOM" and properties.get("singleSink") in sinks:
+        return [properties["singleSink"]]
+    if mode == "MULTIPLE":
+        active = [sink.strip() for sink in properties.get("activeSinks", "").split(",")
+                  if sink.strip() in sinks]
+        if active:
+            return active
+    analog = next((sink for sink in sinks if "analog-stereo" in sink), None)
+    if analog:
+        return [analog]
+    return list(sinks)[:1]
+
+
+def clear_audio_output_links() -> None:
+    source = ""
+    for line in pipewire_links().splitlines():
+        stripped = line.strip()
+        if stripped.startswith("|->"):
+            if source in (AUDIO_OUTPUT_LEFT, AUDIO_OUTPUT_RIGHT):
+                target = stripped[3:].strip()
+                result = run(["pw-link", "-d", source, target])
+                combined = result.stdout + result.stderr
+                if result.returncode and "No such link" not in combined:
+                    raise RuntimeError(f"could not clear audio output link {source} -> {target}: {combined.strip()}")
+        elif stripped:
+            source = stripped
+
+
+def repair_audio_output() -> dict[str, object]:
+    deadline = time.monotonic() + ROUTE_REPAIR_WAIT_SECONDS
+    sinks: dict[str, tuple[str, str]] = {}
+    while time.monotonic() < deadline:
+        sinks = discover_audio_sinks()
+        if sinks:
+            break
+        sleep_for_route_retry(deadline)
+    if not sinks:
+        raise RuntimeError("no controllable audio output sink is visible")
+    targets = audio_repair_targets(sinks)
+    clear_audio_output_links()
+    links: dict[str, str] = {}
+    for sink in targets:
+        left, right = sinks[sink]
+        links[f"{sink}:left"] = ensure_link(AUDIO_OUTPUT_LEFT, left, deadline)
+        links[f"{sink}:right"] = ensure_link(AUDIO_OUTPUT_RIGHT, right, deadline)
+        if sink.startswith("alsa_output.") and "analog-stereo" in sink:
+            run(["pactl", "set-sink-port", sink, "analog-output-headphones"])
+    return {"status": "audio-repaired", "sinks": targets, "links": links}
+
+
+def wait_for_live_rack(timeout: float = 90) -> None:
+    deadline = time.monotonic() + timeout
+    missing = list(LIVE_RACK_REQUIRED_PORTS)
+    while time.monotonic() < deadline:
+        ports = set(line.strip() for line in (pipewire_output_ports() + pipewire_input_ports()).splitlines())
+        missing = [port for port in LIVE_RACK_REQUIRED_PORTS if port not in ports]
+        if not missing:
+            return
+        time.sleep(1)
+    raise RuntimeError("live rack ports did not register: " + ", ".join(missing))
+
+
+def recover_live_rig() -> dict[str, object]:
+    arturia_keylab_output(time.monotonic() + ROUTER_START_WAIT_SECONDS)
+    reset("full")
+    wait_for_live_rack()
+    ensure_arturia_router(time.monotonic() + ROUTER_START_WAIT_SECONDS)
+    audio = repair_audio_output()
+    routes = repair_routes()
+    return {"status": "rig-recovered", "audio": audio, "routes": routes}
+
+
+def latest_events(limit: int = 12) -> list[dict[str, object]]:
+    if not EVENT_LOG.exists():
+        return []
+    entries: list[dict[str, object]] = []
+    for line in EVENT_LOG.read_text(encoding="utf-8").splitlines()[-limit:]:
+        try:
+            entries.append(json.loads(line))
+        except json.JSONDecodeError:
+            entries.append({"raw": line})
+    return entries
+
+
+def status() -> dict[str, object]:
+    return {
+        "profile_dir": str(profile_dir()),
+        "environment_file": str(ENV_FILE),
+        "environment": read_env().splitlines(),
+        "services": {
+            "headless": service_state(HEADLESS),
+            "encoder": service_state(ENCODER),
+            "selector": service_state(SELECTOR),
+            "smk25": service_state(SMK),
+        },
+        "events": latest_events(),
+    }
+
+
+def apply_profile(name: str) -> None:
+    available = profiles()
+    if name not in available:
+        raise RuntimeError(f"unknown profile {name!r}; available: {', '.join(sorted(available))}")
+    previous = read_env()
+    if previous:
+        PREVIOUS_ENV_FILE.write_text(previous, encoding="utf-8")
+    contents = available[name].read_text(encoding="utf-8")
+    expected_genres = next(
+        (line.split("=", 1)[1].strip().split(",")
+         for line in contents.splitlines()
+         if line.startswith("MUSIC_RIG_FAST_GENRES=")),
+        [],
+    )
+    write_env(contents)
+    restart_selector()
+    deadline = time.monotonic() + 90
+    while time.monotonic() < deadline:
+        if service_state(SELECTOR) == "active":
+            events = latest_events(3)
+            warm_events = [event for event in events
+                           if event.get("event") == "fast-mode-enabled"]
+            if expected_genres:
+                if any(set(event.get("warm_genres", [])) == set(expected_genres)
+                       for event in warm_events):
+                    return
+            elif warm_events:
+                return
+        time.sleep(1)
+    if previous:
+        write_env(previous)
+        restart_selector()
+    raise RuntimeError(f"profile {name!r} did not become ready; previous profile restored")
+
+
+def rollback() -> None:
+    if not PREVIOUS_ENV_FILE.exists():
+        raise RuntimeError("no previous profile is available")
+    current = read_env()
+    ENV_FILE.write_text(PREVIOUS_ENV_FILE.read_text(encoding="utf-8"), encoding="utf-8")
+    PREVIOUS_ENV_FILE.write_text(current, encoding="utf-8")
+    restart_selector()
+
+
+def wait_for_ports(names: list[str], timeout: float = 90) -> None:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        outputs = run(["pw-link", "-o"]).stdout.splitlines()
+        if all(name in outputs for name in names):
+            return
+        time.sleep(1)
+    raise RuntimeError(f"required Carla ports did not register: {', '.join(names)}")
+
+
+def kill_orphan_genres() -> None:
+    result = run(["ps", "-eo", "pid=,args="])
+    pids: list[int] = []
+    for line in result.stdout.splitlines():
+        parts = line.strip().split(None, 1)
+        if len(parts) != 2 or not any(prefix in parts[1]
+                                      for prefix in ("FAST-GENRE-", "SAFE-GENRE-")):
+            continue
+        try:
+            pids.append(int(parts[0]))
+        except ValueError:
+            pass
+    for pid in pids:
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except (ProcessLookupError, PermissionError):
+            pass
+    if pids:
+        time.sleep(3)
+    for pid in pids:
+        try:
+            os.kill(pid, signal.SIGKILL)
+        except (ProcessLookupError, PermissionError):
+            pass
+    run(["flatpak", "kill", "studio.kx.carla"])
+
+
+def emergency_reset() -> Path:
+    timestamp = time.strftime("%Y%m%dT%H%M%S")
+    backup = HOME / ".local/state/music-rig/emergency-resets" / timestamp
+    backup.mkdir(parents=True, exist_ok=True)
+    for source in (ENV_FILE, PREVIOUS_ENV_FILE,
+                   HOME / ".local/state/smk25-pad-layers/state",
+                   HOME / ".local/share/music-rig/arturia-profile-session/last-session.json"):
+        if source.exists():
+            shutil.copy2(source, backup / source.name)
+    write_env("MUSIC_RIG_TRANSITION_MODE=fast\n")
+    for unit in (SELECTOR, ENCODER, SMK, HEADLESS):
+        run(["systemctl", "--user", "stop", unit])
+    kill_orphan_genres()
+    state = HOME / ".local/state/smk25-pad-layers/state"
+    if state.exists():
+        state.unlink()
+    run(["systemctl", "--user", "start", HEADLESS], check=True)
+    wait_for_ports(["AR-CH-1 - Basic Piano:output_1", "SMC-MIX - 8-Band EQ:Output L"])
+    run(["systemctl", "--user", "start", ENCODER], check=True)
+    run(["systemctl", "--user", "start", SMK], check=True)
+    run(["systemctl", "--user", "start", SELECTOR], check=True)
+    return backup
+
+
+def reset(kind: str) -> str | None:
+    if kind == "genres":
+        write_env("MUSIC_RIG_TRANSITION_MODE=fast\n")
+        restart_selector()
+        return None
+    if kind == "arturia":
+        restart_selector()
+        return None
+    if kind == "smk25":
+        run(["systemctl", "--user", "stop", SMK], check=True)
+        state = HOME / ".local/state/smk25-pad-layers/state"
+        if state.exists():
+            state.replace(state.with_name("state.reset-backup"))
+        run(["systemctl", "--user", "start", SMK], check=True)
+        return None
+    if kind == "output":
+        run(["systemctl", "--user", "restart", ENCODER], check=True)
+        return None
+    if kind == "full":
+        write_env("MUSIC_RIG_TRANSITION_MODE=fast\n")
+        run(["systemctl", "--user", "stop", SELECTOR], check=True)
+        run(["systemctl", "--user", "restart", HEADLESS], check=True)
+        run(["systemctl", "--user", "restart", ENCODER], check=True)
+        run(["systemctl", "--user", "start", SELECTOR], check=True)
+        return None
+    if kind == "emergency":
+        return str(emergency_reset())
+    raise RuntimeError(f"unknown reset type: {kind}")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    subparsers = parser.add_subparsers(dest="operation", required=True)
+    subparsers.add_parser("status")
+    subparsers.add_parser("list")
+    apply_parser = subparsers.add_parser("apply")
+    apply_parser.add_argument("profile")
+    subparsers.add_parser("rollback")
+    subparsers.add_parser("repair-routes")
+    subparsers.add_parser("repair-audio")
+    subparsers.add_parser("recover")
+    events_parser = subparsers.add_parser("events")
+    events_parser.add_argument("--limit", type=int, default=20)
+    reset_parser = subparsers.add_parser("reset")
+    reset_parser.add_argument("kind", choices=(
+        "full", "emergency", "arturia", "smk25", "output", "genres"))
+    arguments = parser.parse_args()
+    try:
+        if arguments.operation == "status":
+            print(json.dumps(status(), indent=2, sort_keys=True))
+        elif arguments.operation == "list":
+            print("\n".join(sorted(profiles())))
+        elif arguments.operation == "apply":
+            apply_profile(arguments.profile)
+            print(json.dumps(status(), indent=2, sort_keys=True))
+        elif arguments.operation == "rollback":
+            rollback()
+            print(json.dumps(status(), indent=2, sort_keys=True))
+        elif arguments.operation == "repair-routes":
+            print(json.dumps(repair_routes(), indent=2, sort_keys=True))
+        elif arguments.operation == "repair-audio":
+            print(json.dumps(repair_audio_output(), indent=2, sort_keys=True))
+        elif arguments.operation == "recover":
+            print(json.dumps(recover_live_rig(), indent=2, sort_keys=True))
+        elif arguments.operation == "events":
+            print(json.dumps(latest_events(arguments.limit), indent=2, sort_keys=True))
+        elif arguments.operation == "reset":
+            backup = reset(arguments.kind)
+            payload = status()
+            if backup:
+                payload["emergency_backup"] = backup
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0
+    except (OSError, RuntimeError, subprocess.CalledProcessError) as error:
+        print(json.dumps({"error": str(error)}), file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
