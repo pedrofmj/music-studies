@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
@@ -47,6 +48,27 @@ LIVE_RACK_REQUIRED_PORTS = (
     "Arturia Main Volume Encoder:audio-out-r",
     "AR Controls - Sustain Scale:events-in",
 )
+SHARED_AUDIO_LINKS = (
+    ("SMK Layer Mixer x8 Stereo:Output L", "LSP Mixer x8 Stereo:Input L"),
+    ("SMK Layer Mixer x8 Stereo:Output R", "LSP Mixer x8 Stereo:Input R"),
+    ("LSP Mixer x8 Stereo:Output L", "SMC-MIX - 8-Band EQ:Input L"),
+    ("LSP Mixer x8 Stereo:Output R", "SMC-MIX - 8-Band EQ:Input R"),
+    ("SMC-MIX - 8-Band EQ:Output L", "Arturia Main Volume Encoder:audio-in-l"),
+    ("SMC-MIX - 8-Band EQ:Output R", "Arturia Main Volume Encoder:audio-in-r"),
+    ("Arturia Main Volume Encoder:absolute-out", "LSP Mixer x8 Stereo:events-in"),
+)
+DEVICE_MIDI_TARGETS = {
+    "SMC-Mixer-Master": tuple(f"SMC-EQ-{channel} CC Scale:events-in" for channel in range(1, 9)),
+    "SMC-PAD-Master": (
+        "PD Controls - Sustain Scale:events-in",
+        "PD-CH-1 Gain Map:events-in",
+    ),
+    "SMC-PAD Pocket-Master": (
+        "PD Controls - Sustain Scale:events-in",
+        "PD-CH-1 Gain Map:events-in",
+    ),
+    "SMK25-Master": ("SMK25 Pad Layers:midi-in",),
+}
 
 
 def run(command: list[str], check: bool = False) -> subprocess.CompletedProcess[str]:
@@ -191,20 +213,15 @@ def restart_selector() -> None:
 
 def ensure_arturia_router(deadline: float) -> dict[str, str]:
     keylab = arturia_keylab_output(deadline)
-    restarted = False
     last_state = service_state(SELECTOR)
     while True:
         if arturia_router_ports_visible():
             return {"keylab": keylab, "selector": service_state(SELECTOR)}
         last_state = service_state(SELECTOR)
-        if last_state in {"failed", "inactive"} and not restarted:
-            restart_selector()
-            restarted = True
-            last_state = service_state(SELECTOR)
         if time.monotonic() >= deadline:
             raise RuntimeError(
                 "Arturia profile router ports are not visible; "
-                f"selector={last_state}. Try Recover Rig after the KeyLab is visible."
+                f"selector={last_state}. No service was restarted; inspect the selector before retrying."
             )
         sleep_for_route_retry(deadline)
 
@@ -212,23 +229,103 @@ def ensure_arturia_router(deadline: float) -> dict[str, str]:
 def repair_routes() -> dict[str, object]:
     router = ensure_arturia_router(time.monotonic() + ROUTER_START_WAIT_SECONDS)
     deadline = time.monotonic() + ROUTE_REPAIR_WAIT_SECONDS
-    operations = {
-        "router_to_master": ensure_link(ARTURIA_ROUTER_OUTPUT, ARTURIA_MASTER_INPUT, deadline),
-    }
+    repaired_links: dict[str, str] = {}
+    unresolved: list[str] = []
+    repaired_links["router_to_master"] = ensure_link(
+        ARTURIA_ROUTER_OUTPUT, ARTURIA_MASTER_INPUT, deadline)
     graph = pipewire_links()
     has_note_target = any(
         link_present(graph, ARTURIA_ROUTER_OUTPUT, target)
         for target in ARTURIA_NOTE_TARGETS
     )
     if has_note_target:
-        operations["router_to_note_target"] = "present"
+        repaired_links["router_to_note_target"] = "present"
     else:
         target = arturia_note_target(deadline)
-        operations["router_to_note_target"] = ensure_link(ARTURIA_ROUTER_OUTPUT, target, deadline)
-    operations["keylab_to_router"] = ensure_link(
+        repaired_links["router_to_note_target"] = ensure_link(ARTURIA_ROUTER_OUTPUT, target, deadline)
+    repaired_links["keylab_to_router"] = ensure_link(
         arturia_keylab_output(deadline), ARTURIA_ROUTER_INPUT, deadline
     )
-    return {"status": "routes-repaired", "router": router, "links": operations}
+    for alias, targets in DEVICE_MIDI_TARGETS.items():
+        source = find_device_midi_output(alias)
+        if not source:
+            repaired_links[f"device:{alias}"] = "source-not-present"
+            unresolved.append(f"MIDI source not present: {alias}")
+            continue
+        for target in targets:
+            if port_present(pipewire_input_ports(), target):
+                try:
+                    repaired_links[f"{alias}->{target}"] = ensure_link(source, target, deadline)
+                except RuntimeError as error:
+                    unresolved.append(str(error))
+    static = repair_project_connections(deadline)
+    repaired_links.update(static["links"])
+    unresolved.extend(static["unresolved"])
+    return {
+        "status": "routes-repaired" if not unresolved else "routes-partially-repaired",
+        "router": router,
+        "links": repaired_links,
+        "unresolved_project_links": unresolved,
+    }
+
+
+def find_device_midi_output(alias: str) -> str:
+    for line in pipewire_output_ports().splitlines():
+        port = line.strip()
+        if alias in port and "capture_1" in port:
+            return port
+    return ""
+
+
+def protected_project_path() -> Path:
+    configured = os.environ.get("CARLA_PEDRO_PROJECT")
+    config_file = HOME / ".config/pedro-live-rack.conf"
+    if not configured and config_file.is_file():
+        for line in config_file.read_text(encoding="utf-8").splitlines():
+            stripped = line.strip()
+            if stripped.startswith("CARLA_PEDRO_PROJECT="):
+                configured = stripped.split("=", 1)[1].strip().strip("\"'")
+                break
+    return Path(configured or "/c/music/carla/pedro.uproject").expanduser()
+
+
+def repair_project_connections(deadline: float) -> dict[str, object]:
+    project = protected_project_path()
+    if not project.is_file():
+        return {"links": {}, "unresolved": [f"protected project missing: {project}"]}
+    try:
+        root = ET.parse(project).getroot()
+    except (OSError, ET.ParseError) as error:
+        return {"links": {}, "unresolved": [f"protected project cannot be parsed: {error}"]}
+
+    outputs = set(line.strip() for line in pipewire_output_ports().splitlines())
+    inputs = set(line.strip() for line in pipewire_input_ports().splitlines())
+    restored: dict[str, str] = {}
+    unresolved: list[str] = []
+    for connection in root.findall("./ExternalPatchbay/Connection"):
+        source = (connection.findtext("Source") or "").strip()
+        target = (connection.findtext("Target") or "").strip()
+        if not source or not target:
+            continue
+        # Device identities and physical sinks are resolved dynamically elsewhere.
+        if source.startswith("Midi-Bridge:") or "PipeWire ALSA" in source:
+            continue
+        if "Speaker + Headphones" in target or "playback_" in target and "PipeWire ALSA" in target:
+            continue
+        if source not in outputs or target not in inputs:
+            unresolved.append(f"{source} -> {target}")
+            continue
+        try:
+            restored[f"{source} -> {target}"] = ensure_link(source, target, deadline)
+        except RuntimeError as error:
+            unresolved.append(str(error))
+    for source, target in SHARED_AUDIO_LINKS:
+        if source in outputs and target in inputs:
+            try:
+                restored[f"{source} -> {target}"] = ensure_link(source, target, deadline)
+            except RuntimeError as error:
+                unresolved.append(str(error))
+    return {"links": restored, "unresolved": unresolved}
 
 
 def read_properties(path: Path) -> dict[str, str]:
@@ -272,21 +369,6 @@ def audio_repair_targets(sinks: dict[str, tuple[str, str]]) -> list[str]:
     return list(sinks)[:1]
 
 
-def clear_audio_output_links() -> None:
-    source = ""
-    for line in pipewire_links().splitlines():
-        stripped = line.strip()
-        if stripped.startswith("|->"):
-            if source in (AUDIO_OUTPUT_LEFT, AUDIO_OUTPUT_RIGHT):
-                target = stripped[3:].strip()
-                result = run(["pw-link", "-d", source, target])
-                combined = result.stdout + result.stderr
-                if result.returncode and "No such link" not in combined:
-                    raise RuntimeError(f"could not clear audio output link {source} -> {target}: {combined.strip()}")
-        elif stripped:
-            source = stripped
-
-
 def repair_audio_output() -> dict[str, object]:
     deadline = time.monotonic() + ROUTE_REPAIR_WAIT_SECONDS
     sinks: dict[str, tuple[str, str]] = {}
@@ -298,7 +380,6 @@ def repair_audio_output() -> dict[str, object]:
     if not sinks:
         raise RuntimeError("no controllable audio output sink is visible")
     targets = audio_repair_targets(sinks)
-    clear_audio_output_links()
     links: dict[str, str] = {}
     for sink in targets:
         left, right = sinks[sink]
@@ -322,13 +403,28 @@ def wait_for_live_rack(timeout: float = 90) -> None:
 
 
 def recover_live_rig() -> dict[str, object]:
+    # Recovery is additive: do not restart a healthy audio engine or clear pad state.
     arturia_keylab_output(time.monotonic() + ROUTER_START_WAIT_SECONDS)
-    reset("full")
+    if service_state(HEADLESS) not in {"active", "activating"}:
+        result = run(["systemctl", "--user", "start", HEADLESS])
+        if result.returncode:
+            raise RuntimeError(result.stdout or result.stderr or f"could not start {HEADLESS}")
     wait_for_live_rack()
+    for unit in (ENCODER, SMK, SELECTOR):
+        if service_state(unit) not in {"active", "activating"}:
+            result = run(["systemctl", "--user", "start", unit])
+            if result.returncode:
+                raise RuntimeError(result.stdout or result.stderr or f"could not start {unit}")
     ensure_arturia_router(time.monotonic() + ROUTER_START_WAIT_SECONDS)
     audio = repair_audio_output()
     routes = repair_routes()
-    return {"status": "rig-recovered", "audio": audio, "routes": routes}
+    fully_recovered = routes["status"] == "routes-repaired"
+    return {
+        "status": "rig-recovered" if fully_recovered else "rig-partially-recovered",
+        "disruptive_service_restarts": [],
+        "audio": audio,
+        "routes": routes,
+    }
 
 
 def latest_events(limit: int = 12) -> list[dict[str, object]]:
@@ -522,11 +618,15 @@ def main() -> int:
             rollback()
             print(json.dumps(status(), indent=2, sort_keys=True))
         elif arguments.operation == "repair-routes":
-            print(json.dumps(repair_routes(), indent=2, sort_keys=True))
+            result = repair_routes()
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0 if result["status"] == "routes-repaired" else 1
         elif arguments.operation == "repair-audio":
             print(json.dumps(repair_audio_output(), indent=2, sort_keys=True))
         elif arguments.operation == "recover":
-            print(json.dumps(recover_live_rig(), indent=2, sort_keys=True))
+            result = recover_live_rig()
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0 if result["status"] == "rig-recovered" else 1
         elif arguments.operation == "events":
             print(json.dumps(latest_events(arguments.limit), indent=2, sort_keys=True))
         elif arguments.operation == "reset":
