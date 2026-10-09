@@ -1022,6 +1022,13 @@ if(BUILD_TESTING)
     endif()
 
     find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter)
+    add_test(
+        NAME music_rig_profile_recovery
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-music-rig-profile-recovery.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../../bin/music-rig-profile"
+    )
+    set_tests_properties(music_rig_profile_recovery PROPERTIES TIMEOUT 10)
     set(MUSIC_RIG_PROFILE_SCHEMA_VALIDATOR
         "${CMAKE_CURRENT_SOURCE_DIR}/validate-performance-rig.py"
     )

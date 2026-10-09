@@ -29,42 +29,41 @@ music-rig-profile events --limit 30
 expected warm-genre event, and restores the previous environment if readiness
 fails.
 
-`repair-routes` is idempotent. It restores the Arturia keyboard-to-router link,
-the router-to-master-control link, and a router note target for the full live
-rack when no current note target is present. Use it after a restart when the
-router appears green but the keyboard produces no sound. KeyLab PipeWire bridge
-names can change after USB devices enumerate in a different order, including
-long `Arturia KL Essential 61 mk3 at usb-...` names; the repair command resolves
-the current `KL Essential 61 mk3 MIDI` port before linking it. It also waits
-briefly for rack note-target ports such as `AR Controls - Sustain Scale` to
-appear during startup before failing. If the Arturia selector died before
-creating `s2-arturia-profile-router`, it restarts the selector once and waits
-up to 90 seconds for the router ports before reconnecting the graph.
+`repair-routes` is additive and idempotent. It restores the Arturia
+keyboard-to-router link, the router-to-master-control link, MIDI device routes,
+and missing internal connections from the protected Carla patchbay. It resolves
+controllers by their descriptive PipeWire port aliases, not transient ALSA
+client numbers, PipeWire node IDs, or USB hub port numbers. In particular, the
+SINCO controllers are matched by names such as `SMC-PAD Pocket-Master`; their
+shared USB product ID is not used to distinguish them. The command waits up to
+30 seconds for MIDI source and target ports that may enumerate late. It never
+restarts the selector or removes existing links; if its router ports are absent,
+it reports the selector state instead.
 
 `repair-audio` restores the performance-rig output from `Arturia Main Volume
 Encoder` to the selected Echora audio sink. For the analog stereo sink it also
 selects the headphone/P2 port.
 
-`recover` is the stronger recovery path for a silent rig after power cycling. It
-runs the full reset sequence, waits for the KeyLab bridge, live rack ports, and
-Arturia router ports to return, then runs both audio repair and route repair. In
-the Echora MIDI Router Operations tab, this is exposed as `Recover Rig`.
+`recover` is the post-boot recovery path. It starts only inactive rack services
+in dependency order, waits for the live Carla ports and current USB MIDI aliases,
+then adds missing audio and MIDI links. It does not reset the rig or restart
+healthy services. In the Echora MIDI Router Operations tab, this is exposed as
+`Recover Rig`.
 
 ## Post-Reboot Recovery
 
-After `landstar` reboots with all rig cables already connected, wait 30-60
-seconds after login, then use Echora MIDI Router > Performance Rig > Operations
-and press `Recover Rig`. This is the normal deterministic rebuild path. It
-waits for the KeyLab bridge, rebuilds the selector/router, restores the audio
-route to the configured sink, and repairs the Arturia MIDI fanout.
+After `landstar` reboots with both hubs and all controller cables already
+connected, log in and wait for PipeWire/WirePlumber to start. Open Echora MIDI
+Router > Performance Rig > Operations and press `Recover Rig`. It starts the
+inactive Carla, encoder, SMK-25, and Arturia selector services, waits for their
+ports and the descriptive USB MIDI aliases to appear, then restores routes. No
+USB cable replug is part of the recovery path. The command reports any device
+alias that remains unavailable instead of claiming full recovery.
 
-If the rig still appears green but Arturia keys are silent, unplug and replug
-only the Arturia USB cable, wait for the KeyLab to finish enumerating, then
-press `Repair Routes`. USB re-enumeration can change the visible PipeWire port
-name between the long `Arturia KL Essential 61 mk3 at usb-...` form and the
-short `KL Essential 61 mk3 N` form; `Repair Routes` resolves the current
-standard `KL Essential 61 mk3 MIDI` capture port and reconnects it to
-`s2-arturia-profile-router:in`.
+Use `Repair Routes` when services and Carla are already active but links are
+missing. It resolves the currently enumerated KeyLab `capture_0` port and the
+M-VAVE `capture_1` aliases even if ALSA client numbers or PipeWire's `SINCO N`
+node labels changed after boot.
 
 The fallback CLI sequence is:
 

@@ -610,12 +610,12 @@ watch_events_and_restore() {
         take_snapshot "$document"
     fi
 
-    event_restore_check "$document"
-    printf 'Watching PipeWire events with a %ss settle period: %s\n' \
-        "$settle" "$document" >&2
     coproc PW_MON { pw-mon -N -o -a; }
     pw_mon_fd=${PW_MON[0]}
     pw_mon_pid=$PW_MON_PID
+    event_restore_check "$document"
+    printf 'Watching PipeWire events with a %ss settle period: %s\n' \
+        "$settle" "$document" >&2
 
     while IFS= read -r -u "$pw_mon_fd" event; do
         # Consume a burst before checking against the settled graph.

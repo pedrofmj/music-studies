@@ -211,6 +211,18 @@ def restart_selector() -> None:
         raise RuntimeError(result.stdout or result.stderr or "selector restart failed")
 
 
+def start_service(unit: str) -> None:
+    command = ["systemctl", "--user", "start", unit]
+    for attempt in range(3):
+        result = run(command)
+        if result.returncode == 0:
+            return
+        error = (result.stdout + result.stderr).strip()
+        if attempt == 2 or "Transaction" not in error or "destructive" not in error:
+            raise RuntimeError(error or f"could not start {unit}")
+        time.sleep(1)
+
+
 def ensure_arturia_router(deadline: float) -> dict[str, str]:
     keylab = arturia_keylab_output(deadline)
     last_state = service_state(SELECTOR)
@@ -246,18 +258,21 @@ def repair_routes() -> dict[str, object]:
     repaired_links["keylab_to_router"] = ensure_link(
         arturia_keylab_output(deadline), ARTURIA_ROUTER_INPUT, deadline
     )
+    device_sources, missing_sources, missing_targets = wait_for_device_midi_ports(deadline)
+    unresolved.extend(f"MIDI source not present: {alias}" for alias in missing_sources)
+    unresolved.extend(f"MIDI target not present: {target}" for target in missing_targets)
     for alias, targets in DEVICE_MIDI_TARGETS.items():
-        source = find_device_midi_output(alias)
+        source = device_sources[alias]
         if not source:
             repaired_links[f"device:{alias}"] = "source-not-present"
-            unresolved.append(f"MIDI source not present: {alias}")
             continue
         for target in targets:
-            if port_present(pipewire_input_ports(), target):
-                try:
-                    repaired_links[f"{alias}->{target}"] = ensure_link(source, target, deadline)
-                except RuntimeError as error:
-                    unresolved.append(str(error))
+            if target in missing_targets:
+                continue
+            try:
+                repaired_links[f"{alias}->{target}"] = ensure_link(source, target, deadline)
+            except RuntimeError as error:
+                unresolved.append(str(error))
     static = repair_project_connections(deadline)
     repaired_links.update(static["links"])
     unresolved.extend(static["unresolved"])
@@ -269,12 +284,22 @@ def repair_routes() -> dict[str, object]:
     }
 
 
-def find_device_midi_output(alias: str) -> str:
-    for line in pipewire_output_ports().splitlines():
-        port = line.strip()
-        if alias in port and "capture_1" in port:
-            return port
-    return ""
+def wait_for_device_midi_ports(deadline: float) -> tuple[dict[str, str], list[str], list[str]]:
+    while True:
+        outputs = [line.strip() for line in pipewire_output_ports().splitlines()]
+        inputs = set(line.strip() for line in pipewire_input_ports().splitlines())
+        sources = {
+            alias: next((port for port in outputs if alias in port and "capture_1" in port), "")
+            for alias in DEVICE_MIDI_TARGETS
+        }
+        missing_sources = [alias for alias, source in sources.items() if not source]
+        missing_targets = sorted({
+            target for targets in DEVICE_MIDI_TARGETS.values()
+            for target in targets if target not in inputs
+        })
+        if (not missing_sources and not missing_targets) or time.monotonic() >= deadline:
+            return sources, missing_sources, missing_targets
+        sleep_for_route_retry(deadline)
 
 
 def protected_project_path() -> Path:
@@ -405,16 +430,10 @@ def wait_for_live_rack(timeout: float = 90) -> None:
 def recover_live_rig() -> dict[str, object]:
     # Recovery is additive: do not restart a healthy audio engine or clear pad state.
     arturia_keylab_output(time.monotonic() + ROUTER_START_WAIT_SECONDS)
-    if service_state(HEADLESS) not in {"active", "activating"}:
-        result = run(["systemctl", "--user", "start", HEADLESS])
-        if result.returncode:
-            raise RuntimeError(result.stdout or result.stderr or f"could not start {HEADLESS}")
-    wait_for_live_rack()
-    for unit in (ENCODER, SMK, SELECTOR):
+    for unit in (HEADLESS, ENCODER, SMK, SELECTOR):
         if service_state(unit) not in {"active", "activating"}:
-            result = run(["systemctl", "--user", "start", unit])
-            if result.returncode:
-                raise RuntimeError(result.stdout or result.stderr or f"could not start {unit}")
+            start_service(unit)
+    wait_for_live_rack()
     ensure_arturia_router(time.monotonic() + ROUTER_START_WAIT_SECONDS)
     audio = repair_audio_output()
     routes = repair_routes()
