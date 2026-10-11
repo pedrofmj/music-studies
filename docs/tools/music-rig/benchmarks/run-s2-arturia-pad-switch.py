@@ -258,10 +258,27 @@ def wait_for_ports(tokens: tuple[str, ...], environment: dict[str, str], timeout
     while time.monotonic() < deadline:
         outputs = run(["pw-link", "-o"], environment).stdout
         inputs = run(["pw-link", "-i"], environment).stdout
-        if all(token in outputs or token in inputs for token in tokens):
+        if all(port_present(outputs, token) or port_present(inputs, token) for token in tokens):
             return
         time.sleep(0.25)
     raise RuntimeError(f"audio base ports did not register: {tokens}")
+
+
+def port_matches(actual: str, expected: str) -> bool:
+    return actual == expected or actual.endswith("/" + expected)
+
+
+def port_present(ports: str, expected: str) -> bool:
+    return any(port_matches(line.strip(), expected) for line in ports.splitlines())
+
+
+def resolve_port(name: str, direction: str, environment: dict[str, str]) -> str:
+    ports = run(["pw-link", direction], environment).stdout
+    for line in ports.splitlines():
+        candidate = line.strip()
+        if port_matches(candidate, name):
+            return candidate
+    return name
 
 
 def normalized_links(snapshot: str) -> str:
@@ -283,10 +300,10 @@ def link_present(snapshot: str, source: str, target: str) -> bool:
     for line in snapshot.splitlines():
         stripped = line.strip()
         if stripped.startswith("|->"):
-            if header == source and stripped[3:].strip() == target:
+            if port_matches(header, source) and port_matches(stripped[3:].strip(), target):
                 return True
         elif stripped.startswith("|<-"):
-            if header == target and stripped[3:].strip() == source:
+            if port_matches(header, target) and port_matches(stripped[3:].strip(), source):
                 return True
         elif stripped:
             header = stripped
@@ -308,9 +325,11 @@ def connect(source: str, target: str, environment: dict[str, str]) -> None:
     deadline = time.monotonic() + 15.0
     last_error = ""
     while time.monotonic() < deadline:
-        if link_present(links(environment), source, target):
+        current_source = resolve_port(source, "-o", environment)
+        current_target = resolve_port(target, "-i", environment)
+        if link_present(links(environment), current_source, current_target):
             return
-        result = run(["pw-link", source, target], environment)
+        result = run(["pw-link", current_source, current_target], environment)
         if result.returncode == 0 or "Arquivo existe" in result.stdout or "File exists" in result.stdout:
             return
         last_error = result.stdout
@@ -350,6 +369,8 @@ def port_ids(direction: str, environment: dict[str, str]) -> dict[str, int]:
         if len(parts) != 2 or not parts[0].isdigit():
             continue
         ports[parts[1]] = int(parts[0])
+        if "/" in parts[1]:
+            ports[parts[1].split("/", 1)[1]] = int(parts[0])
     return ports
 
 
@@ -400,7 +421,8 @@ def connect_with_ids(source: str, target: str, output_ids: dict[str, int],
             return True
     return False
 def disconnect(source: str, target: str, environment: dict[str, str]) -> None:
-    run(["pw-link", "-d", source, target], environment)
+    run(["pw-link", "-d", resolve_port(source, "-o", environment),
+         resolve_port(target, "-i", environment)], environment)
 
 
 def find_keylab(environment: dict[str, str]) -> str:

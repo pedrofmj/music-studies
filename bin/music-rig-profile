@@ -120,7 +120,19 @@ def pipewire_input_ports() -> str:
 
 
 def port_present(ports: str, port: str) -> bool:
-    return any(line.strip() == port for line in ports.splitlines())
+    return any(port_matches(line.strip(), port) for line in ports.splitlines())
+
+
+def port_matches(actual: str, expected: str) -> bool:
+    return actual == expected or actual.endswith("/" + expected)
+
+
+def resolve_port(port: str, direction: str) -> str:
+    for line in run(["pw-link", direction]).stdout.splitlines():
+        actual = line.strip()
+        if port_matches(actual, port):
+            return actual
+    return port
 
 
 def sleep_for_route_retry(deadline: float) -> None:
@@ -172,10 +184,10 @@ def link_present(graph: str, source: str, target: str) -> bool:
     for line in graph.splitlines():
         stripped = line.strip()
         if stripped.startswith("|->"):
-            if header == source and stripped[3:].strip() == target:
+            if port_matches(header, source) and port_matches(stripped[3:].strip(), target):
                 return True
         elif stripped.startswith("|<-"):
-            if header == target and stripped[3:].strip() == source:
+            if port_matches(header, target) and port_matches(stripped[3:].strip(), source):
                 return True
         elif stripped:
             header = stripped
@@ -188,7 +200,9 @@ def ensure_link(source: str, target: str, deadline: float) -> str:
         graph = pipewire_links()
         if link_present(graph, source, target):
             return "present"
-        result = run(["pw-link", source, target])
+        current_source = resolve_port(source, "-o")
+        current_target = resolve_port(target, "-i")
+        result = run(["pw-link", current_source, current_target])
         combined = (result.stdout + result.stderr).strip()
         if result.returncode == 0 or "File exists" in combined:
             return "restored"
@@ -289,7 +303,7 @@ def repair_routes() -> dict[str, object]:
 def wait_for_device_midi_ports(deadline: float) -> tuple[dict[str, str], list[str], list[str]]:
     while True:
         outputs = [line.strip() for line in pipewire_output_ports().splitlines()]
-        inputs = set(line.strip() for line in pipewire_input_ports().splitlines())
+        inputs = [line.strip() for line in pipewire_input_ports().splitlines()]
         sources = {
             alias: next((port for port in outputs if alias in port and "capture_1" in port), "")
             for alias in DEVICE_MIDI_TARGETS
@@ -297,7 +311,7 @@ def wait_for_device_midi_ports(deadline: float) -> tuple[dict[str, str], list[st
         missing_sources = [alias for alias, source in sources.items() if not source]
         missing_targets = sorted({
             target for targets in DEVICE_MIDI_TARGETS.values()
-            for target in targets if target not in inputs
+            for target in targets if not any(port_matches(actual, target) for actual in inputs)
         })
         if (not missing_sources and not missing_targets) or time.monotonic() >= deadline:
             return sources, missing_sources, missing_targets
@@ -339,7 +353,8 @@ def repair_project_connections(deadline: float) -> dict[str, object]:
             continue
         if "Speaker + Headphones" in target or "playback_" in target and "PipeWire ALSA" in target:
             continue
-        if source not in outputs or target not in inputs:
+        if not any(port_matches(actual, source) for actual in outputs) or not any(
+                port_matches(actual, target) for actual in inputs):
             unresolved.append(f"{source} -> {target}")
             continue
         try:
@@ -373,9 +388,9 @@ def discover_audio_sinks() -> dict[str, tuple[str, str]]:
     right: dict[str, str] = {}
     for line in pipewire_input_ports().splitlines():
         port = line.strip()
-        if port.endswith(":playback_FL"):
+        if port.endswith((":playback_FL", ":send_FL")):
             left[port.rsplit(":", 1)[0]] = port
-        elif port.endswith(":playback_FR"):
+        elif port.endswith((":playback_FR", ":send_FR")):
             right[port.rsplit(":", 1)[0]] = port
     return {sink: (left[sink], right[sink]) for sink in left if sink in right}
 
@@ -391,6 +406,10 @@ def audio_repair_targets(sinks: dict[str, tuple[str, str]]) -> list[str]:
         if active:
             return active
     if mode == "DEFAULT":
+        configured = [sink.strip() for sink in properties.get("activeSinks", "").split(",")
+                      if sink.strip() in sinks]
+        if configured:
+            return configured
         result = run(["pactl", "get-default-sink"])
         default_sink = result.stdout.strip()
         if result.returncode == 0 and default_sink in sinks:
@@ -426,8 +445,8 @@ def wait_for_live_rack(timeout: float = 90) -> None:
     deadline = time.monotonic() + timeout
     missing = list(LIVE_RACK_REQUIRED_PORTS)
     while time.monotonic() < deadline:
-        ports = set(line.strip() for line in (pipewire_output_ports() + pipewire_input_ports()).splitlines())
-        missing = [port for port in LIVE_RACK_REQUIRED_PORTS if port not in ports]
+        ports = pipewire_output_ports() + pipewire_input_ports()
+        missing = [port for port in LIVE_RACK_REQUIRED_PORTS if not port_present(ports, port)]
         if not missing:
             return
         time.sleep(1)
