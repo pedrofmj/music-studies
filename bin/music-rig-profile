@@ -239,6 +239,7 @@ def ensure_arturia_router(deadline: float) -> dict[str, str]:
 
 
 def repair_routes() -> dict[str, object]:
+    audio = repair_audio_output()
     router = ensure_arturia_router(time.monotonic() + ROUTER_START_WAIT_SECONDS)
     deadline = time.monotonic() + ROUTE_REPAIR_WAIT_SECONDS
     repaired_links: dict[str, str] = {}
@@ -278,6 +279,7 @@ def repair_routes() -> dict[str, object]:
     unresolved.extend(static["unresolved"])
     return {
         "status": "routes-repaired" if not unresolved else "routes-partially-repaired",
+        "audio": audio,
         "router": router,
         "links": repaired_links,
         "unresolved_project_links": unresolved,
@@ -388,6 +390,11 @@ def audio_repair_targets(sinks: dict[str, tuple[str, str]]) -> list[str]:
                   if sink.strip() in sinks]
         if active:
             return active
+    if mode == "DEFAULT":
+        result = run(["pactl", "get-default-sink"])
+        default_sink = result.stdout.strip()
+        if result.returncode == 0 and default_sink in sinks:
+            return [default_sink]
     analog = next((sink for sink in sinks if "analog-stereo" in sink), None)
     if analog:
         return [analog]
@@ -435,13 +442,12 @@ def recover_live_rig() -> dict[str, object]:
             start_service(unit)
     wait_for_live_rack()
     ensure_arturia_router(time.monotonic() + ROUTER_START_WAIT_SECONDS)
-    audio = repair_audio_output()
     routes = repair_routes()
     fully_recovered = routes["status"] == "routes-repaired"
     return {
         "status": "rig-recovered" if fully_recovered else "rig-partially-recovered",
         "disruptive_service_restarts": [],
-        "audio": audio,
+        "audio": routes["audio"],
         "routes": routes,
     }
 

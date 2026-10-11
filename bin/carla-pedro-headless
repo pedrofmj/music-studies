@@ -18,17 +18,24 @@ readonly OSC_PORT="${CARLA_OSC_UDP_PORT:-21337}"
 
 resolve_audio_sink() {
     local sink="${CARLA_AUDIO_SINK:-}"
-    if [[ -z $sink ]] && command -v pactl >/dev/null 2>&1; then
-        sink=$(pactl list sinks short | awk '$2 ~ /analog-stereo/ && $2 !~ /\.monitor$/ {print $2; exit}')
-    fi
-    [[ -n $sink ]] || {
-        printf '%s\n' 'No analog stereo PipeWire sink is available.' >&2
-        exit 1
-    }
-    printf '%s\n' "$sink"
+    for _ in {1..120}; do
+        if [[ -n $sink ]]; then
+            printf '%s\n' "$sink"
+            return
+        fi
+        if command -v pactl >/dev/null 2>&1; then
+            sink=$(pactl list sinks short | awk '$2 ~ /analog-stereo/ && $2 !~ /\.monitor$/ {print $2; exit}')
+        fi
+        [[ -n $sink ]] || sleep 0.5
+    done
+    printf '%s\n' 'No analog stereo PipeWire sink appeared within 60 seconds.' >&2
+    exit 1
 }
 
 readonly AUDIO_SINK="$(resolve_audio_sink)"
+headless_carla_running() {
+    pgrep -f -- "^/usr/bin/python3 /app/share/carla/carla .*--osc-gui=${OSC_PORT} .*${PROJECT}" >/dev/null 2>&1
+}
 
 if [[ ! -r $PROJECT ]]; then
     printf 'Carla project is not readable: %s\n' "$PROJECT" >&2
@@ -38,7 +45,7 @@ if [[ ! -d $SOUNDFONT_WORKDIR ]]; then
     printf 'Carla SoundFont directory is missing: %s\n' "$SOUNDFONT_WORKDIR" >&2
     exit 1
 fi
-if pgrep -f '^/usr/bin/python3 /app/share/carla/carla ' >/dev/null 2>&1; then
+if headless_carla_running; then
     printf '%s\n' 'A Carla process is already running; stop the GUI rack before starting headless Carla.' >&2
     exit 1
 fi
@@ -58,7 +65,7 @@ stop() {
 trap stop TERM INT
 
 for _ in {1..120}; do
-    if pgrep -f '^/usr/bin/python3 /app/share/carla/carla ' >/dev/null 2>&1; then
+    if headless_carla_running; then
         break
     fi
     if ! kill -0 "$launcher_pid" >/dev/null 2>&1; then
@@ -68,7 +75,7 @@ for _ in {1..120}; do
     sleep 0.25
 done
 
-if ! pgrep -f '^/usr/bin/python3 /app/share/carla/carla ' >/dev/null 2>&1; then
+if ! headless_carla_running; then
     printf '%s\n' 'Carla backend did not register within 30 seconds.' >&2
     stop
 fi
@@ -91,7 +98,7 @@ restore_audio_links() {
 restore_audio_links &
 link_restore_pid=$!
 
-while pgrep -f '^/usr/bin/python3 /app/share/carla/carla ' >/dev/null 2>&1; do
+while headless_carla_running; do
     sleep 1
 done
 

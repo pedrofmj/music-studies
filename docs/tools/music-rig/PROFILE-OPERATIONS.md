@@ -30,9 +30,10 @@ expected warm-genre event, and restores the previous environment if readiness
 fails.
 
 `repair-routes` is additive and idempotent. It restores the Arturia
-keyboard-to-router link, the router-to-master-control link, MIDI device routes,
-and missing internal connections from the protected Carla patchbay. It resolves
-controllers by their descriptive PipeWire port aliases, not transient ALSA
+keyboard-to-router link, the router-to-master-control link, selected audio
+output, MIDI device routes, and missing internal connections from the protected
+Carla patchbay. In `DEFAULT` audio mode it uses PipeWire's current default sink.
+It resolves controllers by their descriptive PipeWire port aliases, not transient ALSA
 client numbers, PipeWire node IDs, or USB hub port numbers. In particular, the
 SINCO controllers are matched by names such as `SMC-PAD Pocket-Master`; their
 shared USB product ID is not used to distinguish them. The command waits up to

@@ -46,11 +46,12 @@ class RecoveryTest(unittest.TestCase):
 
         with patch.object(cli, "arturia_keylab_output", return_value="keylab"), \
                 patch.object(cli, "service_state", side_effect=service_state), \
-                patch.object(cli, "run", side_effect=start_unit), \
-                patch.object(cli, "wait_for_live_rack", side_effect=wait_for_live_rack), \
-                patch.object(cli, "ensure_arturia_router", return_value={"selector": "active"}), \
-                patch.object(cli, "repair_audio_output", return_value={"status": "audio-repaired"}), \
-                patch.object(cli, "repair_routes", return_value={"status": "routes-repaired"}):
+            patch.object(cli, "run", side_effect=start_unit), \
+            patch.object(cli, "wait_for_live_rack", side_effect=wait_for_live_rack), \
+            patch.object(cli, "ensure_arturia_router", return_value={"selector": "active"}), \
+            patch.object(cli, "repair_routes", return_value={
+                "status": "routes-repaired", "audio": {"status": "audio-repaired"}
+            }):
             result = cli.recover_live_rig()
 
         self.assertEqual(expected, started)
@@ -60,11 +61,12 @@ class RecoveryTest(unittest.TestCase):
         cli = self.cli
         with patch.object(cli, "arturia_keylab_output", return_value="keylab"), \
                 patch.object(cli, "service_state", return_value="active"), \
-                patch.object(cli, "run") as run, \
-                patch.object(cli, "wait_for_live_rack"), \
-                patch.object(cli, "ensure_arturia_router", return_value={"selector": "active"}), \
-                patch.object(cli, "repair_audio_output", return_value={"status": "audio-repaired"}), \
-                patch.object(cli, "repair_routes", return_value={"status": "routes-repaired"}):
+            patch.object(cli, "run") as run, \
+            patch.object(cli, "wait_for_live_rack"), \
+            patch.object(cli, "ensure_arturia_router", return_value={"selector": "active"}), \
+            patch.object(cli, "repair_routes", return_value={
+                "status": "routes-repaired", "audio": {"status": "audio-repaired"}
+            }):
             result = cli.recover_live_rig()
 
         run.assert_not_called()
@@ -107,6 +109,45 @@ class RecoveryTest(unittest.TestCase):
         self.assertTrue(all(sources.values()))
         self.assertEqual([], missing_sources)
         self.assertEqual([], missing_targets)
+
+    def test_default_audio_mode_uses_current_pipewire_default_sink(self):
+        cli = self.cli
+        default_sink = "alsa_output.pci-platform-sof-hifi-sink"
+        sinks = {
+            default_sink: (f"{default_sink}:playback_FL", f"{default_sink}:playback_FR"),
+            "alsa_output.other-analog-stereo": (
+                "alsa_output.other-analog-stereo:playback_FL",
+                "alsa_output.other-analog-stereo:playback_FR",
+            ),
+        }
+        command = ["pactl", "get-default-sink"]
+        with patch.object(cli, "read_properties", return_value={"mode": "DEFAULT"}), \
+                patch.object(cli, "run", return_value=cli.subprocess.CompletedProcess(
+                    command, 0, default_sink + "\n", "")) as run:
+            targets = cli.audio_repair_targets(sinks)
+
+        self.assertEqual([default_sink], targets)
+        run.assert_called_once_with(command)
+
+    def test_repair_routes_also_repairs_audio_output(self):
+        cli = self.cli
+        aliases = list(cli.DEVICE_MIDI_TARGETS)
+        sources = {alias: f"Midi-Bridge:SINCO:{alias}:(capture_1)" for alias in aliases}
+        note_link = f"{cli.ARTURIA_ROUTER_OUTPUT}\n  |-> {cli.ARTURIA_FULL_RACK_INPUT}\n"
+        audio = {"status": "audio-repaired", "sinks": ["current-default"]}
+        with patch.object(cli, "repair_audio_output", return_value=audio), \
+                patch.object(cli, "ensure_arturia_router", return_value={"selector": "active"}), \
+                patch.object(cli, "ensure_link", return_value="present"), \
+                patch.object(cli, "pipewire_links", return_value=note_link), \
+                patch.object(cli, "arturia_keylab_output", return_value="keylab"), \
+                patch.object(cli, "wait_for_device_midi_ports", return_value=(sources, [], [])), \
+                patch.object(cli, "repair_project_connections", return_value={
+                    "links": {}, "unresolved": []
+                }):
+            result = cli.repair_routes()
+
+        self.assertEqual(audio, result["audio"])
+        self.assertEqual("routes-repaired", result["status"])
 
 
 if __name__ == "__main__":
