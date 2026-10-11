@@ -34,7 +34,7 @@ resolve_audio_sink() {
 
 readonly AUDIO_SINK="$(resolve_audio_sink)"
 headless_carla_running() {
-    pgrep -f -- "^/usr/bin/python3 /app/share/carla/carla .*--osc-gui=${OSC_PORT} .*${PROJECT}" >/dev/null 2>&1
+    pgrep -f -- "^/usr/bin/python3 /app/share/carla/carla .*--osc-gui=${OSC_PORT} " >/dev/null 2>&1
 }
 
 if [[ ! -r $PROJECT ]]; then

@@ -18,6 +18,7 @@ resource test.
 music-rig-profile list
 music-rig-profile status
 music-rig-profile apply validated-4-5
+music-rig-profile apply validated-to-6
 music-rig-profile rollback
 music-rig-profile repair-routes
 music-rig-profile repair-audio
