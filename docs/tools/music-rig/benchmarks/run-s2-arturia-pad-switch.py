@@ -740,16 +740,13 @@ def main() -> int:
                                   if connection[0] == "s2-arturia-profile-router:out"]
             other_midi_connections = [connection for connection in midi_connections
                                       if connection[0] != "s2-arturia-profile-router:out"]
-            def connect_cached(source: str, target: str) -> None:
-                connect_by_current_ids(source, target, environment)
-
             for source, target in genre_audio_connections(warm):
-                connect_cached(source, target)
+                connect(source, target, environment)
             connect("s2-arturia-profile-router:out", MIDI_TARGETS[0], environment)
             for source, target in router_connections:
-                connect_cached(source, target)
+                connect(source, target, environment)
             for source, target in other_midi_connections:
-                connect_cached(source, target)
+                connect(source, target, environment)
             expected = (*genre_midi_connections(warm), *genre_audio_connections(warm))
             current_links = links(environment)
             missing = [(source, target) for source, target in expected
