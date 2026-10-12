@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import ctypes
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 import datetime
@@ -11,6 +12,7 @@ import hashlib
 import json
 import os
 import re
+import select
 import signal
 import subprocess
 import tempfile
@@ -84,6 +86,10 @@ PAD_PROFILES = {
     15: "praise-leads",
     16: "acoustic-worship",
 }
+PROFILE_PAD_CODES = {profile: code for code, profile in PAD_PROFILES.items()}
+GENRE_ROUTER_PORTS = tuple(
+    f"s2-arturia-profile-router:genre-pad-{code}" for code in range(4, 17)
+)
 GENRE_ACTIVE_LAYERS = {
     # These are fixed protected Carla engine channels, not logical profile
     # layer numbers. The genre declarations choose the same engine identities.
@@ -321,9 +327,115 @@ def wait_for_links_absent(connections: tuple[tuple[str, str], ...],
     raise RuntimeError("PipeWire links did not disconnect before the next route was connected")
 
 
+class PersistentLinker:
+    def __init__(self) -> None:
+        self.client = None
+        self.lib = None
+        self.opened = False
+        self.enabled = False
+        self.notes = 0
+
+    def note(self, message: str) -> None:
+        if self.notes >= 8:
+            return
+        self.notes += 1
+        path = Path.home() / ".local/state/music-rig/arturia-profile-session/linker.log"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as stream:
+            stream.write(message + "\n")
+
+    def open(self) -> None:
+        if self.opened:
+            return
+        self.opened = True
+        try:
+            pipewire_jack_libraries = list(
+                Path("/usr/lib").glob("*/pipewire-0.3/jack/libjack.so.0")
+            )
+            if not pipewire_jack_libraries:
+                self.note("PipeWire JACK shim not found")
+                return
+            self.lib = ctypes.CDLL(str(pipewire_jack_libraries[0]))
+            self.lib.jack_client_open.restype = ctypes.c_void_p
+            self.lib.jack_connect.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
+            self.lib.jack_disconnect.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
+            self.lib.jack_activate.argtypes = [ctypes.c_void_p]
+            status = ctypes.c_int(0)
+            self.client = self.lib.jack_client_open(b"music-rig-linker", 1, ctypes.byref(status))
+            if self.client:
+                activation = self.lib.jack_activate(self.client)
+                self.note(f"client-open status={status.value} activate={activation}")
+            else:
+                self.note(f"client-open failed status={status.value}")
+        except OSError:
+            self.client = None
+
+    def connect(self, source: str, target: str) -> bool:
+        if not self.enabled:
+            return False
+        self.open()
+        if not self.client or self.lib is None:
+            return False
+        result = self.lib.jack_connect(self.client, source.encode(), target.encode())
+        self.last = (result, source, target)
+        if result in (0, 17):
+            self.note(f"connect {result} {source} -> {target}")
+        if result not in (0, 17):
+            self.note(f"connect {result} {source} -> {target}")
+            self.note_ports()
+        return result in (0, 17)
+
+    def note_ports(self) -> None:
+        if self.lib is None or not self.client:
+            return
+        self.lib.jack_get_ports.restype = ctypes.POINTER(ctypes.c_char_p)
+        self.lib.jack_get_ports.argtypes = [
+            ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_ulong
+        ]
+        ports = self.lib.jack_get_ports(self.client, None, None, 0)
+        if not ports:
+            self.note("jack_get_ports empty")
+            return
+        samples = []
+        index = 0
+        while ports[index] and index < 4:
+            samples.append(ports[index].decode())
+            index += 1
+        self.note("jack ports " + " | ".join(samples))
+
+    def disconnect(self, source: str, target: str) -> bool:
+        if not self.enabled:
+            return False
+        self.open()
+        if not self.client or self.lib is None:
+            return False
+        result = self.lib.jack_disconnect(self.client, source.encode(), target.encode())
+        return result in (0, 2)
+
+
+LINKER = PersistentLinker()
+
+
+def resolved_ports(direction: str, environment: dict[str, str]) -> dict[str, str]:
+    result = run(["pw-link", direction], environment)
+    names: dict[str, str] = {}
+    for line in result.stdout.splitlines():
+        actual = line.strip()
+        if not actual:
+            continue
+        names[actual] = actual
+        if "/" in actual:
+            names[actual.split("/", 1)[1]] = actual
+    return names
+
+
 def connect(source: str, target: str, environment: dict[str, str]) -> None:
     deadline = time.monotonic() + 15.0
     last_error = ""
+    current_source = resolve_port(source, "-o", environment)
+    current_target = resolve_port(target, "-i", environment)
+    if LINKER.connect(current_source, current_target):
+        return
     while time.monotonic() < deadline:
         current_source = resolve_port(source, "-o", environment)
         current_target = resolve_port(target, "-i", environment)
@@ -337,28 +449,26 @@ def connect(source: str, target: str, environment: dict[str, str]) -> None:
     raise RuntimeError(f"failed to link {source} -> {target}: {last_error}")
 
 
-def connect_many(connections: tuple[tuple[str, str], ...], environment: dict[str, str]) -> None:
-    output_ids = port_ids("-o", environment)
-    input_ids = port_ids("-i", environment)
-
-    def connect_pair(source: str, target: str) -> None:
-        for attempt in range(2):
-            source_id = output_ids.get(source)
-            target_id = input_ids.get(target)
-            if source_id is not None and target_id is not None:
-                result = run(["pw-link", str(source_id), str(target_id)], environment)
-                if result.returncode == 0 or "File exists" in result.stdout or "Arquivo existe" in result.stdout:
-                    return
-            if attempt == 0:
-                output_ids.update(port_ids("-o", environment))
-                input_ids.update(port_ids("-i", environment))
-        connect(source, target, environment)
-
-    with ThreadPoolExecutor(max_workers=min(8, len(connections))) as executor:
-        futures = [executor.submit(connect_pair, source, target)
-                   for source, target in connections]
-        for future in futures:
-            future.result()
+def connect_many(connections: tuple[tuple[str, str], ...], environment: dict[str, str],
+                 strict: bool = True) -> list[tuple[str, str]]:
+    if not connections:
+        return []
+    outputs = resolved_ports("-o", environment)
+    inputs = resolved_ports("-i", environment)
+    failures: list[tuple[str, str]] = []
+    for source, target in connections:
+        current_source = outputs.get(source, source)
+        current_target = inputs.get(target, target)
+        if LINKER.connect(current_source, current_target):
+            continue
+        result = run(["pw-link", current_source, current_target], environment)
+        if result.returncode == 0 or "File exists" in result.stdout or "Arquivo existe" in result.stdout:
+            continue
+        failures.append((source, target))
+    if strict and failures:
+        source, target = failures[0]
+        raise RuntimeError(f"failed to link {source} -> {target}")
+    return failures
 
 
 def port_ids(direction: str, environment: dict[str, str]) -> dict[str, int]:
@@ -423,6 +533,19 @@ def connect_with_ids(source: str, target: str, output_ids: dict[str, int],
 def disconnect(source: str, target: str, environment: dict[str, str]) -> None:
     run(["pw-link", "-d", resolve_port(source, "-o", environment),
          resolve_port(target, "-i", environment)], environment)
+
+
+def disconnect_many(connections: tuple[tuple[str, str], ...], environment: dict[str, str]) -> None:
+    if not connections:
+        return
+    outputs = resolved_ports("-o", environment)
+    inputs = resolved_ports("-i", environment)
+    for source, target in connections:
+        current_source = outputs.get(source, source)
+        current_target = inputs.get(target, target)
+        if LINKER.disconnect(current_source, current_target):
+            continue
+        run(["pw-link", "-d", current_source, current_target], environment)
 
 
 def find_keylab(environment: dict[str, str]) -> str:
@@ -543,10 +666,11 @@ def main() -> int:
                         "AR Controls - Sustain Scale:events-in"), environment)
         router = subprocess.Popen(
             ["/usr/bin/pw-jack", str(arguments.router), "s2-arturia-profile-router", str(fifo)],
-            env=environment, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, text=True,
+            env=environment, stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
         )
         wait_for_ports(("s2-arturia-profile-router:in", "s2-arturia-profile-router:out",
-                        *MIDI_TARGETS), environment)
+                        *GENRE_ROUTER_PORTS, *MIDI_TARGETS), environment)
         for target in MIDI_TARGETS:
             disconnect(keylab, target, environment)
         connect(keylab, ROUTER_INPUT, environment)
@@ -697,13 +821,34 @@ def main() -> int:
                 finally:
                     os.close(instance_read)
                 ports = discover_warmed_genre_ports(prefix, process)
-                time.sleep(1.0)
-                return WarmedGenre(profile, prefix, process, instance_id, *ports)
+                warm = WarmedGenre(profile, prefix, process, instance_id, *ports)
+                connect_warmed_genre(warm)
+                return warm
             except (OSError, RuntimeError):
                 run(["flatpak", "kill", instance_id], environment)
                 if process.poll() is None:
                     process.send_signal(signal.SIGTERM)
                 raise
+
+        def router_genre_output(profile: str) -> str:
+            code = PROFILE_PAD_CODES.get(profile)
+            if code is None or code < 4:
+                raise RuntimeError(f"profile has no dedicated genre router output: {profile}")
+            return f"s2-arturia-profile-router:genre-pad-{code}"
+
+        def set_router_profile(profile: str) -> None:
+            if router is None or router.poll() is not None or router.stdin is None:
+                raise RuntimeError("Arturia profile router is not available for profile selection")
+            code = PROFILE_PAD_CODES.get(profile, 3) if (
+                profile in warmed_genres or profile in FAST_ENGINE_PROFILES
+            ) else 3
+            command = bytes((code,))
+            router.stdin.write(command)
+            router.stdin.flush()
+            if router.stdout is None or not select.select([router.stdout], [], [], 0.1)[0]:
+                raise RuntimeError(f"router did not acknowledge active profile {profile}")
+            if os.read(router.stdout.fileno(), 1) != command:
+                raise RuntimeError(f"router acknowledged the wrong active profile for {profile}")
 
         def genre_midi_connections(warm: WarmedGenre) -> tuple[tuple[str, str], ...]:
             active_layers = GENRE_ACTIVE_LAYERS[warm.profile]
@@ -713,7 +858,7 @@ def main() -> int:
                 return any(marker in port for marker in active_marker)
 
             connections: list[tuple[str, str]] = [
-                ("s2-arturia-profile-router:out", target)
+                (router_genre_output(warm.profile), target)
                 for target in (*warm.midi_inputs, *warm.midi_control_inputs)
                 if active(target)
             ]
@@ -752,29 +897,18 @@ def main() -> int:
             return f"LSP Mixer x8 Stereo:Audio input {side} {slot}"
 
         def connect_warmed_genre(warm: WarmedGenre) -> None:
-            refresh_warmed_genre_ports(warm)
-            expected = (*genre_midi_connections(warm), *genre_audio_connections(warm))
-            wait_for_endpoint_ids(expected, environment)
-            for target in MIDI_TARGETS:
-                disconnect("s2-arturia-profile-router:out", target, environment)
+            if not warm.midi_inputs or not warm.audio_outputs:
+                refresh_warmed_genre_ports(warm)
             midi_connections = genre_midi_connections(warm)
-            router_connections = [connection for connection in midi_connections
-                                  if connection[0] == "s2-arturia-profile-router:out"]
-            other_midi_connections = [connection for connection in midi_connections
-                                      if connection[0] != "s2-arturia-profile-router:out"]
-            for source, target in genre_audio_connections(warm):
-                connect(source, target, environment)
-            connect("s2-arturia-profile-router:out", MIDI_TARGETS[0], environment)
-            for source, target in router_connections:
-                connect(source, target, environment)
-            for source, target in other_midi_connections:
-                connect(source, target, environment)
+            connect_many(genre_audio_connections(warm), environment)
+            connect_many(midi_connections, environment)
             expected = (*genre_midi_connections(warm), *genre_audio_connections(warm))
             current_links = links(environment)
             missing = [(source, target) for source, target in expected
                        if not link_present(current_links, source, target)]
             if missing:
-                raise RuntimeError(f"warmed genre route validation failed: {missing[0][0]} -> {missing[0][1]}")
+                refresh_warmed_genre_ports(warm)
+                connect_many(tuple(missing), environment)
 
         def validate_warmed_genre(warm: WarmedGenre) -> None:
             refresh_warmed_genre_ports(warm)
@@ -793,12 +927,9 @@ def main() -> int:
             warm.midi_inputs, warm.midi_control_inputs, warm.midi_control_outputs, warm.audio_outputs = ports
 
         def disconnect_warmed_genre(warm: WarmedGenre) -> None:
-            for source, target in (*genre_midi_connections(warm), *genre_audio_connections(warm)):
-                disconnect(source, target, environment)
-            # Keep the shared LSP/SMC and master-output path live so independent
-            # devices such as SMK-25 do not pause during a genre switch.
-            for target in MIDI_TARGETS:
-                disconnect("s2-arturia-profile-router:out", target, environment)
+            # Warm genre links stay fixed; the router directs MIDI to the active
+            # genre output and PipeWire removes links when Carla exits.
+            del warm
 
         def stop_warm_genres() -> None:
             for warm in list(warmed_genres.values()):
@@ -844,7 +975,8 @@ def main() -> int:
             inputs = run(["pw-link", "-i"], environment).stdout
             if (router is not None and router.poll() is None
                     and "s2-arturia-profile-router:out" in outputs
-                    and "s2-arturia-profile-router:in" in inputs):
+                    and "s2-arturia-profile-router:in" in inputs
+                    and all(port in outputs for port in GENRE_ROUTER_PORTS)):
                 return
             if router is not None and router.poll() is None:
                 router.send_signal(signal.SIGTERM)
@@ -855,13 +987,20 @@ def main() -> int:
                     router.wait()
             router = subprocess.Popen(
                 ["/usr/bin/pw-jack", str(arguments.router), "s2-arturia-profile-router", str(fifo)],
-                env=environment, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, text=True,
+                env=environment, stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
             )
-            wait_for_ports(("s2-arturia-profile-router:in", "s2-arturia-profile-router:out"), environment)
+            wait_for_ports(("s2-arturia-profile-router:in", "s2-arturia-profile-router:out",
+                            *GENRE_ROUTER_PORTS), environment)
             keylab = find_keylab(environment)
             for target in MIDI_TARGETS:
                 disconnect(keylab, target, environment)
             connect(keylab, ROUTER_INPUT, environment)
+            for target in MIDI_TARGETS:
+                connect("s2-arturia-profile-router:out", target, environment)
+            set_router_profile(current)
+            for warmed in warmed_genres.values():
+                connect_warmed_genre(warmed)
 
         def start_warm_engines() -> None:
             try:
@@ -878,12 +1017,8 @@ def main() -> int:
             if profile not in warm_candidates or warm_candidates[profile].poll() is not None:
                 raise RuntimeError(f"Warm engine is not running: {profile}")
             was_warmed_genre = current in warmed_genres
-            if was_warmed_genre:
-                stop_candidate()
             if current == "full-live-rack" and not audio_touched:
-                for source, target in ARTURIA_AUDIO:
-                    disconnect(source, target, environment)
-                wait_for_links_absent(ARTURIA_AUDIO, environment)
+                disconnect_many(ARTURIA_AUDIO, environment)
                 audio_touched = True
             for engine_input, left_output, right_output in FAST_ENGINE_PROFILES.values():
                 disconnect("s2-arturia-profile-router:out", engine_input, environment)
@@ -902,6 +1037,7 @@ def main() -> int:
                 if genre_quantum_changed:
                     set_pipewire_quantum(DEFAULT_PIPEWIRE_QUANTUM, environment)
                     genre_quantum_changed = False
+            set_router_profile(profile)
             active_arturia_layers = set()
             current = profile
             profiles_seen.append(profile)
@@ -911,25 +1047,16 @@ def main() -> int:
             warm = warmed_genres.get(profile)
             if warm is None or warm.process.poll() is not None:
                 raise RuntimeError(f"Warmed genre is not running: {profile}")
-            ensure_router()
-            wait_for_ports(MIDI_TARGETS, environment)
-            # Warmed genres share the live graph's quantum. Changing the global
-            # quantum here can unregister their ports during the switch.
-            validate_warmed_genre(warm)
-            if current in GENRE_ACTIVE_LAYERS:
+            if router is None or router.poll() is not None:
+                ensure_router()
+                for warmed in warmed_genres.values():
+                    connect_warmed_genre(warmed)
+            if current in GENRE_ACTIVE_LAYERS and current not in warmed_genres:
                 stop_candidate()
             if current == "full-live-rack" and not audio_touched:
-                for source, target in ARTURIA_AUDIO:
-                    disconnect(source, target, environment)
-                wait_for_links_absent(ARTURIA_AUDIO, environment)
+                disconnect_many(ARTURIA_AUDIO, environment)
                 audio_touched = True
-            for engine_input, left_output, right_output in FAST_ENGINE_PROFILES.values():
-                disconnect("s2-arturia-profile-router:out", engine_input, environment)
-                disconnect(left_output, LSP_LEFT, environment)
-                disconnect(right_output, LSP_RIGHT, environment)
-            if current in warmed_genres:
-                disconnect_warmed_genre(warmed_genres[current])
-            connect_warmed_genre(warm)
+            set_router_profile(profile)
             active_arturia_layers = set()
             current = profile
             profiles_seen.append(profile)
@@ -941,8 +1068,6 @@ def main() -> int:
                 disconnect("s2-arturia-profile-router:out", engine_input, environment)
                 disconnect(left_output, LSP_LEFT, environment)
                 disconnect(right_output, LSP_RIGHT, environment)
-            if current in warmed_genres:
-                disconnect_warmed_genre(warmed_genres[current])
             ensure_full_audio(restore_independent=False)
             restore_fast_independent_device_routes()
             if genre_quantum_changed:
@@ -957,6 +1082,7 @@ def main() -> int:
                 connect("s2-arturia-profile-router:out", target, environment)
             for source, target in MASTER_CONTROL:
                 connect(source, target, environment)
+            set_router_profile("full-live-rack")
             current = "full-live-rack"
 
         def restore_fast_independent_device_routes() -> None:
@@ -1023,6 +1149,7 @@ def main() -> int:
                 connect("s2-arturia-profile-router:out", target, environment)
             for source, target in MASTER_CONTROL:
                 connect(source, target, environment)
+            set_router_profile("full-live-rack")
             current = "full-live-rack"
 
         def start_candidate(profile: str) -> None:
@@ -1192,6 +1319,7 @@ def main() -> int:
             connect("s2-arturia-profile-router:out", MIDI_TARGETS[0], environment)
             connect(left_port, LSP_LEFT, environment)
             connect(right_port, LSP_RIGHT, environment)
+            set_router_profile("full-live-rack")
             current = profile
             profiles_seen.append(profile)
 
@@ -1212,6 +1340,7 @@ def main() -> int:
                     if configured_fast_genres:
                         start_warm_genres()
                         fast_genre_enabled = True
+                        LINKER.enabled = True
                         diagnostic_event(
                             diagnostic_log,
                             "fast-mode-enabled",

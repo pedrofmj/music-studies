@@ -13,6 +13,9 @@ typedef struct stimulus {
     jack_port_t *input;
     unsigned long input_events;
     unsigned long output_events;
+    unsigned long input_note_on;
+    unsigned long input_note_off;
+    unsigned long input_control;
 } stimulus;
 
 static int process(jack_nframes_t frames, void *opaque)
@@ -22,7 +25,7 @@ static int process(jack_nframes_t frames, void *opaque)
     void *input = jack_port_get_buffer(value->input, frames);
     jack_midi_event_t event;
     jack_nframes_t frame;
-    unsigned char note_on[] = {0x90, 60, 100};
+    unsigned char note_on[] = {0x90, 60, 48};
     unsigned char control_a[] = {0xb0, 20, 0};
     unsigned char control_b[] = {0xb0, 20, 127};
     unsigned char control_c[] = {0xb0, 74, 64};
@@ -44,6 +47,21 @@ static int process(jack_nframes_t frames, void *opaque)
     for (index = 0U; index < jack_midi_get_event_count(input); ++index) {
         if (jack_midi_event_get(&event, input, index) == 0) {
             value->input_events += 1UL;
+            if (event.size > 0U) {
+                switch (event.buffer[0] & 0xf0U) {
+                case 0x80U:
+                    value->input_note_off += 1UL;
+                    break;
+                case 0x90U:
+                    value->input_note_on += 1UL;
+                    break;
+                case 0xb0U:
+                    value->input_control += 1UL;
+                    break;
+                default:
+                    break;
+                }
+            }
         }
     }
     return 0;
@@ -55,6 +73,7 @@ int main(int argc, char **argv)
     jack_client_t *client;
     stimulus value = {0};
     struct timespec delay;
+    const char *server_name = getenv("JACK_SERVER_NAME");
     const char *source = NULL;
     char feedback_port[256];
     long duration_ms;
@@ -70,12 +89,13 @@ int main(int argc, char **argv)
     if (argc == 5) {
         source = argv[4];
     }
-    client = jack_client_open(
-        argv[1],
-        JackNoStartServer | JackServerName,
-        &status,
-        "music-rig-s2"
-    );
+    if (server_name != NULL && server_name[0] != '\0') {
+        client = jack_client_open(
+            argv[1], JackNoStartServer | JackServerName, &status, server_name
+        );
+    } else {
+        client = jack_client_open(argv[1], JackNoStartServer, &status);
+    }
     if (client == NULL) {
         fprintf(stderr, "jack_client_open failed: 0x%x\n", status);
         return 1;
@@ -101,10 +121,14 @@ int main(int argc, char **argv)
         jack_client_close(client);
         return 1;
     }
-    if (jack_connect(client, jack_port_name(value.output), argv[2]) != 0) {
-        fprintf(stderr, "could not connect output to %s\n", argv[2]);
-        jack_client_close(client);
-        return 1;
+    if (strcmp(argv[2], "-") != 0) {
+        int connection_result = jack_connect(client, jack_port_name(value.output), argv[2]);
+        if (connection_result != 0) {
+            fprintf(stderr, "could not connect %s to %s: %d\n",
+                jack_port_name(value.output), argv[2], connection_result);
+            jack_client_close(client);
+            return 1;
+        }
     }
     if (source != NULL && jack_connect(client, source, feedback_port) != 0) {
         fprintf(stderr, "could not connect feedback from %s\n", source);
@@ -119,5 +143,7 @@ int main(int argc, char **argv)
     (void)jack_client_close(client);
     printf("output_events=%lu input_events=%lu\n",
         value.output_events, value.input_events);
+    printf("input_note_on=%lu input_note_off=%lu input_control=%lu\n",
+        value.input_note_on, value.input_note_off, value.input_control);
     return 0;
 }
