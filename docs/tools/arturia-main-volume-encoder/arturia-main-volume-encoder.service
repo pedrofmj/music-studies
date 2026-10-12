@@ -9,6 +9,7 @@ Type=simple
 ExecStart=/usr/bin/pw-jack %h/.local/bin/arturia-main-volume-encoder %h/.local/state/arturia-main-volume-encoder/value 3
 Restart=always
 RestartSec=2
+TimeoutStopSec=15
 
 [Install]
 WantedBy=default.target

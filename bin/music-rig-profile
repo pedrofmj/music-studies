@@ -603,6 +603,53 @@ def emergency_reset() -> Path:
     return backup
 
 
+POWER_STOP_ORDER = (SELECTOR, ENCODER, SMK, HEADLESS)
+POWER_START_ORDER = (HEADLESS, ENCODER, SMK, SELECTOR)
+
+
+def power_off(dry_run: bool = False) -> dict[str, object]:
+    payload: dict[str, object] = {
+        "operation": "power-off",
+        "stop": list(POWER_STOP_ORDER),
+        "preserve": [str(ENV_FILE), str(PREVIOUS_ENV_FILE)],
+        "untouched": ["pipewire.service", "wireplumber.service"],
+    }
+    if dry_run:
+        payload["status"] = "dry-run"
+        return payload
+    for unit in POWER_STOP_ORDER:
+        run(["systemctl", "--user", "stop", unit])
+    kill_orphan_genres()
+    deadline = time.monotonic() + 60
+    remaining = list(POWER_STOP_ORDER)
+    while time.monotonic() < deadline:
+        remaining = [
+            unit for unit in POWER_STOP_ORDER
+            if service_state(unit) not in {"inactive", "failed"}
+        ]
+        if not remaining:
+            payload["status"] = "rig-powered-off"
+            payload["services"] = {unit: service_state(unit) for unit in POWER_STOP_ORDER}
+            return payload
+        time.sleep(1)
+    payload["status"] = "rig-power-off-timeout"
+    payload["remaining"] = remaining
+    return payload
+
+
+def power_on(dry_run: bool = False) -> dict[str, object]:
+    if dry_run:
+        return {
+            "operation": "power-on",
+            "status": "dry-run",
+            "start": list(POWER_START_ORDER),
+            "profile": str(ENV_FILE),
+        }
+    result = recover_live_rig()
+    result["operation"] = "power-on"
+    return result
+
+
 def reset(kind: str) -> str | None:
     if kind == "genres":
         write_env("MUSIC_RIG_TRANSITION_MODE=fast\n")
@@ -644,6 +691,9 @@ def main() -> int:
     subparsers.add_parser("repair-routes")
     subparsers.add_parser("repair-audio")
     subparsers.add_parser("recover")
+    for operation in ("power-off", "power-on"):
+        power_parser = subparsers.add_parser(operation)
+        power_parser.add_argument("--dry-run", action="store_true")
     events_parser = subparsers.add_parser("events")
     events_parser.add_argument("--limit", type=int, default=20)
     reset_parser = subparsers.add_parser("reset")
@@ -673,6 +723,14 @@ def main() -> int:
             return 0 if result["status"] == "rig-recovered" else 1
         elif arguments.operation == "events":
             print(json.dumps(latest_events(arguments.limit), indent=2, sort_keys=True))
+        elif arguments.operation == "power-off":
+            result = power_off(arguments.dry_run)
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0 if result["status"] in {"dry-run", "rig-powered-off"} else 1
+        elif arguments.operation == "power-on":
+            result = power_on(arguments.dry_run)
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0 if result["status"] in {"dry-run", "rig-recovered"} else 1
         elif arguments.operation == "reset":
             backup = reset(arguments.kind)
             payload = status()

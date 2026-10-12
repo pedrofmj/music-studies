@@ -472,6 +472,12 @@ int jack_activate(jack_client_t *client)
     return 0;
 }
 
+int jack_deactivate(jack_client_t *client)
+{
+    (void)client;
+    return 0;
+}
+
 jack_nframes_t jack_get_sample_rate(jack_client_t *client)
 {
     (void)client;

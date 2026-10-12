@@ -29,6 +29,7 @@ extern jack_client_t *jack_client_open(
 );
 extern int jack_client_close(jack_client_t *);
 extern int jack_activate(jack_client_t *);
+extern int jack_deactivate(jack_client_t *);
 extern jack_nframes_t jack_get_sample_rate(jack_client_t *);
 extern int jack_set_process_callback(
     jack_client_t *, int (*)(jack_nframes_t, void *), void *
@@ -392,6 +393,9 @@ int main(int argc, char **argv)
     (void)save_state(
         state_path, atomic_load(&volume_value), atomic_load(&mute_value)
     );
+    signal(SIGINT, SIG_IGN);
+    signal(SIGTERM, SIG_IGN);
+    (void)jack_deactivate(client);
     jack_client_close(client);
     return 0;
 }

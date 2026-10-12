@@ -149,6 +149,18 @@ class RecoveryTest(unittest.TestCase):
         self.assertEqual(audio, result["audio"])
         self.assertEqual("routes-repaired", result["status"])
 
+    def test_power_commands_dry_run_without_stopping_or_starting(self):
+        cli = self.cli
+        with patch.object(cli, "run") as run, patch.object(cli, "recover_live_rig") as recover:
+            off = cli.power_off(dry_run=True)
+            on = cli.power_on(dry_run=True)
+        run.assert_not_called()
+        recover.assert_not_called()
+        self.assertEqual("dry-run", off["status"])
+        self.assertEqual(list(cli.POWER_STOP_ORDER), off["stop"])
+        self.assertIn("pipewire.service", off["untouched"])
+        self.assertEqual(list(cli.POWER_START_ORDER), on["start"])
+
 
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0]])
