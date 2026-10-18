@@ -1,7 +1,7 @@
 # Windows Arturia Shared-SF2 Host
 
-Status: code-only WinMM adapter and shared route contract are present. A Carla
-audio-host bridge, Windows SoundFont-root resolver, and physical certification
+Status: code-only WinMM adapter, shared route contract, and Insync SoundFont
+root resolver are present. A Carla audio-host bridge and physical certification
 remain pending.
 
 ## Scope
@@ -14,9 +14,10 @@ and send queued output. The fake WinMM seam tests identity reorder, ambiguity,
 bounded queues, control-state replay, and shutdown without opening a device.
 
 The shared catalog uses relative SoundFont paths from
-`arturia-genre-patches.json`; Windows must resolve them beneath the user's
-Insync-managed `Flash/PED/MIDI/Pack de Timbres/Library` directory. No SF2 files
-are copied into the repository.
+`arturia-genre-patches.json`. The Windows path adapter resolves the user's
+Known-Folder profile, checks the direct `Flash/PED/MIDI/Pack de Timbres/Library`
+layout, then searches one account level below `Insync/`. It rejects absolute or
+parent-traversal catalog paths. No SF2 files are copied into the repository.
 
 ## Current Boundary
 

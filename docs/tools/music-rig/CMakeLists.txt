@@ -115,13 +115,14 @@ if(WIN32)
     add_library(music_rig_winmm_midi STATIC
         runtime/windows/music_rig_winmm_midi.c
         runtime/windows/music_rig_winmm_midi_win32.c
+        runtime/windows/music_rig_win32_soundfont_paths.c
     )
     target_include_directories(music_rig_winmm_midi
         PUBLIC runtime/windows/include
     )
     target_link_libraries(music_rig_winmm_midi
         PUBLIC music_rig_device_midi_shadow
-        PRIVATE winmm
+        PRIVATE winmm shell32 ole32
     )
     target_compile_features(music_rig_winmm_midi PUBLIC c_std_17)
     set_target_properties(music_rig_winmm_midi PROPERTIES C_EXTENSIONS OFF)
