@@ -70,6 +70,13 @@ The [Windows build contract](WINDOWS-BUILD.md) defines the hosted MSVC proof,
 native reproduction commands, and the boundary between CI portability and a
 physical audio reference machine.
 
+The standalone Android Arturia host prototype is in [`android/`](../../../android/).
+It uses Android MIDI, SAF-selected SoundFonts, and a separately supplied
+FluidSynth bundle. Its current Organ profile is a single-SF2 approximation; the
+full setBfree/Full Live/SMC/SMK roles and device/audio certification remain
+pending. See the
+[Android host feature note](../../features/0001.0000.0000.0000-configurable-performance-rig/android-arturia-shared-sf2-host.md).
+
 The [physical Windows resource result](benchmarks/windows-resource-beanstar.json)
 samples the short CLI process and a 60-second synthetic event-waiting daemon,
 including working set, CPU, threads, handles, shutdown, and cleanup. It opens

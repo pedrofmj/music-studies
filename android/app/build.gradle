@@ -1,0 +1,50 @@
+plugins {
+    id "com.android.application"
+}
+
+def fluidsynthRoot = providers.gradleProperty("fluidsynthRoot").orNull
+
+android {
+    namespace "org.musicrig.android"
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "org.musicrig.android"
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName "0.1.0"
+
+        if (fluidsynthRoot != null) {
+            externalNativeBuild {
+                cmake {
+                    arguments "-DFLUIDSYNTH_ROOT=${fluidsynthRoot}"
+                    cppFlags "-std=c++17"
+                }
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    sourceSets {
+        main {
+            assets.srcDir(rootProject.file("../docs/tools/music-rig/benchmarks"))
+            if (fluidsynthRoot != null) {
+                jniLibs.srcDir(file("${fluidsynthRoot}/jniLibs"))
+            }
+        }
+    }
+
+    if (fluidsynthRoot != null) {
+        externalNativeBuild {
+            cmake {
+                path file("src/main/cpp/CMakeLists.txt")
+                version "3.22.1"
+            }
+        }
+    }
+}
