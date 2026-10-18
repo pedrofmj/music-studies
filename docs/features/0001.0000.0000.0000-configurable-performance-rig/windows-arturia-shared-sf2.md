@@ -13,6 +13,13 @@ enqueue into bounded rings; worker threads drain input, route behavior output,
 and send queued output. The fake WinMM seam tests identity reorder, ambiguity,
 bounded queues, control-state replay, and shutdown without opening a device.
 
+The session core accepts an injected engine interface, so the same profile
+switch transaction can drive Carla or another SF2 host. It applies cached
+fader/knob values, keeps master volume/mute separate, routes notes and common
+controllers to active layers, and rolls back failed activation or control
+updates. The Windows branch does not yet provide the concrete Carla engine
+adapter.
+
 The shared catalog uses relative SoundFont paths from
 `arturia-genre-patches.json`. The Windows path adapter resolves the user's
 Known-Folder profile, checks the direct `Flash/PED/MIDI/Pack de Timbres/Library`
