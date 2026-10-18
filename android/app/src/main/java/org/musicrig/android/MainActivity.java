@@ -123,6 +123,7 @@ public final class MainActivity extends Activity {
         getContentResolver().takePersistableUriPermission(soundFontTree, flags);
         getPreferences(MODE_PRIVATE).edit().putString("soundfont_tree",
                 soundFontTree.toString()).apply();
+        stopService(new Intent(this, RigHostService.class));
         if (midiInput != null) {
             midiInput.close();
             midiInput = null;
@@ -147,7 +148,21 @@ public final class MainActivity extends Activity {
         }
         ProfileCatalog.ProfileOption option =
                 (ProfileCatalog.ProfileOption) genreSpinner.getSelectedItem();
-        selectProfile(option.id, false);
+        startRigService(option.id);
+    }
+
+    private void startRigService(String profileId) {
+        Intent service = new Intent(this, RigHostService.class)
+                .setAction(RigHostService.ACTION_START_PROFILE)
+                .putExtra(RigHostService.EXTRA_PROFILE_ID, profileId)
+                .putExtra(RigHostService.EXTRA_SOUNDFONT_TREE, soundFontTree.toString());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(service);
+        } else {
+            startService(service);
+        }
+        requestBluetoothPermissions();
+        profileStatus.setText("Starting profile: " + profileId);
     }
 
     private void selectProfile(String profileId, boolean fromPad) {
@@ -247,6 +262,12 @@ public final class MainActivity extends Activity {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_BLUETOOTH_CONNECT);
         }
+        if (Build.VERSION.SDK_INT >= 33 &&
+                checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
+                        PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                    REQUEST_BLUETOOTH_CONNECT);
+        }
     }
 
     @Override
@@ -270,15 +291,6 @@ public final class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        if (midiInput != null) {
-            midiInput.close();
-        }
-        controlExecutor.execute(() -> {
-            if (host != null) {
-                host.close();
-                host = null;
-            }
-        });
         controlExecutor.shutdown();
         super.onDestroy();
     }

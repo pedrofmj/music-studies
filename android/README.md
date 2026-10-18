@@ -28,6 +28,11 @@ volume CC and knobs to the configured reverb CC. Central encoder CC114 uses
 binary-offset master volume; click CC115 toggles master mute. Both are handled
 outside the 18-control cache and are not sent to individual layers.
 
+Playback and MIDI ownership live in `RigHostService`, a foreground media
+service, rather than the Activity. The Activity is only a control surface, so
+screen rotation and screen-off operation do not intentionally destroy the audio
+host. Notification and Bluetooth permissions still require user approval.
+
 The first profile option is `Android Organ (single SF2 layer; not setBfree
 drawbars)`. It resolves the catalog's JF Gospel Organ preset and maps Fader 1 to
 that channel's volume and Knob 1 to reverb. This is an SF2 playback mode, not a
