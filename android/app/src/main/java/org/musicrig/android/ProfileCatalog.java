@@ -60,6 +60,14 @@ public final class ProfileCatalog {
         return new ArrayList<>(genres);
     }
 
+    public List<Sf2Profile> genreProfiles() throws JSONException {
+        List<Sf2Profile> profiles = new ArrayList<>();
+        for (String genre : genres) {
+            profiles.add(profile(genre));
+        }
+        return profiles;
+    }
+
     public List<ProfileOption> profileOptions() {
         List<ProfileOption> options = new ArrayList<>();
         options.add(new ProfileOption(ORGAN_PROFILE_ID,

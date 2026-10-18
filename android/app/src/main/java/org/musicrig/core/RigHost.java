@@ -58,6 +58,14 @@ public final class RigHost implements AutoCloseable {
         replayControls();
     }
 
+    /** Loads and indexes a profile's SoundFonts without changing the active profile. */
+    public synchronized void preloadProfile(Sf2Profile nextProfile) throws Exception {
+        for (Sf2Profile.SoundFont patch : nextProfile.soundFonts) {
+            LoadedSoundFont loaded = loadSoundFont(patch.path);
+            resolvePreset(patch, loaded);
+        }
+    }
+
     public synchronized boolean onMidiMessage(byte[] message) {
         if (message == null || message.length < 2) {
             return false;

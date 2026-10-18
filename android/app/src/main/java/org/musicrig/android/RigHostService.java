@@ -80,8 +80,20 @@ public final class RigHostService extends Service {
             }
             host.selectProfile(profile);
             updateNotification("Music Rig: " + profile.label);
+            preloadGenreCatalog();
         } catch (Exception exception) {
             updateNotification("Music Rig profile error");
+        }
+    }
+
+    private void preloadGenreCatalog() {
+        try {
+            for (Sf2Profile genre : catalog.genreProfiles()) {
+                host.preloadProfile(genre);
+            }
+            updateNotification("Music Rig: SF2 catalog ready");
+        } catch (Exception exception) {
+            updateNotification("Music Rig: SF2 prewarm incomplete");
         }
     }
 

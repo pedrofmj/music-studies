@@ -19,6 +19,10 @@ Each layer's requested preset is resolved by exact match against the catalog
 label; missing or duplicate preset labels prevent profile activation rather
 than falling back to bank/program 0/0.
 
+After the first profile becomes audible, the service prewarms the resolved genre
+catalog in its control worker. Prewarming reuses the same loaded SoundFont IDs;
+it does not replace the active profile or require MIDI input.
+
 The 18 cached CCs match the portable API. Startup values are zero except
 control-array index 16 (Arturia knob 8, CC 16), which starts at 64. The main
 encoder is not in the cache. Active profile switches configure the route and
