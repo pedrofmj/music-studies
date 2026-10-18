@@ -14,6 +14,7 @@ add_library(music_rig_core STATIC
     runtime/core/music_rig_control.c
     runtime/core/music_rig_core.c
     runtime/core/music_rig_arturia_shared_sf2.c
+    runtime/core/music_rig_arturia_carla_host.c
     runtime/core/music_rig_arturia_session.c
     runtime/core/music_rig_definition.c
     runtime/core/music_rig_device_ports.c
@@ -479,6 +480,30 @@ else()
 endif()
 
 if(BUILD_TESTING)
+    add_executable(music_rig_arturia_carla_host_test
+        tests/arturia-carla-host-test.c
+    )
+    target_link_libraries(music_rig_arturia_carla_host_test
+        PRIVATE music_rig_core music_rig_current_behaviors
+    )
+    target_compile_features(music_rig_arturia_carla_host_test PRIVATE c_std_17)
+    set_target_properties(music_rig_arturia_carla_host_test PROPERTIES
+        C_EXTENSIONS OFF
+    )
+    if(MSVC)
+        target_compile_options(music_rig_arturia_carla_host_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+    else()
+        target_compile_options(music_rig_arturia_carla_host_test PRIVATE
+            -Wall -Wextra -Wpedantic -Werror
+        )
+    endif()
+    add_test(
+        NAME music_rig_arturia_carla_host
+        COMMAND music_rig_arturia_carla_host_test
+    )
+
     add_executable(music_rig_arturia_session_core_test
         tests/arturia-session-core-test.c
     )
