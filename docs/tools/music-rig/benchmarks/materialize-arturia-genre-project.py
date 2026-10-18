@@ -14,6 +14,17 @@ from pathlib import Path
 
 AR_PREFIX = "AR-CH-"
 CHUNK_PREFIX = b"VC2!\x10\r\x00\x00"
+GENRE_CONTROL_CCS = {
+    1: {"Volume Map": 73, "Reverb Map": 74},
+    2: {"Volume Map": 75, "Reverb Map": 71},
+    3: {"Volume Map": 79, "Reverb Map": 76},
+    4: {"Volume Map": 72, "Reverb Map": 77},
+    5: {"Volume Map": 80, "Reverb Map": 93},
+    6: {"Volume Map": 81, "Reverb Map": 18},
+    7: {"Volume Map": 82, "Reverb Map": 19},
+    8: {"Volume Map": 83, "Reverb Map": 16},
+    9: {"Volume Map": 85, "Reverb Map": 17},
+}
 
 
 def excluded_name(name: str) -> bool:
@@ -104,14 +115,25 @@ def main() -> int:
             raise ValueError("source project must contain both VST2 and SF2 Arturia templates")
 
         retained_maps = []
-        for channel in (2, 4, 5, 6, 7, 8, 9):
+        for channel, control_ccs in GENRE_CONTROL_CCS.items():
             for kind in ("Volume Map", "Reverb Map"):
                 source_name = f"AR-CH-{channel} {kind}"
                 source = map_plugins.get(source_name)
+                if source is None and channel in (1, 3):
+                    source = map_plugins.get(f"AR-CH-2 {kind}")
                 if source is None:
                     raise ValueError(f"required map plugin is missing: {source_name}")
                 retained = copy.deepcopy(source)
                 retained.find("Info/Name").text = f"GENRE-CH-{channel} {kind}"
+                input_cc = next(
+                    (parameter for parameter in retained.findall("Data/Parameter")
+                     if parameter.findtext("Symbol") == "ccin"),
+                    None,
+                )
+                input_value = None if input_cc is None else input_cc.find("Value")
+                if input_value is None:
+                    raise ValueError(f"map plugin has no CC input parameter: {source_name}")
+                input_value.text = str(control_ccs[kind])
                 retained_maps.append(retained)
 
         for child in list(root):

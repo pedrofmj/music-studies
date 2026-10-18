@@ -1,0 +1,134 @@
+#!/usr/bin/env python3
+"""Verify all nine Arturia genre layers have volume and reverb CC maps."""
+
+from __future__ import annotations
+
+import json
+import subprocess
+import sys
+import tempfile
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+
+SCRIPT_PATH = Path(__file__).resolve()
+TOOLS_ROOT = SCRIPT_PATH.parents[1]
+REPOSITORY_ROOT = SCRIPT_PATH.parents[4]
+MATERIALIZER = TOOLS_ROOT / "benchmarks" / "materialize-arturia-genre-project.py"
+SOURCE_PROJECT = (
+    REPOSITORY_ROOT
+    / "src/audio-software/carla/projects/pedro-live-rack/pedro.uproject"
+)
+MANIFEST_PATH = TOOLS_ROOT / "benchmarks" / "arturia-genre-patches.json"
+CONTROL_CCS = {
+    1: (73, 74),
+    2: (75, 71),
+    3: (79, 76),
+    4: (72, 77),
+    5: (80, 93),
+    6: (81, 18),
+    7: (82, 19),
+    8: (83, 16),
+    9: (85, 17),
+}
+PROFILES = ("worship-piano", "ambient-worship")
+
+
+def fixture_assets(manifest: dict, root: Path) -> tuple[Path, Path]:
+    soundfont_root = root / "soundfonts"
+    decent_sampler_root = root / "decent-sampler"
+    patches = manifest["patches"]
+    selected = {
+        patch_id
+        for profile in PROFILES
+        for patch_id in manifest["genres"][profile]
+    }
+    for patch_id in selected:
+        patch = patches[patch_id]
+        asset_root = soundfont_root if patch["engine"] == "sf2" else decent_sampler_root
+        asset = asset_root / patch["path"]
+        asset.parent.mkdir(parents=True, exist_ok=True)
+        if patch["engine"] == "sf2":
+            asset.write_bytes(b"fixture soundfont")
+        else:
+            asset.write_text("<DecentSampler />\n", encoding="utf-8")
+    return soundfont_root, decent_sampler_root
+
+
+def control_value(plugin: ET.Element, symbol: str) -> str:
+    parameter = next(
+        (item for item in plugin.findall("Data/Parameter")
+         if item.findtext("Symbol") == symbol),
+        None,
+    )
+    if parameter is None or parameter.find("Value") is None:
+        raise AssertionError(f"{plugin.findtext('Info/Name')} has no {symbol} value")
+    return parameter.findtext("Value") or ""
+
+
+def verify_profile(profile: str, root: Path, assets: tuple[Path, Path]) -> None:
+    output = root / f"{profile}.uproject"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(MATERIALIZER),
+            "--source-project",
+            str(SOURCE_PROJECT),
+            "--manifest",
+            str(MANIFEST_PATH),
+            "--genre",
+            profile,
+            "--soundfont-root",
+            str(assets[0]),
+            "--decent-sampler-root",
+            str(assets[1]),
+            "--output",
+            str(output),
+        ],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise AssertionError(f"{profile} materialization failed: {result.stderr}")
+
+    plugins = ET.parse(output).getroot().findall("Plugin")
+    by_name = {
+        plugin.findtext("Info/Name"): plugin
+        for plugin in plugins
+        if plugin.findtext("Info/Name")
+    }
+    instruments = [name for name in by_name if name.startswith("GENRE-CH-")
+                   and " Map" not in name]
+    if len(instruments) != 9:
+        raise AssertionError(f"{profile} has {len(instruments)} genre instruments, expected 9")
+
+    for channel, (volume_cc, reverb_cc) in CONTROL_CCS.items():
+        for kind, expected_cc, output_cc in (
+            ("Volume Map", volume_cc, 7),
+            ("Reverb Map", reverb_cc, 91),
+        ):
+            name = f"GENRE-CH-{channel} {kind}"
+            plugin = by_name.get(name)
+            if plugin is None:
+                raise AssertionError(f"{profile} is missing {name}")
+            if control_value(plugin, "ccin") != str(expected_cc):
+                raise AssertionError(f"{profile} has the wrong input CC for {name}")
+            if control_value(plugin, "ccout") != str(output_cc):
+                raise AssertionError(f"{profile} has the wrong output CC for {name}")
+
+
+def main() -> int:
+    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    with tempfile.TemporaryDirectory(prefix="arturia-genre-control-maps-") as temporary:
+        root = Path(temporary)
+        assets = fixture_assets(manifest, root)
+        for profile in PROFILES:
+            verify_profile(profile, root, assets)
+    print("Arturia genre control maps: PASS (profiles=2, layers=9)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

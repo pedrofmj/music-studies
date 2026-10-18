@@ -13,6 +13,7 @@ add_library(music_rig_core STATIC
     runtime/core/music_rig_compiled_tables.c
     runtime/core/music_rig_control.c
     runtime/core/music_rig_core.c
+    runtime/core/music_rig_arturia_shared_sf2.c
     runtime/core/music_rig_definition.c
     runtime/core/music_rig_device_ports.c
     runtime/core/music_rig_diagnostics.c
@@ -31,6 +32,7 @@ set_target_properties(music_rig_core PROPERTIES
 )
 
 add_library(music_rig_current_behaviors STATIC
+    runtime/behaviors/music_rig_arturia_control_state.c
     runtime/behaviors/music_rig_current_arturia.c
     runtime/behaviors/music_rig_current_smk25.c
 )
@@ -457,6 +459,57 @@ else()
 endif()
 
 if(BUILD_TESTING)
+    add_executable(music_rig_arturia_pad_control_state_test
+        tests/arturia-pad-control-state-test.c
+    )
+    target_link_libraries(music_rig_arturia_pad_control_state_test
+        PRIVATE music_rig_current_behaviors
+    )
+    target_compile_features(music_rig_arturia_pad_control_state_test
+        PRIVATE c_std_17
+    )
+    set_target_properties(music_rig_arturia_pad_control_state_test PROPERTIES
+        C_EXTENSIONS OFF
+    )
+    if(MSVC)
+        target_compile_options(music_rig_arturia_pad_control_state_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+    else()
+        target_compile_options(music_rig_arturia_pad_control_state_test PRIVATE
+            -Wall -Wextra -Wpedantic -Werror
+        )
+    endif()
+    add_test(
+        NAME music_rig_arturia_pad_control_state
+        COMMAND music_rig_arturia_pad_control_state_test
+    )
+    add_executable(music_rig_arturia_shared_sf2_plan_test
+        tests/arturia-shared-sf2-plan-test.c
+    )
+    target_link_libraries(music_rig_arturia_shared_sf2_plan_test
+        PRIVATE music_rig_core
+    )
+    target_compile_features(music_rig_arturia_shared_sf2_plan_test
+        PRIVATE c_std_17
+    )
+    set_target_properties(music_rig_arturia_shared_sf2_plan_test PROPERTIES
+        C_EXTENSIONS OFF
+    )
+    if(MSVC)
+        target_compile_options(music_rig_arturia_shared_sf2_plan_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+    else()
+        target_compile_options(music_rig_arturia_shared_sf2_plan_test PRIVATE
+            -Wall -Wextra -Wpedantic -Werror
+        )
+    endif()
+    add_test(
+        NAME music_rig_arturia_shared_sf2_plan
+        COMMAND music_rig_arturia_shared_sf2_plan_test
+    )
+
     add_executable(music_rig_core_test
         tests/core-test.c
     )
@@ -1161,6 +1214,25 @@ if(BUILD_TESTING)
     )
     set_tests_properties(
         music_rig_materializer_self_test
+        PROPERTIES TIMEOUT 30
+    )
+
+    add_test(
+        NAME music_rig_arturia_genre_control_maps
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-arturia-genre-control-maps"
+    )
+    set_tests_properties(
+        music_rig_arturia_genre_control_maps
+        PROPERTIES TIMEOUT 30
+    )
+    add_test(
+        NAME music_rig_arturia_shared_sf2_routing
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-arturia-shared-sf2-routing.py"
+    )
+    set_tests_properties(
+        music_rig_arturia_shared_sf2_routing
         PROPERTIES TIMEOUT 30
     )
 

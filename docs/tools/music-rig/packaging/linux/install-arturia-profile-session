@@ -82,6 +82,8 @@ readonly SETBFREE_SOURCE="${candidate_root}/setbfree-root/usr/bin/setBfree"
 readonly SETBFREE_CONFIG="${REPO_ROOT}/docs/tools/music-rig/benchmarks/s2-setbfree-keylab-controls.cfg"
 readonly SETBFREE_LIB="${candidate_root}/setbfree-root/usr/lib"
 readonly ROUTER_SOURCE="${REPO_ROOT}/docs/tools/music-rig/benchmarks/arturia-pad-router.c"
+readonly ROUTER_CONTROL_STATE_SOURCE="${REPO_ROOT}/docs/tools/music-rig/runtime/behaviors/music_rig_arturia_control_state.c"
+readonly ROUTER_INCLUDE_ROOT="${REPO_ROOT}/docs/tools/music-rig/runtime/behaviors/include"
 
 for required in "$SYNTHV1_SOURCE" "$SYNTHV1_PRESET" "$SYNTHV1_CONTROLS" \
     "$SETBFREE_SOURCE" "$SETBFREE_CONFIG" "$SETBFREE_LIB"; do
@@ -91,6 +93,8 @@ if [[ -n $router_binary ]]; then
     [[ -f $router_binary ]] || { printf 'Router binary is missing: %s\n' "$router_binary" >&2; exit 1; }
 else
     [[ -f $ROUTER_SOURCE ]] || { printf 'Router source is missing: %s\n' "$ROUTER_SOURCE" >&2; exit 1; }
+    [[ -f $ROUTER_CONTROL_STATE_SOURCE ]] || { printf 'Router control-state source is missing: %s\n' "$ROUTER_CONTROL_STATE_SOURCE" >&2; exit 1; }
+    [[ -d $ROUTER_INCLUDE_ROOT ]] || { printf 'Router include root is missing: %s\n' "$ROUTER_INCLUDE_ROOT" >&2; exit 1; }
 fi
 
 mkdir -p "$INSTALL_ROOT" "$SERVICE_ROOT" "$USER_BIN_ROOT"
@@ -112,7 +116,8 @@ cp -a "${genre_project_root}/." "${INSTALL_ROOT}/genre-projects/"
 if [[ -n $router_binary ]]; then
     install -m 0755 "$router_binary" "${INSTALL_ROOT}/arturia-pad-router"
 else
-    cc "$ROUTER_SOURCE" -o "${INSTALL_ROOT}/arturia-pad-router" -ljack
+    cc -I "$ROUTER_INCLUDE_ROOT" "$ROUTER_SOURCE" "$ROUTER_CONTROL_STATE_SOURCE" \
+        -o "${INSTALL_ROOT}/arturia-pad-router" -ljack
 fi
 install -m 0644 "$SERVICE_SOURCE" "${SERVICE_ROOT}/${SERVICE_NAME}"
 systemctl --user daemon-reload

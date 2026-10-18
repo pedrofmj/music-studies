@@ -19,6 +19,16 @@ systemctl --user stop music-rig-arturia-profile-session.service
 Stopping the service restores `full-live-rack` and removes temporary candidate
 connections.
 
+Every selector start now selects Tonewheel Organ and seeds the nine fader
+values to `0`; the nine knob values are seeded to `0` except Knob 8, which is
+`64`. The main encoder is not part of this state. The router remembers each
+fader/knob CC received during the session and reapplies the cached values after
+each mode switch. Since the KeyLab does not report control positions on request,
+put all physical faders at the bottom before starting the rig. In Organ mode,
+bottom is the loudest drawbar position, intentionally providing an audible
+startup check. The knobs are endless encoders; their seeded values are logical
+instrument values, not physical angular positions.
+
 ## Pad Modes
 
 Pad management matches MIDI channel 10 only. Normal keyboard notes use channel 1

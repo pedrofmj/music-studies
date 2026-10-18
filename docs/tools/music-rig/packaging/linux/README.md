@@ -34,10 +34,11 @@ systemctl --user status music-rig-arturia-profile-session.service
 systemctl --user stop music-rig-arturia-profile-session.service
 ```
 
-The service starts in `full-live-rack`, consumes only the Arturia channel-10 pad
-management notes, forwards keyboard/control MIDI, and swaps only the Arturia
-audio layer. SMK-25, SMC-Mixer, SMC-PAD, and SMC-PAD Pocket remain connected.
-Stopping or failing the service restores the default Arturia layer.
+The service starts in `tonewheel-organ-setbfree` with seeded fader/knob values,
+consumes only the Arturia channel-10 pad management notes, forwards
+keyboard/control MIDI, and swaps only the Arturia audio layer. SMK-25,
+SMC-Mixer, SMC-PAD, and SMC-PAD Pocket remain connected. Stopping or failing the
+service restores `full-live-rack`.
 
 ## Transition Certification
 

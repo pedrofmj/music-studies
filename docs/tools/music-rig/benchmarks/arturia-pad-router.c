@@ -3,6 +3,8 @@
 #include <jack/jack.h>
 #include <jack/midiport.h>
 
+#include "music_rig/arturia_control_state.h"
+
 #include <fcntl.h>
 #include <poll.h>
 #include <signal.h>
@@ -20,6 +22,8 @@ typedef struct router {
     jack_port_t *genre_outputs[13];
     int trigger_fd;
     atomic_int active_profile;
+    atomic_bool replay_control_state;
+    music_rig_arturia_control_state control_state;
 } router;
 
 static volatile sig_atomic_t running = 1;
@@ -59,6 +63,29 @@ static int process(jack_nframes_t frames, void *opaque)
         genre_buffers[index] = jack_port_get_buffer(value->genre_outputs[index], frames);
         jack_midi_clear_buffer(genre_buffers[index]);
     }
+    if (atomic_exchange(&value->replay_control_state, false)) {
+        int active_profile = atomic_load(&value->active_profile);
+        void *active_output = active_profile >= 4 && active_profile <= 16
+            ? genre_buffers[active_profile - 4] : output;
+        size_t control_index;
+
+        for (control_index = 0U;
+             control_index < MUSIC_RIG_ARTURIA_CONTROL_COUNT;
+             ++control_index) {
+            uint8_t message[3];
+
+            if (!music_rig_arturia_control_state_message(
+                    &value->control_state, control_index, message)) {
+                continue;
+            }
+            (void)jack_midi_event_write(
+                active_output, 0U, message, sizeof(message)
+            );
+            if (active_output != output) {
+                (void)jack_midi_event_write(output, 0U, message, sizeof(message));
+            }
+        }
+    }
     for (index = 0U; index < jack_midi_get_event_count(input); ++index) {
         jack_midi_event_t event;
         int profile;
@@ -67,6 +94,14 @@ static int process(jack_nframes_t frames, void *opaque)
 
         if (jack_midi_event_get(&event, input, index) != 0 || event.size == 0U) {
             continue;
+        }
+        if (event.size == 3U) {
+            (void)music_rig_arturia_control_state_update(
+                &value->control_state,
+                event.buffer[0],
+                event.buffer[1],
+                event.buffer[2]
+            );
         }
         profile = event.size >= 3U &&
             (event.buffer[0] & 0xf0U) == 0x90U &&
@@ -137,7 +172,9 @@ int main(int argc, char **argv)
     value.output = jack_port_register(
         client, "out", JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0U
     );
-    atomic_init(&value.active_profile, 3);
+    music_rig_arturia_control_state_init(&value.control_state);
+    atomic_init(&value.active_profile, 1);
+    atomic_init(&value.replay_control_state, false);
     for (index = 4U; index <= 16U; ++index) {
         (void)snprintf(port_name, sizeof(port_name), "genre-pad-%u", index);
         value.genre_outputs[index - 4U] = jack_port_register(
@@ -166,6 +203,7 @@ int main(int argc, char **argv)
             ssize_t count = read(STDIN_FILENO, &profile_code, sizeof(profile_code));
             if (count == 1 && profile_code >= 1U && profile_code <= 16U) {
                 atomic_store(&value.active_profile, profile_code);
+                atomic_store(&value.replay_control_state, true);
                 ssize_t ack_bytes = write(STDOUT_FILENO, &profile_code, sizeof(profile_code));
                 (void)ack_bytes;
             }

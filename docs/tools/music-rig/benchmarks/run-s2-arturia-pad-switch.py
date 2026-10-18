@@ -87,9 +87,15 @@ PAD_PROFILES = {
     16: "acoustic-worship",
 }
 PROFILE_PAD_CODES = {profile: code for code, profile in PAD_PROFILES.items()}
+STARTUP_PROFILE = "tonewheel-organ-setbfree"
 GENRE_ROUTER_PORTS = tuple(
     f"s2-arturia-profile-router:genre-pad-{code}" for code in range(4, 17)
 )
+SHARED_SF2_CLIENT_PREFIX = "PERSISTENT-GENRE-"
+SHARED_SF2_MAP_PREFIX = "SHARED-GENRE-CH-"
+SHARED_SF2_MAP_CHANNELS = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+SHARED_SF2_MAP_KINDS = ("Volume Map", "Reverb Map")
+SHARED_SF2_PORT_REGISTRATION_TIMEOUT_SECONDS = 180.0
 GENRE_ACTIVE_LAYERS = {
     # These are fixed protected Carla engine channels, not logical profile
     # layer numbers. The genre declarations choose the same engine identities.
@@ -133,6 +139,76 @@ class WarmedGenre:
     midi_control_inputs: tuple[str, ...]
     midi_control_outputs: tuple[str, ...]
     audio_outputs: tuple[str, ...]
+
+
+@dataclass
+class SharedSf2Engine:
+    """One resident Carla project containing the complete SF2 genre catalog."""
+
+    process: subprocess.Popen[str]
+    instance_id: str
+    mapping: dict
+    midi_inputs: dict[str, str]
+    audio_outputs: dict[str, tuple[str, str]]
+    map_midi_inputs: dict[tuple[int, str], str]
+    map_midi_outputs: dict[tuple[int, str], str]
+    active_profile: str | None = None
+    active_links: tuple[tuple[str, str], ...] = ()
+
+
+def validate_shared_sf2_mapping(mapping: dict) -> None:
+    if mapping.get("schema") != "music-studies/arturia-shared-sf2-engine/v1":
+        raise ValueError("unsupported shared SF2 mapping schema")
+    engine_patches = mapping.get("engine_patches")
+    genres = mapping.get("genres")
+    if not isinstance(engine_patches, dict) or not isinstance(genres, dict):
+        raise ValueError("shared SF2 mapping is incomplete")
+    if tuple(mapping.get("map_channels", ())) != SHARED_SF2_MAP_CHANNELS:
+        raise ValueError("shared SF2 layer map channels do not match the router")
+    for profile in GENRE_ACTIVE_LAYERS:
+        patch_ids = genres.get(profile)
+        if not isinstance(patch_ids, list) or len(patch_ids) != 9:
+            raise ValueError(f"shared SF2 mapping has no nine-slot profile for {profile}")
+        for patch_id in patch_ids:
+            patch = engine_patches.get(patch_id)
+            if not isinstance(patch, dict) or not patch.get("plugin_name"):
+                raise ValueError(f"shared SF2 engine patch is missing: {patch_id}")
+
+
+def shared_sf2_route_plan(
+    profile: str,
+    mapping: dict,
+    router_output: str,
+    midi_inputs: dict[str, str],
+    audio_outputs: dict[str, tuple[str, str]],
+    map_midi_inputs: dict[tuple[int, str], str],
+    map_midi_outputs: dict[tuple[int, str], str],
+) -> tuple[tuple[tuple[str, str], ...], tuple[tuple[str, str], ...]]:
+    if profile not in GENRE_ACTIVE_LAYERS:
+        raise ValueError(f"profile has no shared SF2 genre routing: {profile}")
+    validate_shared_sf2_mapping(mapping)
+    midi_connections: list[tuple[str, str]] = []
+    audio_connections: list[tuple[str, str]] = []
+    patch_ids = mapping["genres"][profile]
+    active_layers = GENRE_ACTIVE_LAYERS[profile]
+    for layer in active_layers:
+        patch_id = patch_ids[layer - 1]
+        instrument_input = midi_inputs.get(patch_id)
+        outputs = audio_outputs.get(patch_id)
+        if instrument_input is None or outputs is None:
+            raise RuntimeError(f"shared SF2 ports are missing for patch {patch_id}")
+        for kind in SHARED_SF2_MAP_KINDS:
+            map_input = map_midi_inputs.get((layer, kind))
+            map_output = map_midi_outputs.get((layer, kind))
+            if map_input is None or map_output is None:
+                raise RuntimeError(f"shared SF2 {kind} ports are missing for layer {layer}")
+            midi_connections.extend(((router_output, map_input), (map_output, instrument_input)))
+        mixer_slot = active_layers.index(layer) + 1
+        audio_connections.extend((
+            (outputs[0], f"LSP Mixer x8 Stereo:Audio input left {mixer_slot}"),
+            (outputs[1], f"LSP Mixer x8 Stereo:Audio input right {mixer_slot}"),
+        ))
+    return tuple(midi_connections), tuple(audio_connections)
 
 
 def parse_fast_genres(value: str) -> tuple[str, ...]:
@@ -239,7 +315,9 @@ def cleanup_orphaned_warm_genres(environment: dict[str, str]) -> None:
     for line in result.stdout.splitlines():
         parts = line.strip().split(None, 1)
         if len(parts) == 2 and any(
-            prefix in parts[1] for prefix in ("FAST-GENRE-", "SAFE-GENRE-")
+            prefix in parts[1] for prefix in (
+                "FAST-GENRE-", "SAFE-GENRE-", SHARED_SF2_CLIENT_PREFIX
+            )
         ):
             try:
                 pids.append(int(parts[0]))
@@ -268,6 +346,86 @@ def wait_for_ports(tokens: tuple[str, ...], environment: dict[str, str], timeout
             return
         time.sleep(0.25)
     raise RuntimeError(f"audio base ports did not register: {tokens}")
+
+
+def discover_shared_sf2_ports(
+    prefix: str,
+    process: subprocess.Popen[str],
+    mapping: dict,
+    environment: dict[str, str],
+    timeout: float = 60.0,
+) -> tuple[
+    dict[str, str],
+    dict[str, tuple[str, str]],
+    dict[tuple[int, str], str],
+    dict[tuple[int, str], str],
+]:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        outputs = run(["pw-link", "-o"], environment).stdout.splitlines()
+        inputs = run(["pw-link", "-i"], environment).stdout.splitlines()
+        midi_inputs: dict[str, str] = {}
+        audio_outputs: dict[str, tuple[str, str]] = {}
+        map_midi_inputs: dict[tuple[int, str], str] = {}
+        map_midi_outputs: dict[tuple[int, str], str] = {}
+        for patch_id, patch in mapping["engine_patches"].items():
+            plugin_name = patch["plugin_name"]
+            midi = next((
+                line.strip() for line in inputs
+                if line.strip().startswith(prefix)
+                and plugin_name in line
+                and line.strip().endswith(":events-in")
+            ), None)
+            plugin_outputs = [
+                line.strip() for line in outputs
+                if line.strip().startswith(prefix)
+                and plugin_name in line
+                and re.search(r":(?:output_[12]|out-(?:left|right))$", line.strip())
+            ]
+            left = next((port for port in plugin_outputs
+                         if port.endswith(":output_1") or port.endswith(":out-left")), None)
+            right = next((port for port in plugin_outputs
+                          if port.endswith(":output_2") or port.endswith(":out-right")), None)
+            if midi is not None:
+                midi_inputs[patch_id] = midi
+            if left is not None and right is not None:
+                audio_outputs[patch_id] = (left, right)
+
+        for channel in SHARED_SF2_MAP_CHANNELS:
+            for kind in SHARED_SF2_MAP_KINDS:
+                plugin_name = f"{SHARED_SF2_MAP_PREFIX}{channel} {kind}"
+                midi_input = next((
+                    line.strip() for line in inputs
+                    if line.strip().startswith(prefix)
+                    and plugin_name in line
+                    and line.strip().endswith(":events-in")
+                ), None)
+                midi_output = next((
+                    line.strip() for line in outputs
+                    if line.strip().startswith(prefix)
+                    and plugin_name in line
+                    and line.strip().endswith(":events-out")
+                ), None)
+                if midi_input is not None:
+                    map_midi_inputs[(channel, kind)] = midi_input
+                if midi_output is not None:
+                    map_midi_outputs[(channel, kind)] = midi_output
+
+        expected_patches = set(mapping["engine_patches"])
+        expected_maps = {
+            (channel, kind)
+            for channel in SHARED_SF2_MAP_CHANNELS
+            for kind in SHARED_SF2_MAP_KINDS
+        }
+        if (set(midi_inputs) == expected_patches
+                and set(audio_outputs) == expected_patches
+                and set(map_midi_inputs) == expected_maps
+                and set(map_midi_outputs) == expected_maps):
+            return midi_inputs, audio_outputs, map_midi_inputs, map_midi_outputs
+        if process.poll() is not None:
+            raise RuntimeError("shared SF2 Carla exited before all ports registered")
+        time.sleep(0.2)
+    raise RuntimeError("shared SF2 Carla ports did not register")
 
 
 def port_matches(actual: str, expected: str) -> bool:
@@ -583,9 +741,10 @@ def main() -> int:
         help="safe rebuilds engines per transition; fast keeps SynthV1 and setBfree warm",
     )
     parser.epilog = (
-        "Fast genre prewarming is opt-in: set MUSIC_RIG_FAST_GENRES to a comma-separated "
-        "list of genre ids (for example worship-piano,jazz-keys) or all. It is used only "
-        "with --transition-mode fast; the default is no genre prewarming."
+        "Without a shared SF2 project, legacy genre prewarming is opt-in: set "
+        "MUSIC_RIG_FAST_GENRES to a comma-separated list of genre ids (or all). "
+        "With --shared-sf2-project and --shared-sf2-map, the complete SF2 catalog "
+        "loads once at startup and this per-genre list is ignored."
     )
     parser.add_argument("--router", type=Path, required=True)
     parser.add_argument("--synthv1", type=Path, required=True)
@@ -595,6 +754,8 @@ def main() -> int:
     parser.add_argument("--setbfree-config", type=Path, required=True)
     parser.add_argument("--setbfree-library", type=Path, required=True)
     parser.add_argument("--genre-project-root", type=Path)
+    parser.add_argument("--shared-sf2-project", type=Path)
+    parser.add_argument("--shared-sf2-map", type=Path)
     parser.add_argument(
         "--control-fifo",
         type=Path,
@@ -609,12 +770,30 @@ def main() -> int:
     arguments = parser.parse_args()
     if not arguments.acknowledge_live_routing:
         parser.error("explicit live-routing acknowledgement is required")
+    if (arguments.shared_sf2_project is None) != (arguments.shared_sf2_map is None):
+        parser.error("--shared-sf2-project and --shared-sf2-map must be supplied together")
 
     environment = os.environ.copy()
     environment.setdefault("XDG_RUNTIME_DIR", "/run/user/50001")
     environment.setdefault("DBUS_SESSION_BUS_ADDRESS", "unix:path=/run/user/50001/bus")
     diagnostic_log = arguments.diagnostic_log.expanduser()
-    diagnostic_event(diagnostic_log, "session-start", output=str(arguments.output))
+    saved_profile = STARTUP_PROFILE
+    diagnostic_event(
+        diagnostic_log, "session-start", output=str(arguments.output),
+        saved_profile=saved_profile,
+    )
+    shared_sf2_mapping: dict | None = None
+    if arguments.shared_sf2_project is not None:
+        try:
+            if not arguments.shared_sf2_project.is_file() or not arguments.shared_sf2_map.is_file():
+                raise ValueError("shared SF2 project or mapping file is missing")
+            shared_sf2_mapping = json.loads(
+                arguments.shared_sf2_map.read_text(encoding="utf-8")
+            )
+            validate_shared_sf2_mapping(shared_sf2_mapping)
+        except (OSError, ValueError, json.JSONDecodeError) as failure:
+            diagnostic_event(diagnostic_log, "shared-sf2-disabled", error=str(failure))
+            shared_sf2_mapping = None
     before = ""
     keylab = ""
     router: subprocess.Popen[str] | None = None
@@ -629,8 +808,10 @@ def main() -> int:
     audio_touched = False
     active_arturia_layers = set(range(1, 10))
     fast_mode_enabled = arguments.transition_mode == "fast"
+    shared_sf2_requested = shared_sf2_mapping is not None
     warm_candidates: dict[str, subprocess.Popen[str]] = {}
     warmed_genres: dict[str, WarmedGenre] = {}
+    shared_sf2_engine: SharedSf2Engine | None = None
     fast_genre_enabled = False
     configured_fast_genres: tuple[str, ...] = ()
     stop_requested = False
@@ -640,6 +821,7 @@ def main() -> int:
     # Early port preflight failures must still run the normal cleanup path.
     stop_warm_engines = lambda: None
     stop_warm_genres = lambda: None
+    stop_shared_sf2_engine = lambda: None
 
     def request_stop(signal_number: int, frame: object) -> None:
         nonlocal stop_requested
@@ -680,7 +862,7 @@ def main() -> int:
         def stop_candidate() -> None:
             nonlocal candidate, candidate_instance_id, current
             was_genre_candidate = current in GENRE_ACTIVE_LAYERS or candidate_instance_id is not None
-            preserve_warm_genres = bool(warmed_genres)
+            preserve_warm_genres = bool(warmed_genres) or shared_sf2_engine is not None
             if current in warmed_genres:
                 disconnect_warmed_genre(warmed_genres[current])
             if candidate is not None:
@@ -768,8 +950,8 @@ def main() -> int:
                     if line.strip().startswith(prefix) and "/GENRE-CH-" in line
                     and re.search(r":(?:output_[12]|out-(?:left|right))$", line.strip())
                 ))
-                if (len(midi_inputs) == 9 and len(midi_control_inputs) == 14
-                        and len(midi_control_outputs) == 14 and len(audio_outputs) == 18):
+                if (len(midi_inputs) == 9 and len(midi_control_inputs) == 18
+                        and len(midi_control_outputs) == 18 and len(audio_outputs) == 18):
                     return (
                         midi_inputs,
                         midi_control_inputs,
@@ -841,6 +1023,7 @@ def main() -> int:
                 raise RuntimeError("Arturia profile router is not available for profile selection")
             code = PROFILE_PAD_CODES.get(profile, 3) if (
                 profile in warmed_genres or profile in FAST_ENGINE_PROFILES
+                or (shared_sf2_engine is not None and profile in GENRE_ACTIVE_LAYERS)
             ) else 3
             command = bytes((code,))
             router.stdin.write(command)
@@ -849,6 +1032,104 @@ def main() -> int:
                 raise RuntimeError(f"router did not acknowledge active profile {profile}")
             if os.read(router.stdout.fileno(), 1) != command:
                 raise RuntimeError(f"router acknowledged the wrong active profile for {profile}")
+
+        def start_shared_sf2_engine() -> SharedSf2Engine:
+            if shared_sf2_mapping is None or arguments.shared_sf2_project is None:
+                raise RuntimeError("shared SF2 project is not configured")
+            instance_read, instance_write = os.pipe()
+            process: subprocess.Popen[str] | None = None
+            instance_id = ""
+            try:
+                process = subprocess.Popen(
+                    ["/usr/bin/flatpak", "run", f"--cwd={arguments.soundfont_workdir}",
+                     "--file-forwarding", f"--instance-id-fd={instance_write}",
+                     "studio.kx.carla", "--no-gui",
+                     f"--cnprefix={SHARED_SF2_CLIENT_PREFIX}",
+                     "@@", str(arguments.shared_sf2_project), "@@"],
+                    env=environment, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                    text=True, start_new_session=True, pass_fds=(instance_write,),
+                )
+            finally:
+                os.close(instance_write)
+            os.set_blocking(instance_read, False)
+            try:
+                deadline = time.monotonic() + GENRE_PORT_REGISTRATION_TIMEOUT_SECONDS
+                while time.monotonic() < deadline:
+                    try:
+                        instance_id = os.read(instance_read, 256).decode().strip()
+                    except BlockingIOError:
+                        if process.poll() is not None:
+                            raise RuntimeError("shared SF2 Carla exited before registering")
+                        time.sleep(0.2)
+                        continue
+                    if instance_id:
+                        break
+                else:
+                    raise RuntimeError("shared SF2 Carla instance did not register")
+            finally:
+                os.close(instance_read)
+            try:
+                ports = discover_shared_sf2_ports(
+                    SHARED_SF2_CLIENT_PREFIX,
+                    process,
+                    shared_sf2_mapping,
+                    environment,
+                    timeout=SHARED_SF2_PORT_REGISTRATION_TIMEOUT_SECONDS,
+                )
+                return SharedSf2Engine(process, instance_id, shared_sf2_mapping, *ports)
+            except (OSError, RuntimeError):
+                run(["flatpak", "kill", instance_id], environment)
+                if process.poll() is None:
+                    process.send_signal(signal.SIGTERM)
+                raise
+
+        def leave_shared_sf2_profile() -> None:
+            if shared_sf2_engine is None or not shared_sf2_engine.active_links:
+                return
+            disconnect_many(shared_sf2_engine.active_links, environment)
+            shared_sf2_engine.active_links = ()
+            shared_sf2_engine.active_profile = None
+
+        def shared_sf2_profile_connections(
+            profile: str,
+        ) -> tuple[tuple[tuple[str, str], ...], tuple[tuple[str, str], ...]]:
+            if shared_sf2_engine is None:
+                raise RuntimeError("shared SF2 engine is not running")
+            return shared_sf2_route_plan(
+                profile,
+                shared_sf2_engine.mapping,
+                router_genre_output(profile),
+                shared_sf2_engine.midi_inputs,
+                shared_sf2_engine.audio_outputs,
+                shared_sf2_engine.map_midi_inputs,
+                shared_sf2_engine.map_midi_outputs,
+            )
+
+        def connect_shared_sf2_profile(profile: str) -> None:
+            if shared_sf2_engine is None or shared_sf2_engine.process.poll() is not None:
+                raise RuntimeError("shared SF2 Carla process is not running")
+            midi_connections, audio_connections = shared_sf2_profile_connections(profile)
+            connect_many((*audio_connections, *midi_connections), environment)
+            shared_sf2_engine.active_profile = profile
+            shared_sf2_engine.active_links = (*midi_connections, *audio_connections)
+
+        def stop_shared_sf2_engine() -> None:
+            nonlocal shared_sf2_engine
+            if shared_sf2_engine is None:
+                return
+            leave_shared_sf2_profile()
+            run(["flatpak", "kill", shared_sf2_engine.instance_id], environment)
+            if shared_sf2_engine.process.poll() is None:
+                shared_sf2_engine.process.send_signal(signal.SIGTERM)
+                try:
+                    shared_sf2_engine.process.wait(timeout=3.0)
+                except subprocess.TimeoutExpired:
+                    try:
+                        os.killpg(shared_sf2_engine.process.pid, signal.SIGKILL)
+                    except (PermissionError, ProcessLookupError):
+                        shared_sf2_engine.process.kill()
+                    shared_sf2_engine.process.wait()
+            shared_sf2_engine = None
 
         def genre_midi_connections(warm: WarmedGenre) -> tuple[tuple[str, str], ...]:
             active_layers = GENRE_ACTIVE_LAYERS[warm.profile]
@@ -999,6 +1280,9 @@ def main() -> int:
             for target in MIDI_TARGETS:
                 connect("s2-arturia-profile-router:out", target, environment)
             set_router_profile(current)
+            if (shared_sf2_engine is not None and shared_sf2_engine.active_profile is not None
+                    and current in GENRE_ACTIVE_LAYERS):
+                connect_shared_sf2_profile(current)
             for warmed in warmed_genres.values():
                 connect_warmed_genre(warmed)
 
@@ -1016,6 +1300,8 @@ def main() -> int:
                 raise RuntimeError(f"Fast mode does not support profile: {profile}")
             if profile not in warm_candidates or warm_candidates[profile].poll() is not None:
                 raise RuntimeError(f"Warm engine is not running: {profile}")
+            if shared_sf2_engine is not None and shared_sf2_engine.active_profile is not None:
+                leave_shared_sf2_profile()
             was_warmed_genre = current in warmed_genres
             if current == "full-live-rack" and not audio_touched:
                 disconnect_many(ARTURIA_AUDIO, environment)
@@ -1110,6 +1396,33 @@ def main() -> int:
                     if destination in inputs:
                         connect(source, destination, environment)
 
+        def switch_shared_sf2_profile(profile: str) -> None:
+            nonlocal current, audio_touched, active_arturia_layers
+            if shared_sf2_engine is None or shared_sf2_engine.process.poll() is not None:
+                raise RuntimeError("shared SF2 Carla process is not running")
+            leave_shared_sf2_profile()
+            if current in FAST_ENGINE_PROFILES:
+                engine_input, left_output, right_output = FAST_ENGINE_PROFILES[current]
+                disconnect_many((
+                    ("s2-arturia-profile-router:out", engine_input),
+                    (left_output, LSP_LEFT),
+                    (right_output, LSP_RIGHT),
+                ), environment)
+            elif current == "full-live-rack" and not audio_touched:
+                disconnect_many(ARTURIA_AUDIO, environment)
+                audio_touched = True
+            elif current in GENRE_ACTIVE_LAYERS:
+                stop_candidate()
+
+            ensure_full_audio()
+            connect_many((*SHARED_AUDIO, *MASTER_AUDIO, *MASTER_CONTROL), environment)
+            restore_fast_independent_device_routes()
+            connect_shared_sf2_profile(profile)
+            set_router_profile(profile)
+            active_arturia_layers = set()
+            current = profile
+            profiles_seen.append(profile)
+
         def ensure_full_audio(restore_independent: bool = True) -> None:
             systemd_user("start", FULL_CARLA_SERVICE, environment)
             wait_for_carla(True, environment)
@@ -1131,9 +1444,14 @@ def main() -> int:
         def restore_live() -> None:
             nonlocal current, audio_touched, active_arturia_layers, genre_quantum_changed
             was_genre = current in GENRE_ACTIVE_LAYERS
+            was_shared_genre = (
+                shared_sf2_engine is not None and shared_sf2_engine.active_profile is not None
+            )
+            if was_shared_genre:
+                leave_shared_sf2_profile()
             stop_candidate()
             ensure_router()
-            if was_genre:
+            if was_genre and not was_shared_genre:
                 restart_full_audio()
             else:
                 ensure_full_audio()
@@ -1155,8 +1473,12 @@ def main() -> int:
         def start_candidate(profile: str) -> None:
             nonlocal candidate, candidate_instance_id, current, audio_touched
             nonlocal active_arturia_layers, genre_quantum_changed
+            if profile in GENRE_ACTIVE_LAYERS and shared_sf2_engine is not None:
+                switch_shared_sf2_profile(profile)
+                return
             if fast_mode_enabled and profile in FAST_ENGINE_PROFILES:
-                if current == "full-live-rack" or current in FAST_ENGINE_PROFILES or current in warmed_genres:
+                if (current == "full-live-rack" or current in FAST_ENGINE_PROFILES
+                        or current in warmed_genres or current in GENRE_ACTIVE_LAYERS):
                     fast_switch_engine(profile)
                     return
             if fast_genre_enabled and profile in warmed_genres:
@@ -1169,6 +1491,8 @@ def main() -> int:
             if profile == "full-live-rack" and current in GENRE_ACTIVE_LAYERS:
                 restore_live()
                 return
+            if shared_sf2_engine is not None and shared_sf2_engine.active_profile is not None:
+                leave_shared_sf2_profile()
             was_genre = current in GENRE_ACTIVE_LAYERS
             stop_candidate()
             if profile in GENRE_ACTIVE_LAYERS:
@@ -1278,8 +1602,8 @@ def main() -> int:
                                       )]
                     audio_outputs = [line for line in audio_outputs
                                      if line.startswith(candidate_prefix)]
-                    if (len(midi_inputs) == 9 and len(midi_control_inputs) == 14
-                            and len(midi_control_outputs) == 14
+                    if (len(midi_inputs) == 9 and len(midi_control_inputs) == 18
+                            and len(midi_control_outputs) == 18
                             and len(audio_outputs) == 18):
                         break
                     if candidate.poll() is not None:
@@ -1324,15 +1648,28 @@ def main() -> int:
             profiles_seen.append(profile)
 
         ensure_full_audio()
-        if fast_mode_enabled:
+        if fast_mode_enabled or shared_sf2_requested:
             cleanup_orphaned_warm_genres(environment)
+        if shared_sf2_requested:
+            try:
+                shared_sf2_engine = start_shared_sf2_engine()
+                diagnostic_event(
+                    diagnostic_log,
+                    "shared-sf2-enabled",
+                    engine_patches=len(shared_sf2_engine.mapping["engine_patches"]),
+                    profiles=sorted(shared_sf2_engine.mapping["genres"]),
+                )
+            except (OSError, RuntimeError) as failure:
+                diagnostic_event(diagnostic_log, "shared-sf2-fallback", error=str(failure))
+        if fast_mode_enabled:
             try:
                 start_warm_engines()
                 diagnostic_event(diagnostic_log, "fast-mode-enabled", warm_profiles=sorted(warm_candidates))
             except (OSError, RuntimeError) as failure:
                 fast_mode_enabled = False
                 diagnostic_event(diagnostic_log, "fast-mode-fallback", error=str(failure))
-            if fast_mode_enabled and os.environ.get("MUSIC_RIG_FAST_GENRES", "").strip():
+            if (fast_mode_enabled and not shared_sf2_requested
+                    and os.environ.get("MUSIC_RIG_FAST_GENRES", "").strip()):
                 try:
                     configured_fast_genres = parse_fast_genres(
                         os.environ["MUSIC_RIG_FAST_GENRES"]
@@ -1350,6 +1687,8 @@ def main() -> int:
                     fast_genre_enabled = False
                     stop_warm_genres()
                     diagnostic_event(diagnostic_log, "fast-mode-fallback", error=str(failure))
+        start_candidate(saved_profile)
+        diagnostic_event(diagnostic_log, "startup-profile-selected", profile=current)
         deadline = time.monotonic() + arguments.duration_ms / 1000.0
         while not stop_requested and (arguments.duration_ms == 0 or time.monotonic() < deadline):
             # Keep the management input exclusive while the watcher observes
@@ -1453,6 +1792,7 @@ def main() -> int:
     finally:
         stop_warm_engines()
         stop_warm_genres()
+        stop_shared_sf2_engine()
         full_active = run(
             ["systemctl", "--user", "is-active", FULL_CARLA_SERVICE], environment
         ).returncode == 0
