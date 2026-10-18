@@ -26,8 +26,8 @@ well, so device-free testing does not require MIDI input.
 - Synth Programmer, the protected nine-instrument Full Live Rack, and SMC/SMK
   controller roles are not implemented. Pad 2 is unavailable; Pad 3 returns to
   the Android Organ fallback rather than Linux Full Live.
-- The activity owns playback; a foreground media service is still required for
-  robust screen-off/background operation.
+- `RigHostService` owns playback and MIDI in a foreground media service so the
+  Activity is only a control surface during screen-off/background operation.
 - The native FluidSynth Android bundle is external. It must contain compatible
   per-ABI libraries and license notices; the build fails closed without it.
 - Preset labels are matched exactly and profile activation fails if the

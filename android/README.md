@@ -43,8 +43,8 @@ Bank A Pad 1 and Pad 3 select this Android Organ fallback; Bank A Pad 4 through
 Bank B Pad 8 select the thirteen SF2 genre profiles. Synth Programmer (Pad 2)
 is not implemented on Android yet. The SMC-Mixer, SMC-PAD, SMC-PAD Pocket,
 SMK-25, and protected nine-instrument Full Live roles are also not implemented
-in this Android code-only slice. Audio is owned by the foreground Activity; a
-foreground playback service is still required for a reliable screen-off session.
+in this Android code-only slice. Audio and MIDI are owned by `RigHostService`,
+a foreground media service, for reliable screen-off operation.
 
 ## FluidSynth Dependency
 

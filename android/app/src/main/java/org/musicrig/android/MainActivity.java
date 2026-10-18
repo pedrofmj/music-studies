@@ -15,27 +15,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.musicrig.core.RigHost;
-import org.musicrig.core.MidiInput;
-import org.musicrig.core.ArturiaPadModes;
-import org.musicrig.core.Sf2Profile;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 public final class MainActivity extends Activity {
     private static final int REQUEST_SF2_TREE = 1;
     private static final int REQUEST_BLUETOOTH_CONNECT = 2;
 
-    private final ExecutorService controlExecutor = Executors.newSingleThreadExecutor();
     private TextView folderStatus;
     private TextView profileStatus;
     private TextView midiStatus;
     private Spinner genreSpinner;
     private ProfileCatalog catalog;
     private Uri soundFontTree;
-    private volatile RigHost host;
-    private MidiInput midiInput;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -124,16 +113,6 @@ public final class MainActivity extends Activity {
         getPreferences(MODE_PRIVATE).edit().putString("soundfont_tree",
                 soundFontTree.toString()).apply();
         stopService(new Intent(this, RigHostService.class));
-        if (midiInput != null) {
-            midiInput.close();
-            midiInput = null;
-        }
-        controlExecutor.execute(() -> {
-            if (host != null) {
-                host.close();
-                host = null;
-            }
-        });
         folderStatus.setText("SoundFont folder selected");
     }
 
@@ -165,85 +144,18 @@ public final class MainActivity extends Activity {
         profileStatus.setText("Starting profile: " + profileId);
     }
 
-    private void selectProfile(String profileId, boolean fromPad) {
-        final Sf2Profile profile;
-        try {
-            profile = catalog.profile(profileId);
-        } catch (Exception exception) {
-            toast("Could not prepare profile: " + exception.getMessage());
-            return;
-        }
-        controlExecutor.execute(() -> {
-            try {
-                if (host == null) {
-                    NativeFluidSynthEngine engine = new NativeFluidSynthEngine();
-                    host = new RigHost(engine,
-                            new SafSoundFontRepository(this, soundFontTree));
-                    runOnUiThread(this::startMidiInput);
-                }
-                host.selectProfile(profile);
-                runOnUiThread(() -> {
-                    for (int index = 0; index < genreSpinner.getCount(); index++) {
-                        ProfileCatalog.ProfileOption option =
-                                (ProfileCatalog.ProfileOption) genreSpinner.getItemAtPosition(index);
-                        if (profileId.equals(option.id)) {
-                            genreSpinner.setSelection(index);
-                            break;
-                        }
-                    }
-                    profileStatus.setText(profile.label + "\n" + profile.mappingDescription);
-                    if (fromPad) {
-                        toast("Pad-selected profile: " + profile.label);
-                    } else {
-                        toast("Profile active: " + profile.label);
-                    }
-                });
-            } catch (Exception exception) {
-                runOnUiThread(() -> toast("Could not start profile: " +
-                        exception.getMessage()));
-            }
-        });
-    }
-
-    private void startMidiInput() {
-        midiInput = new AndroidMidiInput(this, new MidiInput.Listener() {
-            @Override
-            public void onMidiMessage(byte[] message) {
-                int padCode = ArturiaPadModes.managementPadCode(message);
-                if (padCode != 0) {
-                    if (ArturiaPadModes.isPress(message)) {
-                        String profile = ArturiaPadModes.profileForCode(padCode);
-                        if (profile == null) {
-                            runOnUiThread(() -> toast("This pad mode is not implemented on Android yet"));
-                        } else {
-                            selectProfile(profile, true);
-                        }
-                    }
-                    return;
-                }
-                RigHost current = host;
-                if (current != null) {
-                    current.onMidiMessage(message);
-                }
-            }
-
-            @Override
-            public void onDeviceCountChanged(int count) {
-                runOnUiThread(() -> midiStatus.setText(count == 0
-                        ? "Waiting for USB or paired BLE MIDI input"
-                        : "MIDI devices connected: " + count));
-            }
-        });
-        midiInput.start();
-        requestBluetoothPermissions();
-    }
-
     private void rescanMidiDevices() {
-        if (midiInput == null) {
-            toast("Start a profile before scanning for MIDI devices");
+        if (soundFontTree == null) {
+            toast("Choose a SoundFont folder first");
             return;
         }
-        midiInput.refresh();
+        Intent service = new Intent(this, RigHostService.class)
+                .setAction(RigHostService.ACTION_REFRESH_MIDI);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(service);
+        } else {
+            startService(service);
+        }
         requestBluetoothPermissions();
     }
 
@@ -274,9 +186,6 @@ public final class MainActivity extends Activity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_BLUETOOTH_CONNECT && midiInput != null) {
-            midiInput.refresh();
-        }
     }
 
     private void showFatal(String message) {
@@ -291,7 +200,6 @@ public final class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        controlExecutor.shutdown();
         super.onDestroy();
     }
 }
