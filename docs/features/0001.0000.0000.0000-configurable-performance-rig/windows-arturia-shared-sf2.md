@@ -1,12 +1,13 @@
 # Windows Arturia Shared-SF2 Host
 
-Status: code-only WinMM adapter, shared route contract, and Insync SoundFont
-root resolver are present. A Carla audio-host bridge and physical certification
-remain pending.
+Status: code-only WinMM adapter, shared route contract, Insync SoundFont root
+resolver, and an injected Carla host boundary are present. The native Carla DLL
+binding and physical certification remain pending.
 
 ## Scope
 
-The branch adds a portable Arturia session core and native WinMM MIDI adapter
+The branch adds a portable Arturia session core, an injected Carla host boundary,
+and a native WinMM MIDI adapter
 around the portable Arturia control state and shared-SF2 route plan. Device identity is the WinMM device-interface
 path, not a persistent numeric device index. MIDI callbacks only timestamp and
 enqueue into bounded rings; worker threads drain input, route behavior output,
@@ -17,8 +18,9 @@ The session core accepts an injected engine interface, so the same profile
 switch transaction can drive Carla or another SF2 host. It applies cached
 fader/knob values, keeps master volume/mute separate, routes notes and common
 controllers to active layers, and rolls back failed activation or control
-updates. The Windows branch does not yet provide the concrete Carla engine
-adapter.
+updates. The Windows branch does not yet provide the concrete Carla DLL/API
+loader; backend operations are injected so the session transaction is testable
+without the Carla runtime bundle.
 
 The shared catalog uses relative SoundFont paths from
 `arturia-genre-patches.json`. The Windows path adapter resolves the user's
