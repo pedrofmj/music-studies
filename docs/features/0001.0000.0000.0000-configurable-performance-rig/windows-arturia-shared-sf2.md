@@ -6,8 +6,8 @@ remain pending.
 
 ## Scope
 
-The branch adds a native WinMM MIDI adapter around the portable Arturia control
-state and shared-SF2 route plan. Device identity is the WinMM device-interface
+The branch adds a portable Arturia session core and native WinMM MIDI adapter
+around the portable Arturia control state and shared-SF2 route plan. Device identity is the WinMM device-interface
 path, not a persistent numeric device index. MIDI callbacks only timestamp and
 enqueue into bounded rings; worker threads drain input, route behavior output,
 and send queued output. The fake WinMM seam tests identity reorder, ambiguity,
@@ -31,3 +31,8 @@ therefore proves the MIDI adapter contract only, not a playable Windows rig.
 fake WinMM operations. On Windows, the `music_rig_winmm_midi` target additionally
 compiles the native WinMM wrapper and links `Winmm.dll`. Neither test accesses
 physical MIDI or audio hardware.
+
+The portable `music_rig_arturia_session_core` test exercises startup defaults,
+Organ/mode profile switching, fader/knob replay, master encoder handling, note,
+sustain, modulation and pitch-bend routing, and failure rollback through an
+injected fake engine.

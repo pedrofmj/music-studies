@@ -14,6 +14,7 @@ add_library(music_rig_core STATIC
     runtime/core/music_rig_control.c
     runtime/core/music_rig_core.c
     runtime/core/music_rig_arturia_shared_sf2.c
+    runtime/core/music_rig_arturia_session.c
     runtime/core/music_rig_definition.c
     runtime/core/music_rig_device_ports.c
     runtime/core/music_rig_diagnostics.c
@@ -477,6 +478,30 @@ else()
 endif()
 
 if(BUILD_TESTING)
+    add_executable(music_rig_arturia_session_core_test
+        tests/arturia-session-core-test.c
+    )
+    target_link_libraries(music_rig_arturia_session_core_test
+        PRIVATE music_rig_core music_rig_current_behaviors
+    )
+    target_compile_features(music_rig_arturia_session_core_test PRIVATE c_std_17)
+    set_target_properties(music_rig_arturia_session_core_test PROPERTIES
+        C_EXTENSIONS OFF
+    )
+    if(MSVC)
+        target_compile_options(music_rig_arturia_session_core_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+    else()
+        target_compile_options(music_rig_arturia_session_core_test PRIVATE
+            -Wall -Wextra -Wpedantic -Werror
+        )
+    endif()
+    add_test(
+        NAME music_rig_arturia_session_core
+        COMMAND music_rig_arturia_session_core_test
+    )
+
     add_executable(music_rig_winmm_midi_offline_test
         tests/winmm-midi-offline-test.c
         runtime/windows/music_rig_winmm_midi.c
