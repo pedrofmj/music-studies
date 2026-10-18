@@ -111,6 +111,19 @@ if(WIN32)
     set(MUSIC_RIG_FILE_STORAGE_SOURCE
         runtime/windows/music_rig_file_storage.c
     )
+    add_library(music_rig_winmm_midi STATIC
+        runtime/windows/music_rig_winmm_midi.c
+        runtime/windows/music_rig_winmm_midi_win32.c
+    )
+    target_include_directories(music_rig_winmm_midi
+        PUBLIC runtime/windows/include
+    )
+    target_link_libraries(music_rig_winmm_midi
+        PUBLIC music_rig_device_midi_shadow
+        PRIVATE winmm
+    )
+    target_compile_features(music_rig_winmm_midi PUBLIC c_std_17)
+    set_target_properties(music_rig_winmm_midi PROPERTIES C_EXTENSIONS OFF)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(MUSIC_RIG_FILE_STORAGE_SOURCE
         runtime/linux/music_rig_file_storage.c
@@ -343,6 +356,11 @@ if(MSVC)
     target_compile_options(music_rig_device_midi_shadow PRIVATE
         ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
     )
+    if(TARGET music_rig_winmm_midi)
+        target_compile_options(music_rig_winmm_midi PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+    endif()
     target_compile_options(music_rig_smc_mixer_relay PRIVATE
         ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
     )
@@ -459,6 +477,34 @@ else()
 endif()
 
 if(BUILD_TESTING)
+    add_executable(music_rig_winmm_midi_offline_test
+        tests/winmm-midi-offline-test.c
+        runtime/windows/music_rig_winmm_midi.c
+    )
+    target_include_directories(music_rig_winmm_midi_offline_test
+        PRIVATE runtime/adapters/include runtime/windows/include
+    )
+    target_link_libraries(music_rig_winmm_midi_offline_test
+        PRIVATE music_rig_core music_rig_current_behaviors
+    )
+    target_compile_features(music_rig_winmm_midi_offline_test PRIVATE c_std_17)
+    set_target_properties(music_rig_winmm_midi_offline_test PROPERTIES
+        C_EXTENSIONS OFF
+    )
+    if(MSVC)
+        target_compile_options(music_rig_winmm_midi_offline_test PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+    else()
+        target_compile_options(music_rig_winmm_midi_offline_test PRIVATE
+            -Wall -Wextra -Wpedantic -Werror
+        )
+    endif()
+    add_test(
+        NAME music_rig_winmm_midi_offline
+        COMMAND music_rig_winmm_midi_offline_test
+    )
+
     add_executable(music_rig_arturia_pad_control_state_test
         tests/arturia-pad-control-state-test.c
     )

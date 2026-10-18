@@ -52,9 +52,11 @@ and the static library's unresolved-symbol audit lock this input-only surface.
 Registration and activation failures close the client and clear every handle.
 Signal shutdown deactivates and closes the client before metrics are read.
 
-The host is built only on Linux when a JACK runtime library is available. The
-portable event engine and its tests build on Linux and Windows without JACK.
-The Windows MIDI host remains Milestone 7 work.
+The JACK host is built only on Linux when a JACK runtime library is available.
+The portable event engine and its tests build on Linux and Windows without
+JACK. A separate native WinMM adapter and no-device fake-seam test now build on
+Windows, but they are not yet wired into a production daemon or Carla audio host;
+physical WinMM device and shared-SF2 host certification remain pending.
 
 ## Explicit Daemon Command
 

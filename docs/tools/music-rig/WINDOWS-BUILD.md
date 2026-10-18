@@ -6,9 +6,9 @@ Windows reference machine, with audio and MIDI certification still pending.
 ## Scope
 
 The portable C17 core, CLI, protocol golden frames, portability guard,
-benchmark contracts, synthetic Windows generation-adoption adapter, and native
-Windows resource probe run in the `Music Rig Portable Core` GitHub Actions
-workflow.
+benchmark contracts, synthetic Windows generation-adoption adapter, WinMM
+adapter with its no-device fake test, and native Windows resource probe run in
+the `Music Rig Portable Core` GitHub Actions workflow.
 
 The workflow pins the operating-system label to `windows-2025` instead of using
 the moving `windows-latest` alias. GitHub documents this as an x64 hosted
@@ -22,6 +22,11 @@ This CI runner proves Windows compilation and platform-contract behavior. It is
 ephemeral and has no music hardware, so it is not the Windows audio reference
 machine and cannot certify MIDI devices, audio backends, plugin hosts, xruns,
 dropouts, resource budgets, or audible behavior.
+
+The WinMM test uses fake device-interface paths and API operations. It proves
+stable identity, bounded callback queues, and output translation without
+enumerating a physical device. It does not start Carla or implement the complete
+Windows Arturia audio host.
 
 ## Native Reproduction
 
