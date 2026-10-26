@@ -22,11 +22,14 @@ public final class ProfileCatalog {
 
     private final JSONObject patchCatalog;
     private final JSONObject routing;
+    private final JSONObject androidOverrides;
     private final List<String> genres;
 
-    private ProfileCatalog(JSONObject patchCatalog, JSONObject routing) throws JSONException {
+    private ProfileCatalog(JSONObject patchCatalog, JSONObject routing,
+                           JSONObject androidOverrides) throws JSONException {
         this.patchCatalog = patchCatalog;
         this.routing = routing;
+        this.androidOverrides = androidOverrides;
         JSONObject genreMap = patchCatalog.getJSONObject("genres");
         genres = new ArrayList<>();
         for (java.util.Iterator<String> keys = genreMap.keys(); keys.hasNext();) {
@@ -37,11 +40,15 @@ public final class ProfileCatalog {
     public static ProfileCatalog load(AssetManager assets) throws IOException, JSONException {
         JSONObject patches;
         JSONObject routes;
+        JSONObject overrides;
         try (InputStream input = assets.open("arturia-genre-patches.json")) {
             patches = new JSONObject(readUtf8(input));
         }
         try (InputStream input = assets.open("arturia-shared-sf2-routing.json")) {
             routes = new JSONObject(readUtf8(input));
+        }
+        try (InputStream input = assets.open("arturia-sf2-assets.android.json")) {
+            overrides = new JSONObject(readUtf8(input));
         }
         if (!"music-studies/arturia-genre-patches/v1".equals(
                 patches.getString("schema")) ||
@@ -53,19 +60,12 @@ public final class ProfileCatalog {
                         integerArray(routes.getJSONArray("knob_ccs")))) {
             throw new JSONException("Unsupported Arturia catalog schema");
         }
-        return new ProfileCatalog(patches, routes);
+        validateAndroidOverrides(patches, overrides);
+        return new ProfileCatalog(patches, routes, overrides);
     }
 
     public List<String> genres() {
         return new ArrayList<>(genres);
-    }
-
-    public List<Sf2Profile> genreProfiles() throws JSONException {
-        List<Sf2Profile> profiles = new ArrayList<>();
-        for (String genre : genres) {
-            profiles.add(profile(genre));
-        }
-        return profiles;
     }
 
     public List<ProfileOption> profileOptions() {
@@ -117,14 +117,14 @@ public final class ProfileCatalog {
             if (!"sf2".equals(patch.getString("engine"))) {
                 throw new JSONException("SF2 substitution does not resolve to an SF2 patch");
             }
-            String path = patch.getString("path");
+            String path = runtimePath(patchId, patch);
+            String label = runtimeLabel(patchId, patch);
             if (active.contains(layer)) {
                 Integer patchIndex = pathIndexes.get(path);
                 if (patchIndex == null) {
                     patchIndex = fonts.size();
                     pathIndexes.put(path, patchIndex);
-                    fonts.add(new Sf2Profile.SoundFont(patchId, path,
-                            patch.getString("label")));
+                    fonts.add(new Sf2Profile.SoundFont(patchId, path, label));
                 }
                 patchIndexes[layer - 1] = patchIndex.shortValue();
             }
@@ -139,7 +139,8 @@ public final class ProfileCatalog {
     }
 
     private Sf2Profile organProfile() throws JSONException {
-        JSONObject patch = patchCatalog.getJSONObject("patches").getJSONObject("organ-gospel");
+        String patchId = "organ-gospel";
+        JSONObject patch = patchCatalog.getJSONObject("patches").getJSONObject(patchId);
         if (!"sf2".equals(patch.getString("engine"))) {
             throw new JSONException("Android Organ profile requires an SF2 catalog patch");
         }
@@ -148,9 +149,57 @@ public final class ProfileCatalog {
         for (int index = 0; index < channelJson.length(); index++) {
             mapChannels[index] = (byte) channelJson.getInt(index);
         }
-        return Sf2Profile.androidOrgan(patch.getString("path"), patch.getString("label"),
+        return Sf2Profile.androidOrgan(runtimePath(patchId, patch),
+                runtimeLabel(patchId, patch),
                 mapChannels, routing.getInt("volume_output_cc"),
                 routing.getInt("reverb_output_cc"));
+    }
+
+    private String runtimePath(String patchId, JSONObject catalogPatch) throws JSONException {
+        JSONObject override = androidOverrides.getJSONObject("patches").optJSONObject(patchId);
+        return override == null ? catalogPatch.getString("path") :
+                override.getString("logical_path");
+    }
+
+    private String runtimeLabel(String patchId, JSONObject catalogPatch) throws JSONException {
+        JSONObject override = androidOverrides.getJSONObject("patches").optJSONObject(patchId);
+        return override == null ? catalogPatch.getString("label") : override.getString("label");
+    }
+
+    private static void validateAndroidOverrides(JSONObject catalog, JSONObject overrides)
+            throws JSONException {
+        if (!"music-studies/arturia-platform-sf2-overrides/v1".equals(
+                overrides.getString("schema")) ||
+                !"android".equals(overrides.getString("platform")) ||
+                !"arturia-genre-patches.json".equals(overrides.getString("source_catalog"))) {
+            throw new JSONException("Unsupported Android SF2 override catalog");
+        }
+        JSONObject catalogPatches = catalog.getJSONObject("patches");
+        JSONObject overridePatches = overrides.getJSONObject("patches");
+        for (java.util.Iterator<String> keys = overridePatches.keys(); keys.hasNext();) {
+            String patchId = keys.next();
+            if (!catalogPatches.has(patchId)) {
+                throw new JSONException("Android SF2 override references an unknown patch");
+            }
+            JSONObject override = overridePatches.getJSONObject(patchId);
+            String path = override.getString("logical_path");
+            String label = override.getString("label");
+            if (!isSafeCatalogPath(path) || label.isEmpty()) {
+                throw new JSONException("Android SF2 override has an invalid path or label");
+            }
+        }
+    }
+
+    private static boolean isSafeCatalogPath(String path) {
+        if (path.isEmpty() || path.startsWith("/") || path.indexOf('\\') >= 0) {
+            return false;
+        }
+        for (String component : path.split("/", -1)) {
+            if (component.isEmpty() || ".".equals(component) || "..".equals(component)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static String readUtf8(InputStream input) throws IOException {

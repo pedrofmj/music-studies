@@ -161,13 +161,13 @@ public final class AndroidMidiInput implements MidiInput {
     private synchronized void connectDevice(MidiDevice device, String bluetoothAddress) {
         if (!started || device == null) {
             if (device != null) {
-                device.close();
+                closeQuietly(device);
             }
             return;
         }
         int id = device.getInfo().getId();
         if (devices.containsKey(id)) {
-            device.close();
+            closeQuietly(device);
             if (bluetoothAddress != null) {
                 bluetoothDeviceIds.put(bluetoothAddress, id);
             }
@@ -181,21 +181,17 @@ public final class AndroidMidiInput implements MidiInput {
                 continue;
             }
             MidiStreamParser parser = new MidiStreamParser(listener::onMidiMessage);
-            try {
-                port.connect(new MidiReceiver() {
-                    @Override
-                    public void onSend(byte[] data, int offset, int count, long timestamp)
-                            throws IOException {
-                        parser.accept(data, offset, count);
-                    }
-                });
-                openedPorts.add(port);
-            } catch (IOException exception) {
-                port.close();
-            }
+            port.connect(new MidiReceiver() {
+                @Override
+                public void onSend(byte[] data, int offset, int count, long timestamp)
+                        throws IOException {
+                    parser.accept(data, offset, count);
+                }
+            });
+            openedPorts.add(port);
         }
         if (openedPorts.isEmpty()) {
-            device.close();
+            closeQuietly(device);
             return;
         }
         devices.put(id, device);
@@ -259,12 +255,12 @@ public final class AndroidMidiInput implements MidiInput {
         List<MidiOutputPort> ports = portsByDevice.remove(id);
         if (ports != null) {
             for (MidiOutputPort port : ports) {
-                port.close();
+                closeQuietly(port);
             }
         }
         MidiDevice device = devices.remove(id);
         if (device != null) {
-            device.close();
+            closeQuietly(device);
         }
         Iterator<Map.Entry<String, Integer>> bluetoothEntries =
                 bluetoothDeviceIds.entrySet().iterator();
@@ -274,6 +270,22 @@ public final class AndroidMidiInput implements MidiInput {
             }
         }
         listener.onDeviceCountChanged(devices.size());
+    }
+
+    private static void closeQuietly(MidiOutputPort port) {
+        try {
+            port.close();
+        } catch (IOException ignored) {
+            // Cleanup should continue even if the MIDI port is already unavailable.
+        }
+    }
+
+    private static void closeQuietly(MidiDevice device) {
+        try {
+            device.close();
+        } catch (IOException ignored) {
+            // Cleanup should continue even if the MIDI device is already unavailable.
+        }
     }
 
     @Override

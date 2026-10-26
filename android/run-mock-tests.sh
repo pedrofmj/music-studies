@@ -19,7 +19,15 @@ javac -d "$CLASSES" \
     "$ROOT/app/src/main/java/org/musicrig/core/Sf2Profile.java" \
     "$ROOT/app/src/main/java/org/musicrig/core/Sf2Preset.java" \
     "$ROOT/app/src/main/java/org/musicrig/core/SoundFontRepository.java" \
+    "$ROOT/app/src/main/java/org/musicrig/core/VerifiedSf2Pack.java" \
     "$ROOT/app/src/main/java/org/musicrig/core/SynthEngine.java" \
     "$ROOT/app/src/main/java/org/musicrig/core/RigHost.java" \
-    "$ROOT/app/src/test/java/org/musicrig/core/RigHostMockTest.java"
+    "$ROOT/app/src/test/java/org/musicrig/core/RigHostMockTest.java" \
+    "$ROOT/app/src/test/java/org/musicrig/core/VerifiedSf2PackTest.java" \
+    "$ROOT/app/src/test/java/org/musicrig/core/VerifiedSf2PackLiveTest.java"
 java -ea -cp "$CLASSES" org.musicrig.core.RigHostMockTest
+java -ea -cp "$CLASSES" org.musicrig.core.VerifiedSf2PackTest
+if [ -n "${MUSIC_RIG_LIVE_SF2_URL:-}" ]; then
+    java -ea -cp "$CLASSES" org.musicrig.core.VerifiedSf2PackLiveTest \
+        "$MUSIC_RIG_LIVE_SF2_URL"
+fi

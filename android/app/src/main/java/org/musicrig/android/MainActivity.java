@@ -2,9 +2,9 @@ package org.musicrig.android;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.ViewGroup;
@@ -16,15 +16,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public final class MainActivity extends Activity {
-    private static final int REQUEST_SF2_TREE = 1;
     private static final int REQUEST_BLUETOOTH_CONNECT = 2;
 
-    private TextView folderStatus;
+    private TextView packStatus;
     private TextView profileStatus;
     private TextView midiStatus;
     private Spinner genreSpinner;
     private ProfileCatalog catalog;
-    private Uri soundFontTree;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -37,11 +35,6 @@ public final class MainActivity extends Activity {
             return;
         }
         buildUi();
-        String savedTree = getPreferences(MODE_PRIVATE).getString("soundfont_tree", null);
-        if (savedTree != null) {
-            soundFontTree = Uri.parse(savedTree);
-            folderStatus.setText("Selected SoundFont folder is remembered");
-        }
     }
 
     private void buildUi() {
@@ -55,13 +48,14 @@ public final class MainActivity extends Activity {
         title.setTextSize(24);
         content.addView(title, matchWrap());
 
-        folderStatus = new TextView(this);
-        folderStatus.setText("Choose the folder containing the SoundFont catalog paths.");
-        content.addView(folderStatus, matchWrap());
-        Button chooseFolder = new Button(this);
-        chooseFolder.setText("Choose SoundFont folder");
-        chooseFolder.setOnClickListener(view -> chooseSoundFontFolder());
-        content.addView(chooseFolder, matchWrap());
+        packStatus = new TextView(this);
+        packStatus.setText("Selected-profile SF2 files download securely as needed. " +
+                "Full Android pack: about 495 MB.");
+        content.addView(packStatus, matchWrap());
+        Button prefetchPack = new Button(this);
+        prefetchPack.setText("Download Full SF2 Pack (495 MB)");
+        prefetchPack.setOnClickListener(view -> confirmPackPrefetch());
+        content.addView(prefetchPack, matchWrap());
 
         genreSpinner = new Spinner(this);
         genreSpinner.setAdapter(new ArrayAdapter<>(this,
@@ -92,35 +86,7 @@ public final class MainActivity extends Activity {
                 ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
-    private void chooseSoundFontFolder() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION |
-                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-        startActivityForResult(intent, REQUEST_SF2_TREE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode != REQUEST_SF2_TREE || resultCode != RESULT_OK || data == null ||
-                data.getData() == null) {
-            return;
-        }
-        soundFontTree = data.getData();
-        int flags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION |
-                Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        getContentResolver().takePersistableUriPermission(soundFontTree, flags);
-        getPreferences(MODE_PRIVATE).edit().putString("soundfont_tree",
-                soundFontTree.toString()).apply();
-        stopService(new Intent(this, RigHostService.class));
-        folderStatus.setText("SoundFont folder selected");
-    }
-
     private void startSelectedProfile() {
-        if (soundFontTree == null) {
-            toast("Choose a SoundFont folder first");
-            return;
-        }
         if (!NativeFluidSynthEngine.isAvailable()) {
             toast("FluidSynth Android native bundle is missing. See android/README.md");
             return;
@@ -133,8 +99,7 @@ public final class MainActivity extends Activity {
     private void startRigService(String profileId) {
         Intent service = new Intent(this, RigHostService.class)
                 .setAction(RigHostService.ACTION_START_PROFILE)
-                .putExtra(RigHostService.EXTRA_PROFILE_ID, profileId)
-                .putExtra(RigHostService.EXTRA_SOUNDFONT_TREE, soundFontTree.toString());
+                .putExtra(RigHostService.EXTRA_PROFILE_ID, profileId);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(service);
         } else {
@@ -145,10 +110,6 @@ public final class MainActivity extends Activity {
     }
 
     private void rescanMidiDevices() {
-        if (soundFontTree == null) {
-            toast("Choose a SoundFont folder first");
-            return;
-        }
         Intent service = new Intent(this, RigHostService.class)
                 .setAction(RigHostService.ACTION_REFRESH_MIDI);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -157,6 +118,28 @@ public final class MainActivity extends Activity {
             startService(service);
         }
         requestBluetoothPermissions();
+    }
+
+    private void confirmPackPrefetch() {
+        new AlertDialog.Builder(this)
+                .setTitle("Download the full SF2 pack?")
+                .setMessage("This downloads about 495 MB to this device. Mobile data " +
+                        "charges may apply.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Download", (dialog, which) -> startPackPrefetch())
+                .show();
+    }
+
+    private void startPackPrefetch() {
+        Intent service = new Intent(this, RigHostService.class)
+                .setAction(RigHostService.ACTION_PREFETCH_SF2_PACK);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(service);
+        } else {
+            startService(service);
+        }
+        packStatus.setText("Full SF2 pack download started. Progress appears in the " +
+                "Music Rig notification.");
     }
 
     private void requestBluetoothPermissions() {

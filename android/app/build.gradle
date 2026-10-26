@@ -3,14 +3,23 @@ plugins {
 }
 
 def fluidsynthRoot = providers.gradleProperty("fluidsynthRoot").orNull
+def androidCatalogAssets = layout.buildDirectory.dir("generated/androidCatalogAssets")
+def prepareAndroidCatalogAssets = tasks.register("prepareAndroidCatalogAssets", Copy) {
+    from(files(
+            rootProject.file("../docs/tools/music-rig/benchmarks/arturia-genre-patches.json"),
+            rootProject.file("../docs/tools/music-rig/benchmarks/arturia-shared-sf2-routing.json"),
+            rootProject.file("../docs/tools/music-rig/benchmarks/arturia-sf2-assets.android.json")))
+    into(androidCatalogAssets)
+}
 
 android {
     namespace "org.musicrig.android"
     compileSdk 35
+    ndkVersion "27.0.12077973"
 
     defaultConfig {
         applicationId "org.musicrig.android"
-        minSdk 23
+        minSdk 24
         targetSdk 35
         versionCode 1
         versionName "0.1.0"
@@ -18,7 +27,8 @@ android {
         if (fluidsynthRoot != null) {
             externalNativeBuild {
                 cmake {
-                    arguments "-DFLUIDSYNTH_ROOT=${fluidsynthRoot}"
+                    arguments "-DFLUIDSYNTH_ROOT=${fluidsynthRoot}",
+                            "-DANDROID_STL=c++_shared"
                     cppFlags "-std=c++17"
                 }
             }
@@ -32,9 +42,9 @@ android {
 
     sourceSets {
         main {
-            assets.srcDir(rootProject.file("../docs/tools/music-rig/benchmarks"))
+            assets.srcDir(androidCatalogAssets)
             if (fluidsynthRoot != null) {
-                jniLibs.srcDir(file("${fluidsynthRoot}/jniLibs"))
+                jniLibs.srcDir(file("${fluidsynthRoot}/lib"))
             }
         }
     }
@@ -47,4 +57,8 @@ android {
             }
         }
     }
+}
+
+tasks.named("preBuild").configure {
+    dependsOn(prepareAndroidCatalogAssets)
 }

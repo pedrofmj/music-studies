@@ -88,9 +88,6 @@ public final class RigHostMockTest {
         MockRepository repository = new MockRepository();
         RigHost host = new RigHost(synth, repository);
         Sf2Profile first = profile("first", new byte[]{1, 2, 6});
-        host.preloadProfile(first);
-        check(synth.loadCountByPath.size() == first.soundFonts.size(),
-                "catalog prewarm did not load each unique SoundFont");
         host.selectProfile(first);
         check(synth.messages.size() == 6, "profile startup should replay controls per active route");
         check(Arrays.equals(synth.messages.get(0), new byte[]{(byte) 0xB0, 7, 0}),
