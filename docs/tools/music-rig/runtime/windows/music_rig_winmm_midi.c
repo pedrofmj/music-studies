@@ -349,7 +349,8 @@ size_t music_rig_winmm_midi_drain_input(music_rig_winmm_midi *host)
     bool has_events = false;
     bool cycle_ready = true;
 
-    if (!valid_host(host) || host->shadow == NULL) {
+    if (!valid_host(host) || (host->shadow == NULL &&
+            host->input_observer == NULL)) {
         return 0U;
     }
     for (slot_index = 0U; slot_index < host->endpoint_count; ++slot_index) {
@@ -358,7 +359,8 @@ size_t music_rig_winmm_midi_drain_input(music_rig_winmm_midi *host)
             break;
         }
     }
-    if (has_events && music_rig_device_midi_shadow_begin_cycle(host->shadow) !=
+    if (has_events && host->shadow != NULL &&
+        music_rig_device_midi_shadow_begin_cycle(host->shadow) !=
             MUSIC_RIG_RESULT_OK) {
         increment(&host->callback_errors);
         cycle_ready = false;
@@ -371,17 +373,30 @@ size_t music_rig_winmm_midi_drain_input(music_rig_winmm_midi *host)
         while (tail != head) {
             music_rig_winmm_midi_event *event =
                 &ring->events[tail & WINMM_EVENT_MASK];
-            music_rig_result result = cycle_ready
-                ? music_rig_device_midi_shadow_process(
-                    host->shadow, slot_index, 0U, event->message,
-                    (size_t)event->message_size
-                )
-                : MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+            if (host->shadow != NULL) {
+                music_rig_result result = cycle_ready
+                    ? music_rig_device_midi_shadow_process(
+                        host->shadow, slot_index, 0U, event->message,
+                        (size_t)event->message_size
+                    )
+                    : MUSIC_RIG_RESULT_ADAPTER_FAILURE;
 
-            if (result == MUSIC_RIG_RESULT_INVALID_DATA) {
-                increment(&host->malformed_input);
-            } else if (result != MUSIC_RIG_RESULT_OK) {
-                increment(&host->callback_errors);
+                if (result == MUSIC_RIG_RESULT_INVALID_DATA) {
+                    increment(&host->malformed_input);
+                } else if (result != MUSIC_RIG_RESULT_OK) {
+                    increment(&host->callback_errors);
+                }
+            }
+            if (host->input_observer != NULL &&
+                event->kind == MUSIC_RIG_WINMM_MIDI_INPUT_SHORT) {
+                music_rig_result result = host->input_observer(
+                    host->input_observer_context, slot_index, event->message,
+                    (size_t)event->message_size
+                );
+
+                if (result != MUSIC_RIG_RESULT_OK) {
+                    increment(&host->callback_errors);
+                }
             }
             ++tail;
             ++event_count;
@@ -754,12 +769,31 @@ music_rig_result music_rig_winmm_midi_attach_shadow(
     return MUSIC_RIG_RESULT_OK;
 }
 
+music_rig_result music_rig_winmm_midi_set_input_observer(
+    music_rig_winmm_midi *host,
+    music_rig_winmm_midi_input_observer_fn observer,
+    void *observer_context
+)
+{
+    if (!valid_host(host)) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+    if (atomic_load_explicit(&host->active, memory_order_acquire) ||
+        host->input_worker_started) {
+        return MUSIC_RIG_RESULT_INVALID_STATE;
+    }
+    host->input_observer = observer;
+    host->input_observer_context = observer == NULL ? NULL : observer_context;
+    return MUSIC_RIG_RESULT_OK;
+}
+
 music_rig_result music_rig_winmm_midi_start(music_rig_winmm_midi *host)
 {
     music_rig_result result;
     size_t index;
 
-    if (!valid_host(host) || host->shadow == NULL) {
+    if (!valid_host(host) || (host->shadow == NULL &&
+            host->input_observer == NULL)) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
     if (atomic_load_explicit(&host->active, memory_order_acquire) ||
@@ -908,14 +942,22 @@ music_rig_result music_rig_winmm_midi_send(
 )
 {
     uint8_t batch[1][3] = {{0U, 0U, 0U}};
+    uint8_t command;
+    size_t expected_size;
 
     if (message == NULL || message_size == 0U || message_size > 3U) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
-    memcpy(batch[0], message, message_size);
-    if (message_size < 3U) {
-        batch[0][2] = 0U;
+    if (message[0] < UINT8_C(0x80) || message[0] >= UINT8_C(0xf0)) {
+        return MUSIC_RIG_RESULT_INVALID_DATA;
     }
+    command = message[0] & UINT8_C(0xf0);
+    expected_size = command == UINT8_C(0xc0) || command == UINT8_C(0xd0)
+        ? 2U : 3U;
+    if (message_size != expected_size) {
+        return MUSIC_RIG_RESULT_INVALID_DATA;
+    }
+    memcpy(batch[0], message, message_size);
     return send_batch(host, slot_index, &batch[0][0], 1U);
 }
 

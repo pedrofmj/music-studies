@@ -1,0 +1,28 @@
+{
+  "schema": "music-studies/arturia-platform-sf2-overrides/v1",
+  "platform": "android",
+  "source_catalog": "arturia-genre-patches.json",
+  "patches": {
+    "piano-cfx": {
+      "logical_path": "android-assets/cfx-premium.sf2",
+      "source_path": "02_SoundFonts/01_Acoustic_Pianos/CFX Premium.sf2",
+      "source_root": "catalog",
+      "label": "CFX Premium",
+      "source_reference": "Galaxy Sound Bank: CFX Premium.sf2; user-confirmed 2026-10-25"
+    },
+    "piano-jf-worship": {
+      "logical_path": "android-assets/jf-soft-grand.sf2",
+      "source_path": "02_SoundFonts/01_Acoustic_Pianos/JF Soft Grand Piano.sf2",
+      "source_root": "catalog",
+      "label": "Soft Grand Piano",
+      "source_reference": "Galaxy Sound Bank: JF Soft Grand Piano.sf2; user-confirmed 2026-10-25"
+    },
+    "piano-motif": {
+      "logical_path": "02_SoundFonts/01_Acoustic_Pianos/Motif ES6 Concert Piano(12Mb).SF2",
+      "source_path": "02_SoundFonts/01_Acoustic_Pianos/Motif ES6 Concert Piano(12Mb).SF2",
+      "source_root": "catalog",
+      "label": "Grand Piano.",
+      "source_reference": "https://www.polyphone.io/en/soundfonts/pianos/305-motif-es6-concert-piano-v2"
+    }
+  }
+}

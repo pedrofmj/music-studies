@@ -51,6 +51,15 @@ typedef void (*music_rig_winmm_midi_input_callback_fn)(
     uint64_t qpc_ns
 );
 
+/* Runs on the input worker for complete short messages. Observers must enqueue
+ * only; they must not call Carla or another thread-affine engine API. */
+typedef music_rig_result (*music_rig_winmm_midi_input_observer_fn)(
+    void *context,
+    size_t slot_index,
+    const uint8_t *message,
+    size_t message_size
+);
+
 /* All operations except the MIDI callback run on control or worker threads. */
 typedef struct music_rig_winmm_midi_ops {
     music_rig_result (*device_count)(
@@ -164,6 +173,8 @@ struct music_rig_winmm_midi {
     const music_rig_winmm_midi_ops *ops;
     void *ops_context;
     music_rig_device_midi_shadow *shadow;
+    music_rig_winmm_midi_input_observer_fn input_observer;
+    void *input_observer_context;
     music_rig_winmm_midi_endpoint endpoints[
         MUSIC_RIG_DEVICE_PROFILE_CAPACITY
     ];
@@ -216,11 +227,18 @@ music_rig_result music_rig_winmm_midi_attach_shadow(
     music_rig_device_midi_shadow *shadow
 );
 
+music_rig_result music_rig_winmm_midi_set_input_observer(
+    music_rig_winmm_midi *host,
+    music_rig_winmm_midi_input_observer_fn observer,
+    void *observer_context
+);
+
 music_rig_result music_rig_winmm_midi_start(music_rig_winmm_midi *host);
 music_rig_result music_rig_winmm_midi_stop(music_rig_winmm_midi *host);
 
 /* Serialize API production and host start/stop with the caller's control loop. */
-/* These calls only enqueue channel-voice short MIDI; the output worker sends. */
+/* Enqueues valid channel-voice MIDI: 2 bytes for C0/D0, otherwise 3 bytes. */
+/* The output worker performs the actual send. */
 music_rig_result music_rig_winmm_midi_send(
     music_rig_winmm_midi *host,
     size_t slot_index,

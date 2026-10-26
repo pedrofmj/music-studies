@@ -43,6 +43,14 @@ static size_t shadow_cycles;
 static uint8_t last_shadow_message[256];
 static size_t last_shadow_message_size;
 
+typedef struct observer_capture {
+    uint8_t messages[8][MUSIC_RIG_WINMM_MIDI_LONG_MESSAGE_CAPACITY];
+    size_t sizes[8];
+    size_t slots[8];
+    size_t count;
+    bool fail_next;
+} observer_capture;
+
 #define CHECK(condition, description) do { \
     if (!(condition)) { \
         fprintf(stderr, "WinMM MIDI offline test failed: %s\n", description); \
@@ -146,7 +154,8 @@ static music_rig_result fake_device_interface(
     if (wcslen(devices[transient_index].interface_path) >= interface_capacity) {
         return MUSIC_RIG_RESULT_BUFFER_TOO_SMALL;
     }
-    wcscpy(interface_path, devices[transient_index].interface_path);
+    wmemcpy(interface_path, devices[transient_index].interface_path,
+        wcslen(devices[transient_index].interface_path) + 1U);
     return MUSIC_RIG_RESULT_OK;
 }
 
@@ -338,6 +347,30 @@ static const music_rig_winmm_midi_ops fake_ops = {
     fake_worker_join
 };
 
+static music_rig_result capture_input_message(
+    void *context,
+    size_t slot_index,
+    const uint8_t *message,
+    size_t message_size
+)
+{
+    observer_capture *capture = context;
+
+    if (capture == NULL || message == NULL || message_size == 0U ||
+        capture->count >= sizeof(capture->messages) / sizeof(capture->messages[0])) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+    if (capture->fail_next) {
+        capture->fail_next = false;
+        return MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+    }
+    memcpy(capture->messages[capture->count], message, message_size);
+    capture->sizes[capture->count] = message_size;
+    capture->slots[capture->count] = slot_index;
+    capture->count += 1U;
+    return MUSIC_RIG_RESULT_OK;
+}
+
 static void setup_devices(fake_winmm *fake)
 {
     memset(fake, 0, sizeof(*fake));
@@ -362,21 +395,47 @@ static void setup_host(
     music_rig_device_midi_shadow_observer observer;
 
     memset(&endpoint, 0, sizeof(endpoint));
-    strcpy(endpoint.slot, "arturia-main");
-    wcscpy(endpoint.input_interface, L"\\\\?\\usb#keylab-target-in");
-    wcscpy(endpoint.output_interface, L"\\\\?\\usb#keylab-target-out");
+    memcpy(endpoint.slot, "arturia-main", sizeof("arturia-main"));
+    memcpy(endpoint.input_interface, L"\\\\?\\usb#keylab-target-in",
+        sizeof(L"\\\\?\\usb#keylab-target-in"));
+    memcpy(endpoint.output_interface, L"\\\\?\\usb#keylab-target-out",
+        sizeof(L"\\\\?\\usb#keylab-target-out"));
     (void)music_rig_winmm_midi_init(host, &fake_ops, fake, &endpoint, 1U);
     (void)music_rig_winmm_midi_observer_init(host, &observer);
     memset(shadow, 0, sizeof(*shadow));
     shadow->abi_version = MUSIC_RIG_DEVICE_MIDI_SHADOW_ABI_VERSION;
     shadow->observer = observer;
     shadow->slot_count = 1U;
-    strcpy(shadow->slots[0].slot, "arturia-main");
+    memcpy(shadow->slots[0].slot, "arturia-main", sizeof("arturia-main"));
     active_shadow = shadow;
     shadow_processed = 0U;
     shadow_cycles = 0U;
     last_shadow_message_size = 0U;
     (void)music_rig_winmm_midi_attach_shadow(host, shadow);
+}
+
+static music_rig_result setup_observer_only_host(
+    music_rig_winmm_midi *host,
+    fake_winmm *fake,
+    observer_capture *capture
+)
+{
+    music_rig_winmm_midi_endpoint endpoint;
+    music_rig_result result;
+
+    memset(&endpoint, 0, sizeof(endpoint));
+    memcpy(endpoint.slot, "arturia-main", sizeof("arturia-main"));
+    memcpy(endpoint.input_interface, L"\\\\?\\usb#keylab-target-in",
+        sizeof(L"\\\\?\\usb#keylab-target-in"));
+    memcpy(endpoint.output_interface, L"\\\\?\\usb#keylab-target-out",
+        sizeof(L"\\\\?\\usb#keylab-target-out"));
+    result = music_rig_winmm_midi_init(host, &fake_ops, fake, &endpoint, 1U);
+    if (result != MUSIC_RIG_RESULT_OK) {
+        return result;
+    }
+    return music_rig_winmm_midi_set_input_observer(
+        host, capture_input_message, capture
+    );
 }
 
 static uint32_t pack_message(uint8_t status, uint8_t data1, uint8_t data2)
@@ -526,6 +585,33 @@ int main(void)
         "output send failure was not counted");
 
     fake.fail_send = 0;
+    {
+        uint8_t truncated_note_on[2] = {UINT8_C(0x90), UINT8_C(60)};
+        uint8_t program_change[2] = {UINT8_C(0xc0), UINT8_C(12)};
+        uint8_t channel_pressure[2] = {UINT8_C(0xd0), UINT8_C(47)};
+        size_t sent_before = fake.sent_message_count;
+
+        CHECK(music_rig_winmm_midi_send(
+                &host, 0U, truncated_note_on, sizeof(truncated_note_on)
+            ) == MUSIC_RIG_RESULT_INVALID_DATA &&
+            music_rig_winmm_midi_drain_output(&host) == 0U &&
+            fake.sent_message_count == sent_before,
+            "truncated note-on was transformed and sent");
+        CHECK(music_rig_winmm_midi_send(
+                &host, 0U, program_change, sizeof(program_change)
+            ) == MUSIC_RIG_RESULT_OK &&
+            music_rig_winmm_midi_drain_output(&host) == 1U &&
+            fake.sent_messages[sent_before] == pack_message(
+                UINT8_C(0xc0), UINT8_C(12), 0U),
+            "valid two-byte program change was rejected or corrupted");
+        CHECK(music_rig_winmm_midi_send(
+                &host, 0U, channel_pressure, sizeof(channel_pressure)
+            ) == MUSIC_RIG_RESULT_OK &&
+            music_rig_winmm_midi_drain_output(&host) == 1U &&
+            fake.sent_messages[sent_before + 1U] == pack_message(
+                UINT8_C(0xd0), UINT8_C(47), 0U),
+            "valid two-byte channel-pressure message was rejected or corrupted");
+    }
     fake.input_callback(fake.input_callback_argument,
         MUSIC_RIG_WINMM_MIDI_INPUT_SHORT,
         pack_message(UINT8_C(0xb0), UINT8_C(114), UINT8_C(33)), NULL, 0U,
@@ -554,6 +640,57 @@ int main(void)
         "restart reused stale numeric indices instead of re-resolving paths");
     CHECK(music_rig_winmm_midi_stop(&host) == MUSIC_RIG_RESULT_OK,
         "reordered-device stop failed");
+
+    setup_devices(&fake);
+    {
+        observer_capture capture = {0};
+        const uint8_t observer_sysex[] = {
+            UINT8_C(0xf0), UINT8_C(0x7d), UINT8_C(0xf7)
+        };
+
+        shadow_cycles = 0U;
+        CHECK(setup_observer_only_host(&host, &fake, &capture) ==
+                MUSIC_RIG_RESULT_OK &&
+            music_rig_winmm_midi_start(&host) == MUSIC_RIG_RESULT_OK,
+            "observer-only input host did not start without a shadow");
+        fake.input_callback(fake.input_callback_argument,
+            MUSIC_RIG_WINMM_MIDI_INPUT_SHORT,
+            pack_message(UINT8_C(0xb0), UINT8_C(1), UINT8_C(42)), NULL, 0U,
+            0U, UINT64_C(1));
+        fake.input_callback(fake.input_callback_argument,
+            MUSIC_RIG_WINMM_MIDI_INPUT_SHORT,
+            pack_message(UINT8_C(0x91), UINT8_C(60), UINT8_C(100)), NULL, 0U,
+            0U, UINT64_C(2));
+        fake.input_callback(fake.input_callback_argument,
+            MUSIC_RIG_WINMM_MIDI_INPUT_SHORT,
+            pack_message(UINT8_C(0xc0), UINT8_C(12), 0U), NULL, 0U, 0U,
+            UINT64_C(3));
+        fake.input_callback(fake.input_callback_argument,
+            MUSIC_RIG_WINMM_MIDI_INPUT_LONG, 0U, observer_sysex,
+            sizeof(observer_sysex), 0U, UINT64_C(4));
+        CHECK(capture.count == 0U && music_rig_winmm_midi_drain_input(&host) ==
+                4U,
+            "observer ran before worker drain or input events were lost");
+        CHECK(capture.count == 3U && capture.slots[0] == 0U &&
+            capture.sizes[0] == 3U && capture.messages[0][1] == 1U &&
+            capture.messages[1][0] == UINT8_C(0x91) &&
+            capture.sizes[1] == 3U && capture.messages[2][0] == UINT8_C(0xc0) &&
+            capture.sizes[2] == 2U && shadow_cycles == 0U &&
+            fake.input_requeue_count == 1U,
+            "observer-only mode did not deliver complete short messages safely");
+        capture.fail_next = true;
+        fake.input_callback(fake.input_callback_argument,
+            MUSIC_RIG_WINMM_MIDI_INPUT_SHORT,
+            pack_message(UINT8_C(0xb0), UINT8_C(2), UINT8_C(43)), NULL, 0U,
+            0U, UINT64_C(5));
+        CHECK(music_rig_winmm_midi_drain_input(&host) == 1U,
+            "observer failure prevented draining the input worker");
+        metrics = music_rig_winmm_midi_metrics_read(&host);
+        CHECK(metrics.callback_errors == UINT64_C(1),
+            "observer failure was not propagated to callback metrics");
+        CHECK(music_rig_winmm_midi_stop(&host) == MUSIC_RIG_RESULT_OK,
+            "observer-only host failed to stop");
+    }
 
     setup_devices(&fake);
     setup_host(&host, &fake, &shadow);

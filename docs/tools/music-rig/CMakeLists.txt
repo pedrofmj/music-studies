@@ -27,6 +27,7 @@ add_library(music_rig_core STATIC
 target_include_directories(music_rig_core
     PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/runtime/core/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/runtime/behaviors/include"
 )
 target_compile_features(music_rig_core PUBLIC c_std_17)
 set_target_properties(music_rig_core PROPERTIES
@@ -127,6 +128,45 @@ if(WIN32)
     )
     target_compile_features(music_rig_winmm_midi PUBLIC c_std_17)
     set_target_properties(music_rig_winmm_midi PROPERTIES C_EXTENSIONS OFF)
+    add_library(music_rig_win32_carla_host STATIC
+        runtime/windows/music_rig_win32_carla_host.c
+    )
+    target_include_directories(music_rig_win32_carla_host
+        PUBLIC runtime/windows/include
+    )
+    target_link_libraries(music_rig_win32_carla_host
+        PUBLIC music_rig_core music_rig_current_behaviors
+    )
+    target_compile_features(music_rig_win32_carla_host PUBLIC c_std_17)
+    set_target_properties(music_rig_win32_carla_host PROPERTIES
+        C_EXTENSIONS OFF
+    )
+    add_library(music_rig_win32_carla_runtime STATIC
+        runtime/windows/win32_carla_runtime.c
+    )
+    target_include_directories(music_rig_win32_carla_runtime
+        PUBLIC runtime/windows/include
+    )
+    target_link_libraries(music_rig_win32_carla_runtime
+        PUBLIC music_rig_winmm_midi music_rig_win32_carla_host
+    )
+    target_compile_features(music_rig_win32_carla_runtime PUBLIC c_std_17)
+    set_target_properties(music_rig_win32_carla_runtime PROPERTIES
+        C_EXTENSIONS OFF
+    )
+    add_executable(music_rig_win32_carla_abi_probe EXCLUDE_FROM_ALL
+        tests/win32-carla-abi-probe.c
+    )
+    target_include_directories(music_rig_win32_carla_abi_probe
+        PRIVATE runtime/windows/include
+    )
+    target_link_libraries(music_rig_win32_carla_abi_probe
+        PRIVATE music_rig_win32_carla_host
+    )
+    target_compile_features(music_rig_win32_carla_abi_probe PRIVATE c_std_17)
+    set_target_properties(music_rig_win32_carla_abi_probe PROPERTIES
+        C_EXTENSIONS OFF
+    )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(MUSIC_RIG_FILE_STORAGE_SOURCE
         runtime/linux/music_rig_file_storage.c
@@ -316,6 +356,12 @@ if(TARGET music_rig_linux_host)
     )
     target_link_libraries(music-rigd PRIVATE music_rig_linux_host)
 endif()
+if(TARGET music_rig_win32_carla_runtime)
+    target_compile_definitions(music-rigd PRIVATE
+        MUSIC_RIG_HAS_WIN32_CARLA_RUNTIME=1
+    )
+    target_link_libraries(music-rigd PRIVATE music_rig_win32_carla_runtime)
+endif()
 if(TARGET music_rig_jack_midi_shadow)
     target_compile_definitions(music-rigd PRIVATE
         MUSIC_RIG_HAS_JACK_MIDI_SHADOW=1
@@ -364,6 +410,21 @@ if(MSVC)
             ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
         )
     endif()
+    if(TARGET music_rig_win32_carla_host)
+        target_compile_options(music_rig_win32_carla_host PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+    endif()
+    if(TARGET music_rig_win32_carla_runtime)
+        target_compile_options(music_rig_win32_carla_runtime PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+    endif()
+    if(TARGET music_rig_win32_carla_abi_probe)
+        target_compile_options(music_rig_win32_carla_abi_probe PRIVATE
+            ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+        )
+    endif()
     target_compile_options(music_rig_smc_mixer_relay PRIVATE
         ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
     )
@@ -405,6 +466,14 @@ else()
         -Wpedantic
         -Werror
     )
+    if(TARGET music_rig_winmm_midi)
+        target_compile_options(music_rig_winmm_midi PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+    endif()
     target_compile_options(music_rig_smc_mixer_relay PRIVATE
         -Wall
         -Wextra
@@ -427,6 +496,30 @@ else()
     endif()
     if(TARGET music_rig_linux_host)
         target_compile_options(music_rig_linux_host PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+    endif()
+    if(TARGET music_rig_win32_carla_host)
+        target_compile_options(music_rig_win32_carla_host PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+    endif()
+    if(TARGET music_rig_win32_carla_runtime)
+        target_compile_options(music_rig_win32_carla_runtime PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror
+        )
+    endif()
+    if(TARGET music_rig_win32_carla_abi_probe)
+        target_compile_options(music_rig_win32_carla_abi_probe PRIVATE
             -Wall
             -Wextra
             -Wpedantic
@@ -555,6 +648,134 @@ if(BUILD_TESTING)
         NAME music_rig_winmm_midi_offline
         COMMAND music_rig_winmm_midi_offline_test
     )
+
+    if(WIN32)
+        add_executable(music_rig_win32_soundfont_paths_test
+            tests/win32-soundfont-paths-test.c
+            runtime/windows/music_rig_win32_soundfont_paths.c
+        )
+        target_include_directories(music_rig_win32_soundfont_paths_test
+            PRIVATE runtime/windows/include
+        )
+        target_link_libraries(music_rig_win32_soundfont_paths_test
+            PRIVATE music_rig_core shell32 ole32
+        )
+        target_compile_features(music_rig_win32_soundfont_paths_test
+            PRIVATE c_std_17
+        )
+        set_target_properties(music_rig_win32_soundfont_paths_test PROPERTIES
+            C_EXTENSIONS OFF
+        )
+        if(MSVC)
+            target_compile_options(music_rig_win32_soundfont_paths_test PRIVATE
+                ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+            )
+        else()
+            target_compile_options(music_rig_win32_soundfont_paths_test PRIVATE
+                -Wall -Wextra -Wpedantic -Werror
+            )
+        endif()
+        add_test(
+            NAME music_rig_win32_soundfont_paths
+            COMMAND music_rig_win32_soundfont_paths_test
+        )
+
+        add_library(music_rig_win32_carla_fake SHARED
+            tests/win32-carla-fake.c
+        )
+        if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+            target_sources(music_rig_win32_carla_fake PRIVATE
+                tests/win32-carla-fake-x86.def
+            )
+        endif()
+        target_include_directories(music_rig_win32_carla_fake PRIVATE tests)
+        target_compile_features(music_rig_win32_carla_fake PRIVATE c_std_17)
+        set_target_properties(music_rig_win32_carla_fake PROPERTIES
+            C_EXTENSIONS OFF
+        )
+
+        add_executable(music_rig_win32_carla_host_offline_test
+            tests/win32-carla-host-offline-test.c
+        )
+        target_include_directories(music_rig_win32_carla_host_offline_test
+            PRIVATE runtime/windows/include tests
+        )
+        target_link_libraries(music_rig_win32_carla_host_offline_test
+            PRIVATE music_rig_win32_carla_host
+        )
+        target_compile_features(music_rig_win32_carla_host_offline_test
+            PRIVATE c_std_17
+        )
+        set_target_properties(music_rig_win32_carla_host_offline_test PROPERTIES
+            C_EXTENSIONS OFF
+        )
+        if(MSVC)
+            target_compile_options(music_rig_win32_carla_fake PRIVATE
+                ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+            )
+            target_compile_options(music_rig_win32_carla_host_offline_test
+                PRIVATE ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+            )
+        else()
+            target_compile_options(music_rig_win32_carla_fake PRIVATE
+                -Wall -Wextra -Wpedantic -Werror
+            )
+            target_compile_options(music_rig_win32_carla_host_offline_test
+                PRIVATE -Wall -Wextra -Wpedantic -Werror
+            )
+        endif()
+        add_test(
+            NAME music_rig_win32_carla_host_offline
+            COMMAND music_rig_win32_carla_host_offline_test
+                "$<TARGET_FILE:music_rig_win32_carla_fake>"
+        )
+        set_tests_properties(
+            music_rig_win32_carla_host_offline PROPERTIES TIMEOUT 10
+        )
+
+        add_executable(music_rig_win32_carla_runtime_offline_test
+            tests/win32-carla-runtime-offline-test.c
+        )
+        target_include_directories(music_rig_win32_carla_runtime_offline_test
+            PRIVATE runtime/windows/include tests
+        )
+        target_link_libraries(music_rig_win32_carla_runtime_offline_test
+            PRIVATE music_rig_win32_carla_runtime
+        )
+        target_compile_features(music_rig_win32_carla_runtime_offline_test
+            PRIVATE c_std_17
+        )
+        set_target_properties(music_rig_win32_carla_runtime_offline_test
+            PROPERTIES C_EXTENSIONS OFF
+        )
+        if(MSVC)
+            target_compile_options(music_rig_win32_carla_runtime_offline_test
+                PRIVATE ${MUSIC_RIG_MSVC_COMPILE_OPTIONS}
+            )
+        else()
+            target_compile_options(music_rig_win32_carla_runtime_offline_test
+                PRIVATE -Wall -Wextra -Wpedantic -Werror
+            )
+        endif()
+        add_test(
+            NAME music_rig_win32_carla_runtime_offline
+            COMMAND music_rig_win32_carla_runtime_offline_test
+                "$<TARGET_FILE:music_rig_win32_carla_fake>"
+        )
+        set_tests_properties(
+            music_rig_win32_carla_runtime_offline PROPERTIES TIMEOUT 10
+        )
+
+        add_test(
+            NAME music_rigd_win32_carla_cli_boundary
+            COMMAND "${CMAKE_COMMAND}"
+                "-DDAEMON=$<TARGET_FILE:music-rigd>"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check-music-rigd-win32-carla-cli.cmake"
+        )
+        set_tests_properties(
+            music_rigd_win32_carla_cli_boundary PROPERTIES TIMEOUT 10
+        )
+    endif()
 
     add_executable(music_rig_arturia_pad_control_state_test
         tests/arturia-pad-control-state-test.c
@@ -1330,6 +1551,43 @@ if(BUILD_TESTING)
     )
     set_tests_properties(
         music_rig_arturia_shared_sf2_routing
+        PROPERTIES TIMEOUT 30
+    )
+    add_test(
+        NAME music_rig_arturia_platform_sf2_assets
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-arturia-platform-sf2-assets.py"
+    )
+    set_tests_properties(
+        music_rig_arturia_platform_sf2_assets
+        PROPERTIES TIMEOUT 10
+    )
+    add_test(
+        NAME music_rig_win32_arturia_profile_command
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/generate-win32-arturia-command.py"
+            --self-test
+    )
+    set_tests_properties(
+        music_rig_win32_arturia_profile_command
+        PROPERTIES TIMEOUT 10
+    )
+    add_test(
+        NAME music_rig_arturia_sf2_pack_staging
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-package-arturia-sf2-pack.py"
+    )
+    set_tests_properties(
+        music_rig_arturia_sf2_pack_staging
+        PROPERTIES TIMEOUT 30
+    )
+    add_test(
+        NAME music_rig_arturia_sf2_pack_project
+        COMMAND "${Python3_EXECUTABLE}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-materialize-arturia-sf2-pack-project.py"
+    )
+    set_tests_properties(
+        music_rig_arturia_sf2_pack_project
         PROPERTIES TIMEOUT 30
     )
 

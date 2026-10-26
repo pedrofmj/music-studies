@@ -296,8 +296,8 @@ static int test_session(void)
     CHECK(fake.calls[3].kind == FAKE_ACTIVATE && fake.calls[3].patch == 18U);
     CHECK(fake.calls[4].kind == FAKE_PATCH_VOLUME &&
         fake.calls[4].patch == 10U && fake.calls[4].value == 11U);
-    CHECK(fake.calls[7].kind == FAKE_PATCH_REVERB &&
-        fake.calls[7].patch == 12U && fake.calls[7].value == 22U);
+    CHECK(fake.calls[9].kind == FAKE_PATCH_REVERB &&
+        fake.calls[9].patch == 12U && fake.calls[9].value == 22U);
     CHECK(fake.calls[15].kind == FAKE_PATCH_REVERB &&
         fake.calls[15].patch == 18U && fake.calls[15].value == 0U);
 

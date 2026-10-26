@@ -14,6 +14,12 @@
 #include "music_rig/linux_lifecycle.h"
 #endif
 
+#if defined(MUSIC_RIG_HAS_WIN32_CARLA_RUNTIME)
+#include "music_rig/arturia_carla_host.h"
+#include "music_rig/win32_carla_runtime.h"
+#include "music_rig/winmm_midi_win32.h"
+#endif
+
 #if defined(MUSIC_RIG_HAS_JACK_MIDI_SHADOW)
 #include "music_rig/device_midi_shadow.h"
 #include "music_rig/jack_midi_shadow.h"
@@ -48,6 +54,10 @@
 #include <unistd.h>
 #endif
 
+#if defined(MUSIC_RIG_HAS_WIN32_CARLA_RUNTIME)
+#include <windows.h>
+#endif
+
 static void print_usage(FILE *stream, const char *program)
 {
     fprintf(stream, "Usage: %s --version\n", program);
@@ -62,6 +72,30 @@ static void print_usage(FILE *stream, const char *program)
         stream,
         "       %s run-shadow --output-suppressed\n",
         program
+    );
+#endif
+#if defined(MUSIC_RIG_HAS_WIN32_CARLA_RUNTIME)
+    fprintf(
+        stream,
+        "       %s run-win32-carla --carla-dll DLL --project CARXP "
+        "--driver NAME --client NAME --midi-client LOOPBACK_CLIENT "
+        "--midi-port LOOPBACK_PORT --input-interface PHYSICAL_WINMM_PATH "
+        "--loopback-output-interface LOOPBACK_WINMM_PATH "
+        "--patch-names CSV --patch-indexes 9_CSV --active-layers CSV "
+        "[--pad-profile CODE:PATCH_INDEXES:ACTIVE_LAYERS]... "
+        "--master-volume 0..127\n",
+        program
+    );
+    fprintf(
+        stream,
+        "       %s run-win32-carla --help\n",
+        program
+    );
+    fputs(
+        "         Windows only; uses WinMM slot arturia-main, with the "
+        "physical controller as input and the dedicated Basic Loopback "
+        "output. Carla MIDI names must identify the matching loopback input.\n",
+        stream
     );
 #endif
 #if defined(MUSIC_RIG_ENABLE_JSON_DEFINITION)
@@ -108,6 +142,640 @@ static void print_usage(FILE *stream, const char *program)
     );
 #endif
 }
+
+#if defined(MUSIC_RIG_HAS_WIN32_CARLA_RUNTIME)
+#define WIN32_CARLA_OPTION_COUNT 12U
+#define WIN32_CARLA_PATCH_NAME_CAPACITY 256U
+#define WIN32_CARLA_VALUE_CAPACITY 32768U
+#define WIN32_CARLA_INDEX_CSV_CAPACITY (6U * 9U + 1U)
+#define WIN32_CARLA_LAYER_CSV_CAPACITY (2U * 9U + 1U)
+
+typedef enum win32_carla_option {
+    WIN32_CARLA_OPTION_DLL = 0,
+    WIN32_CARLA_OPTION_PROJECT,
+    WIN32_CARLA_OPTION_DRIVER,
+    WIN32_CARLA_OPTION_CLIENT,
+    WIN32_CARLA_OPTION_MIDI_CLIENT,
+    WIN32_CARLA_OPTION_MIDI_PORT,
+    WIN32_CARLA_OPTION_INPUT_INTERFACE,
+    WIN32_CARLA_OPTION_LOOPBACK_OUTPUT_INTERFACE,
+    WIN32_CARLA_OPTION_PATCH_NAMES,
+    WIN32_CARLA_OPTION_PATCH_INDEXES,
+    WIN32_CARLA_OPTION_ACTIVE_LAYERS,
+    WIN32_CARLA_OPTION_MASTER_VOLUME
+} win32_carla_option;
+
+static const char *const win32_carla_option_names[WIN32_CARLA_OPTION_COUNT] = {
+    "--carla-dll",
+    "--project",
+    "--driver",
+    "--client",
+    "--midi-client",
+    "--midi-port",
+    "--input-interface",
+    "--loopback-output-interface",
+    "--patch-names",
+    "--patch-indexes",
+    "--active-layers",
+    "--master-volume"
+};
+
+typedef struct win32_carla_arguments {
+    const char *values[WIN32_CARLA_OPTION_COUNT];
+    bool seen[WIN32_CARLA_OPTION_COUNT];
+    char patch_name_storage[MUSIC_RIG_ARTURIA_CARLA_PATCH_CAPACITY]
+        [WIN32_CARLA_PATCH_NAME_CAPACITY];
+    const char *patch_names[MUSIC_RIG_ARTURIA_CARLA_PATCH_CAPACITY];
+    uint16_t patch_indexes[MUSIC_RIG_ARTURIA_SHARED_SF2_LAYER_COUNT];
+    uint8_t active_layers[MUSIC_RIG_ARTURIA_SHARED_SF2_LAYER_COUNT];
+    const char *pad_profile_values[
+        MUSIC_RIG_WIN32_CARLA_RUNTIME_PROFILE_CAPACITY
+    ];
+    music_rig_win32_carla_profile_map pad_profiles[
+        MUSIC_RIG_WIN32_CARLA_RUNTIME_PROFILE_CAPACITY
+    ];
+    size_t patch_count;
+    size_t active_layer_count;
+    size_t pad_profile_count;
+    uint8_t master_volume;
+    music_rig_winmm_midi_endpoint endpoint;
+} win32_carla_arguments;
+
+static volatile LONG win32_carla_stop_requested;
+
+static void print_win32_carla_help(FILE *stream, const char *program)
+{
+    print_usage(stream, program);
+    fputs(
+        "         --patch-names is a comma-separated catalogue of 1..256 "
+        "nonempty names.\n"
+        "         --patch-indexes contains exactly 9 zero-based catalogue "
+        "indexes.\n"
+        "         --active-layers contains 1..9 unique layer numbers "
+        "(1..9).\n"
+        "         Repeat --pad-profile CODE:PATCH_INDEXES:ACTIVE_LAYERS; "
+        "codes 1..16 match Android ArturiaPadModes (Bank A pads 1..8, then "
+        "Bank B pads 1..8). Code 2 is unsupported.\n"
+        "         Pad-profile indexes use the same catalogue as the initial "
+        "profile; each profile has exactly 9 indexes.\n"
+        "         Endpoint paths are UTF-8 WinMM interface paths; the Carla "
+        "MIDI client/port identify the Basic Loopback input.\n",
+        stream
+    );
+}
+
+static bool win32_carla_option_id(
+    const char *name,
+    win32_carla_option *option
+)
+{
+    size_t index;
+
+    for (index = 0U; index < WIN32_CARLA_OPTION_COUNT; ++index) {
+        if (strcmp(name, win32_carla_option_names[index]) == 0) {
+            *option = (win32_carla_option)index;
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool win32_carla_parse_arguments(
+    int argc,
+    char **argv,
+    win32_carla_arguments *arguments
+)
+{
+    int index;
+    size_t option_index;
+
+    memset(arguments, 0, sizeof(*arguments));
+    for (index = 2; index < argc; ++index) {
+        win32_carla_option option;
+        const char *value;
+
+        if (strcmp(argv[index], "--pad-profile") == 0) {
+            if (index + 1 >= argc || argv[index + 1][0] == '\0' ||
+                argv[index + 1][0] == '-') {
+                fprintf(stderr,
+                    "missing value for run-win32-carla option: %s\n",
+                    argv[index]);
+                return false;
+            }
+            if (arguments->pad_profile_count >=
+                    MUSIC_RIG_WIN32_CARLA_RUNTIME_PROFILE_CAPACITY) {
+                fprintf(stderr, "too many --pad-profile options\n");
+                return false;
+            }
+            arguments->pad_profile_values[arguments->pad_profile_count++] =
+                argv[++index];
+            continue;
+        }
+        if (!win32_carla_option_id(argv[index], &option)) {
+            fprintf(stderr, "unknown run-win32-carla option: %s\n", argv[index]);
+            return false;
+        }
+        option_index = (size_t)option;
+        if (arguments->seen[option_index]) {
+            fprintf(stderr, "duplicate run-win32-carla option: %s\n", argv[index]);
+            return false;
+        }
+        if (index + 1 >= argc || argv[index + 1][0] == '\0' ||
+            argv[index + 1][0] == '-') {
+            fprintf(stderr, "missing value for run-win32-carla option: %s\n",
+                argv[index]);
+            return false;
+        }
+        value = argv[++index];
+        arguments->seen[option_index] = true;
+        arguments->values[option_index] = value;
+    }
+    for (option_index = 0U; option_index < WIN32_CARLA_OPTION_COUNT;
+         ++option_index) {
+        if (!arguments->seen[option_index]) {
+            fprintf(stderr, "missing required run-win32-carla option: %s\n",
+                win32_carla_option_names[option_index]);
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool win32_carla_nonempty_text(
+    const char *text,
+    size_t capacity
+)
+{
+    size_t index;
+    bool non_whitespace = false;
+
+    if (text == NULL || capacity == 0U) {
+        return false;
+    }
+    for (index = 0U; index < capacity; ++index) {
+        unsigned char character = (unsigned char)text[index];
+
+        if (character == '\0') {
+            return non_whitespace;
+        }
+        if (character != ' ' && character != '\t' && character != '\r' &&
+            character != '\n' && character != '\v' && character != '\f') {
+            non_whitespace = true;
+        }
+    }
+    return false;
+}
+
+static bool win32_carla_parse_decimal(
+    const char *text,
+    size_t length,
+    uint32_t maximum,
+    uint32_t *value
+)
+{
+    uint32_t parsed = 0U;
+    size_t index;
+
+    if (text == NULL || length == 0U || value == NULL) {
+        return false;
+    }
+    for (index = 0U; index < length; ++index) {
+        uint32_t digit;
+
+        if (text[index] < '0' || text[index] > '9') {
+            return false;
+        }
+        digit = (uint32_t)(text[index] - '0');
+        if (digit > maximum || parsed > (maximum - digit) / 10U) {
+            return false;
+        }
+        parsed = parsed * 10U + digit;
+    }
+    *value = parsed;
+    return true;
+}
+
+static bool win32_carla_parse_patch_names(
+    const char *csv,
+    win32_carla_arguments *arguments
+)
+{
+    const char *start = csv;
+
+    while (true) {
+        const char *end = strchr(start, ',');
+        size_t length = end == NULL ? strlen(start) : (size_t)(end - start);
+        size_t index = arguments->patch_count;
+
+        if (index >= MUSIC_RIG_ARTURIA_CARLA_PATCH_CAPACITY || length == 0U ||
+            length >= WIN32_CARLA_PATCH_NAME_CAPACITY) {
+            return false;
+        }
+        memcpy(arguments->patch_name_storage[index], start, length);
+        arguments->patch_name_storage[index][length] = '\0';
+        if (!win32_carla_nonempty_text(
+                arguments->patch_name_storage[index],
+                WIN32_CARLA_PATCH_NAME_CAPACITY
+            )) {
+            return false;
+        }
+        arguments->patch_names[index] = arguments->patch_name_storage[index];
+        arguments->patch_count += 1U;
+        if (end == NULL) {
+            return true;
+        }
+        start = end + 1;
+        if (*start == '\0') {
+            return false;
+        }
+    }
+}
+
+static bool win32_carla_parse_index_csv(
+    const char *csv,
+    uint16_t patch_count,
+    uint16_t indexes[MUSIC_RIG_ARTURIA_SHARED_SF2_LAYER_COUNT]
+)
+{
+    const char *start = csv;
+    size_t count = 0U;
+
+    while (true) {
+        const char *end = strchr(start, ',');
+        size_t length = end == NULL ? strlen(start) : (size_t)(end - start);
+        uint32_t parsed;
+
+        if (count >= MUSIC_RIG_ARTURIA_SHARED_SF2_LAYER_COUNT ||
+            !win32_carla_parse_decimal(
+                start, length, UINT16_MAX, &parsed
+            ) || parsed >= patch_count) {
+            return false;
+        }
+        indexes[count++] = (uint16_t)parsed;
+        if (end == NULL) {
+            return count == MUSIC_RIG_ARTURIA_SHARED_SF2_LAYER_COUNT;
+        }
+        start = end + 1;
+        if (*start == '\0') {
+            return false;
+        }
+    }
+}
+
+static bool win32_carla_parse_active_layers(
+    const char *csv,
+    uint8_t active_layers[MUSIC_RIG_ARTURIA_SHARED_SF2_LAYER_COUNT],
+    size_t *active_layer_count
+)
+{
+    bool seen[MUSIC_RIG_ARTURIA_SHARED_SF2_LAYER_COUNT] = {false};
+    const char *start = csv;
+
+    if (active_layers == NULL || active_layer_count == NULL) {
+        return false;
+    }
+    *active_layer_count = 0U;
+    while (true) {
+        const char *end = strchr(start, ',');
+        size_t length = end == NULL ? strlen(start) : (size_t)(end - start);
+        uint32_t parsed;
+        size_t layer_index;
+
+        if (*active_layer_count >=
+                MUSIC_RIG_ARTURIA_SHARED_SF2_LAYER_COUNT ||
+            !win32_carla_parse_decimal(start, length,
+                MUSIC_RIG_ARTURIA_SHARED_SF2_LAYER_COUNT, &parsed) ||
+            parsed == 0U) {
+            return false;
+        }
+        layer_index = (size_t)parsed - 1U;
+        if (seen[layer_index]) {
+            return false;
+        }
+        seen[layer_index] = true;
+        active_layers[(*active_layer_count)++] =
+            (uint8_t)parsed;
+        if (end == NULL) {
+            return *active_layer_count > 0U;
+        }
+        start = end + 1;
+        if (*start == '\0') {
+            return false;
+        }
+    }
+}
+
+static bool win32_carla_parse_pad_profile(
+    const char *value,
+    uint16_t patch_count,
+    music_rig_win32_carla_profile_map *profile
+)
+{
+    const char *first_separator;
+    const char *second_separator;
+    size_t code_length;
+    size_t indexes_length;
+    size_t layers_length;
+    char indexes_csv[WIN32_CARLA_INDEX_CSV_CAPACITY];
+    char layers_csv[WIN32_CARLA_LAYER_CSV_CAPACITY];
+    uint32_t code;
+
+    if (value == NULL || profile == NULL) {
+        return false;
+    }
+    first_separator = strchr(value, ':');
+    if (first_separator == NULL) {
+        return false;
+    }
+    second_separator = strchr(first_separator + 1, ':');
+    if (second_separator == NULL || strchr(second_separator + 1, ':') != NULL) {
+        return false;
+    }
+    code_length = (size_t)(first_separator - value);
+    indexes_length = (size_t)(second_separator - first_separator - 1);
+    layers_length = strlen(second_separator + 1);
+    if (!win32_carla_parse_decimal(value, code_length, 16U, &code) ||
+        code == 0U || code == 2U ||
+        indexes_length == 0U || indexes_length >= sizeof(indexes_csv) ||
+        layers_length == 0U || layers_length >= sizeof(layers_csv)) {
+        return false;
+    }
+    memcpy(indexes_csv, first_separator + 1, indexes_length);
+    indexes_csv[indexes_length] = '\0';
+    memcpy(layers_csv, second_separator + 1, layers_length + 1U);
+    profile->management_pad_code = (uint8_t)code;
+    return win32_carla_parse_index_csv(
+            indexes_csv, patch_count, profile->patch_indexes
+        ) && win32_carla_parse_active_layers(
+            layers_csv, profile->active_layers, &profile->active_layer_count
+        );
+}
+
+static bool win32_carla_utf8_interface_path(
+    const char *utf8,
+    wchar_t output[MUSIC_RIG_WINMM_MIDI_INTERFACE_CAPACITY]
+)
+{
+    int required;
+
+    if (!win32_carla_nonempty_text(
+            utf8, MUSIC_RIG_WINMM_MIDI_INTERFACE_CAPACITY * 4U
+        )) {
+        return false;
+    }
+    required = MultiByteToWideChar(
+        CP_UTF8, MB_ERR_INVALID_CHARS, utf8, -1, NULL, 0
+    );
+    if (required <= 1 ||
+        (size_t)required > MUSIC_RIG_WINMM_MIDI_INTERFACE_CAPACITY) {
+        return false;
+    }
+    return MultiByteToWideChar(
+        CP_UTF8,
+        MB_ERR_INVALID_CHARS,
+        utf8,
+        -1,
+        output,
+        (int)MUSIC_RIG_WINMM_MIDI_INTERFACE_CAPACITY
+    ) == required;
+}
+
+static bool win32_carla_validate_arguments(
+    win32_carla_arguments *arguments
+)
+{
+    const char *const *values = arguments->values;
+    music_rig_arturia_shared_sf2_plan plan;
+    size_t index;
+    uint32_t master_volume;
+
+    if (!win32_carla_nonempty_text(values[WIN32_CARLA_OPTION_DLL],
+            WIN32_CARLA_VALUE_CAPACITY) ||
+        !win32_carla_nonempty_text(values[WIN32_CARLA_OPTION_PROJECT],
+            WIN32_CARLA_VALUE_CAPACITY) ||
+        !win32_carla_nonempty_text(values[WIN32_CARLA_OPTION_DRIVER],
+            WIN32_CARLA_VALUE_CAPACITY) ||
+        !win32_carla_nonempty_text(values[WIN32_CARLA_OPTION_CLIENT],
+            WIN32_CARLA_VALUE_CAPACITY) ||
+        !win32_carla_nonempty_text(values[WIN32_CARLA_OPTION_MIDI_CLIENT],
+            WIN32_CARLA_PATCH_NAME_CAPACITY) ||
+        !win32_carla_nonempty_text(values[WIN32_CARLA_OPTION_MIDI_PORT],
+            WIN32_CARLA_PATCH_NAME_CAPACITY) ||
+        !win32_carla_parse_patch_names(
+            values[WIN32_CARLA_OPTION_PATCH_NAMES], arguments
+        ) ||
+        arguments->patch_count > UINT16_MAX ||
+        !win32_carla_parse_index_csv(
+            values[WIN32_CARLA_OPTION_PATCH_INDEXES],
+            (uint16_t)arguments->patch_count,
+            arguments->patch_indexes
+        ) ||
+        !win32_carla_parse_active_layers(
+            values[WIN32_CARLA_OPTION_ACTIVE_LAYERS],
+            arguments->active_layers, &arguments->active_layer_count
+        ) ||
+        !win32_carla_parse_decimal(
+            values[WIN32_CARLA_OPTION_MASTER_VOLUME],
+            strlen(values[WIN32_CARLA_OPTION_MASTER_VOLUME]),
+            127U,
+            &master_volume
+        )) {
+        return false;
+    }
+    if (!win32_carla_utf8_interface_path(
+            values[WIN32_CARLA_OPTION_INPUT_INTERFACE],
+            arguments->endpoint.input_interface
+        ) ||
+        !win32_carla_utf8_interface_path(
+            values[WIN32_CARLA_OPTION_LOOPBACK_OUTPUT_INTERFACE],
+            arguments->endpoint.output_interface
+        ) ||
+        wcscmp(arguments->endpoint.input_interface,
+            arguments->endpoint.output_interface) == 0) {
+        return false;
+    }
+    memcpy(arguments->endpoint.slot, "arturia-main", sizeof("arturia-main"));
+    arguments->master_volume = (uint8_t)master_volume;
+    if (music_rig_arturia_shared_sf2_plan_build(
+            arguments->patch_indexes,
+            (uint16_t)arguments->patch_count,
+            arguments->active_layers,
+            arguments->active_layer_count,
+            &plan
+        ) != MUSIC_RIG_RESULT_OK) {
+        return false;
+    }
+    for (index = 0U; index < plan.route_count; ++index) {
+        if (plan.routes[index].fader_cc > 127U ||
+            plan.routes[index].knob_cc > 127U) {
+            return false;
+        }
+    }
+    for (index = 0U; index < arguments->pad_profile_count; ++index) {
+        size_t previous;
+
+        if (!win32_carla_parse_pad_profile(
+                arguments->pad_profile_values[index],
+                (uint16_t)arguments->patch_count,
+                &arguments->pad_profiles[index]
+            )) {
+            return false;
+        }
+        for (previous = 0U; previous < index; ++previous) {
+            if (arguments->pad_profiles[previous].management_pad_code ==
+                    arguments->pad_profiles[index].management_pad_code) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+static BOOL WINAPI win32_carla_console_control(DWORD control_type)
+{
+    if (control_type == CTRL_C_EVENT || control_type == CTRL_BREAK_EVENT ||
+        control_type == CTRL_CLOSE_EVENT || control_type == CTRL_LOGOFF_EVENT ||
+        control_type == CTRL_SHUTDOWN_EVENT) {
+        (void)InterlockedExchange(&win32_carla_stop_requested, 1L);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static music_rig_result win32_carla_close_runtime(
+    music_rig_win32_carla_runtime **runtime
+)
+{
+    music_rig_result first_failure = MUSIC_RIG_RESULT_OK;
+
+    while (*runtime != NULL) {
+        music_rig_result result = music_rig_win32_carla_runtime_close(runtime);
+
+        if (first_failure == MUSIC_RIG_RESULT_OK &&
+            result != MUSIC_RIG_RESULT_OK) {
+            first_failure = result;
+        }
+        if (*runtime != NULL) {
+            Sleep(100U);
+        }
+    }
+    return first_failure;
+}
+
+static int run_win32_carla(int argc, char **argv)
+{
+    win32_carla_arguments arguments;
+    music_rig_winmm_midi_win32 native;
+    music_rig_win32_carla_runtime *runtime = NULL;
+    music_rig_win32_carla_host_options carla_options;
+    music_rig_result result;
+    music_rig_result close_result;
+    char error_message[512] = {0};
+    bool native_initialized = false;
+    bool control_handler_installed = false;
+
+    if (argc == 3 && strcmp(argv[2], "--help") == 0) {
+        print_win32_carla_help(stdout, argv[0]);
+        return MUSIC_RIG_RESULT_OK;
+    }
+    if (!win32_carla_parse_arguments(argc, argv, &arguments) ||
+        !win32_carla_validate_arguments(&arguments)) {
+        fprintf(stderr, "invalid run-win32-carla options or values\n");
+        print_win32_carla_help(stderr, argv[0]);
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+
+    result = music_rig_winmm_midi_win32_init(&native);
+    if (result != MUSIC_RIG_RESULT_OK) {
+        fprintf(stderr, "WinMM native initialization failed: result %d\n",
+            (int)result);
+        return (int)result;
+    }
+    native_initialized = true;
+
+    memset(&carla_options, 0, sizeof(carla_options));
+    carla_options.carla_dll_path =
+        arguments.values[WIN32_CARLA_OPTION_DLL];
+    carla_options.project_path = arguments.values[WIN32_CARLA_OPTION_PROJECT];
+    carla_options.driver_name = arguments.values[WIN32_CARLA_OPTION_DRIVER];
+    carla_options.client_name = arguments.values[WIN32_CARLA_OPTION_CLIENT];
+    carla_options.midi_client_name =
+        arguments.values[WIN32_CARLA_OPTION_MIDI_CLIENT];
+    carla_options.midi_port_name =
+        arguments.values[WIN32_CARLA_OPTION_MIDI_PORT];
+    carla_options.patch_names = arguments.patch_names;
+    carla_options.patch_count = (uint16_t)arguments.patch_count;
+    carla_options.patch_indexes = arguments.patch_indexes;
+    carla_options.catalog_patch_count = (uint16_t)arguments.patch_count;
+    carla_options.active_layers = arguments.active_layers;
+    carla_options.active_layer_count = arguments.active_layer_count;
+    carla_options.initial_master_volume = arguments.master_volume;
+
+    result = music_rig_win32_carla_runtime_open(
+        &runtime,
+        music_rig_winmm_midi_win32_ops(),
+        &native,
+        &arguments.endpoint,
+        1U,
+        arguments.pad_profiles,
+        arguments.pad_profile_count,
+        &carla_options,
+        "arturia-main",
+        error_message,
+        sizeof(error_message)
+    );
+    if (result != MUSIC_RIG_RESULT_OK) {
+        fprintf(stderr, "Win32 Carla runtime open failed: result %d%s%s\n",
+            (int)result,
+            error_message[0] == '\0' ? "" : ": ",
+            error_message);
+        goto shutdown;
+    }
+
+    (void)InterlockedExchange(&win32_carla_stop_requested, 0L);
+    if (!SetConsoleCtrlHandler(win32_carla_console_control, TRUE)) {
+        fprintf(stderr, "Could not install the Windows console-control handler\n");
+        result = MUSIC_RIG_RESULT_ADAPTER_FAILURE;
+        goto shutdown;
+    }
+    control_handler_installed = true;
+    puts("run-win32-carla ready; press Ctrl+C to stop");
+    (void)fflush(stdout);
+    while (InterlockedCompareExchange(
+            &win32_carla_stop_requested, 0L, 0L
+        ) == 0L) {
+        result = music_rig_win32_carla_runtime_pump(runtime, NULL);
+        if (result != MUSIC_RIG_RESULT_OK) {
+            fprintf(stderr, "Win32 Carla runtime pump failed: result %d\n",
+                (int)result);
+            break;
+        }
+        Sleep(10U);
+    }
+
+shutdown:
+    if (control_handler_installed) {
+        (void)SetConsoleCtrlHandler(win32_carla_console_control, FALSE);
+    }
+    close_result = win32_carla_close_runtime(&runtime);
+    if (result == MUSIC_RIG_RESULT_OK) {
+        result = close_result;
+    }
+    if (native_initialized) {
+        music_rig_result dispose_result =
+            music_rig_winmm_midi_win32_dispose(&native);
+
+        if (result == MUSIC_RIG_RESULT_OK) {
+            result = dispose_result;
+        }
+    }
+    if (result != MUSIC_RIG_RESULT_OK) {
+        fprintf(stderr, "Win32 Carla runtime stopped with result %d\n",
+            (int)result);
+    }
+    return (int)result;
+}
+#endif
 
 #if defined(MUSIC_RIG_HAS_LINUX_HOST)
 static int resolve_host_paths(music_rig_host_paths *paths)
@@ -1052,6 +1720,12 @@ int main(int argc, char **argv)
         print_usage(stdout, argv[0]);
         return MUSIC_RIG_RESULT_OK;
     }
+
+#if defined(MUSIC_RIG_HAS_WIN32_CARLA_RUNTIME)
+    if (argc >= 2 && strcmp(argv[1], "run-win32-carla") == 0) {
+        return run_win32_carla(argc, argv);
+    }
+#endif
 
 #if defined(MUSIC_RIG_HAS_LINUX_HOST)
     if (argc == 6 && strcmp(argv[1], "run") == 0 &&

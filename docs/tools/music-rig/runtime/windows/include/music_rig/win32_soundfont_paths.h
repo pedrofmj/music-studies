@@ -15,7 +15,7 @@ music_rig_result music_rig_win32_soundfont_root_resolve(
     size_t root_capacity
 );
 
-/* Joins a relative catalog path under a previously resolved library root. */
+/* Joins a relative catalog path; capacity failures return BUFFER_TOO_SMALL. */
 music_rig_result music_rig_win32_soundfont_path_join(
     const wchar_t *root,
     const wchar_t *relative_path,

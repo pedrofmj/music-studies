@@ -23,7 +23,12 @@ static bool append_path(
     const wchar_t *suffix
 )
 {
-    int written = _snwprintf_s(
+    int written;
+
+    if (output == NULL || base == NULL || suffix == NULL || capacity == 0U) {
+        return false;
+    }
+    written = _snwprintf_s(
         output, capacity, _TRUNCATE, L"%ls\\%ls", base, suffix
     );
 
@@ -45,7 +50,7 @@ static bool copy_path(wchar_t *output, size_t capacity, const wchar_t *path)
     return true;
 }
 
-static bool find_account_root(
+static music_rig_result find_account_root(
     const wchar_t *insync_root,
     wchar_t *output,
     size_t capacity
@@ -54,14 +59,15 @@ static bool find_account_root(
     WIN32_FIND_DATAW data;
     wchar_t pattern[MUSIC_RIG_WIN32_SOUNDFONT_PATH_CAPACITY];
     HANDLE search;
+    music_rig_result result = MUSIC_RIG_RESULT_NOT_FOUND;
 
     if (!append_path(pattern, sizeof(pattern) / sizeof(pattern[0]),
             insync_root, L"*")) {
-        return false;
+        return MUSIC_RIG_RESULT_BUFFER_TOO_SMALL;
     }
     search = FindFirstFileW(pattern, &data);
     if (search == INVALID_HANDLE_VALUE) {
-        return false;
+        return MUSIC_RIG_RESULT_NOT_FOUND;
     }
     do {
         wchar_t account_root[MUSIC_RIG_WIN32_SOUNDFONT_PATH_CAPACITY];
@@ -79,13 +85,14 @@ static bool find_account_root(
                 L"Google Drive\\Flash\\PED\\MIDI\\Pack de Timbres\\Library")) {
             continue;
         }
-        if (directory_exists(candidate) && copy_path(output, capacity, candidate)) {
-            FindClose(search);
-            return true;
+        if (directory_exists(candidate)) {
+            result = copy_path(output, capacity, candidate)
+                ? MUSIC_RIG_RESULT_OK : MUSIC_RIG_RESULT_BUFFER_TOO_SMALL;
+            break;
         }
     } while (FindNextFileW(search, &data) != 0);
     FindClose(search);
-    return false;
+    return result;
 }
 
 music_rig_result music_rig_win32_soundfont_root_resolve(
@@ -98,7 +105,7 @@ music_rig_result music_rig_win32_soundfont_root_resolve(
     wchar_t insync_root[MUSIC_RIG_WIN32_SOUNDFONT_PATH_CAPACITY];
     wchar_t direct_root[MUSIC_RIG_WIN32_SOUNDFONT_PATH_CAPACITY];
     HRESULT status;
-    bool found = false;
+    music_rig_result result = MUSIC_RIG_RESULT_NOT_FOUND;
 
     if (root == NULL || root_capacity == 0U) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
@@ -116,24 +123,55 @@ music_rig_result music_rig_win32_soundfont_root_resolve(
             profile_root, L"Insync") ||
         !append_path(direct_root, sizeof(direct_root) / sizeof(direct_root[0]),
             profile_root, L"Flash\\PED\\MIDI\\Pack de Timbres\\Library")) {
-        status = E_INVALIDARG;
+        result = MUSIC_RIG_RESULT_BUFFER_TOO_SMALL;
         goto cleanup;
     }
     if (directory_exists(direct_root)) {
-        found = copy_path(root, root_capacity, direct_root);
+        result = copy_path(root, root_capacity, direct_root)
+            ? MUSIC_RIG_RESULT_OK : MUSIC_RIG_RESULT_BUFFER_TOO_SMALL;
     } else if (directory_exists(insync_root)) {
-        found = find_account_root(insync_root, root, root_capacity);
+        result = find_account_root(insync_root, root, root_capacity);
     }
-    status = found ? S_OK : HRESULT_FROM_WIN32(ERROR_PATH_NOT_FOUND);
 
 cleanup:
     if (known_profile != NULL) {
         CoTaskMemFree(known_profile);
     }
-    if (status == E_INVALIDARG) {
-        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    return result;
+}
+
+static bool has_parent_segment(const wchar_t *path)
+{
+    const wchar_t *segment = path;
+    const wchar_t *cursor;
+
+    for (cursor = path;; ++cursor) {
+        if (*cursor == L'\\' || *cursor == L'/' || *cursor == L'\0') {
+            size_t length = (size_t)(cursor - segment);
+
+            while (length > 0U && segment[length - 1U] == L' ') {
+                length -= 1U;
+            }
+            if (length == 2U && segment[0] == L'.' &&
+                segment[1] == L'.') {
+                return true;
+            }
+            while (length > 0U && segment[length - 1U] == L'.') {
+                length -= 1U;
+            }
+            while (length > 0U && segment[length - 1U] == L' ') {
+                length -= 1U;
+            }
+            if (length == 2U && segment[0] == L'.' &&
+                segment[1] == L'.') {
+                return true;
+            }
+            if (*cursor == L'\0') {
+                return false;
+            }
+            segment = cursor + 1;
+        }
     }
-    return found ? MUSIC_RIG_RESULT_OK : MUSIC_RIG_RESULT_NOT_FOUND;
 }
 
 music_rig_result music_rig_win32_soundfont_path_join(
@@ -147,9 +185,11 @@ music_rig_result music_rig_win32_soundfont_path_join(
         root[0] == L'\0' || relative_path[0] == L'\0' ||
         relative_path[0] == L'\\' || relative_path[0] == L'/' ||
         wcschr(relative_path, L':') != NULL ||
-        wcsstr(relative_path, L"..") != NULL ||
-        !append_path(output, output_capacity, root, relative_path)) {
+        has_parent_segment(relative_path)) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
+    }
+    if (!append_path(output, output_capacity, root, relative_path)) {
+        return MUSIC_RIG_RESULT_BUFFER_TOO_SMALL;
     }
     return MUSIC_RIG_RESULT_OK;
 }

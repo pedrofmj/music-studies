@@ -1,7 +1,6 @@
 #include "music_rig/arturia_carla_host.h"
 
 #include <stddef.h>
-#include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -10,7 +9,9 @@
 typedef struct fake_carla {
     size_t opens;
     size_t closes;
+    size_t idles;
     size_t finds;
+    size_t midi_connections;
     size_t activates;
     size_t deactivates;
     size_t volumes;
@@ -20,8 +21,12 @@ typedef struct fake_carla {
     size_t pitches;
     size_t master_volume;
     size_t master_mute;
+    size_t connections_this_open;
+    size_t deactivations_this_open;
     uint16_t last_patch;
     uint8_t last_value;
+    bool fail_midi_connection;
+    bool bad_startup_order;
 } fake_carla;
 
 static music_rig_result open_project(
@@ -35,6 +40,8 @@ static music_rig_result open_project(
         return MUSIC_RIG_RESULT_INVALID_DATA;
     }
     fake->opens += 1U;
+    fake->connections_this_open = 0U;
+    fake->deactivations_this_open = 0U;
     return MUSIC_RIG_RESULT_OK;
 }
 
@@ -44,17 +51,51 @@ static music_rig_result close_project(void *context)
     return MUSIC_RIG_RESULT_OK;
 }
 
+static void idle(void *context)
+{
+    ((fake_carla *)context)->idles += 1U;
+}
+
 static music_rig_result find_patch(void *context, const char *name, uint16_t *id)
 {
     fake_carla *fake = context;
+    const char *digits;
     unsigned int value = 0U;
 
-    if (sscanf(name, "patch-%u", &value) != 1 || value > UINT16_MAX || id == NULL) {
+    if (name == NULL || id == NULL || strncmp(name, "patch-", 6U) != 0) {
         return MUSIC_RIG_RESULT_NOT_FOUND;
+    }
+    digits = name + 6;
+    if (*digits == '\0') {
+        return MUSIC_RIG_RESULT_NOT_FOUND;
+    }
+    while (*digits != '\0') {
+        unsigned int digit;
+
+        if (*digits < '0' || *digits > '9') {
+            return MUSIC_RIG_RESULT_NOT_FOUND;
+        }
+        digit = (unsigned int)(*digits - '0');
+        if (value > ((unsigned int)UINT16_MAX - digit) / 10U) {
+            return MUSIC_RIG_RESULT_NOT_FOUND;
+        }
+        value = value * 10U + digit;
+        digits += 1;
     }
     fake->finds += 1U;
     *id = (uint16_t)value;
     return MUSIC_RIG_RESULT_OK;
+}
+
+static music_rig_result connect_midi_input(void *context, uint16_t id)
+{
+    fake_carla *fake = context;
+
+    fake->midi_connections += 1U;
+    fake->connections_this_open += 1U;
+    fake->last_patch = id;
+    return fake->fail_midi_connection
+        ? MUSIC_RIG_RESULT_ADAPTER_FAILURE : MUSIC_RIG_RESULT_OK;
 }
 
 static music_rig_result patch_call(
@@ -70,10 +111,20 @@ static music_rig_result patch_call(
 }
 
 static music_rig_result activate(void *c, uint16_t p) {
-    return patch_call(c, p, 0U, &((fake_carla *)c)->activates);
+    fake_carla *fake = c;
+    if (fake->deactivations_this_open < 4U ||
+        fake->connections_this_open < 4U) {
+        fake->bad_startup_order = true;
+    }
+    return patch_call(c, p, 0U, &fake->activates);
 }
 static music_rig_result deactivate(void *c, uint16_t p) {
-    return patch_call(c, p, 0U, &((fake_carla *)c)->deactivates);
+    fake_carla *fake = c;
+    if (fake->connections_this_open < 4U) {
+        fake->bad_startup_order = true;
+    }
+    fake->deactivations_this_open += 1U;
+    return patch_call(c, p, 0U, &fake->deactivates);
 }
 static music_rig_result volume(void *c, uint16_t p, uint8_t v) {
     return patch_call(c, p, v, &((fake_carla *)c)->volumes);
@@ -118,17 +169,37 @@ int main(void)
     fake_carla fake = {0};
     music_rig_arturia_carla_host host;
     music_rig_arturia_carla_ops ops = {
-        open_project, close_project, find_patch, activate, deactivate,
-        volume, reverb, note, controller, pitch, master_volume, master_mute
+        open_project, close_project, idle, find_patch, connect_midi_input,
+        activate, deactivate, volume, reverb, note, controller, pitch,
+        master_volume, master_mute
     };
 
+    ops.idle = NULL;
+    CHECK(music_rig_arturia_carla_host_open(
+        &host, &ops, &fake, "shared.uproject", "wasapi", "music-rig",
+        patch_names, 4U, patch_indexes, 4U, organ, sizeof(organ), 100U
+    ) == MUSIC_RIG_RESULT_INVALID_ARGUMENT);
+    CHECK(fake.opens == 0U);
+    ops.idle = idle;
+    fake.fail_midi_connection = true;
+    CHECK(music_rig_arturia_carla_host_open(
+        &host, &ops, &fake, "shared.uproject", "wasapi", "music-rig",
+        patch_names, 4U, patch_indexes, 4U, organ, sizeof(organ), 100U
+    ) == MUSIC_RIG_RESULT_ADAPTER_FAILURE);
+    CHECK(fake.opens == 1U && fake.closes == 1U && fake.activates == 0U &&
+        fake.deactivates == 0U);
+    fake.fail_midi_connection = false;
     CHECK(music_rig_arturia_carla_host_open(
         &host, &ops, &fake, "shared.uproject", "wasapi", "music-rig",
         patch_names, 4U, patch_indexes, 4U, organ, sizeof(organ), 100U
     ) == MUSIC_RIG_RESULT_OK);
-    CHECK(fake.opens == 1U && fake.finds == 4U && fake.activates == 1U);
+    CHECK(fake.opens == 2U && fake.finds == 5U &&
+        fake.midi_connections == 5U && fake.deactivates == 4U &&
+        fake.activates == 1U && !fake.bad_startup_order);
+    CHECK(music_rig_arturia_carla_host_idle(&host) == MUSIC_RIG_RESULT_OK &&
+        fake.idles == 1U);
     CHECK(music_rig_arturia_carla_host_process_midi(&host, midi, sizeof(midi)) ==
-        MUSIC_RIG_RESULT_OK && fake.volumes == 1U && fake.last_patch == 10U);
+        MUSIC_RIG_RESULT_OK && fake.volumes == 1U && fake.last_patch == 13U);
     CHECK(music_rig_arturia_carla_host_select_profile(
         &host, patch_indexes, 4U, mode, sizeof(mode)
     ) == MUSIC_RIG_RESULT_OK);
@@ -137,6 +208,8 @@ int main(void)
     CHECK(music_rig_arturia_carla_host_process_midi(&host, midi, sizeof(midi)) ==
         MUSIC_RIG_RESULT_OK && fake.notes == 3U);
     CHECK(music_rig_arturia_carla_host_close(&host) == MUSIC_RIG_RESULT_OK);
-    CHECK(fake.closes == 1U);
+    CHECK(fake.closes == 2U);
+    CHECK(music_rig_arturia_carla_host_idle(&host) ==
+        MUSIC_RIG_RESULT_INVALID_STATE);
     return 0;
 }

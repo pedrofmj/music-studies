@@ -16,10 +16,16 @@ typedef struct music_rig_arturia_carla_ops {
         const char *client_name
     );
     music_rig_result (*close_project)(void *context);
+    void (*idle)(void *context);
     music_rig_result (*find_patch)(
         void *context,
         const char *patch_name,
         uint16_t *backend_patch_id
+    );
+    /* Routes raw controls/pitch while suppressing raw notes sent via send_note. */
+    music_rig_result (*connect_midi_input)(
+        void *context,
+        uint16_t backend_patch_id
     );
     music_rig_result (*activate_patch)(void *context, uint16_t backend_patch_id);
     music_rig_result (*deactivate_patch)(void *context, uint16_t backend_patch_id);
@@ -92,6 +98,11 @@ music_rig_result music_rig_arturia_carla_host_process_midi(
     music_rig_arturia_carla_host *host,
     const uint8_t *message,
     size_t message_size
+);
+
+/* Call regularly on the same serialized host thread as all other Carla ops. */
+music_rig_result music_rig_arturia_carla_host_idle(
+    music_rig_arturia_carla_host *host
 );
 
 music_rig_result music_rig_arturia_carla_host_close(

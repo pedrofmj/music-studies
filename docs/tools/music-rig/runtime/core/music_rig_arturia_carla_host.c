@@ -158,7 +158,8 @@ music_rig_result music_rig_arturia_carla_host_open(
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
     if (ops->open_project == NULL || ops->close_project == NULL ||
-        ops->find_patch == NULL) {
+        ops->idle == NULL || ops->find_patch == NULL ||
+        ops->connect_midi_input == NULL || ops->deactivate_patch == NULL) {
         return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
     memset(host, 0, sizeof(*host));
@@ -173,13 +174,29 @@ music_rig_result music_rig_arturia_carla_host_open(
     host->project_open = true;
     host->patch_count = patch_count;
     for (index = 0U; index < patch_count; ++index) {
-        if (patch_names[index] == NULL ||
-            host->ops.find_patch(
-                ops_context, patch_names[index], &host->backend_patch_ids[index]
-            ) != MUSIC_RIG_RESULT_OK) {
-            (void)host->ops.close_project(ops_context);
-            memset(host, 0, sizeof(*host));
-            return MUSIC_RIG_RESULT_NOT_FOUND;
+        if (patch_names[index] == NULL) {
+            result = MUSIC_RIG_RESULT_NOT_FOUND;
+            goto close_failed_open;
+        }
+        result = host->ops.find_patch(
+            ops_context, patch_names[index], &host->backend_patch_ids[index]
+        );
+        if (result != MUSIC_RIG_RESULT_OK) {
+            goto close_failed_open;
+        }
+        result = host->ops.connect_midi_input(
+            ops_context, host->backend_patch_ids[index]
+        );
+        if (result != MUSIC_RIG_RESULT_OK) {
+            goto close_failed_open;
+        }
+    }
+    for (index = 0U; index < patch_count; ++index) {
+        result = host->ops.deactivate_patch(
+            ops_context, host->backend_patch_ids[index]
+        );
+        if (result != MUSIC_RIG_RESULT_OK) {
+            goto close_failed_open;
         }
     }
     engine = session_ops();
@@ -194,9 +211,13 @@ music_rig_result music_rig_arturia_carla_host_open(
         initial_master_volume
     );
     if (result != MUSIC_RIG_RESULT_OK) {
-        (void)host->ops.close_project(ops_context);
-        memset(host, 0, sizeof(*host));
+        goto close_failed_open;
     }
+    return result;
+
+close_failed_open:
+    (void)host->ops.close_project(ops_context);
+    memset(host, 0, sizeof(*host));
     return result;
 }
 
@@ -210,6 +231,9 @@ music_rig_result music_rig_arturia_carla_host_select_profile(
 {
     if (!valid_host(host)) {
         return MUSIC_RIG_RESULT_INVALID_STATE;
+    }
+    if (catalog_patch_count != host->patch_count) {
+        return MUSIC_RIG_RESULT_INVALID_ARGUMENT;
     }
     return music_rig_arturia_session_select_profile(
         &host->session,
@@ -232,6 +256,17 @@ music_rig_result music_rig_arturia_carla_host_process_midi(
     return music_rig_arturia_session_process_midi(
         &host->session, message, message_size
     );
+}
+
+music_rig_result music_rig_arturia_carla_host_idle(
+    music_rig_arturia_carla_host *host
+)
+{
+    if (!valid_host(host)) {
+        return MUSIC_RIG_RESULT_INVALID_STATE;
+    }
+    host->ops.idle(host->ops_context);
+    return MUSIC_RIG_RESULT_OK;
 }
 
 music_rig_result music_rig_arturia_carla_host_close(

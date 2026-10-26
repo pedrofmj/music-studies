@@ -1,0 +1,22 @@
+EXPORTS
+    carla_standalone_host_init=_carla_standalone_host_init
+    carla_set_engine_callback=_carla_set_engine_callback
+    carla_set_engine_option=_carla_set_engine_option
+    carla_engine_init=_carla_engine_init
+    carla_engine_close=_carla_engine_close
+    carla_engine_idle=_carla_engine_idle
+    carla_load_project=_carla_load_project
+    carla_get_current_plugin_count=_carla_get_current_plugin_count
+    carla_get_plugin_info=_carla_get_plugin_info
+    carla_get_parameter_count=_carla_get_parameter_count
+    carla_get_parameter_info=_carla_get_parameter_info
+    carla_get_parameter_ranges=_carla_get_parameter_ranges
+    carla_set_active=_carla_set_active
+    carla_set_volume=_carla_set_volume
+    carla_set_parameter_value=_carla_set_parameter_value
+    carla_set_option=_carla_set_option
+    carla_send_midi_note=_carla_send_midi_note
+    carla_patchbay_refresh=_carla_patchbay_refresh
+    carla_patchbay_connect=_carla_patchbay_connect
+    carla_get_last_error=_carla_get_last_error
+    music_rig_win32_carla_fake_get_status=_music_rig_win32_carla_fake_get_status
