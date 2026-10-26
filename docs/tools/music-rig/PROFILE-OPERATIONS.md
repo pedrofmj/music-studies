@@ -10,8 +10,14 @@ state directly.
 Profiles are versioned `.env` files in `runtime-profiles/`. Install them on the
 performance host under `~/.config/music-rig/profiles/`.
 
-The currently validated simultaneous genre profile is `validated-4-5`. Genres
-6-10 are validated individually and should not be combined without a separate
+The legacy per-genre Carla prewarm configuration has separately validated
+resource limits: `validated-4-5` is the validated simultaneous pair, while
+genres 6-10 were validated individually. The current Landstar selector uses the
+shared-SF2 engine, which loads the common catalog once and ignores
+`MUSIC_RIG_FAST_GENRES`; `validated-to-6` therefore does not start three genre
+engines. In shared-SF2 mode, profile apply readiness is the
+`shared-sf2-enabled` event covering the configured genre IDs. Without the
+shared-SF2 engine, do not combine legacy prewarmed genres without a separate
 resource test.
 
 ```bash

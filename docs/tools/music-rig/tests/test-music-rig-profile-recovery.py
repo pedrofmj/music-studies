@@ -5,7 +5,9 @@ from __future__ import annotations
 
 from importlib.machinery import SourceFileLoader
 from importlib.util import module_from_spec, spec_from_loader
+import json
 import sys
+import tempfile
 import time
 import unittest
 from pathlib import Path
@@ -148,6 +150,207 @@ class RecoveryTest(unittest.TestCase):
 
         self.assertEqual(audio, result["audio"])
         self.assertEqual("routes-repaired", result["status"])
+
+    def test_repair_project_connections_resolves_namespaced_carla_ports(self):
+        cli = self.cli
+        with tempfile.TemporaryDirectory() as directory:
+            project = Path(directory) / "pedro.uproject"
+            project.write_text("<CARLA><ExternalPatchbay /></CARLA>", encoding="utf-8")
+            outputs = []
+            inputs = []
+            for source, target in cli.SHARED_AUDIO_LINKS:
+                outputs.append(
+                    source if source.startswith("Arturia Main Volume Encoder:")
+                    else "Carla.374/" + source
+                )
+                inputs.append(
+                    target if target.startswith("Arturia Main Volume Encoder:")
+                    else "Carla.374/" + target
+                )
+            with patch.object(cli, "protected_project_path", return_value=project), \
+                    patch.object(cli, "pipewire_output_ports",
+                                 return_value="\n".join(outputs)), \
+                    patch.object(cli, "pipewire_input_ports",
+                                 return_value="\n".join(inputs)), \
+                    patch.object(cli, "ensure_link", return_value="restored") as ensure_link:
+                result = cli.repair_project_connections(time.monotonic() + 5)
+
+        expected_audio_return = (
+            "SMC-MIX - 8-Band EQ:Output L -> Arturia Main Volume Encoder:audio-in-l"
+        )
+        self.assertEqual(len(cli.SHARED_AUDIO_LINKS), len(result["links"]))
+        self.assertEqual("restored", result["links"][expected_audio_return])
+        self.assertEqual([], result["unresolved"])
+        self.assertEqual(len(cli.SHARED_AUDIO_LINKS), ensure_link.call_count)
+
+    def test_apply_profile_reports_fast_mode_fallback_and_restores_previous_profile(self):
+        cli = self.cli
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            environment_file = root / "profile.env"
+            previous_file = root / "profile.env.previous"
+            event_log = root / "transition-events.jsonl"
+            profile_file = root / "validated-to-6.env"
+            previous_contents = "MUSIC_RIG_TRANSITION_MODE=safe\n"
+            profile_contents = (
+                "MUSIC_RIG_TRANSITION_MODE=fast\n"
+                "MUSIC_RIG_FAST_GENRES=worship-piano,gospel-keys,ambient-worship\n"
+            )
+            environment_file.write_text(previous_contents, encoding="utf-8")
+            profile_file.write_text(profile_contents, encoding="utf-8")
+            restart_count = 0
+
+            def restart_with_fallback_event():
+                nonlocal restart_count
+                restart_count += 1
+                if restart_count == 1:
+                    events = (
+                        {"event": "session-start", "pid": 42},
+                        {"event": "fast-mode-fallback", "pid": 42,
+                         "error": "warmed genre endpoints exceeded the resource limit"},
+                    )
+                    event_log.write_text(
+                        "".join(json.dumps(event) + "\n" for event in events),
+                        encoding="utf-8",
+                    )
+
+            with patch.object(cli, "ENV_FILE", environment_file), \
+                    patch.object(cli, "PREVIOUS_ENV_FILE", previous_file), \
+                    patch.object(cli, "EVENT_LOG", event_log), \
+                    patch.object(cli, "profiles", return_value={
+                        "validated-to-6": profile_file
+                    }), \
+                    patch.object(cli, "service_state", return_value="active"), \
+                    patch.object(cli, "restart_selector",
+                                 side_effect=restart_with_fallback_event), \
+                    patch.object(cli.time, "sleep"):
+                with self.assertRaisesRegex(
+                        RuntimeError,
+                        "fast-mode-fallback: warmed genre endpoints exceeded the resource limit"):
+                    cli.apply_profile("validated-to-6")
+
+            self.assertEqual(previous_contents,
+                             environment_file.read_text(encoding="utf-8"))
+            self.assertEqual(2, restart_count)
+
+    def test_apply_profile_accepts_matching_warm_genre_event(self):
+        cli = self.cli
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            environment_file = root / "profile.env"
+            previous_file = root / "profile.env.previous"
+            event_log = root / "transition-events.jsonl"
+            profile_file = root / "validated-single.env"
+            profile_contents = (
+                "MUSIC_RIG_TRANSITION_MODE=fast\n"
+                "MUSIC_RIG_FAST_GENRES=worship-piano\n"
+            )
+            profile_file.write_text(profile_contents, encoding="utf-8")
+
+            def restart_with_ready_event():
+                events = (
+                    {"event": "session-start", "pid": 84},
+                    {"event": "fast-mode-enabled", "pid": 84,
+                     "warm_genres": ["worship-piano"]},
+                )
+                event_log.write_text(
+                    "".join(json.dumps(event) + "\n" for event in events),
+                    encoding="utf-8",
+                )
+
+            with patch.object(cli, "ENV_FILE", environment_file), \
+                    patch.object(cli, "PREVIOUS_ENV_FILE", previous_file), \
+                    patch.object(cli, "EVENT_LOG", event_log), \
+                    patch.object(cli, "profiles", return_value={
+                        "validated-single": profile_file
+                    }), \
+                    patch.object(cli, "service_state", return_value="active"), \
+                    patch.object(cli, "restart_selector",
+                                 side_effect=restart_with_ready_event), \
+                    patch.object(cli.time, "sleep"):
+                cli.apply_profile("validated-single")
+
+            self.assertEqual(profile_contents,
+                             environment_file.read_text(encoding="utf-8"))
+
+    def test_apply_profile_accepts_shared_sf2_coverage_for_requested_genres(self):
+        cli = self.cli
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            environment_file = root / "profile.env"
+            previous_file = root / "profile.env.previous"
+            event_log = root / "transition-events.jsonl"
+            profile_file = root / "validated-to-6.env"
+            profile_contents = (
+                "MUSIC_RIG_TRANSITION_MODE=fast\n"
+                "MUSIC_RIG_FAST_GENRES=worship-piano,gospel-keys,ambient-worship\n"
+            )
+            profile_file.write_text(profile_contents, encoding="utf-8")
+
+            def restart_with_shared_sf2_event():
+                events = (
+                    {"event": "session-start", "pid": 126},
+                    {"event": "shared-sf2-enabled", "pid": 126,
+                     "profiles": ["worship-piano", "gospel-keys", "ambient-worship",
+                                  "jazz-keys"]},
+                )
+                event_log.write_text(
+                    "".join(json.dumps(event) + "\n" for event in events),
+                    encoding="utf-8",
+                )
+
+            with patch.object(cli, "ENV_FILE", environment_file), \
+                    patch.object(cli, "PREVIOUS_ENV_FILE", previous_file), \
+                    patch.object(cli, "EVENT_LOG", event_log), \
+                    patch.object(cli, "profiles", return_value={
+                        "validated-to-6": profile_file
+                    }), \
+                    patch.object(cli, "service_state", return_value="active"), \
+                    patch.object(cli, "restart_selector",
+                                 side_effect=restart_with_shared_sf2_event), \
+                    patch.object(cli.time, "sleep"):
+                cli.apply_profile("validated-to-6")
+
+            self.assertEqual(profile_contents,
+                             environment_file.read_text(encoding="utf-8"))
+
+    def test_apply_profile_ignores_previous_session_shutdown_event(self):
+        cli = self.cli
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            environment_file = root / "profile.env"
+            previous_file = root / "profile.env.previous"
+            event_log = root / "transition-events.jsonl"
+            profile_file = root / "validated-to-6.env"
+            profile_contents = (
+                "MUSIC_RIG_TRANSITION_MODE=fast\n"
+                "MUSIC_RIG_FAST_GENRES=worship-piano,gospel-keys,ambient-worship\n"
+            )
+            profile_file.write_text(profile_contents, encoding="utf-8")
+            event_reads = [
+                [{"event": "session-error", "pid": 40, "error": ""}],
+                [
+                    {"event": "session-error", "pid": 40, "error": ""},
+                    {"event": "session-start", "pid": 41},
+                    {"event": "shared-sf2-enabled", "pid": 41,
+                     "profiles": ["worship-piano", "gospel-keys", "ambient-worship"]},
+                ],
+            ]
+
+            with patch.object(cli, "ENV_FILE", environment_file), \
+                    patch.object(cli, "PREVIOUS_ENV_FILE", previous_file), \
+                    patch.object(cli, "EVENT_LOG", event_log), \
+                    patch.object(cli, "profiles", return_value={
+                        "validated-to-6": profile_file
+                    }), \
+                    patch.object(cli, "service_state", return_value="active"), \
+                    patch.object(cli, "restart_selector"), \
+                    patch.object(cli, "events_after", side_effect=event_reads), \
+                    patch.object(cli.time, "sleep"):
+                cli.apply_profile("validated-to-6")
+
+            self.assertEqual(profile_contents,
+                             environment_file.read_text(encoding="utf-8"))
 
     def test_power_commands_dry_run_without_stopping_or_starting(self):
         cli = self.cli

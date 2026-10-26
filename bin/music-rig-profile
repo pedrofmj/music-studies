@@ -89,7 +89,8 @@ def profiles() -> dict[str, Path]:
     return {path.stem: path for path in sorted(profile_dir().glob("*.env"))}
 
 
-def read_env(path: Path = ENV_FILE) -> str:
+def read_env(path: Path | None = None) -> str:
+    path = path or ENV_FILE
     return path.read_text(encoding="utf-8") if path.exists() else ""
 
 
@@ -362,7 +363,9 @@ def repair_project_connections(deadline: float) -> dict[str, object]:
         except RuntimeError as error:
             unresolved.append(str(error))
     for source, target in SHARED_AUDIO_LINKS:
-        if source in outputs and target in inputs:
+        source_present = any(port_matches(actual, source) for actual in outputs)
+        target_present = any(port_matches(actual, target) for actual in inputs)
+        if source_present and target_present:
             try:
                 restored[f"{source} -> {target}"] = ensure_link(source, target, deadline)
             except RuntimeError as error:
@@ -483,6 +486,34 @@ def latest_events(limit: int = 12) -> list[dict[str, object]]:
     return entries
 
 
+def event_log_size() -> int:
+    try:
+        return EVENT_LOG.stat().st_size
+    except OSError:
+        return 0
+
+
+def events_after(offset: int) -> list[dict[str, object]]:
+    if not EVENT_LOG.exists():
+        return []
+    try:
+        with EVENT_LOG.open("rb") as stream:
+            size = EVENT_LOG.stat().st_size
+            stream.seek(offset if size >= offset else 0)
+            lines = stream.read().decode("utf-8", errors="replace").splitlines()
+    except OSError:
+        return []
+    entries: list[dict[str, object]] = []
+    for line in lines:
+        try:
+            entry = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(entry, dict):
+            entries.append(entry)
+    return entries
+
+
 def status() -> dict[str, object]:
     return {
         "profile_dir": str(profile_dir()),
@@ -502,6 +533,7 @@ def apply_profile(name: str) -> None:
     available = profiles()
     if name not in available:
         raise RuntimeError(f"unknown profile {name!r}; available: {', '.join(sorted(available))}")
+    had_previous_file = ENV_FILE.exists()
     previous = read_env()
     if previous:
         PREVIOUS_ENV_FILE.write_text(previous, encoding="utf-8")
@@ -512,25 +544,80 @@ def apply_profile(name: str) -> None:
          if line.startswith("MUSIC_RIG_FAST_GENRES=")),
         [],
     )
+    event_offset = event_log_size()
     write_env(contents)
     restart_selector()
     deadline = time.monotonic() + 90
+    failure_detail = ""
+    last_selector_state = "unknown"
     while time.monotonic() < deadline:
-        if service_state(SELECTOR) == "active":
-            events = latest_events(3)
-            warm_events = [event for event in events
+        last_selector_state = service_state(SELECTOR)
+        events = events_after(event_offset)
+        session_starts = [event for event in events if event.get("event") == "session-start"]
+        selector_pid = session_starts[-1].get("pid") if session_starts else None
+        selector_events = (
+            [event for event in events if event.get("pid") == selector_pid]
+            if selector_pid is not None else []
+        )
+        fallbacks = [event for event in selector_events
+                     if event.get("event") in {
+                         "fast-mode-fallback", "shared-sf2-fallback", "session-error"
+                     }]
+        if fallbacks:
+            event = fallbacks[-1]
+            reason = str(event.get("error") or "no reason was recorded")[:300]
+            failure_detail = (
+                f"; selector reported {event.get('event')}: {reason}"
+            )
+            break
+        if last_selector_state == "active":
+            warm_events = [event for event in selector_events
                            if event.get("event") == "fast-mode-enabled"]
+            shared_sf2_events = [event for event in selector_events
+                                  if event.get("event") == "shared-sf2-enabled"]
             if expected_genres:
-                if any(set(event.get("warm_genres", [])) == set(expected_genres)
-                       for event in warm_events):
+                warmed = any(set(event.get("warm_genres", [])) == set(expected_genres)
+                             for event in warm_events)
+                shared = any(
+                    isinstance(event.get("profiles"), list) and
+                    set(expected_genres).issubset(event["profiles"])
+                    for event in shared_sf2_events
+                )
+                if warmed or shared:
                     return
-            elif warm_events:
+            elif warm_events or shared_sf2_events:
                 return
         time.sleep(1)
-    if previous:
-        write_env(previous)
-        restart_selector()
-    raise RuntimeError(f"profile {name!r} did not become ready; previous profile restored")
+    if had_previous_file:
+        try:
+            if previous:
+                write_env(previous)
+            else:
+                ENV_FILE.unlink(missing_ok=True)
+            restart_selector()
+            rollback_status = (
+                "previous profile restored" if previous else
+                "previous empty profile restored"
+            )
+        except Exception as failure:
+            rollback_status = f"previous profile rollback failed: {failure}"
+    else:
+        try:
+            ENV_FILE.unlink(missing_ok=True)
+            restart_selector()
+            rollback_status = "failed profile selection removed; selector restarted without an override"
+        except Exception as failure:
+            rollback_status = f"failed profile selection could not be rolled back: {failure}"
+    if not failure_detail:
+        recent_events = ", ".join(
+            str(event.get("event")) for event in selector_events[-4:]
+        ) or "none"
+        failure_detail = (
+            f"; selector state={last_selector_state}, recent events={recent_events}"
+        )
+    raise RuntimeError(
+        f"profile {name!r} did not become ready; {rollback_status}{failure_detail}"
+    )
 
 
 def rollback() -> None:
