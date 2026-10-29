@@ -31,6 +31,9 @@ KEYLAB_DISCOVERY_TIMEOUT_SECONDS = 60.0
 LSP_LEFT = "LSP Mixer x8 Stereo:Input L"
 LSP_RIGHT = "LSP Mixer x8 Stereo:Input R"
 MIDI_GUARD_INTERVAL_SECONDS = 0.5
+SMK25_MIDI_GUARD_INTERVAL_SECONDS = 2.0
+SMK25_MIDI_ALIAS = "SMK25-Master"
+SMK25_MIDI_INPUT = "SMK25 Pad Layers:midi-in"
 GENRE_PORT_REGISTRATION_TIMEOUT_SECONDS = 60.0
 DEFAULT_PIPEWIRE_QUANTUM = "1024"
 GENRE_PIPEWIRE_QUANTUM = "2048"
@@ -607,6 +610,29 @@ def connect(source: str, target: str, environment: dict[str, str]) -> None:
     raise RuntimeError(f"failed to link {source} -> {target}: {last_error}")
 
 
+def ensure_smk25_midi_route(environment: dict[str, str]) -> str | None:
+    source_result = run(["pw-link", "-o"], environment)
+    if source_result.returncode != 0:
+        raise RuntimeError(source_result.stdout or "could not enumerate MIDI outputs")
+    source = next((
+        line.strip() for line in source_result.stdout.splitlines()
+        if SMK25_MIDI_ALIAS in line and "capture_1" in line
+    ), None)
+    target = SMK25_MIDI_INPUT
+    if source is None:
+        return None
+
+    target_result = run(["pw-link", "-i"], environment)
+    if target_result.returncode != 0:
+        raise RuntimeError(target_result.stdout or "could not enumerate MIDI inputs")
+    if not port_present(target_result.stdout, target):
+        return None
+    if link_present(links(environment), source, target):
+        return None
+    connect(source, target, environment)
+    return source
+
+
 def connect_many(connections: tuple[tuple[str, str], ...], environment: dict[str, str],
                  strict: bool = True) -> list[tuple[str, str]]:
     if not connections:
@@ -817,6 +843,8 @@ def main() -> int:
     stop_requested = False
     error: str | None = None
     last_midi_guard = 0.0
+    last_smk25_midi_guard = 0.0
+    last_smk25_route_error = ""
     genre_quantum_changed = False
     # Early port preflight failures must still run the normal cleanup path.
     stop_warm_engines = lambda: None
@@ -1704,6 +1732,27 @@ def main() -> int:
                 if not link_present(links(environment), keylab, ROUTER_INPUT):
                     run(["pw-link", keylab, ROUTER_INPUT], environment)
                 last_midi_guard = now
+            if now - last_smk25_midi_guard >= SMK25_MIDI_GUARD_INTERVAL_SECONDS:
+                try:
+                    source = ensure_smk25_midi_route(environment)
+                    if source is not None:
+                        diagnostic_event(
+                            diagnostic_log,
+                            "smk25-midi-route-restored",
+                            source=source,
+                            target=SMK25_MIDI_INPUT,
+                        )
+                    last_smk25_route_error = ""
+                except (OSError, RuntimeError) as failure:
+                    route_error = str(failure)
+                    if route_error != last_smk25_route_error:
+                        diagnostic_event(
+                            diagnostic_log,
+                            "smk25-midi-route-repair-failed",
+                            error=route_error,
+                        )
+                    last_smk25_route_error = route_error
+                last_smk25_midi_guard = now
             if audio_touched:
                 for index, (source, target) in enumerate(ARTURIA_AUDIO):
                     if index // 2 + 1 not in active_arturia_layers:
