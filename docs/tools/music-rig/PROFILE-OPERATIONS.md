@@ -48,10 +48,11 @@ shared USB product ID is not used to distinguish them. The command waits up to
 restarts the selector or removes existing links; if its router ports are absent,
 it reports the selector state instead.
 
-While the selector is running, its MIDI guard also re-discovers the KeyLab and
-SMK-25 `capture_1` ports after USB re-enumeration and restores their input links.
-The standalone SMK-25 layer service owns the routing transform, but does not
-watch the USB source port itself.
+While the selector is running, its MIDI guards re-discover the KeyLab and all
+independent SINCO `capture_1` ports (SMC-Mixer, SMC-PAD, SMC-PAD Pocket, and
+SMK-25) after USB re-enumeration and restore missing input links. The standalone
+SMK-25 layer service owns the routing transform, but does not watch its USB
+source port itself.
 
 `repair-audio` restores the performance-rig output from `Arturia Main Volume
 Encoder` to the selected Echora audio sink. For the analog stereo sink it also

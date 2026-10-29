@@ -1401,12 +1401,12 @@ if(BUILD_TESTING)
     )
     set_tests_properties(music_rig_profile_recovery PROPERTIES TIMEOUT 10)
     add_test(
-        NAME music_rig_smk25_hotplug_recovery
+        NAME music_rig_independent_device_hotplug_recovery
         COMMAND "${Python3_EXECUTABLE}"
-            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-smk25-hotplug-recovery.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test-independent-device-hotplug-recovery.py"
             "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/run-s2-arturia-pad-switch.py"
     )
-    set_tests_properties(music_rig_smk25_hotplug_recovery PROPERTIES TIMEOUT 10)
+    set_tests_properties(music_rig_independent_device_hotplug_recovery PROPERTIES TIMEOUT 10)
     set(MUSIC_RIG_PROFILE_SCHEMA_VALIDATOR
         "${CMAKE_CURRENT_SOURCE_DIR}/validate-performance-rig.py"
     )

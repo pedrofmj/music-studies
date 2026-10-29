@@ -31,9 +31,7 @@ KEYLAB_DISCOVERY_TIMEOUT_SECONDS = 60.0
 LSP_LEFT = "LSP Mixer x8 Stereo:Input L"
 LSP_RIGHT = "LSP Mixer x8 Stereo:Input R"
 MIDI_GUARD_INTERVAL_SECONDS = 0.5
-SMK25_MIDI_GUARD_INTERVAL_SECONDS = 2.0
-SMK25_MIDI_ALIAS = "SMK25-Master"
-SMK25_MIDI_INPUT = "SMK25 Pad Layers:midi-in"
+INDEPENDENT_DEVICE_MIDI_GUARD_INTERVAL_SECONDS = 2.0
 GENRE_PORT_REGISTRATION_TIMEOUT_SECONDS = 60.0
 DEFAULT_PIPEWIRE_QUANTUM = "1024"
 GENRE_PIPEWIRE_QUANTUM = "2048"
@@ -127,6 +125,23 @@ FAST_ENGINE_PROFILES = {
         "setBfree:out_left",
         "setBfree:out_right",
     ),
+}
+INDEPENDENT_DEVICE_MIDI_TARGETS = {
+    "SMC-Mixer-Master": tuple(
+        f"SMC-EQ-{channel} CC Scale:events-in" for channel in range(1, 9)
+    ),
+    "SMC-PAD-Master": (
+        "PD Controls - Sustain Scale:events-in",
+        "PD-CH-1 - Drum Set:events-in",
+        "PD-CH-1 Volume Map:events-in",
+        "PD-CH-1 Gain Map:events-in",
+    ),
+    "SMC-PAD Pocket-Master": (
+        "PD-CH-1 - Drum Set:events-in",
+        "PD Controls - Sustain Scale:events-in",
+        "PD-CH-1 Gain Map:events-in",
+    ),
+    "SMK25-Master": ("SMK25 Pad Layers:midi-in",),
 }
 
 
@@ -610,27 +625,45 @@ def connect(source: str, target: str, environment: dict[str, str]) -> None:
     raise RuntimeError(f"failed to link {source} -> {target}: {last_error}")
 
 
-def ensure_smk25_midi_route(environment: dict[str, str]) -> str | None:
+def ensure_independent_device_midi_routes(
+    environment: dict[str, str],
+) -> list[tuple[str, str, str]]:
     source_result = run(["pw-link", "-o"], environment)
     if source_result.returncode != 0:
         raise RuntimeError(source_result.stdout or "could not enumerate MIDI outputs")
-    source = next((
-        line.strip() for line in source_result.stdout.splitlines()
-        if SMK25_MIDI_ALIAS in line and "capture_1" in line
-    ), None)
-    target = SMK25_MIDI_INPUT
-    if source is None:
-        return None
+    sources = {
+        alias: next((
+            line.strip() for line in source_result.stdout.splitlines()
+            if alias in line and "capture_1" in line
+        ), None)
+        for alias in INDEPENDENT_DEVICE_MIDI_TARGETS
+    }
+    if not any(sources.values()):
+        return []
 
     target_result = run(["pw-link", "-i"], environment)
     if target_result.returncode != 0:
         raise RuntimeError(target_result.stdout or "could not enumerate MIDI inputs")
-    if not port_present(target_result.stdout, target):
-        return None
-    if link_present(links(environment), source, target):
-        return None
-    connect(source, target, environment)
-    return source
+    inputs = target_result.stdout
+    routes = [
+        (alias, source, target)
+        for alias, targets in INDEPENDENT_DEVICE_MIDI_TARGETS.items()
+        if (source := sources[alias]) is not None
+        for target in targets
+        if port_present(inputs, target)
+    ]
+    if not routes:
+        return []
+
+    snapshot = links(environment)
+    restored: list[tuple[str, str, str]] = []
+    for alias, source, target in routes:
+        if link_present(snapshot, source, target):
+            continue
+        connect(source, target, environment)
+        restored.append((alias, source, target))
+        snapshot = links(environment)
+    return restored
 
 
 def connect_many(connections: tuple[tuple[str, str], ...], environment: dict[str, str],
@@ -843,8 +876,8 @@ def main() -> int:
     stop_requested = False
     error: str | None = None
     last_midi_guard = 0.0
-    last_smk25_midi_guard = 0.0
-    last_smk25_route_error = ""
+    last_independent_device_midi_guard = 0.0
+    last_independent_device_route_error = ""
     genre_quantum_changed = False
     # Early port preflight failures must still run the normal cleanup path.
     stop_warm_engines = lambda: None
@@ -1400,29 +1433,7 @@ def main() -> int:
             current = "full-live-rack"
 
         def restore_fast_independent_device_routes() -> None:
-            outputs = run(["pw-link", "-o"], environment).stdout.splitlines()
-            inputs = run(["pw-link", "-i"], environment).stdout
-            targets = {
-                "SMC-Mixer-Master": tuple(
-                    f"SMC-EQ-{channel} CC Scale:events-in" for channel in range(1, 9)
-                ),
-                "SMC-PAD-Master": (
-                    "PD Controls - Sustain Scale:events-in",
-                    "PD-CH-1 - Drum Set:events-in",
-                    "PD-CH-1 Volume Map:events-in",
-                    "PD-CH-1 Gain Map:events-in",
-                ),
-                "SMC-PAD Pocket-Master": ("PD-CH-1 - Drum Set:events-in",),
-                "SMK25-Master": ("SMK25 Pad Layers:midi-in",),
-            }
-            for alias, destinations in targets.items():
-                source = next((line.strip() for line in outputs
-                               if alias in line and "capture_1" in line), None)
-                if source is None:
-                    continue
-                for destination in destinations:
-                    if destination in inputs:
-                        connect(source, destination, environment)
+            ensure_independent_device_midi_routes(environment)
 
         def switch_shared_sf2_profile(profile: str) -> None:
             nonlocal current, audio_touched, active_arturia_layers
@@ -1732,27 +1743,30 @@ def main() -> int:
                 if not link_present(links(environment), keylab, ROUTER_INPUT):
                     run(["pw-link", keylab, ROUTER_INPUT], environment)
                 last_midi_guard = now
-            if now - last_smk25_midi_guard >= SMK25_MIDI_GUARD_INTERVAL_SECONDS:
+            if now - last_independent_device_midi_guard >= \
+                    INDEPENDENT_DEVICE_MIDI_GUARD_INTERVAL_SECONDS:
                 try:
-                    source = ensure_smk25_midi_route(environment)
-                    if source is not None:
+                    restored = ensure_independent_device_midi_routes(environment)
+                    if restored:
                         diagnostic_event(
                             diagnostic_log,
-                            "smk25-midi-route-restored",
-                            source=source,
-                            target=SMK25_MIDI_INPUT,
+                            "independent-midi-routes-restored",
+                            links=[
+                                {"device": alias, "source": source, "target": target}
+                                for alias, source, target in restored
+                            ],
                         )
-                    last_smk25_route_error = ""
+                    last_independent_device_route_error = ""
                 except (OSError, RuntimeError) as failure:
                     route_error = str(failure)
-                    if route_error != last_smk25_route_error:
+                    if route_error != last_independent_device_route_error:
                         diagnostic_event(
                             diagnostic_log,
-                            "smk25-midi-route-repair-failed",
+                            "independent-midi-route-repair-failed",
                             error=route_error,
                         )
-                    last_smk25_route_error = route_error
-                last_smk25_midi_guard = now
+                    last_independent_device_route_error = route_error
+                last_independent_device_midi_guard = now
             if audio_touched:
                 for index, (source, target) in enumerate(ARTURIA_AUDIO):
                     if index // 2 + 1 not in active_arturia_layers:
