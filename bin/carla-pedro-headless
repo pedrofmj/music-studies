@@ -37,6 +37,41 @@ headless_carla_running() {
     pgrep -f -- "^/usr/bin/python3 /app/share/carla/carla .*--osc-gui=${OSC_PORT} " >/dev/null 2>&1
 }
 
+matching_headless_carla_pid() {
+    local line pid command project_path
+    while IFS= read -r line; do
+        pid=${line%% *}
+        command=${line#* }
+        [[ $command == *"--osc-gui=${OSC_PORT} "* ]] || continue
+        project_path=${command#*"--osc-gui=${OSC_PORT} "}
+        project_path=${project_path%% *}
+        [[ -r $project_path ]] || continue
+        if cmp -s -- "$PROJECT" "$project_path"; then
+            printf '%s\n' "$pid"
+            return 0
+        fi
+    done < <(pgrep -af -- "^/usr/bin/python3 /app/share/carla/carla .*--osc-gui=${OSC_PORT} " || true)
+    return 1
+}
+
+resolve_port() {
+    local direction=$1 expected=$2 actual
+    while IFS= read -r actual; do
+        if [[ $actual == "$expected" || $actual == */"$expected" ]]; then
+            printf '%s\n' "$actual"
+            return 0
+        fi
+    done < <(pw-link "$direction")
+    return 1
+}
+
+connect_ports() {
+    local source target
+    source=$(resolve_port -o "$1") || return 1
+    target=$(resolve_port -i "$2") || return 1
+    timeout 3s pw-link "$source" "$target" >/dev/null 2>&1
+}
+
 if [[ ! -r $PROJECT ]]; then
     printf 'Carla project is not readable: %s\n' "$PROJECT" >&2
     exit 1
@@ -45,53 +80,62 @@ if [[ ! -d $SOUNDFONT_WORKDIR ]]; then
     printf 'Carla SoundFont directory is missing: %s\n' "$SOUNDFONT_WORKDIR" >&2
     exit 1
 fi
-if headless_carla_running; then
-    printf '%s\n' 'A Carla process is already running; stop the GUI rack before starting headless Carla.' >&2
-    exit 1
-fi
-
-flatpak run --cwd="$SOUNDFONT_WORKDIR" --file-forwarding "$APP_ID" \
-    --no-gui "--osc-gui=${OSC_PORT}" @@ "$PROJECT" @@ &
-launcher_pid=$!
+launcher_pid=""
+owns_backend=0
 
 stop() {
-    kill "$launcher_pid" >/dev/null 2>&1 || true
     if [[ -n ${link_restore_pid:-} ]]; then
         kill "$link_restore_pid" >/dev/null 2>&1 || true
     fi
-    flatpak kill "$APP_ID" >/dev/null 2>&1 || true
+    if [[ $owns_backend == 1 ]]; then
+        kill "$launcher_pid" >/dev/null 2>&1 || true
+        flatpak kill "$APP_ID" >/dev/null 2>&1 || true
+    fi
     exit 143
 }
 trap stop TERM INT
 
-for _ in {1..120}; do
-    if headless_carla_running; then
-        break
-    fi
-    if ! kill -0 "$launcher_pid" >/dev/null 2>&1; then
-        printf '%s\n' 'Carla launcher exited before the backend registered.' >&2
+if headless_carla_running; then
+    if ! backend_pid=$(matching_headless_carla_pid); then
+        printf '%s\n' 'A different Carla project is already using the configured OSC port.' >&2
         exit 1
     fi
-    sleep 0.25
-done
+    printf 'Adopting existing Carla backend PID %s for %s.\n' "$backend_pid" "$PROJECT" >&2
+else
+    flatpak run --cwd="$SOUNDFONT_WORKDIR" --file-forwarding "$APP_ID" \
+        --no-gui "--osc-gui=${OSC_PORT}" @@ "$PROJECT" @@ &
+    launcher_pid=$!
+    owns_backend=1
 
-if ! headless_carla_running; then
-    printf '%s\n' 'Carla backend did not register within 30 seconds.' >&2
-    stop
+    for _ in {1..120}; do
+        if headless_carla_running; then
+            break
+        fi
+        if ! kill -0 "$launcher_pid" >/dev/null 2>&1; then
+            printf '%s\n' 'Carla launcher exited before the backend registered.' >&2
+            exit 1
+        fi
+        sleep 0.25
+    done
+
+    if ! headless_carla_running; then
+        printf '%s\n' 'Carla backend did not register within 30 seconds.' >&2
+        stop
+    fi
 fi
 
 restore_audio_links() {
     for _ in {1..24}; do
-        timeout 3s pw-link "SMC-MIX - 8-Band EQ:Output L" \
-            "Arturia Main Volume Encoder:audio-in-l" >/dev/null 2>&1 || true
-        timeout 3s pw-link "SMC-MIX - 8-Band EQ:Output R" \
-            "Arturia Main Volume Encoder:audio-in-r" >/dev/null 2>&1 || true
-        timeout 3s pw-link "Arturia Main Volume Encoder:absolute-out" \
-            "LSP Mixer x8 Stereo:events-in" >/dev/null 2>&1 || true
-        timeout 3s pw-link "Arturia Main Volume Encoder:audio-out-l" \
-            "${AUDIO_SINK}:playback_FL" >/dev/null 2>&1 || true
-        timeout 3s pw-link "Arturia Main Volume Encoder:audio-out-r" \
-            "${AUDIO_SINK}:playback_FR" >/dev/null 2>&1 || true
+        connect_ports "SMC-MIX - 8-Band EQ:Output L" \
+            "Arturia Main Volume Encoder:audio-in-l" || true
+        connect_ports "SMC-MIX - 8-Band EQ:Output R" \
+            "Arturia Main Volume Encoder:audio-in-r" || true
+        connect_ports "Arturia Main Volume Encoder:absolute-out" \
+            "LSP Mixer x8 Stereo:events-in" || true
+        connect_ports "Arturia Main Volume Encoder:audio-out-l" \
+            "${AUDIO_SINK}:playback_FL" || true
+        connect_ports "Arturia Main Volume Encoder:audio-out-r" \
+            "${AUDIO_SINK}:playback_FR" || true
         sleep 2
     done
 }
