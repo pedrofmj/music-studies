@@ -32,6 +32,7 @@ LSP_LEFT = "LSP Mixer x8 Stereo:Input L"
 LSP_RIGHT = "LSP Mixer x8 Stereo:Input R"
 MIDI_GUARD_INTERVAL_SECONDS = 0.5
 INDEPENDENT_DEVICE_MIDI_GUARD_INTERVAL_SECONDS = 2.0
+ACTIVE_PROFILE_AUDIO_GUARD_INTERVAL_SECONDS = 2.0
 GENRE_PORT_REGISTRATION_TIMEOUT_SECONDS = 60.0
 DEFAULT_PIPEWIRE_QUANTUM = "1024"
 GENRE_PIPEWIRE_QUANTUM = "2048"
@@ -126,6 +127,15 @@ FAST_ENGINE_PROFILES = {
         "setBfree:out_right",
     ),
 }
+
+
+def fast_engine_audio_connections(profile: str) -> tuple[tuple[str, str], ...]:
+    engine = FAST_ENGINE_PROFILES.get(profile)
+    if engine is None:
+        return ()
+    return ((engine[1], LSP_LEFT), (engine[2], LSP_RIGHT))
+
+
 INDEPENDENT_DEVICE_MIDI_TARGETS = {
     "SMC-Mixer-Master": tuple(
         f"SMC-EQ-{channel} CC Scale:events-in" for channel in range(1, 9)
@@ -688,6 +698,20 @@ def connect_many(connections: tuple[tuple[str, str], ...], environment: dict[str
     return failures
 
 
+def ensure_audio_routes(
+    connections: tuple[tuple[str, str], ...], environment: dict[str, str],
+) -> list[tuple[str, str]]:
+    graph = links(environment)
+    restored: list[tuple[str, str]] = []
+    for source, target in connections:
+        if link_present(graph, source, target):
+            continue
+        connect(source, target, environment)
+        restored.append((source, target))
+        graph = links(environment)
+    return restored
+
+
 def port_ids(direction: str, environment: dict[str, str]) -> dict[str, int]:
     result = run(["pw-link", "-I", direction], environment)
     ports: dict[str, int] = {}
@@ -878,6 +902,8 @@ def main() -> int:
     last_midi_guard = 0.0
     last_independent_device_midi_guard = 0.0
     last_independent_device_route_error = ""
+    last_active_profile_audio_guard = 0.0
+    last_active_profile_audio_route_error = ""
     genre_quantum_changed = False
     # Early port preflight failures must still run the normal cleanup path.
     stop_warm_engines = lambda: None
@@ -1347,6 +1373,41 @@ def main() -> int:
             for warmed in warmed_genres.values():
                 connect_warmed_genre(warmed)
 
+        def ensure_active_profile_audio_routes() -> list[tuple[str, str]]:
+            if current in FAST_ENGINE_PROFILES:
+                engine = warm_candidates.get(current)
+                if engine is None or engine.poll() is not None:
+                    raise RuntimeError(f"active profile engine is not running: {current}")
+                connections = fast_engine_audio_connections(current)
+            elif current in GENRE_ACTIVE_LAYERS and current in warmed_genres:
+                warm = warmed_genres[current]
+                refresh_warmed_genre_ports(warm)
+                connections = genre_audio_connections(warm)
+            elif (current in GENRE_ACTIVE_LAYERS and shared_sf2_engine is not None
+                  and shared_sf2_engine.active_profile == current):
+                _, connections = shared_sf2_profile_connections(current)
+            elif current in GENRE_ACTIVE_LAYERS and candidate is not None:
+                if candidate.poll() is not None:
+                    raise RuntimeError(f"active profile engine is not running: {current}")
+                prefix = f"SAFE-GENRE-{current}-"
+                outputs = run(["pw-link", "-o"], environment)
+                audio_outputs = tuple(
+                    port for line in outputs.stdout.splitlines()
+                    if (port := line.strip()).startswith(prefix)
+                    and "GENRE-CH-" in port
+                    and port.endswith((":output_1", ":output_2", ":out-left", ":out-right"))
+                )
+                connections = tuple(
+                    (output, genre_audio_target(output, current))
+                    for output in audio_outputs
+                    if f"GENRE-CH-" in output
+                )
+                if not connections:
+                    raise RuntimeError(f"active profile audio ports are unavailable: {current}")
+            else:
+                return []
+            return ensure_audio_routes(connections, environment)
+
         def start_warm_engines() -> None:
             try:
                 warm_candidates["synth-programmer-synthv1"] = start_synth_engine()
@@ -1767,6 +1828,30 @@ def main() -> int:
                         )
                     last_independent_device_route_error = route_error
                 last_independent_device_midi_guard = now
+            if now - last_active_profile_audio_guard >= \
+                    ACTIVE_PROFILE_AUDIO_GUARD_INTERVAL_SECONDS:
+                try:
+                    restored = ensure_active_profile_audio_routes()
+                    if restored:
+                        diagnostic_event(
+                            diagnostic_log,
+                            "active-profile-audio-routes-restored",
+                            profile=current,
+                            links=[{"source": source, "target": target}
+                                   for source, target in restored],
+                        )
+                    last_active_profile_audio_route_error = ""
+                except (OSError, RuntimeError) as failure:
+                    route_error = str(failure)
+                    if route_error != last_active_profile_audio_route_error:
+                        diagnostic_event(
+                            diagnostic_log,
+                            "active-profile-audio-route-repair-failed",
+                            profile=current,
+                            error=route_error,
+                        )
+                    last_active_profile_audio_route_error = route_error
+                last_active_profile_audio_guard = now
             if audio_touched:
                 for index, (source, target) in enumerate(ARTURIA_AUDIO):
                     if index // 2 + 1 not in active_arturia_layers:

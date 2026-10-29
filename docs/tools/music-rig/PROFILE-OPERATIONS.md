@@ -54,6 +54,11 @@ SMK-25) after USB re-enumeration and restore missing input links. The standalone
 SMK-25 layer service owns the routing transform, but does not watch its USB
 source port itself.
 
+The selector also checks the active profile's external synth audio links every
+two seconds. In particular, it reconnects SetBfree or synthv1 stereo outputs to
+the current LSP mixer inputs if Carla recreates the mixer with new PipeWire port
+IDs.
+
 `repair-audio` restores the performance-rig output from `Arturia Main Volume
 Encoder` to the selected Echora audio sink. For the analog stereo sink it also
 selects the headphone/P2 port.
@@ -86,6 +91,27 @@ music-rig-profile recover
 # if Arturia remains silent after replugging only the Arturia USB cable:
 music-rig-profile repair-routes
 ```
+
+## Deterministic Recovery
+
+Use `music-rig-profile recover` as the first recovery action. It starts only
+missing services, waits for the rack and controller ports, repairs the common
+MIDI/audio graph, and explicitly checks the active SetBfree or synthv1 stereo
+route. The running selector continues checking profile-specific audio links, so
+a Carla mixer recreation does not require a manual port-ID repair. A successful
+result means the services and expected links are present; it cannot prove that a
+physical controller, sound device, amplifier, or instrument is producing audible
+sound.
+
+If recovery reports `rig-partially-recovered`, use its unresolved routes and
+service states rather than restarting healthy components blindly. If it reports
+`rig-recovered` but audio remains silent, stop sustained notes and use
+`music-rig-profile reset arturia` during a safe pause. That restarts the selector
+and returns to its configured startup profile. Use `music-rig-profile reset full`
+only as the final software recovery step during a safe pause; it restarts the
+full Carla rack and may change the active profile. If the full reset still
+produces no sound, check the hardware, sink, and cables: software cannot
+guarantee recovery from an external device failure.
 
 ## Resets
 

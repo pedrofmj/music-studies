@@ -11,7 +11,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 
 def load_profile_cli(path: Path):
@@ -53,6 +53,10 @@ class RecoveryTest(unittest.TestCase):
             patch.object(cli, "ensure_arturia_router", return_value={"selector": "active"}), \
             patch.object(cli, "repair_routes", return_value={
                 "status": "routes-repaired", "audio": {"status": "audio-repaired"}
+            }), \
+            patch.object(cli, "active_selector_profile", return_value="cinematic-strings"), \
+            patch.object(cli, "repair_active_profile_audio_routes", return_value={
+                "status": "not-applicable"
             }):
             result = cli.recover_live_rig()
 
@@ -68,11 +72,45 @@ class RecoveryTest(unittest.TestCase):
             patch.object(cli, "ensure_arturia_router", return_value={"selector": "active"}), \
             patch.object(cli, "repair_routes", return_value={
                 "status": "routes-repaired", "audio": {"status": "audio-repaired"}
+            }), \
+            patch.object(cli, "active_selector_profile", return_value="cinematic-strings"), \
+            patch.object(cli, "repair_active_profile_audio_routes", return_value={
+                "status": "not-applicable"
             }):
             result = cli.recover_live_rig()
 
         run.assert_not_called()
         self.assertEqual("rig-recovered", result["status"])
+
+    def test_recovery_does_not_claim_success_without_an_active_profile(self):
+        cli = self.cli
+        with patch.object(cli, "arturia_keylab_output", return_value="keylab"), \
+                patch.object(cli, "service_state", return_value="active"), \
+                patch.object(cli, "wait_for_live_rack"), \
+                patch.object(cli, "ensure_arturia_router", return_value={"selector": "active"}), \
+                patch.object(cli, "repair_routes", return_value={
+                    "status": "routes-repaired", "audio": {"status": "audio-repaired"}
+                }), \
+                patch.object(cli, "active_selector_profile", return_value=None):
+            result = cli.recover_live_rig()
+
+        self.assertEqual("rig-partially-recovered", result["status"])
+        self.assertEqual("profile-unknown", result["active_profile_audio"]["status"])
+
+    def test_recovery_repairs_active_tonewheel_audio_routes(self):
+        cli = self.cli
+        with patch.object(cli, "ensure_link", return_value="restored") as ensure_link:
+            result = cli.repair_active_profile_audio_routes("tonewheel-organ-setbfree")
+
+        self.assertEqual("profile-audio-repaired", result["status"])
+        self.assertEqual("tonewheel-organ-setbfree", result["profile"])
+        self.assertEqual(2, ensure_link.call_count)
+        ensure_link.assert_any_call(
+            "setBfree:out_left", "LSP Mixer x8 Stereo:Input L", ANY
+        )
+        ensure_link.assert_any_call(
+            "setBfree:out_right", "LSP Mixer x8 Stereo:Input R", ANY
+        )
 
     def test_start_retries_a_transient_destructive_systemd_transaction(self):
         cli = self.cli

@@ -57,13 +57,26 @@ SHARED_AUDIO_LINKS = (
     ("SMC-MIX - 8-Band EQ:Output R", "Arturia Main Volume Encoder:audio-in-r"),
     ("Arturia Main Volume Encoder:absolute-out", "LSP Mixer x8 Stereo:events-in"),
 )
+FAST_PROFILE_AUDIO_LINKS = {
+    "synth-programmer-synthv1": (
+        ("s2-synthv1-live:out_1", "LSP Mixer x8 Stereo:Input L"),
+        ("s2-synthv1-live:out_2", "LSP Mixer x8 Stereo:Input R"),
+    ),
+    "tonewheel-organ-setbfree": (
+        ("setBfree:out_left", "LSP Mixer x8 Stereo:Input L"),
+        ("setBfree:out_right", "LSP Mixer x8 Stereo:Input R"),
+    ),
+}
 DEVICE_MIDI_TARGETS = {
     "SMC-Mixer-Master": tuple(f"SMC-EQ-{channel} CC Scale:events-in" for channel in range(1, 9)),
     "SMC-PAD-Master": (
         "PD Controls - Sustain Scale:events-in",
+        "PD-CH-1 - Drum Set:events-in",
+        "PD-CH-1 Volume Map:events-in",
         "PD-CH-1 Gain Map:events-in",
     ),
     "SMC-PAD Pocket-Master": (
+        "PD-CH-1 - Drum Set:events-in",
         "PD Controls - Sustain Scale:events-in",
         "PD-CH-1 Gain Map:events-in",
     ),
@@ -465,12 +478,18 @@ def recover_live_rig() -> dict[str, object]:
     wait_for_live_rack()
     ensure_arturia_router(time.monotonic() + ROUTER_START_WAIT_SECONDS)
     routes = repair_routes()
-    fully_recovered = routes["status"] == "routes-repaired"
+    profile = active_selector_profile()
+    profile_audio = repair_active_profile_audio_routes(profile)
+    fully_recovered = (
+        routes["status"] == "routes-repaired"
+        and profile_audio["status"] in {"profile-audio-repaired", "not-applicable"}
+    )
     return {
         "status": "rig-recovered" if fully_recovered else "rig-partially-recovered",
         "disruptive_service_restarts": [],
         "audio": routes["audio"],
         "routes": routes,
+        "active_profile_audio": profile_audio,
     }
 
 
@@ -484,6 +503,52 @@ def latest_events(limit: int = 12) -> list[dict[str, object]]:
         except json.JSONDecodeError:
             entries.append({"raw": line})
     return entries
+
+
+def active_selector_profile(timeout: float = 30) -> str | None:
+    deadline = time.monotonic() + timeout
+    while True:
+        result = run([
+            "systemctl", "--user", "show", SELECTOR, "--property=MainPID", "--value"
+        ])
+        try:
+            pid = int(result.stdout.strip())
+        except ValueError:
+            pid = 0
+
+        if pid and EVENT_LOG.exists():
+            profile = None
+            for line in EVENT_LOG.read_text(encoding="utf-8").splitlines():
+                try:
+                    event = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if event.get("pid") != pid:
+                    continue
+                if event.get("event") in {"startup-profile-selected", "transition-pass"}:
+                    profile = event.get("profile")
+                elif event.get("event") == "transition-recovered":
+                    profile = event.get("final_profile")
+            if isinstance(profile, str):
+                return profile
+        if time.monotonic() >= deadline:
+            return None
+        time.sleep(0.25)
+
+
+def repair_active_profile_audio_routes(profile: str | None) -> dict[str, object]:
+    if profile is None:
+        return {"status": "profile-unknown", "profile": None}
+    connections = FAST_PROFILE_AUDIO_LINKS.get(profile or "")
+    if connections is None:
+        return {"status": "not-applicable", "profile": profile}
+
+    deadline = time.monotonic() + ROUTE_REPAIR_WAIT_SECONDS
+    links = {
+        f"{source} -> {target}": ensure_link(source, target, deadline)
+        for source, target in connections
+    }
+    return {"status": "profile-audio-repaired", "profile": profile, "links": links}
 
 
 def event_log_size() -> int:
