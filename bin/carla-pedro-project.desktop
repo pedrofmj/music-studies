@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Carla - Pedro Project
-Comment=Open the Pedro live rack in Carla
-Exec=carla-pedro-project
-Icon=studio.kx.carla
-Terminal=false
-Categories=AudioVideo;Audio;
-StartupNotify=true
