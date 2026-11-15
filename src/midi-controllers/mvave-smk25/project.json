@@ -1,0 +1,19 @@
+{
+  "project": {
+    "name": "M-VAVE SMK25 Study and Setup Plan",
+    "objective": "Create a reproducible knowledge base and operating setup for the M-VAVE SMK25."
+  },
+  "device": {
+    "manufacturer": "M-VAVE",
+    "model": "SMK25",
+    "category": "25-key wireless MIDI keyboard controller"
+  },
+  "goals": [
+    "Understand every physical control and operating mode.",
+    "Build reliable wired USB workflows before BLE MIDI.",
+    "Document host endpoints, mappings, presets, and firmware state.",
+    "Prefer Linux-native configuration and preserve editor-dependent settings."
+  ],
+  "documentation_root": "src/midi-controllers/mvave-smk25",
+  "status": "starter"
+}

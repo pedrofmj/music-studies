@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "device": {
+    "id": "arturia-keylab-essential-61-mk3",
+    "manufacturer": "Arturia",
+    "model": "KeyLab Essential 61 mk3",
+    "category": "61-key MIDI keyboard and DAW controller",
+    "repository_root": "src/midi-controllers/arturia-keylab-essential-61-mk3"
+  },
+  "manual_sources": [
+    {
+      "id": "keylab-essential-mk3-manual",
+      "official_pdf": "https://downloads.arturia.net/products/keylab-essential-49-mk3/manual/keylab-essential-mk3_Manual_1_0_0_EN.pdf",
+      "local_pdf": "../manual/source/keylab-essential-mk3_Manual_1_0_0_EN.pdf",
+      "extracted_text": "../manual/extracted/keylab-essential-mk3_Manual_1_0_0_EN.txt",
+      "status": "official source retained locally and extracted"
+    },
+    {
+      "id": "arturia-keylab-essential-mk3-faq",
+      "url": "https://support.arturia.com/hc/en-us/articles/8841900354076-KeyLab-Essential-mk3-General-Questions",
+      "authority": "Arturia support",
+      "status": "web source"
+    }
+  ],
+  "capabilities": {
+    "audio": {
+      "source_refs": [
+        { "source_id": "keylab-essential-mk3-manual", "pdf_pages": [2, 4] }
+      ],
+      "generates_audio": false,
+      "audio_inputs": [],
+      "audio_outputs": [],
+      "note": "The KeyLab Essential 61 mk3 sends MIDI and control data. It has no documented sound engine or audio output."
+    },
+    "midi": {
+      "source_refs": [
+        { "source_id": "keylab-essential-mk3-manual", "pdf_pages": [4, 8, 14, 35, 45] },
+        { "source_id": "arturia-keylab-essential-mk3-faq", "source_section": "MIDI ports" }
+      ],
+      "ports": [
+        {
+          "name": "USB-C MIDI",
+          "connector": "USB-C",
+          "direction": "in_out",
+          "protocol": "USB MIDI",
+          "host_required": true,
+          "purpose": "standard MIDI communication, power, and control information"
+        },
+        {
+          "name": "five-pin MIDI OUT",
+          "connector": "five-pin DIN MIDI OUT",
+          "direction": "out",
+          "protocol": "MIDI",
+          "host_required": false,
+          "purpose": "direct control of hardware synth modules"
+        },
+        {
+          "name": "USB DINTHRU endpoint",
+          "connector": "USB virtual port routed to the five-pin MIDI OUT",
+          "direction": "out",
+          "protocol": "USB MIDI to DIN MIDI",
+          "host_required": true,
+          "purpose": "send host-generated MIDI through the physical MIDI OUT"
+        },
+        {
+          "name": "USB MCU/HUI endpoint",
+          "connector": "USB virtual port",
+          "direction": "in_out",
+          "protocol": "MCU or HUI",
+          "host_required": true,
+          "purpose": "dedicated DAW control-surface communication"
+        },
+        {
+          "name": "USB Analog Lab display endpoint",
+          "connector": "USB virtual port",
+          "direction": "in",
+          "protocol": "Arturia control data",
+          "host_required": true,
+          "purpose": "receive Analog Lab V display messages"
+        }
+      ],
+      "messages": [
+        "keyboard notes and velocity",
+        "pad notes with velocity and aftertouch",
+        "pitch bend and modulation",
+        "encoder and fader assignments",
+        "DAW-control messages through dedicated integration or MCU/HUI"
+      ]
+    },
+    "controls": {
+      "source_refs": [
+        { "source_id": "keylab-essential-mk3-manual", "pdf_pages": [3, 4, 6, 7, 9, 16] }
+      ],
+      "surface": [
+        "61 velocity-sensitive synth-action keys",
+        "eight velocity- and aftertouch-sensitive pads",
+        "nine endless encoders",
+        "nine faders",
+        "pitch bend and modulation wheels",
+        "large display and contextual buttons",
+        "DAW command center and transport controls",
+        "arpeggiator, chord, scale, hold, bank, transpose, and octave controls"
+      ],
+      "programs": "Arturia, DAW, and up to six User programs",
+      "pedal_port": "1/4-inch TRS input accepts sustain pedal, footswitch, or continuous/expression control pedal"
+    },
+    "power": {
+      "source_refs": [
+        { "source_id": "keylab-essential-mk3-manual", "pdf_pages": [4, 6, 8] }
+      ],
+      "power_modes": ["USB-C bus power", "USB-C power supply when using five-pin MIDI OUT"]
+    }
+  },
+  "connection_rules": [
+    {
+      "id": "keylab-needs-sound-source",
+      "rule": "The KeyLab does not generate audible sound. Send its MIDI to a software instrument, XPS-30, or other sound module, then route that sound source's audio separately.",
+      "source_refs": [
+        { "source_id": "keylab-essential-mk3-manual", "pdf_pages": [2, 4] }
+      ]
+    },
+    {
+      "id": "keylab-direct-hardware-midi-out",
+      "rule": "The five-pin MIDI OUT is a documented direct path for controlling hardware synth modules. It can also act as MIDI Thru for host-generated MIDI through the USB DINTHRU endpoint.",
+      "source_refs": [
+        { "source_id": "keylab-essential-mk3-manual", "pdf_pages": [8, 14] }
+      ]
+    },
+    {
+      "id": "keylab-usb-needs-host",
+      "rule": "The KeyLab USB-C connection needs a computer or other compatible USB host. It is not a direct USB connection to the XPS-30 USB COMPUTER port.",
+      "source_refs": [
+        { "source_id": "keylab-essential-mk3-manual", "pdf_pages": [6, 8] }
+      ]
+    },
+    {
+      "id": "keylab-separate-daw-port",
+      "rule": "Use the standard MIDI endpoint for notes and normal MIDI controls. Use the dedicated MCU/HUI endpoint only when configuring a DAW control surface, since enabling it unnecessarily can produce unwanted MIDI events from transport controls.",
+      "source_refs": [
+        { "source_id": "keylab-essential-mk3-manual", "pdf_pages": [14, 45] },
+        { "source_id": "arturia-keylab-essential-mk3-faq", "source_section": "MIDI ports" }
+      ]
+    }
+  ],
+  "roles": [
+    "61-key USB MIDI keyboard for software instruments",
+    "direct five-pin MIDI controller for the Roland XPS-30 or another hardware sound module",
+    "DAW control surface through supported integration or MCU/HUI",
+    "host-to-hardware DIN MIDI interface through the USB DINTHRU endpoint"
+  ],
+  "unknowns": [
+    "Actual firmware version, serial details, and bundled-software activation state have not been recorded.",
+    "Linux ALSA client names and the availability of each USB virtual port have not been tested.",
+    "Pedal make, polarity, and selected pedal mode have not been tested.",
+    "Any custom User program, channel assignment, DAW mapping, or MIDI Control Center backup is not yet recorded."
+  ]
+}

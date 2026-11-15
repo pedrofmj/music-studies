@@ -1,0 +1,496 @@
+USER MANUAL
+ SMC-PAD POCKET
+Ⅰ. Packing list                                                            EN
+■ SMC-PAD POCKET;
+■ USB-C Connection Cable;
+■ User manual;
+
+Ⅱ. Type of Connection                                                      EN
+■ USB Connection: Plug the cable through the USB port to the Windows/Mac
+it will automatic be recognized, When plug into Windows/Mac the SMC-PAD
+will be charging at the same time；
+(Red light: charging, Green light: charging complete)
+
+■ Wireless Connection:
+Windows:
+1.Download the BT MIDI Connector software from the official website
+（Scan the QR Code) .
+macOS:
+1.Open Audio MIDI Setup.
+2.Navigate to MIDI Studio.
+3.Click the BT button to connect the device.
+For more connection details, check the page: Connection Methods
+
+■ Wireless Adapter: Plug Wireless Adapter B into Windows/Mac, connection
+was successfully when lights stay on.
+
+■ MIDI OUT Connection:
+Wireless connection: Use Five-Pin wireless MIDI adapter A connecting to
+device such as synthesizer or other device that support MIDI IN;
+(Notes : if connected the Five Pin wireless adapter, smc-pad pocket cannot
+connect to other host )
+                                   Wireless adapter A
+
+
+
+Note: Wireless Adapter A and B are not
+within the package need to buy
+additionally；
+Low Battery Indicator: When the device                        Wireless adapter B
+has insufficient power, Pad 16 will flash.
+
+                                      -01-
+Ⅲ. Panel Overview                                                          EN
+
+
+
+
+                                                                          ②
+
+
+
+
+                                                                   ①
+
+
+
+
+① Back of device                              ② Pads
+Switch : Turn on/off the device               Sixteen RGB back-lit pads with
+Power indicator :The indicator                velocity-sensitive & aftertouch;
+                                              Include Note, Midi CC, Program
+light illuminates red while charging
+                                              Change;
+and turns green when fully
+                                              Note: You can only change
+charged;                                      settings inside software(Scan the
+USB-C : for cable connection and              QR code on the back of the
+charging at the same time                     machine to download the
+                                              software).
+
+
+
+
+                                       -02-
+Ⅲ. Panel Overview                                                          EN
+
+Presets select 1-4 :
+Holding Presets 1 - 4 Pads then turn on the device will step into the
+corresponding
+presets :
+By default Presets 1 16 drum pads are pre map to the ableton live drum
+rack ：
+Presets 2 pre map to fl studio fpc drums :
+Presets 3 pre map to garage band drums :
+Presets 4 pre defined the Pads 9-16 to use as control button :
+
+
+
+
+             Note
+            Repeat          Latch           Rate -         Rate +
+
+
+
+
+            Swing -        Swing +          Bank -         Bank +
+
+
+
+
+④ Control Mapping:
+Assign various controls to specific pads using the MIDI Suite software (PC/Mac,
+cable connection) or MIDI Suite app (iOS/Android, wireless connection). Save
+your custom mappings as presets for quick access. Available controls include:
+1.Note Repeat: Trigger notes repeatedly based on Rate and Tempo settings
+2.Rate Adjustment (Increase/Decrease)
+3.Swing Adjustment (Increase/Decrease)
+4.Bank Selection (Next/Previous)
+5.Latch
+
+                                     -03-
+Ⅳ. Software Parameters introduction                                          EN
+The following content is the introduction to the MIDI Suite software for
+Windows/Mac. Download the software from the website to change the
+parameters of the SMC-Pad Pocket.
+
+
+  Note Repeat
+
+  Time     1/32T               Tempo         240       Swing      50
+
+
+  Sync                         Latch
+
+
+
+
+•Time: Adjust note repeat rate relative to tempo (1/4 to 1/32t)
+•Tempo: Set the beats per minute (BPM) for note repeat
+•Swing: Apply rhythmic variation to repeated notes (0-100%)
+•Sync: Synchronize with external clock sources like DAW software
+  To enable the sync function, assign the MIDI out port of the device in
+  your DAW's configuration settings.
+•Latch: Enable continuous note repeat after pad release
+
+
+  PAD1
+
+  Mode     Control           Type      Note repeat   Channel    Channel 10
+
+  Note     36        E (2)          Minvel     0       Maxvel     127
+
+  Led      255        Color
+
+
+
+
+                                        -04-
+Ⅳ. Software Parameters introduction                                         EN
+Pad Modes:
+Switch between Note mode (default) and Control mode. In Control mode, pads
+function as assignable buttons rather than note triggers.
+
+
+  PAD1
+
+  Mode     Pad              Type     Note         Channel      Channel 10
+
+  Note     36       C (2)          Minvel   0        Maxvel     127
+
+  Led      255        Color
+
+
+
+
+Control Types:
+•Note: Send standard MIDI note messages
+•CC Toggle: Toggle between two CC values with each press
+•Momentary: Send one CC value on press, another on release
+•Program Change: Send MIDI program change messages
+•Custom: Input and send System Exclusive (SysEx) messages
+
+
+•Channel: Assign MIDI channels to individual pads note :
+•Note: Customize the MIDI note for each pad
+•MinVel: Set the minimum velocity threshold for pad triggering
+•MaxVel: Set the maximum velocity limit for pad triggering
+•Color: Assign custom colors to pads for visual organization
+
+
+
+
+                                       -05-
+Ⅳ. Software Parameters introduction                                           EN
+
+
+  Globe
+
+  PadCurve       4             Pad Bank      3
+
+
+  Aftertouch
+
+
+
+•Pad Curve: Adjust the velocity response curve for all pads, When set to 4, it
+represents full velocity.
+•Pad Bank: Access 7 banks of 16 pads each, providing 112 unique MIDI notes
+•Aftertouch: Enable/disable pressure sensitivity for expressive control
+
+
+Ⅴ. Technology Parameters                                                      EN
+
+Product Dimensions 105mm(L) x 105mm (W)x 16mm(H)
+Product Weight        130g
+
+Pads                  16 RGB Back-Lit Pads with velocity-sensitive and after touch
+
+
+Output                USB-C port
+                      Wireless connection with Windows/Mac/ios/Android
+                      Wireless Midi Out Function
+Power                 Battery supplied or USB-bus-powered
+Battery Model/Type 603040
+Battery Nominal       3.7V
+Voltage
+Battery capacity      780mAh
+
+
+
+
+                                      -06-
+Ⅵ. FCC Warning Statement                                                           EN
+★Changes or modifications not expressly approved by the party responsible
+for compliance could void the user’s authority to operate the equipment. This
+equipment has been tested and found to comply with the limits for a Class B
+digital device, pursuant to Part 15 of the FCC Rules. These limits are designed
+to provide reasonable protection against harmful interference in a residential
+installation. This equipment generates uses and can radiate radio frequency
+energy and, if not installed and used in accordance with the instructions, may
+cause harmful interference to radio communications. However, there is no
+guarantee that interference will not occur in a particular installation. If this
+equipment does cause harmful interference to radio or television reception,
+which can be determined by turning the equipment off and on, the user is
+encouraged to try to correct the interference by one or more of the following
+measures:
+‐‐ Reorient or relocate the receiving antenna.
+‐‐ Increase the separation between the equipment and receiver.
+‐‐ Connect the equipment into an outlet on a circuit different from that to
+which the receiver is connected.
+‐‐ Consult the dealer or an experienced radio/TV technician for help.
+
+
+FCC Radiation Exposure Statement
+The device has been evaluated to meet general RF exposure requirement. The
+device can be used in portable exposure condition without restriction.
+
+
+This device complies with Part 15 of the FCC Rules. Operation is subject to the
+following two conditions:
+(1)This device may not cause harmful interference.
+(2)This device must accept any interference received, including interference
+that may cause undesired operation.
+
+
+
+
+                                       -07-
+Ⅶ. Connection Method                                                          EN
+Our device is a class-compliant device, which means when using a USB
+cable, it won't need any driver. Software that supports MIDI will
+automatically recognize the device.
+
+
+Wireless for Windows: Download and install the BT MIDI Connector from the
+QR code below to use our devices wirelessly (Requires Windows 10 or later).
+
+
+Wireless for Mac:
+1.Open the Audio MIDI Setup
+2.Open MIDI Studio
+3.Click the BT icon
+4.Find the device and click 'Connect'
+
+
+Wireless for iOS/Android: For iOS/Android devices, it requires software that
+supports BLE MIDI. Connect the SMC-Pad Pocket within software like
+GarageBand, FL Studio Mobile, or Cubasis LE.
+
+
+
+
+Midi suite for windows         Midi suite for mac         Bt Midi Connector
+
+
+
+
+                                        -08-
+一. 包装清单                                          CN
+■ SMC-PAD POCKET;
+■ USB-C连接线;
+■ 用户指南；
+
+二. 设备连接                                          CN
+■ USB连接：将线缆插入USB端口连接到Windows/Mac，
+设备将自动被识别。连接时，SMC-PAD将同时进行充电；
+（红灯：正在充电，绿灯：充电完成）
+
+
+■ 无线连接：
+Windows系统：
+1.从官方网站下载BT MIDI Connector软件（扫描二维码）。
+macOS系统：
+1.打开音频MIDI设置。
+2.导航至MIDI工作室。
+3.点击BT按钮连接设备。
+有关更多无线连接详情，请查看"连接方法"页面。
+
+
+■ 无线适配器：将无线适配器B插入Windows/Mac，
+当指示灯都保持常亮时表示连接成功；
+
+
+■ MIDI OUT连接：
+无线连接：使用五针无线MIDI适配器A连接到合成器或其他支持MIDI IN的设备；
+（注意：如果连接了五针无线适配器，smc-pad pocket将无法连接到其他主机）
+
+
+                        无线适配器A
+
+
+注意：无线适配器A和B不包含在包装
+内，需要另外购买；
+电量不足指示：当设备电量不足时，
+                                       无线适配器 B
+PAD 16会开始闪烁
+
+                       -01-
+三. 功能介绍                                      CN
+
+
+
+
+                                             ②
+
+
+
+
+                                       ①
+
+
+
+
+① 设备背面                 ② 打击垫（Pads)
+开关：打开/关闭设备             十六个带有RGB背光的打击垫，具有
+电源指示灯 ：充电时亮红灯，充满时      力度感应（Velocity Sensetive)和触
+亮绿灯。                   后效果(After Touch)；支持发送音
+USB-C接口：               符、MIDI CC和Program Change码；
+用于有线连接和同时充电            注：您只能在软件内更改发码设置
+                       （扫描设备背面的二维码下载件）。
+
+
+
+
+                -02-
+三. 功能介绍                                               CN
+预设选择 1-4：按住预设1-4对应的打击垫，然后开启设备，将进入相应的预设：
+默认情况下：
+预设1的16个鼓垫预先映射到Ableton Live的Drum Rack：
+预设2预先映射到FL Studio的FPC鼓：
+预设3预先映射到GarageBand的原生鼓：
+预设4预定义触控板9-16用作控制按钮：
+
+
+
+
+        Note
+       Repeat       Latch      Rate -    Rate +
+
+
+
+
+       Swing -    Swing +      Bank -    Bank +
+
+
+
+
+④ 打击垫分配为控制按键：
+使用MIDI Suite软件（PC/Mac，有线连接）或MIDI Suite app（iOS/Android，无
+线连接）将各种控制分配到特定的打击垫（PADS）。将自定义分配保存为预设以
+便快速访问。可用的控制包括：
+1.音符重复（Note Repeat)：根据速率和节奏设置重复触发音符
+2.速率调整(Rate)（增加/减少）
+3.摇摆调整(Swing)（增加/减少）
+4.Bank选择(Pad Bank)（下一组/上一组）
+5.音符重复锁定锁定(Latch)
+
+
+
+
+                            -03-
+四.软件参数介绍                                                                CN
+以下内容是MIDI Suite软件（适用于Windows/Mac）的介绍，从网站下载该软件
+可以更改SMC-Pad Pocket的参数。
+
+
+Note Repeat
+
+Time   1/32T               Tempo         240      Swing     50
+
+
+Sync                       Latch
+
+
+
+
+•速率（Rate)：相对于节奏调整音符重复速率（1/4 到 1/32t）
+•节拍（Tempo)：为音符重复设置每分钟节拍数（BPM）
+•摇摆(Swing)：为重复的音符应用节奏变化（0-100%）
+•同步(Sync)：与外部时钟源（如DAW软件）同步
+ 要启用同步功能，请在DAW的配置设置中分配设备的MIDI输出口。
+•锁定(Latch)：在松开打击垫后音符重复将持续
+
+
+PAD1
+
+Mode   Control           Type     Note repeat   Channel    Channel 10
+
+Note   36        E (2)          Minvel    0       Maxvel    127
+
+Led    255        Color
+
+
+
+
+                                    -04-
+四.软件参数介绍                                                          CN
+打击垫模式：
+在音符模式（默认）和控制模式之间切换。在控制模式下，触控板
+功能为可分配的按钮，而不是音符触发器（Note)。
+
+ PAD1
+
+ Mode   Pad           Type     Note       Channel    Channel 10
+
+ Note   36    C (2)          Minvel   0     Maxvel    127
+
+ Led    255    Color
+
+
+
+控制类型：
+•音符(Note)：发送标准MIDI音符码
+•CC切换（CC Toggle)：每次按下在两个CC值之间切换
+•瞬时(Momentary)：按下时发送一个CC值，释放时发送另一个
+•程序变更(Program Change)：发送MIDI程序变更消息
+•自定义：输入并发送系统（System exclusive）消息
+
+•通道（Channel）：为各个打击垫分配MIDI通道
+•音符（Note）：自定义每个打击垫的MIDI音符
+•最小力度（MinVel）：设置触控板触发的最小力度阈值
+•最大力度（MaxVel）：设置触控板触发的最大力度限制
+•颜色（Color）：为触控板分配自定义颜色
+
+
+
+
+                                 -05-
+四.软件参数介绍                                                          CN
+
+ PAD1
+
+ Mode   Pad           Type     Note       Channel    Channel 10
+
+ Note   36    C (2)          Minvel   0     Maxvel    127
+
+ Led    255    Color
+
+
+
+•打击垫曲线（Pad Curve）：调整所有打击垫的力度响应曲线
+（在调整为4时，打击垫触发力度为满力度（Full Velocity)）
+•打击垫组（Pad Bank）：访问7组16个打击垫，提供112个不同
+的MIDI音符
+•触后（Aftertouch）：启用/禁用触后控制
+
+五.技术参数                                                            CN
+
+产品尺寸          105mm(L) x 105mm (W)x 16mm(H)
+产品重量          130g
+鼓垫            16个RGB背光支持力度感应和触后的打击垫
+
+              USB-C型接口
+输出            无线连接Windows/Mac/ios/Android
+              无线MIDI OUT功能
+电源            电池供电或USB供电
+电池型号规格        603040
+电池标称电压        3.7V
+电池额定容量        780mAh
+修订            2024-10-16
+
+
+
+
+                                 -06-
+

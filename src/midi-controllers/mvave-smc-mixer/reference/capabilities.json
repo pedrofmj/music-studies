@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "device": {
+    "id": "mvave-smc-mixer",
+    "manufacturer": "M-VAVE",
+    "model": "SMC-Mixer",
+    "category": "eight-channel MIDI DAW control surface",
+    "repository_root": "src/midi-controllers/mvave-smc-mixer"
+  },
+  "manual_sources": [
+    {
+      "id": "smc-mixer-manual",
+      "local_pdf": "../manual/source/SMC-MIXER_ZE.pdf",
+      "extracted_text": "../manual/extracted/SMC-MIXER_ZE.txt"
+    }
+  ],
+  "capabilities": {
+    "audio": {
+      "source_refs": [
+        { "source_id": "smc-mixer-manual", "pdf_pages": [1, 6] }
+      ],
+      "generates_audio": false,
+      "audio_inputs": [],
+      "audio_outputs": [],
+      "note": "Despite its name, the SMC-Mixer is a MIDI DAW surface and not an audio mixer."
+    },
+    "midi": {
+      "source_refs": [
+        { "source_id": "smc-mixer-manual", "pdf_pages": [1, 3, 4, 6] }
+      ],
+      "ports": [
+        {
+          "name": "USB-C MIDI",
+          "connector": "USB-C",
+          "direction": "in_out",
+          "protocol": "USB MIDI control surface",
+          "host_required": true,
+          "purpose": "DAW connection and charging"
+        },
+        {
+          "name": "BLE MIDI",
+          "connector": "Bluetooth",
+          "direction": "in_out",
+          "protocol": "BLE MIDI control surface",
+          "host_required": true
+        },
+        {
+          "name": "optional wireless MIDI OUT",
+          "connector": "optional wireless MIDI device",
+          "direction": "out",
+          "protocol": "wireless MIDI",
+          "host_required": false
+        }
+      ],
+      "daw_protocol": "manual documents Mackie Control input and output setup for multiple DAWs"
+    },
+    "controls": {
+      "source_refs": [
+        { "source_id": "smc-mixer-manual", "pdf_pages": [4, 5, 6] }
+      ],
+      "surface": [
+        "8 faders for current group track volumes",
+        "8 endless encoders for current group track pan by default",
+        "mute, solo, record-arm, and select controls",
+        "play, stop, record, rewind, fast-forward, track bank, and navigation controls",
+        "DAW and User modes"
+      ],
+      "feedback": "fader LED flashes when physical fader position does not align with track volume"
+    },
+    "power": {
+      "source_refs": [
+        { "source_id": "smc-mixer-manual", "pdf_pages": [1, 6] }
+      ],
+      "power_modes": ["internal battery", "USB bus power"]
+    }
+  },
+  "connection_rules": [
+    {
+      "id": "smc-mixer-is-not-audio-mixer",
+      "rule": "The SMC-Mixer cannot accept, mix, or output XPS-30 or FM-1 audio. Use a real mixer or audio interface for sound signals.",
+      "source_refs": [
+        { "source_id": "smc-mixer-manual", "pdf_pages": [1, 6] }
+      ]
+    },
+    {
+      "id": "smc-mixer-host-daw-role",
+      "rule": "For Mackie Control, configure the DAW with SMC-Mixer as both control-surface input and output. It is designed as a host/DAW control surface, not a direct controller for the XPS-30 front panel.",
+      "source_refs": [
+        { "source_id": "smc-mixer-manual", "pdf_pages": [3] }
+      ]
+    },
+    {
+      "id": "smc-mixer-usb-needs-host",
+      "rule": "USB-C and BLE need a computer or mobile host. Neither is a direct USB link to another USB device.",
+      "source_refs": [
+        { "source_id": "smc-mixer-manual", "pdf_pages": [1] }
+      ]
+    }
+  ],
+  "roles": [
+    "Mackie Control DAW surface",
+    "user-mapped MIDI controller for a host",
+    "track-bank and transport controller"
+  ],
+  "unknowns": [
+    "The vendor manual does not establish native Linux configuration software or BLE support.",
+    "Record a Linux DAW's actual MIDI input and output endpoint names when tested."
+  ]
+}

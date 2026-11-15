@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "device": "M-VAVE SMC-PAD Pocket",
+  "stored_for": "internal_study",
+  "manual": {
+    "official_product_page": "https://www.m-vave.com/product?id=smc-pad-pocket",
+    "official_manual_url": "https://manualf.oss-cn-hongkong.aliyuncs.com/manual/MIDI-KEYBOARD/SMC-PAD-POCKET.pdf",
+    "local_file": "source/SMC-PAD-POCKET.pdf",
+    "downloaded_at": "2026-07-27",
+    "page_count": 15,
+    "file_size_bytes": 483139,
+    "sha256": "69c7e2acba00d0062854e44d10d8780232d3712b99576a1a57eed22906108298"
+  }
+}

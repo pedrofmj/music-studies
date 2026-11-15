@@ -1,0 +1,2382 @@
+USER MANUAL
+
+_KEYLAB ESSENTIAL MK3
+
+Special Thanks
+DIRECTION
+Frédéric Brun
+
+Kevin Molcard
+
+DEVELOPMENT
+Yannick Bellance (lead)
+
+Florian Rameau (lead)
+
+Valentin Foare
+
+Nicolas Dubois (lead)
+
+Timothée Béhéty
+
+Farès Mezdour
+
+Antonio Eiras
+
+Lionel Ferragut
+
+Thibault Sénac
+
+MANUFACTURING
+Jérôme Blanc
+
+Nadine Lantheaume
+
+QUALITY
+Emilie Jacuszin
+
+QUALITY ASSURANCE
+Julien Viannenc (Lead)
+
+Aurélien Mortha
+
+Bastien Hervieux
+
+Nicolas Naudin
+
+Nicolas Stermann
+
+MANUAL
+Sven Bornemark
+
+Jimmy Michon
+
+BETA-TEST
+Charles Capsis IV
+
+Andrew Henderson
+
+Terry Marsden
+
+Richard Courtel
+
+Are Leistad
+
+Paolo Apollo Negri
+
+Adrian Dybowski
+
+Andrew Macaulay
+
+Grégory Roudgé
+
+TJ Trifeletti
+
+© ARTURIA SA – 2023 – All rights reserved.
+26 avenue Jean Kuntzmann
+38330 Montbonnot-Saint-Martin
+FRANCE
+www.arturia.com
+Information contained in this manual is subject to change without notice and does not
+represent a commitment on the part of Arturia. The software described in this manual is
+provided under the terms of a license agreement or non-disclosure agreement. The software
+license agreement specifies the terms and conditions for its lawful use. No part of this
+manual may be reproduced or transmitted in any form or by any purpose other than
+purchaser’s personal use, without the express written permission of ARTURIA S.A.
+All other products, logos or company names quoted in this manual are trademarks or
+registered trademarks of their respective owners.
+Product version: 1.0.0
+
+Revision date: 23 May 2023
+
+Congratulations on purchasing the
+Arturia KeyLab Essential mk3!
+Get ready to start your musical journey.
+KeyLab Essential is a class-compliant, universal MIDI controller, capable of harnessing the
+power of practically any software instrument and DAW. It has been designed to enhance
+your workflow, let you spend less time using a keyboard and mouse to create music, and
+seamlessly integrate with Arturia Analog Lab V.
+This instruction manual covers the general use and features of KeyLab Essential, and goes
+into more detail on the technical aspects of the controller so you can make the most of its
+advanced functionality.
+In this package, you will find:
+•
+
+KeyLab Essential controller keyboard
+
+•
+
+USB cable
+
+•
+
+Analog Lab V license for download
+
+•
+
+Ableton Live Lite
+
+•
+
+Native Instruments The Gentleman
+
+•
+
+LoopCloud
+
+•
+
+UVI Model D
+
+•
+
+Melodics
+
+Don’t lose your registration information! The serial numbers and activation codes detailed
+in the Quick Start Guide are required to unlock your software.
+Remember to register! It sounds boring, but it’s worth it. Registering is important because it
+lets you download and activate Analog Lab V, as well as the Arturia MIDI Control Center.
+
+Special Message Section
+Specifications Subject to Change: The information contained in this manual is believed to
+be correct at the time of printing. However, Arturia reserves the right to change or modify
+any of the specifications without notice or obligation to update the hardware that has been
+purchased.
+IMPORTANT: The product and its software, when used in combination with an amplifier,
+headphones or speakers, may be able to produce sound levels that could cause permanent
+hearing loss. DO NOT operate for long periods of time at a high level or at a level that is
+uncomfortable.
+If you encounter any hearing loss or ringing in the ears, you should consult an audiologist.
+NOTICE: Service charges incurred due to a lack of knowledge relating to how a function
+or feature works (when the product is operating as designed) are not covered by the
+manufacturer’s warranty, and are therefore the owner's responsibility. Please study this
+manual carefully and consult your dealer before requesting service.
+Precautions include, but are not limited to, the following:
+1.
+
+Read and understand all the instructions.
+
+2.
+
+Always follow the instructions on the instrument.
+
+3.
+
+Before cleaning the instrument, always remove the USB cable. When cleaning,
+use a soft and dry cloth. Do not use gasoline, alcohol, acetone, turpentine or any
+other organic solutions; do not use a liquid cleaner, spray or cloth that's too wet.
+
+4.
+
+Do not use the instrument near water or moisture, such as a bathtub, sink,
+swimming pool or similar place.
+
+5.
+
+Do not place the instrument in an unstable position where it might accidentally
+fall over.
+
+6.
+
+Do not place heavy objects on the instrument. Do not block openings or vents
+of the instrument; these locations are used for air circulation to prevent the
+instrument from overheating. Do not place the instrument near a heat vent at any
+location with poor air circulation.
+
+7.
+
+Do not open or insert anything into the instrument that may cause a fire or
+electrical shock.
+
+8.
+
+Do not spill any kind of liquid onto the instrument.
+
+9.
+
+Always take the instrument to a qualified service center. You will invalidate your
+warranty if you open and remove the cover, and improper assembly may cause
+electrical shock or other malfunctions.
+
+10.
+
+Do not use the instrument with thunder and lightning present; otherwise it may
+cause long distance electrical shock.
+
+11.
+
+Do not expose the instrument to hot sunlight.
+
+12.
+
+Do not use the instrument when there is a gas leak nearby.
+
+13.
+
+Arturia is not responsible for any damage or data loss caused by improper
+operation of the instrument.
+
+Table Of Contents
+1. Welcome to KeyLab Essential ............................................................................................................................. 2
+
+1.1. What’s KeyLab Essential? ................................................................................................................................................ 2
+1.2. KeyLab Essential Features Summary...................................................................................................................... 4
+
+2. Installation....................................................................................................................................................................... 5
+3. Hardware Overview .................................................................................................................................................. 6
+
+3.1. Connecting KeyLab Essential ........................................................................................................................................ 6
+3.2. Front Panel................................................................................................................................................................................ 6
+3.3. Rear Panel................................................................................................................................................................................. 8
+3.4. Display......................................................................................................................................................................................... 8
+
+4. KeyLab Essential operations ............................................................................................................................... 9
+
+4.1. Wheels.......................................................................................................................................................................................... 9
+4.2. MIDI Channel.......................................................................................................................................................................... 9
+4.3. Bank ........................................................................................................................................................................................... 10
+4.4. Transpose –/+ and Octave –/+..................................................................................................................................... 11
+4.5. Pads ............................................................................................................................................................................................ 12
+4.6. DAW Control Section ........................................................................................................................................................ 13
+4.6.1. MIDI Setup in you DAW......................................................................................................................................................................................... 14
+
+4.7. Prog.............................................................................................................................................................................................. 16
+4.8. Part................................................................................................................................................................................................ 17
+4.8.1. Setting Split Points ...................................................................................................................................................................................................... 17
+4.8.2. Editing Part 1 and 2 .................................................................................................................................................................................................. 18
+
+4.9. Hold Mode................................................................................................................................................................................ 19
+4.10. Chord Mode ....................................................................................................................................................................... 20
+4.10.1. Playing Predefined Chords............................................................................................................................................................................. 20
+4.10.2. Creating a Chord .................................................................................................................................................................................................... 21
+
+4.11. Scale .......................................................................................................................................................................................... 22
+4.12. Arpeggiator .......................................................................................................................................................................... 24
+4.12.1. Activating and deactivating the Arpeggiator......................................................................................................................................... 24
+4.12.2. Entering and leaving Arpeggio Edit ............................................................................................................................................................ 25
+4.12.3. Editing the Arpeggiator....................................................................................................................................................................................... 26
+4.12.4. Arpeggiator Parameters ..................................................................................................................................................................................... 27
+
+4.13. Tap Tempo ............................................................................................................................................................................. 31
+4.13.1. The Arpeggiator, Chord Mode, Scale Mode, and Hold Mode ....................................................................................................... 31
+
+4.14. Vegas Mode ......................................................................................................................................................................... 32
+4.15. Factory Reset...................................................................................................................................................................... 33
+
+5. KeyLab Essential and Analog Lab V ............................................................................................................ 34
+
+5.1. Important Note — It’s All Malleable ......................................................................................................................... 34
+5.2. Audio and MIDI Setup.................................................................................................................................................... 35
+5.2.1. Analog Lab V MIDI Settings............................................................................................................................................................................... 35
+
+5.3. Browsing Presets............................................................................................................................................................... 37
+5.3.1. Browsing Within Types.......................................................................................................................................................................................... 38
+
+5.4. Knobs and Faders............................................................................................................................................................. 38
+5.5. Pads ........................................................................................................................................................................................... 39
+5.6. Controlling Parts in Analog Lab V .......................................................................................................................... 39
+5.6.1. Adding a Part in Analog Lab V ......................................................................................................................................................................... 39
+5.6.2. Editing an Existing Multi Preset ...................................................................................................................................................................... 40
+5.6.3. Editing in the Part Menu........................................................................................................................................................................................ 41
+5.6.4. Controlling Parts ....................................................................................................................................................................................................... 42
+
+6. DAW Control ................................................................................................................................................................. 43
+
+6.1. Custom Controlled DAWs .............................................................................................................................................. 43
+6.1.1. Transport Control ........................................................................................................................................................................................................ 44
+
+6.2. DAW Control with Mackie Control Universal ................................................................................................... 45
+
+7. Declaration of Conformity................................................................................................................................... 46
+
+7.1. FCC ............................................................................................................................................................................................... 46
+7.2. CANADA.................................................................................................................................................................................... 46
+7.3. CE ................................................................................................................................................................................................. 46
+7.4. ROHS .......................................................................................................................................................................................... 47
+
+8. Software License Agreement............................................................................................................................ 48
+
+1. WELCOME TO KEYLAB ESSENTIAL
+1.1. What’s KeyLab Essential?
+
+Congratulations – you have made a great choice!
+KeyLab Essential has been designed to be your best friend when you're making music.
+Whether on stage, in studio or while rehearsing and jamming, you need transparency and
+direct routes to the sounds you have in your head.
+KeyLab Essential is a lighweight and easy-to-use MIDI keyboard controller. But don’t let
+its elegant appearance fool you — it’s huge on features usually found in more expensive
+keyboards.
+Not only can you use KeyLab Essential to play your sound modules (inside or outside of
+your computer), but also control important functions inside your DAW. This will boost your
+workflow!
+KeyLab Essential automatically recognizes and controls popular DAWs including Ableton
+Live, Apple Logic Pro, Bitwig Studio, Image-Line FL Studio, and Steinberg Cubase. On top of
+that, KeyLab Essential can control any DAW using the MCU/HUI protocol.
+You can control your DAW transport with dedicated Transport buttons, use the knobs to
+tweak plug-in parameters, and adjust track volumes and pans by using the KeyLab Essential
+faders.
+A complete keyboard production studio, KeyLab Essential also comes with the incredible
+Arturia Analog Lab V – your very own vintage and modern keyboard collection, with access
+to over 2000 presets from the award-winning V Collection, ready to customize and play in
+an instant.
+Whether you want a searing-hot synth lead or an ethereal string pad, a vintage upright
+piano or a complex, animated soundscape, KeyLab Essential gives you everything you need
+to perform and record. All the ingredients of the cocktail are there and ready to be mixed
+according to your own style.
+
+2
+
+Arturia - User Manual KeyLab Essential mk3 - Welcome to KeyLab Essential
+
+Nine endless encoder knobs and nine faders give you hands-on access to numerous sound
+sculpting parameters inside Analog Lab V. Other V Collection instruments can also be
+remotely controlled whis way, when you customize the settings in MIDI Control Center. Live
+sound editing should always be this easy!
+You’ll play KeyLab Essential's 49 or 61 velocity sensitive, synth-action keys. The eight backlit
+performance pads sense velocity and aftertouch. Plus there are Pitch Bend and Modulation
+Wheels, of course.
+Please note, that the front and rear panels of the 49- and 61-key keyboards sport exactly the
+same buttons, knobs, faders and connectivity. They're just spaced a bit differently on the
+larger models.
+On top of that, Arturia's MIDI Control Center software (a free download) lets you map
+parameters directly to KeyLab Essential’s physical controls to create custom configurations.
+You can then save these as user programs and recall them from the KeyLab Essential
+hardware.
+
+
+
+! For further information MIDI Control Center, please consult MIDI Control Center manual, an app
+
+available for download from the Arturia website.
+
+Arturia - User Manual KeyLab Essential mk3 - Welcome to KeyLab Essential
+
+3
+
+1.2. KeyLab Essential Features Summary
+•
+
+49- or 61-key velocity-sensitive keyboard.
+
+•
+
+Eight velocity- and pressure-sensitive RGB pads.
+
+•
+
+Two pad banks for a total of 16 functional pads.
+
+•
+
+Dentented and clickable main encoder knob for navigation.
+
+•
+
+Large easy-to-read display.
+
+•
+
+DAW Transport control via dedicated buttons plus Save, Quantize, Undo, and
+Redo.
+
+•
+
+Nine endless encoder knobs and nine faders.
+
+•
+
+Wheels for pitch-bend and modulation.
+
+•
+
+Hold button for hands-free (and feet-free) sustain.
+
+•
+
+Full-featured classic synth style arpeggiator.
+
+•
+
+Chord play memorizes and plays user defined chords from one note.
+
+•
+
+Scale mode makes it easy to always play in the right key and tonality.
+
+•
+
+Hold, Arpeggiator, Chord, and Scale can be combined.
+
+•
+
+Octave and semitone transpose functions.
+
+•
+
+USB-C powered.
+
+•
+
+MIDI via USB-C and standard 5-pin MIDI output.
+
+•
+
+1/4-inch TRS input accepts sustain, switch, or expression/continuous control
+pedal.
+
+•
+
+Included software:
+◦ Arturia Analog Lab V,
+
+•
+
+4
+
+◦
+
+Ableton Live Lite,
+
+◦
+
+Native Instruments The Gentleman,
+
+◦
+
+UVI Grand Piano Model D,
+
+◦
+
+Melodics subscription,
+
+◦
+
+Loopcloud subscription.
+
+USB-C to USB-A cable included.
+
+Arturia - User Manual KeyLab Essential mk3 - Welcome to KeyLab Essential
+
+2. INSTALLATION
+The first thing to do upon receiving your KeyLab Essential keyboard, after having completed
+the registration process, is to update its firmware. Indeed, Arturia releases periodic
+firmware updates to add functionality and improve performance.
+To proceed with the update, you'll first need to download and install the MIDI Control Center,
+the powerful companion software we designed to work with our hardware, from the KeyLab
+Essential's Resources page.
+Once this is done, you can follow these steps to upgrade the firmware of KeyLab Essential:
+1. Download the latest firmware from the KeyLab Essential's Resources page.
+2. Launch MIDI Control Center.
+3. Please make sure KeyLab Essential 3 is selected under Device in MIDI Control Center.
+Click on the box showing the firmware revision:
+
+4. Click “Upgrade” in the dialogue box that follows, then navigate to the firmware file on
+your computer and select it. The four buttons are now lit in blue, running in cycle.
+5. Follow the rest of the onscreen instructions. When the firmware loading is complete,
+KeyLab Essential will restart and be ready for use.
+Once your KeyLab Essential is ready, you can start using it to control various virtual
+instruments, like our own Analog Lab V [p.34].
+For more information on how the MIDI Control Center works with the KeyLab Essential,
+please refer to the dedicated manual in the KeyLab Essential section of our Downloads &
+Manuals page.
+
+Arturia - User Manual KeyLab Essential mk3 - Installation
+
+5
+
+3. HARDWARE OVERVIEW
+3.1. Connecting KeyLab Essential
+First of all, we recommend that you install the Analog Lab V and MIDI Control Center and
+be sure to register and authorize them. Connect KeyLab Essential to your computer using
+the included USB cable. Power and data is supplied through this connection.
+You are strongly recommended to download the MCC and let it install KeyLab Essential's
+custom driver. Without this specific driver under Windows, you won't be able to use MIDI
+with multiple instances that use MIDI protocol on your computer.
+
+3.2. Front Panel
+The controls on the front panel of KeyLab Essential are as follows.
+
+6
+
+Number
+
+Name
+
+Description
+
+1.
+
+Wheels [p.9]
+
+These easy-to-reach controllers act as pitch-bend and modulation wheels.
+
+2.
+
+MIDI Ch button
+
+This button lets you select MIDI out channel.
+
+3.
+
+Bank button
+
+Choose to use Bank A or B for the Performance Pads.
+
+4.
+
+Transp –/+ buttons
+
+Transpose the keyboard in semitone steps.
+
+5.
+
+Octave –/+ buttons
+
+Transpose the keyboard up or down an octave.
+
+Arturia - User Manual KeyLab Essential mk3 - Hardware Overview
+
+Number
+
+Name
+
+6.
+
+Pads [p.12]
+
+Description
+For finger drumming and playing MIDI notes. Velocity- and pressuresensitive.
+
+Save/Quant/Undo/Redo
+
+This section lets you manage your Presets and quantize Scales and
+
+buttons
+
+Rhythm.
+
+8.
+
+DAW Command Center
+
+Remote controls for your DAW.
+
+9.
+
+Large Display
+
+10.
+
+Contextual buttons
+
+11.
+
+Dentented Main Encoder
+
+7.
+
+Shows parameter names, values, and all information about KeyLab
+Essential status.
+Four buttons with various tasks depending on context.
+Navigates Presets in Analog Lab [p.34], navigates into KeyLab
+Essential's feature menu, and performs other functions in DAWs [p.43].
+Is also a clickable select button.
+Navigates through the 3 main operating modes: Arturia, DAW, and
+
+12.
+
+Program button
+
+13.
+
+Part button
+
+14.
+
+Hold button
+
+15.
+
+Chord button
+
+16.
+
+Scale button
+
+17.
+
+Arpeggio button
+
+A Controller Keyboard without an Arpeggiator? We don't think so.
+
+18.
+
+Knobs and Faders
+
+Control parameters in plugins, e.g. instrument and effects.
+
+19.
+
+MIDI Keyboard
+
+User.
+Handles Part selection and Split Points.
+Sustains notes and arpeggios played from the keys (not the pads)
+when active.
+A convenient function for playing chords with one finger.
+Reduces the number of notes on the keyboard to those that fit a
+particular key and tonality.
+
+49 or 61 velocity sensitive, synth-action keys. Velocity curve can be
+edited in the MIDI Control Center App.
+
+
+
+! Velocity sensitive: Both the MIDI keyboard and the pads on KeyLab Essential are sensitive to how
+
+
+
+! Pressure Sensitivity: Playing a pad and then pressing it harder will send out Pressure data that can
+
+hard you play them. Hit harder for higher volume.
+
+trigger various modulation changes (filter, volume etc.).
+Pressure sensivity is often called Aftertouch. KeyLab Essential pads use the more luxurious version
+called Polyphonic Aftertouch, where each pad sends out individual data.
+
+Arturia - User Manual KeyLab Essential mk3 - Hardware Overview
+
+7
+
+3.3. Rear Panel
+
+Number
+
+Name
+
+Description
+
+1.
+
+Kensington Lock Port
+
+This socket accepts a standard Kensington laptop lock for anti-theft.
+
+2.
+
+Control Pedal Input
+
+3.
+
+MIDI Out
+
+4.
+
+USB-C port
+
+1/4" TRS; accepts sustain pedal, footswitch, or a continuous controller
+(expression pedal).
+5-pin DIN MIDI output for controlling hardware synth modules. Can also
+be used as MIDI Thru.
+Use this socket to connect KeyLab Essential to your device. This USBC port provides both power, MIDI data, and control information.
+Alternatively, a Power Supply Unit can connect to this port to power
+KeyLab Essential, when the MIDI connector is used.
+
+3.4. Display
+By default, the main Display momentarily shows a graphic of whatever control you touch,
+along with the value sent by that control as you move it. For example, this is what is
+displayed when you move a knob:
+
+When you strike a pad, the display first shows your initial velocity. If you then apply afterpressure, it will display that value.
+
+8
+
+Arturia - User Manual KeyLab Essential mk3 - Hardware Overview
+
+4. KEYLAB ESSENTIAL OPERATIONS
+4.1. Wheels
+
+To the left is the pitch-bend wheel. It is spring-loaded: If you push it in one direction and
+then remove your finger, the wheel snaps back to its center position. The bend range can
+be adjusted in the MIDI Control Center software (see separate manual). In fact, the MIDI
+Control Center app allows you to customize the function of almost every physical control of
+your KeyLab Essential or other Arturia controller.
+Pushing the modulation wheel on the right increases the modulation amount. As with a
+modulation wheel on any synth, the wheel and its current value stays where you leave it
+when you remove your finger, until you manually move the modulation wheel again.
+The modulation wheel by default sends MIDI CC 1 (the usual control number for
+modulation), but this control number can also be changed in the MIDI Control Center app.
+If you want to control the Volume or Filter Cutoff Frequency or any other parameter of your
+sound device, this can be done.
+Movements of these wheels will be reflected in the Display.
+
+4.2. MIDI Channel
+
+When working in a DAW or multiple hard- or software instruments, you may want to decide
+what MIDI channel KeyLab Essential uses to send notes and controller data. You can easily
+change that channel number by holding the MIDI Channel button and pressing the correct
+key on the keyboard.
+The notes from the lowest C to D# (Eb) in the second octave set MIDI channels to 1–16.
+Example: If you want to transmit on channel 10, hold the MIDI Channel button and hit the
+lowest A key.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+9
+
+The MIDI channel numbers are printed on the front panel for easy reference.
+
+4.3. Bank
+
+KeyLab Essential has 8 Pads that allow you to conveniently play MIDI notes or drum sounds.
+While only 8 pads may seem a bit meager, you can actually use 2 banks. This enables you
+to play/trigger a total of 16 (8 + 8) notes.
+By default, Bank 1 plays MIDI notes 36 (C1) to 43 (G1). Bank 2 plays 44 (G#1) to 51 (D#2).
+Pad Bank
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+A
+
+40 (E1)
+
+41 (F1)
+
+42 (F#1)
+
+43 (G1)
+
+36 (C1)
+
+37 (C#1)
+
+38 (D1)
+
+39 (D#1)
+
+B
+
+48 (C2)
+
+48 (C#2)
+
+50 (D2)
+
+51 (D#2)
+
+44 (G#1)
+
+45 (A1)
+
+46 (A#1)
+
+47 (B1)
+
+You can switch between Bank 1 and 2 by pressing the Bank button. While doing so, the
+Display confirms what Bank is currently selected.
+
+
+
+10
+
+! When Bank B is selected, the Bank button shines brighter.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+4.4. Transpose –/+ and Octave –/+
+
+To transpose the keyboard up or down one semitone, press Transp– or Transp+. When the
+keyboard is transposed one or several semitones, the button shines brighter.
+
+
+
+! By pressing Transp– and Transp+ at the same time, any transposition shift is reset.
+
+To shift the keyboard up or down an octave, press the Oct– or Oct+ button. You can transpose
+3 octaves down and 3 octaves up. When the keyboard is transposed one or several octaves,
+the button shines brighter.
+
+
+
+! By pressing Oct– and Oct+ at the same time, any octave shift is reset.
+
+The Display will reflect your action in either case. Transpose and Octave-shift apply to the
+keyboard only, not the pads. The pads send MIDI note numbers, and those note numbers
+may be edited in the MIDI Control Center app.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+11
+
+4.5. Pads
+
+The eight velocity- and poly pressure-sensitive pads on KeyLab Essential serve multiple
+purposes. In their default state, they send MIDI notes on channel 10 – the channel most
+commonly used for drums in a DAW or multi-timbral synthesizer.
+Press Bank to switch between pad banks A and B. Bank B sends other MIDI notes, also on
+channel 10. The default note numbers — which may all be changed for User Modes in the
+MIDI Control Center app — are:
+Pad Bank
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+A
+
+40 (E1)
+
+41 (F1)
+
+42 (F#1)
+
+43 (G1)
+
+36 (C1)
+
+37 (C#1)
+
+38 (D1)
+
+39 (D#1)
+
+B
+
+48 (C2)
+
+48 (C#2)
+
+50 (D2)
+
+51 (D#2)
+
+44 (G#1)
+
+45 (A1)
+
+46 (A#1)
+
+47 (B1)
+
+
+
+12
+
+! Every time you press the Bank button, the Display will confirm what Bank is currently selected.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+4.6. DAW Control Section
+KeyLab Essential allows you to remotely control your DAW. We have created DEEP scripts
+for 5 major DAWs:
+•
+
+Ableton Live
+
+•
+
+Apple Logic Pro
+
+•
+
+Bitwig Studio
+
+•
+
+Image-Line FL Studio
+
+•
+
+Steinberg Cubase
+
+KeyLab Essential automatically recognizes the above DAWs. On top of that, KeyLab Essential
+can control any DAW on the market thanks to the MCU and HUI protocols.
+
+
+
+! In order to use this sophisticated version of DAW Control, the scripts must be properly installed. To
+
+
+
+! You can download dedicated User Guides for each DAW from the KeyLab Essential's Resources
+
+do so, please upload the latest version of your favorite DAW.
+
+page.
+
+You enter DAW mode by pressing the Prog button until the display says DAWs. This mode is
+required if you want a deep integration using the scripts written for the 5 above mentioned
+DAWs. DAW Control works in any of the Prog modes thanks to the MCU and HUI protocol.
+The twelve buttons to the left of the Display are all DAW related, although Save, Undo and
+Redo can also be used in Arturia Software. These buttons send control messages to your
+software, and they are designed to work conveniently with any DAW. If you want, you can
+re-configure these buttons in MIDI Control Center.
+Using the industry standard Mackie HUI data language, KeyLab Essential gives you direct
+access to the most frequently used commands in your recording software, including:
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+13
+
+•
+
+Save: Saves your track.
+
+•
+
+Quant: Turns Quantize on and off.
+
+•
+
+Undo: Reverses your last action, such as deleting a track, or capturing a MIDI
+performance.
+
+•
+
+Redo: Reverses your last Undo action.
+
+The DAW Command Center also puts popular transport controls at your fingertips:
+•
+
+Loop: Toggles the Loop function in your DAW on and off. The loop region is set
+within your software.
+
+•
+
+Rewind/Fast-forward: Quickly jogs the playback cursor back and forth, letting
+you conveniently find specific points in your track while editing.
+
+•
+
+Metronome: Toggles your DAW’s metronome on and off.
+
+•
+
+Stop: Stops playback. In some recording software, this will also return the
+playback cursor to the start of the track.
+
+•
+
+Play/Pause: Starts and pauses your track at the current position of the playback
+cursor in your DAW.
+
+•
+
+Record: Arms the record function in your DAW. Hitting the Record button while
+the track is stopped will begin playback while recording. If the track is already
+playing, hitting Record will begin recording from the current playback cursor
+position.
+
+•
+
+Tap: Tap Tempo to enter a BPM value.
+
+The buttons in the DAW Command Center default to a general workable configuration, and
+you can re-configure them in MIDI Control Center.
+The output of the DAW Command Center can be toggled between MCU and HUI protocols
+within the MCC.
+
+
+
+NOTE: KeyLab Essential's compatibility with your chosen DAW will depend on how each
+
+manufacturer handles the MCU and HUI protocols. For more information, consult the KeyLab Essential
+page on the Arturia website, or the documentation of your preferred DAW.
+
+•
+
+User Programs: KeyLab Essential can store up to 6 User Programs — custom
+control mappings you have created in the MIDI Control Center app (see separate
+manual). User Presets may be individually enabled or disabled in the Device
+Settings of the MIDI Control Center app. We will explain what to do in more detail
+in Chapter 5, but for now, know that holding Prog and pressing a Pad will select
+any enabled user presets alongside the ARTURIA and DAWs modes as described
+above.
+
+4.6.1. MIDI Setup in you DAW
+When using KeyLab Essential with a DAW, it is important that you get the MIDI setings right.
+In your DAW, probably under Preferences and Audio or MIDI setup, there should be a page
+that describe the MIDI inputs and outputs. After selecting KL Essentrial 49/61 mk3 and your
+MIDI controller, you'll fund further options.
+
+14
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+This is the MIDI device settings page in Studio One
+•
+
+KL Essential (49/61) mk3 MIDI: Enables MIDI communication via the USB-C port
+on KeyLab Essential.
+
+•
+
+KL Essential (49/61) mk3 DINTHRU: Passes outgoing MIDI information from the
+host software through KeyLab Essential’s 5-pin MIDI out connector. This can be
+useful when you want to sequence and control hardware synths with your DAW
+using KeyLab Essential as a MIDI interface.
+
+•
+
+KL Essential (49/61) mk3 MCU/HUI: Enables KeyLab Essential as a Mackie
+Control Universal surface via a dedicated port, to not interfere with other MIDI
+messages as notes or control changes.
+
+•
+
+KL Essential (49/61) mk3 ALV Transmits screen messages from Analog Lab V to
+KeyLab Essential.
+
+You will almost always want KL Essential (49/61) mk3 MIDI turned on. If using KeyLab
+Essential to control any of the custom supported DAWs [p.43], ensure KL Essential (49/61)
+mk3 MCU/HUI is not activated.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+15
+
+4.7. Prog
+By pressing Prog repeatedly, you will cycle through KeyLab Essentials main modes.
+
+
+
+•
+
+Arturia: This mode is used to control any instrument in your computer.
+
+•
+
+DAWs: This mode enables the scripts written especially for these DAWs: Live,
+Logic Pro, Bitwig Studio, FL Studio, and Cubase.
+
+•
+
+User: You can use up to 6 User Programs of presets, i.e. those that are enabled in
+MIDI Control Center.
+
+! Alternatively, you can hold Prog and select any mode by pressing the appropriate Pad. ! When
+
+controlling your DAW using the MCU/HUI protocol, KeyLab Essential may be in any Prog mode (Arturia,
+DAWs, or User 1–6).
+
+16
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+4.8. Part
+This section will describe the features found when pressing the Part button.
+
+The Part feature can be used in both User/DAW mode and Arturia mode. However, this
+feature works differently in the first case and the second case.
+In the first case, the purpose of this feature is to, for example, control different virtual
+instruments or hardware products at the same time.
+In the second case, the Part feature allows you to control remotely multi presets from
+Analog Lab V.
+Analog Lab V can, as many other virtual instruments, operate in Single and Multi mode.
+When using a Multi, you will often need greater control over the individual parts, and KeyLab
+Essential gives you lots of options here.
+
+
+
+To learn more about how to control parts in Analog Lab V, please refer to the Controlling Parts in
+
+Analog Lab V [p.39] section of this manual.
+
+You exit Part mode by pressing the button below On.
+Hitting the button below the Return symbol exits the Part section.
+
+4.8.1. Setting Split Points
+When first hitting the Part button, the Display will confirm that you're controlling Part 1.
+Immediately pressing Part again takes you to Part 2. If no Split Point or Multi is activated,
+the Display will invite you to create one or enter the menu.
+
+By long-pressing Part, you will enter edit mode for Part 1 or 2. You can select what part to
+edit by selecting one of the P1 and P2 buttons at the bottom of the screen.
+On this page, you can also set the Split point. When you rotate the Main Encoder, you skip
+through the four edit points:
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+17
+
+•
+
+Lower limit for Part 1.
+
+•
+
+Upper limit for Part 1.
+
+•
+
+Lower limit for Part 2.
+
+•
+
+Upper limit for Part 2.
+
+You can edit any of those points by rotating to the desired point, then clicking the Main
+Encoder and turning it to edit. Clicking again takes you back to select mode.
+With this flexible layout, you can easily create overlaps or a very limited note range for any
+part. And of course, with both parts covering the same note range, two sounds will play in
+unison.
+
+4.8.2. Editing Part 1 and 2
+When in Multi or Split Point mode, you can edit Part 1 or 2 by pressing the button below P1
+or P2. The heading on the screen will now read Editing Part 1 (or 2).
+
+By navigating this menu, you now have the option to change octave and MIDI channel for
+the parts. Very straightforward.
+Hitting the button below the Return symbol takes you back to the Part menu, and a second
+press exits the Part section.
+
+18
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+4.9. Hold Mode
+
+The button marked Hold will hold the last note(s) played until a new note is played or until
+you disengage the Hold function.
+You activate Hold by pressing its button. The button will light up and the display will say Hold
+mode ON. You turn off Hold by pressing the button again.
+
+The Hold function differs from using a sustain pedal. After pressing a sustain pedal, every
+note you play will keep sustaining until you release the pedal. In Hold mode, only notes that
+are played simultaneously will be held. Example: Activate Hold mode and play C and G, then
+release the keys. Those two notes will now keep on sounding until you hit a new key or keys;
+C and G will stop playing and the newly added note(s) will be held.
+
+
+
+! Hold can be activated in two ways – either by pressing the Hold button before playing the notes
+
+or when the keys are actually played (before they are released). ! When Hold is active, the Hold button
+shines brighter. ! Hold only works in conjunction with the keys, not the pads.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+19
+
+4.10. Chord Mode
+
+KeyLab Essential includes a Chord Mode that memorizes chords you input and then allows
+you to play them from one key, transposing as it goes.
+Chord information is transmitted as MIDI data over the USB-C port and/or 5-pin MIDI output,
+depending on which are selected in your host software’s MIDI settings.
+To turn chord mode on and off, Chord button. With Chord on, playing one note will play the
+last recorded chord.
+
+
+
+! Chords can be scaled and can be fed into the Arpeggiator. ! The Chord Play mode (whether
+
+the chord is playing or not) and the Chord Edit mode (where you tweak the chord) are somewhat
+independent of each other, i.e. the Chord doesn't automatically play just because you enter Chord Edit
+mode. Also, quitting Chord Edit mode doesn't turn off the Chord function.
+
+4.10.1. Playing Predefined Chords
+After long-pressing and releasing the Chord button, you can select any of the predefined
+chords in KeyLab Essential. You will find them under Preset.
+
+20
+
+•
+
+Octave
+
+•
+
+5th
+
+•
+
+Major Triad
+
+•
+
+Minor Triad
+
+•
+
+Sus 2
+
+•
+
+Sus 4
+
+•
+
+Major 7
+
+•
+
+Minor 7
+
+•
+
+Major 9
+
+•
+
+Minor 9
+
+•
+
+Major 11
+
+•
+
+Minor 11
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+4.10.2. Creating a Chord
+You enter Chord Edit mode by long-pressing the Chord button. Now the text in the Display
+says Create Chord.
+You leave Chord Edit mode by pressing the leftmost contextual button (under the down-left
+pointing arrow).
+
+Now, play the chord you want KeyLab Essential to memorize on the keyboard, either all at
+once or adding a note at a time. The display shows the following:
+
+Then, release the Chord button. Chord mode is automatically enabled. Your chord is now
+memorized and will be retained if you leave Chord Mode and return, and even if KeyLab
+Essential is powered off. To overwrite the chord with a new one, simply repeat the process.
+
+
+
+! If you want the lowest note in the chord to be the root note (this should be the most common
+
+preference), make sure to play the lowest note before the other notes (when creating a chord).
+
+You exit Chord mode by pressing the Chord button again.
+
+
+
+! When Chord is active, the Chord button shines brighter. ! Chord only works in conjunction with the
+
+keys, not the pads.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+21
+
+4.11. Scale
+You enter Scale Edit mode by long-pressing the Scale button.
+You leave Scale Edit mode by pressing the leftmost contextual button (under the down-left
+pointing arrow).
+
+The Scale function helps you stay in the right key and tonality when playing. Scale works by
+simply redirecting those notes that don't belong to the scale selected. As a result, every note
+you play on the KeyLab Essential will "sound right".
+You activate Scale mode by pressing the Scale button. Whatever scale and key was last
+selected, will now be activated.
+By long-pressing Scale, you will be presented with the Scale page. Press the button below
+Root and use the large Encoder Knob to select the key you want to use. Press the fourth
+button, under Type, to choose the preferred type of scale.
+
+There are a number of scales to choose from:
+
+22
+
+•
+
+Chromatic: Standard scale used on every western keyboard instrument.
+
+•
+
+Major: Major scale.
+
+•
+
+Minor: Natural minor.
+
+•
+
+Dorian: Dorian (or doric) mode.
+
+•
+
+Phrygian: Phrygian mode.
+
+•
+
+Lydian: Lydian mode.
+
+•
+
+Mixolydian: Mixolydian mode.
+
+•
+
+Locrian: Locrian mode.,
+
+•
+
+Harmonic Minor: Harmonic minor.
+
+•
+
+Blues: Blues scale with only 6 notes.
+
+•
+
+Pentatonic Major: 5 note pentatonic scale.
+
+•
+
+Pentatonic Minor: 5 note pentatonic, also a simplified blues scale.
+
+•
+
+Japanese: 5 note pentatonic scale.
+
+•
+
+Gypsy: One of several Gypsy scales.
+
+•
+
+Arabic: Arabic or double harmonic scale.
+
+•
+
+Freygish: Freygish or Phrygian dominant scale.
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+The Scale display actually shows you what notes are included in the scale you have chosen.
+Please look at the small keyboard in the Display.
+The white notes are included in the scale and the black ones are omitted. The root key is
+marked by an arrow.
+To get back to standard keyboard mode (no Scale selected), press the Scale button.
+
+
+
+! When Scale is active, the Scale button shines brighter. ! Scale only works in conjunction with
+
+the keys, not the pads. ! The Scale Play mode (whether the scale is active or not) and the Scale Edit
+mode (where you tweak the scale) are somewhat independent of each other, i.e. the Scale doesn't
+automatically become active just because you enter Scale Edit mode. Also, quitting Scale Edit mode
+doesn't turn off the Scale function.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+23
+
+4.12. Arpeggiator
+
+KeyLab Essential includes a fun and flexible Arpeggiator fashioned after those in classic
+synths, letting you craft rolling, percolating patterns out of held chords.
+An arpeggiator is included in many synthesizer models. It takes chords played on the
+keyboard and converts them into arpeggios. An arpeggiator usually includes controls for
+Speed, Range (in octaves), Mode (if the pattern moves up, down, or up/down etc.), and Hold
+(continues playing the arpeggio after the keys have been released).
+Arpeggiator information is transmitted as MIDI data over the USB-C port and/or 5-pin MIDI
+output, depending on which are selected in your host software’s MIDI settings.
+
+4.12.1. Activating and deactivating the Arpeggiator
+To turn the arpeggiator on and off, press the Arpeggio button. The KeyLab Essential display
+will momentarily reflect its state:
+
+
+
+! The Arpeggiator is triggered only by the keyboard, not the pads. Also, when the Arpeggiator is
+
+activated, the pads can still be used to trigger sounds.
+
+24
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+4.12.2. Entering and leaving Arpeggio Edit
+You enter the Arpeggio Edit pages by long-pressing the Arp button.
+You leave Arpeggio Edit by pressing the leftmost contextual button (under the down-left
+pointing arrow).
+When in Arpeggiator Edit, the display will always show this:
+
+
+
+! The Arpeggio Play state (whether the arpeggiator is running or not) and the Arpeggio Edit
+
+status (where you tweak the arpeggiator's behavior) are somewhat independent of each other, i.e. the
+Arpeggiator doesn't automatically start just because you enter the Arpeggiator Edit pages. Also, quitting
+Arpeggio Edit doesn't turn off the Arpeggiator.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+25
+
+4.12.3. Editing the Arpeggiator
+Please read the previous chapters about the two distinct Arpeggiator states – Arpeggiator
+Play and Arpeggiator Edit first. Once you've learned that part, we can start editing the way
+the Arpeggiator plays patterns.
+So, long-press the Arpeggiator button to get into the Arpeggiator Edit page. Then, hit the
+Arpeggiator button to activate the Arpeggiator.
+The display will now look like this:
+
+The Arpeggio Edit functions occupy two pages. You can change pages by hitting the 1 or 2
+buttons below the screen. An alternative method is to simply turn the Encoder knob.
+The Arpeggiator parameters are:
+•
+
+On/Off: Engages or disengages the Arpeggiator.
+
+•
+
+Mode: Chooses the order in which the Arpeggiator plays notes.
+
+•
+
+Division: Adjusts the rhythmic subdivision relative to master tempo.
+
+•
+
+Gate: Adjusts the gate time of notes, i.e. the length of each arpeggiated note.
+
+•
+
+Swing: Adds a swing factor for a “behind the beat” feel.
+
+•
+
+Rate: Sets the Arpeggiator rate in beats per minute when Sync is set to Internal.
+
+•
+
+Sync: Selects KeyLab Essential’s internal clock (Rate) or an external source such
+as connected software or hardware (Ext) as the source of master tempo.
+
+•
+
+Octaves: Chooses the octave range of played notes, from zero to three octaves.
+
+To select a parameter for editing, click the Encoder. Then turn the Encoder to edit. When
+done, click the Encoder again.
+When browsing the parameters, the values are underscored.
+
+When a parameter is ready for editing, its value is surrounded by a square.
+
+26
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+4.12.4. Arpeggiator Parameters
+Now let’s describe each arpeggiator parameter in more detail.
+
+4.12.4.1. Arpeggiator On/Off
+
+This parameter has two states: On or Off. Edit to turn Arpeggiator On off Or. A quicker
+method is to hit the Arpeggiator button.
+
+4.12.4.2. Mode
+
+Mode governs the play order of arpeggiated notes. The choices are:
+•
+
+Up: Plays notes in ascending order only.
+
+•
+
+Down: Plays notes in descending order only.
+
+•
+
+Inc: Inclusive. Plays notes in ascending and descending order and repeats the
+highest and lowest notes in the pattern.
+
+•
+
+Exc: Exclusive. Plays notes in ascending and descending order and does not
+repeat the highest and lowest notes in the pattern.
+
+•
+
+Rand: Random. Plays all held notes in random order.
+
+•
+
+Order: Plays notes in the order in which you pressed keys on the keyboard.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+27
+
+
+
+♪ While Order offers the most flexibility, random arpeggiation was a signature of ’80s synthpop hits
+
+such as “Rio” by Duran Duran.
+
+4.12.4.3. Division
+
+This setting controls the rhythmic subdivision of the Arpeggiator relative to master tempo —
+whether the tempo source is internal or external. Values include 1/4-, 1/8th-, 16th-, and 32ndnotes, both “straight” and with triplet feel options. “T” after the displayed value (e.g. “1/8T”)
+indicates triplet feel.
+
+
+
+! With 1/8 division chosen, even eighth notes are played. With 1/8T, 3 eighth note triplets will play.
+
+This differs from Swing, where a Swing value of 67% will play eighth notes in a triple fashion.
+
+4.12.4.4. Gate
+
+Gate time is the duration window during which each note is allowed to “speak,” and it’s the
+same from note to note. Lower gate times result in a more clipped or staccato sound, while
+longer gate times give the full envelope of the notes more of a chance to play out.
+
+
+
+♪ If the volume envelope of a sound has a long release, reducing the Gate time helps arpeggiated
+
+notes sound more defined.
+
+28
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+4.12.4.5. Swing
+
+Swing is a “behind the beat” feeling instead of a perfectly even rhythmic pulse.
+With 1/8 chosen as a division and Swing set to Off (which is actually 50%), all eighth notes
+are played evenly. By increasing the Swing factor, every second note in an eighth note group
+will play later. At 67%, you get a true (exact) swing feel. Values in the 55–64 range give a
+slightly jerky feel that can be magic in some cases.
+This behaviour of course applies to all divisions – 1/8, 1/16, and 1/32.
+
+4.12.4.6. Rate
+
+This parameter adjusts the rate of the Arpeggiator in beats per minute, but only when
+the Sync parameter is set to Internal. If you turn this knob while external Sync is set, the
+message “External Sync selected” is displayed.
+
+
+
+♪ You can also set the rate using the Tap Tempo [p.31] button.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+29
+
+4.12.4.7. Sync
+
+There are two options here: Internal and External.
+
+
+
+•
+
+Rate: Arpeggiator speed is determined by KeyLab Essential’s internal clock and
+Rate setting (see above).
+
+•
+
+Ext: Arpeggiator Rate is determined by the tempo set in host software such as
+a DAW. If there is no clock detected by the Arpeggiator, playing the KeyLab
+Essential keyboard will trigger a popup saying "Arp Sync: Ext - No clock detected".
+Also, you'll have to make sure a clock is sent to the USB port of KeyLab Essential
+and don't forget to press play in your DAW.
+
+♪ Which one to use? If you’re playing Analog Lab in as a stand-alone instrument, using KeyLab
+
+Essential’s internal tempo lets you quickly tweak the rate across everything you’re doing. Likewise
+if you’re controlling a hardware synth module from the 5-pin MIDI port. If Analog Lab or another
+instrument is a plug-in within a DAW session, then of course you’ll want to set KeyLab Essential to
+External and let your DAW direct tempo. ♪ A DAW can only control the Arpeggiator Rate when the DAW
+is playing; KeyLab Essential can't sync to a DAW that is stopped.
+
+4.12.4.8. Octave
+
+The Arpeggiator can play notes in a range of zero to three octaves up. At zero, it plays only
+the actual notes as held on the keyboard, at 1 it adds one octave up and so on.
+
+30
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+4.13. Tap Tempo
+
+Tap Tempo lets you set KeyLab Essential’s internal clock for the Arpeggiator by tapping in a
+beat. If performing with bandmates that include a live drummer — or drum machine that’s
+not MIDI’ed or synced to anything — this lets you sync up KeyLab Essential by ear.
+
+
+
+♪ The more times you tap, the better the clock will match whatever beat is in the air.
+
+4.13.1. The Arpeggiator, Chord Mode, Scale Mode, and Hold
+Mode
+Chord Mode interacts with the Arpeggiator. If both are turned on, the Arpeggiator plays the
+notes in the memorized chord, applying all of the other settings such as Mode, Division, etc.
+Chords can also be scaled and fed into the Arpeggiator.
+Scale interacts in a similar way, as the arpeggiated notes based on the chord will be
+quantized to the selected scale.
+
+Now, engage Hold, and you can change the musical key of the Arpeggiator by striking single
+notes, setting your hands free to tweak other things in your session!
+
+
+
+! Remember that Hold can be activated by its own for long evolving pads, for instance.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+31
+
+4.14. Vegas Mode
+If left idle, KeyLab Essential will go into what we call “Vegas Mode,” which is akin to a
+computer screensaver. The Display will go dark and the pads will cycle through a rainbow
+of colors.
+Simply play a key or touch any control on KeyLab Essential to return to normal operation.
+
+
+
+! In the MIDI Control Center app you can set the time before Vegas Mode kicks in or disable Vegas
+
+mode and let KeyLab Essential go into sleep mode instead (with screen and LEDs off). By default, Vegas
+Mode starts after 5 minutes.
+
+32
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+4.15. Factory Reset
+
+
+
+! This procedure will erase all user presets and device settings and restore them to factory defaults.
+
+Use the MIDI Control Center software to back up your changes first.
+
+To reset the KeyLab Essential to its original factory settings:
+1. Unplug the USB-C cable from the back of the keyboard.
+2. Hold down the contextual buttons 1 and 2 below the screen.
+3. Plug the USB-C cable back in and continue to hold the buttons until the screen says
+Firmware / Exit / Reset.
+
+4. Release buttons 1 and 2. Press Reset to reset KeyLab Essential to its original factory
+settings or press Exit to exit to normal operation.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential operations
+
+33
+
+5. KEYLAB ESSENTIAL AND ANALOG LAB V
+This chapter will focus mostly on how KeyLab Essential interacts with Analog Lab V – a
+browser of preset sounds from keyboard and synth instruments that shaped music history.
+
+Armed with Keylab Essential and Analog Lab V, you'll be able to cover every possible
+musical situation.
+
+5.1. Important Note — It’s All Malleable
+Everything described here covers a default operating mode designed to get you up and
+running quickly with KeyLab Essential and your Analog Lab V. The parameters assigned to
+a Macro surely vary from Preset to Preset, so what you hear when you turn knobs 1-8 will
+be different.
+You can also treat KeyLab Essential as a generic MIDI controller, overriding the default
+control assignments by directly MIDI “Learn”-ing new ones from within any Arturia
+instrument — select the MIDI settings tab, click learn, choose a parameter onscreen, and
+wiggle a control on KeyLab Essential.
+
+
+
+! KeyLab Essential works like any other MIDI controller with non-Arturia software and plug-ins, but
+
+with the advantage of MIDI Control Center letting you determine exactly what messages and values
+each of its controls sends.
+
+34
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential and Analog Lab V
+
+5.2. Audio and MIDI Setup
+The first thing to do after launching Analog Lab V in stand-alone mode, is to make sure
+the software is set to output audio correctly and that it will receive MIDI from the KeyLab
+Essential keyboard.
+
+If running Analog Lab V in stand-alone mode, open its Audio MIDI Settings from the main
+menu (the 3 horizontal lines in the upper left corner). If using Analog Lab V as a plug-in
+inside your DAW, open the MIDI preferences in your DAW and select KeyLab Essential (49/
+61) mk3 MIDI in the input list, then create an Analog Lab V track and arm it: You will now be
+able to play and control Analog Lab V inside your favorite DAW.
+The above screen shows the settings in Analog Lab V stand-alone. Configure your audio
+device as desired. The important thing here are the three MIDI ports/devices that KeyLab
+Essential shows to Analog Lab V or any DAW:
+•
+
+KL Essential (49/61) mk3 MIDI: Enables MIDI communication via the USB-C port
+on KeyLab Essential.
+
+•
+
+KL Essential (49/61) mk3 DINTHRU: Passes outgoing MIDI information from the
+host software through KeyLab Essential’s 5-pin MIDI out connector. This can be
+useful when you want to sequence and control hardware synths with your DAW
+using KeyLab Essential as a MIDI interface.
+
+•
+
+KL Essential (49/61) mk3 MCU/HUI: Enables KeyLab Essential as a Mackie
+Control Universal surface via a dedicated port, to not interfere with other MIDI
+messages as notes or control changes.
+
+•
+
+KL Essential (49/61) mk3 ALV Transmits screen messages from Analog Lab V to
+KeyLab Essential.
+
+You will almost always want KL Essential (49/61) mk3 MIDI turned on. If using KeyLab
+Essential to control any of the custom supported DAWs [p.43] described in the next chapter,
+ensure KL Essential (49/61) mk3 MCU/HUI is not activated.
+
+5.2.1. Analog Lab V MIDI Settings
+Click the gear icon at the upper right corner of Analog Lab V to open the Settings section.
+Click on the MIDI tab and select KL Essential from the MIDI Controller drop-down menu, if
+it has not already beed automatically detected.
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential and Analog Lab V
+
+35
+
+This will select a template of custom controller mappings. When Controls is engaged in the
+lower toolbar of Analog Lab V, a duplicate of KeyLab Essential’s controls are displayed at
+the bottom of the screen, like so:
+
+Now – and this is important – make sure the ARTURIA program mode is selected by clicking
+the Prog button in KeyLab Essential. You may have to click a few times. You can also hold
+the Prog button and press Pad 1.
+
+36
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential and Analog Lab V
+
+5.3. Browsing Presets
+One of the first things KeyLab Essential can do in Analog Lab V is browse and select sound
+Presets using the Main Encoder.
+Turn the Main Encoder knob to scroll through the Presets shown in the central search results
+area of Analog Lab V’s browser. Press the knob to load a Preset. The display in KeyLab
+Essential will show the Preset name and its Type:
+
+
+
+! A preset that has been selected but not loaded yet, shows a blinking name in the Display.
+
+Long-pressing the knob will then add the Preset to your Liked Presets in Analog Lab V, or
+remove it if it was previously Liked. Pressing the button below the heart symbol has the
+same effect.
+A heart icon appears in Analog Lab V to indicate a liked preset.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential and Analog Lab V
+
+37
+
+5.3.1. Browsing Within Types
+You can also drill partway down into the “tree structure” of Analog Lab V’s Preset hierarchy,
+specifically the categories of Presets known as Types.
+
+Turn the main encoder (the one below the display) to browse through the different
+instrument Types. Press the encoder to select that Type. You can now turn the encoder to
+scroll through subtypes only within the chosen Type.
+To go back up one level in the hierarchy when browsing Presets within a Type (i.e. to the
+level where you’re selecting Types), press the button below Types
+
+5.3.1.1. Navigating Types
+•
+
+To browse between Types: Turn the Main encoder knob.
+
+•
+
+To select a Type: Press encoder.
+
+•
+
+To display all Presets within a Type: Click on the button below the Tick icon. All
+Presets within that Type are now listed on your computer screen.
+
+•
+
+To access subtypes, click on the main encoder.
+
+•
+
+If you are in a subtypes list, clicking on the main encoder will enter the subtypes
+preset list.
+
+5.4. Knobs and Faders
+With KeyLab Essential in ARTURIA mode (press Prog until you get there) and KeyLab
+Essential selected as the MIDI controller in the MIDI settings [p.35], the knobs and faders
+are dedicated to parameters in a way intended to make your live performances and studio
+tweaking super smooth.
+
+The Knobs and Faders are assigned to the Arturia instrument’s Macros. Since you can assign
+multiple parameters to a Macro, you can get a lot of mileage out of twisting a single knob on
+KeyLab Essential. This is even more true if you own full versions of V Collection instruments,
+which you can then open inside of Analog Lab V to map their internal parameters to Macros.
+
+
+
+! Please make sure to select KL Essential 3 as your MIDI Controller under the cogwheel in Analog
+
+Lab V's upper right corner. You can edit exactly what every Knob and Fader does in the MIDI Control
+Center app.
+
+38
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential and Analog Lab V
+
+5.5. Pads
+
+The Pads in KeyLab Essential’s send MIDI notes as outlined in the previous chapter. The
+default notes are:
+Pad Bank
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+A
+
+40 (E1)
+
+41 (F1)
+
+42 (F#1)
+
+43 (G1)
+
+36 (C1)
+
+37 (C#1)
+
+38 (D1)
+
+39 (D#1)
+
+B
+
+48 (C2)
+
+48 (C#2)
+
+50 (D2)
+
+51 (D#2)
+
+44 (G#1)
+
+45 (A1)
+
+46 (A#1)
+
+47 (B1)
+
+5.6. Controlling Parts in Analog Lab V
+When KeyLab Essential is in Arturia mode (press the Prog button until you get there), the
+Part feature allows you to remotely control multi presets in Analog Lab V.
+To use this feature, you can either load a Multi preset (turn the Main Encoder and click to
+select) or add a part to a single preset.
+
+5.6.1. Adding a Part in Analog Lab V
+To add a part, long-press the Part button while being on a Single preset. By doing so, you
+will enter the Add Part menu.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential and Analog Lab V
+
+39
+
+This menu has four options.
+
+
+
+•
+
+Types: Takes you to to the Types menu
+
+•
+
+Validate part or Remove part: Validates or Removes a part (if no preset is loaded)
+
+•
+
+Browse Up: Scrolls backwards in the preset list and loads the preset
+
+•
+
+Browse Down: Scrolls forward in the preset list and loads the preset
+
+To select a preset, and to be able to listen to it, click on the main encoder.
+
+5.6.2. Editing an Existing Multi Preset
+You can also edit a Multi preset that has been loaded in Analog Lab V. To do so, long-press
+the Part button, then release it. This takes you to the Multi Part page.
+
+Here you can create Splits by adjusting the split points for part 1 and 2.
+Also on this page there a 4 dedicated functions.
+
+40
+
+•
+
+Back: Takes you back to the previous page
+
+•
+
+Edit Part 1: Lets you tweak further parameters in part 1
+
+•
+
+Edit Part 2: Lets you tweak further parameters in part 2
+
+•
+
+Remove Part 2: Removes part 2
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential and Analog Lab V
+
+5.6.3. Editing in the Part Menu
+By pressing the button below the Edit Part 1 or Edit Part 2 symbol, you can edit a further set
+of parameters.
+
+•
+
+Back: Takes you back to the previous menu
+
+•
+
+Replace Part 1 or Part 2: Gives you access to the Replace Part menu
+
+•
+
+Octave: Changes the octave played by the part
+
+•
+
+MIDI Channel: Set the MIDI channel of the part that Analog Lab V listens to
+
+5.6.3.1. Replace part menu
+
+This menu allows you to load a preset into a specific part. You have four options:
+
+
+
+•
+
+Types: Access to the types menu
+
+•
+
+Validate part or Remove part: Lets you validate or remove a part (if no preset is
+loaded)
+
+•
+
+Browse Up: Scrolls backwards in the preset list and loads the preset
+
+•
+
+Browse Down: Scrolls forward in the preset list and loads the preset
+
+! To load a preset, you can also click on the Main Encoder. Loading the preset allows you to listen to
+
+the preset.
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential and Analog Lab V
+
+41
+
+5.6.4. Controlling Parts
+Controlling a part allows you to control the parameters of this specific part.
+To select a part to control, short press the part button. It will switch between part 1 and part
+2.
+
+
+
+Clicking 3 times will get you back to the "Master" Part.
+
+On the display, you will have four options:
+
+42
+
+•
+
+Types: Takes you to the Types list
+
+•
+
+Replace Part: Allows you to replace part 1 or 2
+
+•
+
+Browse Up: Scrolls backwards in the preset list and loads the preset
+
+•
+
+Browse Down: Scrolls forward in the preset list and loads the preset
+
+Arturia - User Manual KeyLab Essential mk3 - KeyLab Essential and Analog Lab V
+
+6. DAW CONTROL
+KeyLab Essential can control all popular DAW (digital audio workstation) software
+programs. Some are directly integrated with KeyLab Essential and others utilize the widely
+used Mackie Control Universal (MCU) or Human User Interface (HUI) protocols.
+Functionality varies depending upon the software, but things KeyLab Essential can do
+include browsing, selecting, and arming tracks; scrolling through the timeline; adjusting
+track volumes and pans; adjusting select parameters inside plug-ins; and controlling the
+transport using the DAW Transport Command Center.
+
+6.1. Custom Controlled DAWs
+This section provides some general information on how you can remotely control the DAWs
+that enjoy advanced integration with KeyLab Essential.
+
+This is what KeyLab Essential looks like in Cubase with advanced
+integration in place.
+For more details about these DAWs, please refer to our dedicated User Guides – one for each
+DAW.
+
+
+
+You can download them from the KeyLab Essential's Resources page.
+
+To begin using KeyLab Essential in DAW Control mode, press the Prog button so the display
+reads “DAWs Program”. KeyLab Essential is now ready to remotely control these fully
+integrated DAWs:
+•
+
+Ableton Live
+
+•
+
+Bitwig Studio
+
+•
+
+Apple Logic Pro
+
+•
+
+Image-Line FL Studio
+
+•
+
+Steinberg Cubase
+
+Please prepare your DAW if you're using any of the five mentioned above. The DAW scripts
+for KeyLab Essential may have to be installed manually. Once you've made sure that you're
+fully up to date, it'll be smooth sailing and your DAW will now recognize KeyLab Essential
+automatically.
+
+
+
+! Clarification: KeyLab Essential can remotely control Loop On/Off, Stop, Play, and Record in any
+
+DAW. Full integration will be added to more DAWs in the future. In the meantime, the user can use create
+similar functionality in MIDI Control Center.
+
+Arturia - User Manual KeyLab Essential mk3 - DAW Control
+
+43
+
+When set to DAWs Program, KeyLab Essential will automatically recognize and connect to
+your DAW. If your DAW isn't recognized, please check your DAW's MIDI settings and make
+sure your DAW is up to date.
+If KeyLab Essential still doesn't recognize the DAW, please refer to these manuals for full
+info on installation and trouble-shooting.
+
+
+
+! Of course you can use all other KeyLab Essential features – like Hold, Chord, Arpeggiator, Transpose
+
+etc. – in any DAW.
+
+6.1.1. Transport Control
+
+With KeyLab Essential in DAW mode, you can use the 6 Transport buttons to the left of the
+screen to control your DAW transport plus Metronome and Tap Tempo. This works similarly
+across all supported DAWs.
+Pad
+
+Function
+
+Display
+
+1
+
+Loop Mode On/Off
+
+Loop Mode ON/OFF
+
+2
+
+Rewind
+
+Rewinds you DAW
+
+3
+
+Fast Forward
+
+Fast forwards your DAW
+
+4
+
+Metronome
+
+Turns DAW metronome ON/OFF
+
+5
+
+Stop
+
+PLAY icon in the lower left corner
+
+6
+
+Play/Pause
+
+PLAY icon in the lower left corner disappears
+
+7
+
+Record
+
+Record icon appears in the upper left corner
+
+8
+
+Tap Tempo
+
+Tap Tempo XX BPM when tapping this pad
+
+Buttons are lit more brightly when their functions are engaged, as shown by the example of
+the play button in the above photo.
+In addition to the above functions, there are numerous DAW-specific functionality in the 5
+DAWs currently supported. For full info, please refer to these manuals.
+
+44
+
+Arturia - User Manual KeyLab Essential mk3 - DAW Control
+
+6.2. DAW Control with Mackie Control Universal
+DAWs for which we do not have custom scripts as of KeyLab Essential’s release, may still be
+controlled using the Mackie Control Universal (MCU) or Human User Interface (HUI) protocol.
+By design, KeyLab Essential defaults to not outputting MCU or HUI in order to avoid certain
+issues. You need to activate it in the MCC if you want to use these protocols.
+Setting up MCU varies from one DAW to another, so consult your DAW’s documentation for
+details. In general, however, you will take these steps:
+•
+
+Enable the MIDI input port KeyLab Essential (49/61) mk3 MCU/HUIM in your
+DAW’s MIDI preferences.
+
+•
+
+Add and set up Mackie Control in your DAW’s “Control Surfaces” settings if it has
+them.
+
+Arturia - User Manual KeyLab Essential mk3 - DAW Control
+
+45
+
+7. DECLARATION OF CONFORMITY
+7.1. FCC
+WARNING: DO NOT MODIFY THE UNIT!
+Any modifications or other changes to this unit not approved by the party responsible for
+compliance could void the user’s authority to operate this equipment.
+This device complies with Part 15 of the FCC Rules. Operation is subject to the following
+two conditions: (1) This device may not cause harmful interference, and (2) This device
+must accept any interference received, including interference that may cause undesired
+operation.
+Responsible Party in USA: Zedra, 185 Alewife Brook Parkway, #210, Cambridge, MA 02138,
+United States T: +1 857 285 5953
+Trade Name: ARTURIA, Model Number: KeyLab Essential mk3
+Note: This equipment has been tested and found to comply with the limits for a Class B
+digital device, pursuant to part 15 of the FCC Rules. These limits are designed to provide
+reasonable protection against harmful interference in a residential installation. This
+equipment generates, uses, and can radiate radio frequency energy and, if not installed
+and used in accordance with the instructions, may cause harmful interference to radio
+communications. However, there is no guarantee that interference will not occur in a
+particular installation. If this equipment does cause harmful interference to radio or
+television reception, which can be determined by turning the equipment off and on, the user
+is encouraged to try to correct the interference by one or more of the following measures: •
+Reorient or relocate the receiving antenna. • Increase the separation between the equipment
+and receiver. • Connect the equipment into an outlet on a circuit different from that to which
+the receiver is connected. • Consult the dealer or an experienced radio/TV technician for
+help.
+
+7.2. CANADA
+This class B digital apparatus meets complies with Canadian ICES-003.
+Cet appareil numérique de la classe B est conforme à la norme NMB-003 du Canada
+
+7.3. CE
+This device has been tested and found to comply with the limits of the European Council
+Directive on the approximation of the laws of the member states relating to Electromagnetic
+Compatibility according to 2014/30/EU, and Low Voltage Directive 2014/35/EU.
+
+46
+
+Arturia - User Manual KeyLab Essential mk3 - Declaration of Conformity
+
+7.4. ROHS
+This device has been produced with lead free solder and fulfills the requirements of the
+ROHS directive 2011/65/EU.
+
+This symbol indicates that the electrical and electronic equipment should not be disposed of
+as general household waste at its end-of-life. Instead, the products should be handed over
+to the applicable collection points for the recycling of electrical and electronic equipment for
+proper treatment, recovery, and recycling in accordance with your national legislation and
+the Directive 2012/19/EU (WEEE – Directive on Waste Electrical and Electronic Equipment).
+For more information about collection points and recycling of these products, please contact
+your local municipal office, your household waste disposal service, or the shop where you
+purchased the product.
+
+Arturia - User Manual KeyLab Essential mk3 - Declaration of Conformity
+
+47
+
+8. SOFTWARE LICENSE AGREEMENT
+In consideration of payment of the Licensee fee, which is a portion of the price you paid,
+Arturia, as Licensor, grants to you (hereinafter termed “Licensee”) a nonexclusive right to
+use this copy of the Analog Lab V (hereinafter the “SOFTWARE”).
+All intellectual property rights in the software belong to Arturia SA (hereinafter: “Arturia”).
+Arturia permits you only to copy, download, install and use the software in accordance with
+the terms and conditions of this Agreement.
+The product contains product activation for protection against unlawful copying. The OEM
+software can be used only following registration.
+Internet access is required for the activation process. The terms and conditions for use of the
+software by you, the end-user, appear below. By installing the software on your computer
+you agree to these terms and conditions. Please read the following text carefully in its
+entirety. If you do not approve these terms and conditions, you must not install this software.
+In this event give the product back to where you have purchased it (including all written
+material, the complete undamaged packing as well as the enclosed hardware) immediately
+but at the latest within 30 days in return for a refund of the purchase price.
+1. Software Ownership Arturia shall retain full and complete title to the SOFTWARE recorded
+on the enclosed disks and all subsequent copies of the SOFTWARE, regardless of the media
+or form on or in which the original disks or copies may exist. The License is not a sale of the
+original SOFTWARE.
+2. Grant of License Arturia grants you a non-exclusive license for the use of the software
+according to the terms and conditions of this Agreement. You may not lease, loan or sublicense the software.
+The use of the software within a network is illegal where there is the possibility of a
+contemporaneous multiple use of the program.
+You are entitled to prepare a backup copy of the software which will not be used for
+purposes other than storage purposes.
+You shall have no further right or interest to use the software other than the limited rights as
+specified in this Agreement. Arturia reserves all rights not expressly granted.
+3. Activation of the Software Arturia may use a compulsory activation of the software and
+a compulsory registration of the OEM software for license control to protect the software
+against unlawful copying. If you do not accept the terms and conditions of this Agreement,
+the software will not work.
+In such a case the product including the software may only be returned within 30 days
+following acquisition of the product. Upon return a claim according to § 11 shall not apply.
+4. Support, Upgrades and Updates after Product Registration You can only receive support,
+upgrades and updates following the personal product registration. Support is provided only
+for the current version and for the previous version during one year after publication of the
+new version. Arturia can modify and partly or completely adjust the nature of the support
+(hotline, forum on the website etc.), upgrades and updates at any time.
+The product registration is possible during the activation process or at any time later through
+the Internet. In such a process you are asked to agree to the storage and use of your
+personal data (name, address, contact, email-address, and license data) for the purposes
+specified above. Arturia may also forward these data to engaged third parties, in particular
+distributors, for support purposes and for the verification of the upgrade or update right.
+5. No Unbundling The software usually contains a variety of different files which in its
+configuration ensure the complete functionality of the software. The software may be used
+as one product only. It is not required that you use or install all components of the software.
+You must not arrange components of the software in a new way and develop a modified
+version of the software or a new product as a result. The configuration of the software may
+not be modified for the purpose of distribution, assignment or resale.
+
+48
+
+Arturia - User Manual KeyLab Essential mk3 - Software License Agreement
+
+6. Assignment of Rights You may assign all your rights to use the software to another
+person subject to the conditions that (a) you assign to this other person (i) this Agreement
+and (ii) the software or hardware provided with the software, packed or preinstalled
+thereon, including all copies, upgrades, updates, backup copies and previous versions,
+which granted a right to an update or upgrade on this software, (b) you do not retain
+upgrades, updates, backup copies und previous versions of this software and (c) the
+recipient accepts the terms and conditions of this Agreement as well as other regulations
+pursuant to which you acquired a valid software license.
+A return of the product due to a failure to accept the terms and conditions of this Agreement,
+e.g. the product activation, shall not be possible following the assignment of rights.
+7. Upgrades and Updates You must have a valid license for the previous or more inferior
+version of the software in order to be allowed to use an upgrade or update for the software.
+Upon transferring this previous or more inferior version of the software to third parties the
+right to use the upgrade or update of the software shall expire.
+The acquisition of an upgrade or update does not in itself confer any right to use the
+software.
+The right of support for the previous or inferior version of the software expires upon the
+installation of an upgrade or update.
+8. Limited Warranty Arturia warrants that the disks on which the software is furnished is
+free from defects in materials and workmanship under normal use for a period of thirty (30)
+days from the date of purchase. Your receipt shall be evidence of the date of purchase. Any
+implied warranties on the software are limited to thirty (30) days from the date of purchase.
+Some states do not allow limitations on duration of an implied warranty, so the above
+limitation may not apply to you. All programs and accompanying materials are provided “as
+is” without warranty of any kind. The complete risk as to the quality and performance of the
+programs is with you. Should the program prove defective, you assume the entire cost of all
+necessary servicing, repair or correction.
+9. Remedies Arturia's entire liability and your exclusive remedy shall be at Arturia's option
+either (a) return of the purchase price or (b) replacement of the disk that does not meet the
+Limited Warranty and which is returned to Arturia with a copy of your receipt. This limited
+Warranty is void if failure of the software has resulted from accident, abuse, modification,
+or misapplication. Any replacement software will be warranted for the remainder of the
+original warranty period or thirty (30) days, whichever is longer.
+10. No other Warranties The above warranties are in lieu of all other warranties, expressed
+or implied, including but not limited to, the implied warranties of merchantability and fitness
+for a particular purpose. No oral or written information or advice given by Arturia, its dealers,
+distributors, agents or employees shall create a warranty or in any way increase the scope
+of this limited warranty.
+11. No Liability for Consequential Damages Neither Arturia nor anyone else involved in
+the creation, production, or delivery of this product shall be liable for any direct, indirect,
+consequential, or incidental damages arising out of the use of, or inability to use this product
+(including without limitation, damages for loss of business profits, business interruption,
+loss of business information and the like) even if Arturia was previously advised of the
+possibility of such damages. Some states do not allow limitations on the length of an implied
+warranty or the exclusion or limitation of incidental or 0consequential damages, so the
+above limitation or exclusions may not apply to you. This warranty gives you specific legal
+rights, and you may also have other rights which vary from state to state.
+
+Arturia - User Manual KeyLab Essential mk3 - Software License Agreement
+
+49
+
+

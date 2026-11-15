@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "device": {
+    "id": "mvave-smc-pad-pocket",
+    "manufacturer": "M-VAVE",
+    "model": "SMC-PAD Pocket",
+    "category": "portable MIDI pad controller",
+    "repository_root": "src/midi-controllers/mvave-smc-pad-pocket"
+  },
+  "manual_sources": [
+    {
+      "id": "smc-pad-pocket-manual",
+      "local_pdf": "../manual/source/SMC-PAD-POCKET.pdf",
+      "extracted_text": "../manual/extracted/SMC-PAD-POCKET.txt"
+    }
+  ],
+  "capabilities": {
+    "audio": {
+      "source_refs": [
+        { "source_id": "smc-pad-pocket-manual", "pdf_pages": [1, 6] }
+      ],
+      "generates_audio": false,
+      "audio_inputs": [],
+      "audio_outputs": [],
+      "note": "The SMC-PAD Pocket sends MIDI only and has no documented audio output."
+    },
+    "midi": {
+      "source_refs": [
+        { "source_id": "smc-pad-pocket-manual", "pdf_pages": [1, 2, 4, 5, 7] }
+      ],
+      "ports": [
+        {
+          "name": "USB-C MIDI",
+          "connector": "USB-C",
+          "direction": "out",
+          "protocol": "class-compliant USB MIDI",
+          "host_required": true
+        },
+        {
+          "name": "BLE MIDI",
+          "connector": "Bluetooth",
+          "direction": "out",
+          "protocol": "BLE MIDI",
+          "host_required": true
+        },
+        {
+          "name": "optional wireless MIDI OUT",
+          "connector": "optional five-pin wireless MIDI adapter A",
+          "direction": "out",
+          "protocol": "wireless MIDI",
+          "host_required": false,
+          "constraint": "when connected to the five-pin adapter, the controller cannot connect to another host"
+        }
+      ],
+      "messages": [
+        "pad note data",
+        "CC toggle or momentary CC assignments",
+        "program changes",
+        "custom SysEx assignments",
+        "aftertouch when enabled"
+      ]
+    },
+    "controls": {
+      "source_refs": [
+        { "source_id": "smc-pad-pocket-manual", "pdf_pages": [2, 3, 4, 5] }
+      ],
+      "surface": [
+        "16 RGB velocity-sensitive and aftertouch pads",
+        "four factory startup presets",
+        "seven banks of 16 pads, for 112 note positions",
+        "note repeat with rate, tempo, swing, external sync, and latch"
+      ],
+      "configuration_limit": "manual documents mapping changes through MIDI Suite desktop or mobile software"
+    },
+    "power": {
+      "source_refs": [
+        { "source_id": "smc-pad-pocket-manual", "pdf_pages": [1, 2, 6] }
+      ],
+      "power_modes": ["internal battery", "USB bus power"]
+    }
+  },
+  "connection_rules": [
+    {
+      "id": "smc-pad-pocket-no-wired-midi-out",
+      "rule": "The stored manual documents USB-C, BLE, and optional wireless five-pin MIDI output, but no wired physical MIDI OUT jack. A direct cable connection to the XPS-30 MIDI IN is not documented.",
+      "source_refs": [
+        { "source_id": "smc-pad-pocket-manual", "pdf_pages": [1, 2, 6] }
+      ]
+    },
+    {
+      "id": "smc-pad-pocket-adapter-exclusive",
+      "rule": "Using the optional five-pin wireless MIDI adapter is mutually exclusive with connection to another host. Choose and document one destination before a performance.",
+      "source_refs": [
+        { "source_id": "smc-pad-pocket-manual", "pdf_pages": [1] }
+      ]
+    },
+    {
+      "id": "smc-pad-pocket-needs-sound-source",
+      "rule": "The SMC-PAD Pocket has no sound engine or audio output. A connected DAW, sampler, or synth must provide the sound and its own audio route.",
+      "source_refs": [
+        { "source_id": "smc-pad-pocket-manual", "pdf_pages": [1, 6] }
+      ]
+    }
+  ],
+  "roles": [
+    "compact USB or BLE pad controller for a host",
+    "wireless pad controller for a hardware MIDI-IN target through the optional adapter",
+    "sample, clip, and scene trigger surface"
+  ],
+  "unknowns": [
+    "The manual does not document a Linux BLE setup or a native Linux mapping editor.",
+    "Record optional adapter model, target, and observed connection behavior when used."
+  ]
+}

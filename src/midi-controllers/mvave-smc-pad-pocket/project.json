@@ -1,0 +1,19 @@
+{
+  "project": {
+    "name": "M-VAVE SMC-PAD Pocket Study and Setup Plan",
+    "objective": "Create a reproducible knowledge base and operating setup for the M-VAVE SMC-PAD Pocket."
+  },
+  "device": {
+    "manufacturer": "M-VAVE",
+    "model": "SMC-PAD Pocket",
+    "category": "ultra-portable wireless MIDI pad controller"
+  },
+  "goals": [
+    "Understand every physical control and operating mode.",
+    "Build reliable wired USB workflows before BLE MIDI.",
+    "Document host endpoints, mappings, presets, and firmware state.",
+    "Prefer Linux-native configuration and preserve editor-dependent settings."
+  ],
+  "documentation_root": "src/midi-controllers/mvave-smc-pad-pocket",
+  "status": "starter"
+}
